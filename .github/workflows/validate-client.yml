@@ -15,9 +15,13 @@ jobs:
             uses: actions/setup-node@v4
             with:
               node-version: 18
+
+          - name: Setup Yarn
+            run: npm install -g yarn@1.22.19
     
           - name: 📥 Download deps
-            run: npm install -g yarn@1.22.19
+            run: yarn
+            working-directory: apps/client
     
           - name: 🔬 Lint
             run: yarn lint
@@ -35,8 +39,12 @@ jobs:
             with:
                 node-version: 18
     
-          - name: 📥 Download deps
+          - name: Setup Yarn
             run: npm install -g yarn@1.22.19
+        
+          - name: 📥 Download deps
+            run: yarn
+            working-directory: apps/client
     
           - name: 🔎 Type check
             run: yarn types:check
