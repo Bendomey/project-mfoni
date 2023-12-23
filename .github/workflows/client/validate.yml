@@ -1,0 +1,41 @@
+name: Lint and types Check
+
+on:
+    workflow_call:
+
+jobs:
+    lint:
+        name: ⬣ ESLint
+        runs-on: ubuntu-latest
+        steps:
+          - name: ⬇️ Checkout repo
+            uses: actions/checkout@v4
+    
+          - name: ⎔ Setup node
+            uses: actions/setup-node@v4
+            with:
+              node-version: 18
+    
+          - name: 📥 Download deps
+            uses: bahmutov/npm-install@v1
+    
+          - name: 🔬 Lint
+            run: npm run lint --silent
+
+    typecheck:
+        name: ʦ TypeScript
+        runs-on: ubuntu-latest
+        steps:
+          - name: ⬇️ Checkout repo
+            uses: actions/checkout@v4
+    
+          - name: ⎔ Setup node
+            uses: actions/setup-node@v4
+            with:
+                node-version: 18
+    
+          - name: 📥 Download deps
+            uses: bahmutov/npm-install@v1
+    
+          - name: 🔎 Type check
+            run: npm run types:check --silent

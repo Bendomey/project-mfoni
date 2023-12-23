@@ -15,10 +15,10 @@
     "dev": "remix dev --manual",
     "start": "remix-serve build/index.js",
     "test": "jest",
-    "lint": "eslint --cache --cache-location ./node_modules/.cache/.eslintcache --ext js,jsx,ts,tsx .",
+    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "format": "prettier --write \"**/*.+(js|jsx|json|yml|yaml|css|less|scss|ts|tsx|md|gql|graphql|mdx|vue)\"",
     "types:check": "tsc -b .",
-    "validate": "yarn test --silent -- --watch=false && yarn lint --silent && yarn types:check --silent"
+    "validate": "yarn test --silent -- --watch=false && yarn lint && yarn types:check"
   },
   "keywords": [
     "experimental",

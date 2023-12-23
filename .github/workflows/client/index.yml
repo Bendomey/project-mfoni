@@ -1,0 +1,17 @@
+name: Client CI
+
+on:
+  push:
+    branches:
+      - main
+      - prod
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code-checks:
+    uses: ./.github/workflows/validate-client.yml
