@@ -20,7 +20,7 @@ jobs:
             uses: bahmutov/npm-install@v1
     
           - name: 🔬 Lint
-            run: npm run lint --silent
+            run: cd apps/client && npm run lint
 
     typecheck:
         name: ʦ TypeScript
@@ -38,4 +38,4 @@ jobs:
             uses: bahmutov/npm-install@v1
     
           - name: 🔎 Type check
-            run: npm run types:check --silent
+            run: cd apps/client && npm run types:check
