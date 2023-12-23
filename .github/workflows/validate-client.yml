@@ -17,10 +17,11 @@ jobs:
               node-version: 18
     
           - name: 📥 Download deps
-            uses: bahmutov/npm-install@v1
+            run: npm install -g yarn@1.22.19
     
           - name: 🔬 Lint
-            run: cd apps/client && npm run lint
+            run: yarn lint
+            working-directory: apps/client
 
     typecheck:
         name: ʦ TypeScript
@@ -35,7 +36,8 @@ jobs:
                 node-version: 18
     
           - name: 📥 Download deps
-            uses: bahmutov/npm-install@v1
+            run: npm install -g yarn@1.22.19
     
           - name: 🔎 Type check
-            run: cd apps/client && npm run types:check
+            run: yarn types:check
+            working-directory: apps/client
