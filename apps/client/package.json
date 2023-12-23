@@ -1,0 +1,51 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "private": true,
+  "sideEffects": false,
+  "description": "Where all users interact with the system.",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf ./node_modules/.cache ./build ./public/build",
+    "prebuild": "yarn clean && echo All clean ✨",
+    "build": "remix build",
+    "dev": "remix dev --manual",
+    "start": "remix-serve build/index.js",
+    "test": "jest",
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/.eslintcache --ext js,jsx,ts,tsx .",
+    "format": "prettier --write \"**/*.+(js|jsx|json|yml|yaml|css|less|scss|ts|tsx|md|gql|graphql|mdx|vue)\"",
+    "types:check": "tsc -b .",
+    "validate": "yarn test --silent -- --watch=false && yarn lint --silent && yarn types:check --silent"
+  },
+  "keywords": [
+    "experimental",
+    "remix"
+  ],
+  "author": "Domey Benjamin<domeybenjamin1@gmail.com>,Fiifi Arkhurst<fiiarkhurst@gmail.com>,Edward Adjei",
+  "license": "ISC",
+  "dependencies": {
+    "@remix-run/css-bundle": "2.4.1",
+    "@remix-run/node": "2.4.1",
+    "@remix-run/react": "2.4.1",
+    "@remix-run/serve": "2.4.1",
+    "isbot": "3.6.8",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "2.4.1",
+    "@types/node": "20.10.5",
+    "@types/react": "18.2.45",
+    "@types/react-dom": "18.2.18",
+    "eslint": "8.56.0",
+    "eslint-config-kentcdodds": "20.5.0",
+    "prettier": "3.1.1",
+    "prettier-plugin-tailwindcss": "0.5.9",
+    "rimraf": "5.0.1",
+    "tailwindcss": "3.4.0",
+    "typescript": "5.3.3"
+  }
+}
