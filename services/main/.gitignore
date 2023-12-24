@@ -17,6 +17,8 @@ nupkg/
 # Fleet
 .fleet/
 
+.envrc
+
 # Code Rush
 .cr/
 
