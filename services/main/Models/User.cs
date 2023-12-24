@@ -21,6 +21,9 @@ public class User
 
     public string? UserPhoto { get; set; }
 
+    [BsonElement("creator_application_id")]
+    public ObjectId? CreatorApplicationId { get; set; } // only set after user is approved as creator
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
