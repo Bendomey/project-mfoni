@@ -97,7 +97,7 @@
     "@aws-sdk/util-utf8-browser" "^3.0.0"
     tslib "^1.11.1"
 
-"@aws-sdk/client-rekognition@^3.478.0":
+"@aws-sdk/client-rekognition@3.478.0":
   version "3.478.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/client-rekognition/-/client-rekognition-3.478.0.tgz#64b8a1442a0ec43d172e734cd3f080c123f76d75"
   integrity sha512-rxy4SOrn712awivrQJwS9n4v16OflFhOq3s51v+c1ky8GKvN+L0De2aBmNQuPkGftZy4eJ5oDHNEnkr0XokvuQ==
