@@ -9,8 +9,10 @@ public class Tag
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId Id { get; set; }
 
+    [BsonElement("name")]
     public required string Name { get; set; }
 
+    [BsonElement("description")]
     public string? Description { get; set; }
 
     [BsonElement("created_at")]

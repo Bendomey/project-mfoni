@@ -2,6 +2,8 @@ using main.DTOs;
 using main.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Text;
+using RabbitMQ.Client;
 
 namespace main.Domains;
 
@@ -10,14 +12,37 @@ public class IndexContent
 
     private readonly ILogger<IndexContent> _logger;
     private readonly IMongoCollection<Content> _contentsCollection;
+    private readonly RabbitMQConnection _rabbitMqConfiguration;
 
-    public IndexContent(ILogger<IndexContent> logger,  IOptions<DatabaseSettings> bookStoreDatabaseSettings,  IOptions<AppConstants> appConstants)
+    public IndexContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> bookStoreDatabaseSettings, IOptions<AppConstants> appConstants, IOptions<RabbitMQConnection> rabbitMQConnection)
     {
         _logger = logger;
+
+        _contentsCollection = connectToDatabase(bookStoreDatabaseSettings, appConstants);
+
+        _rabbitMqConfiguration = rabbitMQConnection.Value;
+
+        _logger.LogDebug("IndexContentService initialized");
+    }
+
+    private IMongoCollection<Content> connectToDatabase(IOptions<DatabaseSettings> bookStoreDatabaseSettings, IOptions<AppConstants> appConstants)
+    {
         var client = new MongoClient(bookStoreDatabaseSettings.Value.ConnectionString);
         var database = client.GetDatabase(bookStoreDatabaseSettings.Value.DatabaseName);
-        _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
-        _logger.LogDebug("IndexContentService initialized");
+        return database.GetCollection<Content>(appConstants.Value.ContentCollection);
+    }
+
+    private IConnection CreateChannel()
+    {
+        ConnectionFactory connection = new ConnectionFactory()
+        {
+            UserName = _rabbitMqConfiguration.UserName,
+            Password = _rabbitMqConfiguration.Password,
+            HostName = _rabbitMqConfiguration.HostName
+        };
+        connection.DispatchConsumersAsync = true;
+        var channel = connection.CreateConnection();
+        return channel;
     }
 
     public string Index()
@@ -26,7 +51,7 @@ public class IndexContent
     }
 
 
-    public async Task<bool> Save(SaveMedia[] mediaInput)
+    public async Task<List<Content>> Save(SaveMedia[] mediaInput)
     {
         var contents = mediaInput.Select(media => new Content
         {
@@ -37,7 +62,32 @@ public class IndexContent
 
         await _contentsCollection.InsertManyAsync(contents);
 
-        // TODO: push to queue for image processing
-        return true;
+        // push to queue for image processing
+        using var connection = CreateChannel();
+        using var channel = connection.CreateModel();
+
+        channel.QueueDeclare(
+            queue: "v1.mfoni.process-media",
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
+            arguments: null
+        );
+
+        contents.ToList().ForEach(content =>
+        {
+            _logger.LogInformation($"Sending message to queue: {content.Id}", content.Id);
+            string message = content.Id.ToString();
+            var body = Encoding.UTF8.GetBytes(message);
+
+            channel.BasicPublish(
+                exchange: "",
+                routingKey: "v1.mfoni.process-media",
+                basicProperties: null,
+                body: body
+            );
+        });
+ 
+        return contents.ToList();
     }
 }

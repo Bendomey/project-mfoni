@@ -6,6 +6,7 @@ namespace main.Models;
 public class RekognitionMetaData
 {
 
+    [BsonElement("status")]
     public required string Status { get; set; } = "PENDING"; // PENDING, INDEXED, NOT_INDEXED, FAILED
     
     [BsonElement("error_details")]

@@ -5,12 +5,13 @@ namespace main.Models;
 
 public class Content
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
+    [BsonElement("_id")]
     public ObjectId Id { get; set; }
     
+    [BsonElement("type")]
     public string Type { get; set; } = "IMAGE"; // IMAGE | VIDEO
 
+    [BsonElement("status")]
     public string Status { get; set; } = "PROCESSING"; // PROCESSING | DONE
     
     [BsonElement("rejected_at")]
@@ -19,13 +20,16 @@ public class Content
     [BsonElement("done_at")]
     public DateTime? DoneAt { get; set; }
 
+    [BsonElement("visibility")]
     public string Visibility { get; set; } = "PUBLIC"; // PUBLIC | PRIVATE
 
+    [BsonElement("amount")]
     public int Amount { get; set; } = 0; // Pesewas equivalent. 0 for free
 
     [BsonElement("rekognition_metadata")]
     public RekognitionMetaData? RekognitionMetaData { get; set; }
 
+    [BsonElement("media")]
     public required S3MetaData Media { get; set; }
 
     [BsonElement("blurred_media")]

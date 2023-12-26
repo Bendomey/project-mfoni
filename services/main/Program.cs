@@ -8,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<DatabaseSettings>(
     builder.Configuration.GetSection("Database"));
 
+builder.Services.Configure<RabbitMQConnection>(
+    builder.Configuration.GetSection("RabbitMQConnection"));
+
 builder.Services.Configure<AppConstants>(
     builder.Configuration.GetSection("AppConstants"));
 

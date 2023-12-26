@@ -9,8 +9,10 @@ public class Admin
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId Id { get; set; }
 
+    [BsonElement("name")]
     public required string Name { get; set; }
 
+    [BsonElement("email")]
     public required string Email { get; set; }
 
     public required string Password { get; set; }

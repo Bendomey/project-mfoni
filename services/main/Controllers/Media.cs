@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using main.Domains;
+using main.Models;
 using main.DTOs;
 
 namespace main.Controllers;
@@ -19,9 +20,8 @@ public class MediaController : ControllerBase
     }
 
     [HttpPost("")]
-    public async Task<bool> Save(SaveMedia[] mediaInput)
+    public async Task<List<Content>> Save(SaveMedia[] mediaInput)
     {
-        _logger.LogInformation("Saving media");
         return await _indexContentService.Save(mediaInput);
     }
 
