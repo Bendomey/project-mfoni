@@ -9,9 +9,9 @@ public class Content
     [BsonRepresentation(BsonType.ObjectId)]
     public ObjectId Id { get; set; }
     
-    public required string Type { get; set; } = "IMAGE"; // IMAGE | VIDEO
+    public string Type { get; set; } = "IMAGE"; // IMAGE | VIDEO
 
-    public required string Status { get; set; } = "PROCESSING"; // PROCESSING | REJECTED | DONE
+    public string Status { get; set; } = "PROCESSING"; // PROCESSING | DONE
     
     [BsonElement("rejected_at")]
     public DateTime? RejectedAt { get; set; }
@@ -19,12 +19,12 @@ public class Content
     [BsonElement("done_at")]
     public DateTime? DoneAt { get; set; }
 
-    public required string Visibility { get; set; } = "PUBLIC"; // PUBLIC | PRIVATE
+    public string Visibility { get; set; } = "PUBLIC"; // PUBLIC | PRIVATE
 
-    public required int Amount { get; set; } = 0; // Pesewas equivalent. 0 for free
+    public int Amount { get; set; } = 0; // Pesewas equivalent. 0 for free
 
     [BsonElement("rekognition_metadata")]
-    public required RekognitionMetaData RekognitionMetaData { get; set; }
+    public RekognitionMetaData? RekognitionMetaData { get; set; }
 
     public required S3MetaData Media { get; set; }
 
@@ -38,7 +38,7 @@ public class Content
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [BsonElement("created_by_id")]
-    public required ObjectId CreatedById { get; set; }
+    public ObjectId? CreatedById { get; set; }
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; }  = DateTime.UtcNow;
