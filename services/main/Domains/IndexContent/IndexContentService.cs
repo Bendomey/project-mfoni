@@ -19,20 +19,21 @@ public class IndexContent
     {
         _logger = logger;
 
-        _contentsCollection = connectToDatabase(bookStoreDatabaseSettings, appConstants);
+        var database = connectToDatabase(bookStoreDatabaseSettings);
+
+        _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
 
         _rabbitMqConfiguration = rabbitMQConnection.Value;
-        
+
         _appConstantsConfiguration = appConstants.Value;
 
         _logger.LogDebug("IndexContentService initialized");
     }
 
-    private IMongoCollection<Content> connectToDatabase(IOptions<DatabaseSettings> bookStoreDatabaseSettings, IOptions<AppConstants> appConstants)
+    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> bookStoreDatabaseSettings)
     {
         var client = new MongoClient(bookStoreDatabaseSettings.Value.ConnectionString);
-        var database = client.GetDatabase(bookStoreDatabaseSettings.Value.DatabaseName);
-        return database.GetCollection<Content>(appConstants.Value.ContentCollection);
+        return client.GetDatabase(bookStoreDatabaseSettings.Value.DatabaseName);
     }
 
     private IConnection CreateChannel()
@@ -54,16 +55,23 @@ public class IndexContent
     }
 
 
-    public async Task<List<Content>> Save(SaveMedia[] mediaInput)
+    public List<Content> Save(SaveMedia[] mediaInput)
     {
-        var contents = mediaInput.Select(media => new Content
-        {
-            Visibility = media.Visibility,
-            Amount = Convert.ToInt32(media.Amount * 100),
-            Media = media.Content,
-        });
+        List<Content> contents = [];
 
-        await _contentsCollection.InsertManyAsync(contents);
+        mediaInput.ToList().ForEach(media =>
+        {
+            var content = new Content
+            {
+                Visibility = media.Visibility,
+                Amount = Convert.ToInt32(media.Amount * 100),
+                Media = media.Content,
+            };
+
+            _contentsCollection.InsertOne(content);
+
+            contents.Add(content);
+        });
 
         // push to queue for image processing
         using var connection = CreateChannel();
@@ -80,7 +88,7 @@ public class IndexContent
         contents.ToList().ForEach(content =>
         {
             _logger.LogInformation($"Sending message to queue: {content.Id}", content.Id);
-            string message = content.Id.ToString();
+            string message = content.Id;
             var body = Encoding.UTF8.GetBytes(message);
 
             channel.BasicPublish(
@@ -90,7 +98,7 @@ public class IndexContent
                 body: body
             );
         });
- 
-        return contents.ToList();
+
+        return contents;
     }
 }

@@ -12,17 +12,16 @@ public class MediaController : ControllerBase
     private readonly ILogger<MediaController> _logger;
     private readonly IndexContent _indexContentService;
 
-
     public MediaController(ILogger<MediaController> logger, IndexContent indexContentService)
     {
         _logger = logger;
         _indexContentService = indexContentService;
     }
 
-    [HttpPost("")]
-    public async Task<List<Content>> Save(SaveMedia[] mediaInput)
+    [HttpPost]
+    public List<Content> Save(SaveMedia[] mediaInput)
     {
-        return await _indexContentService.Save(mediaInput);
+        return _indexContentService.Save(mediaInput);
     }
 
     [HttpGet("{id:required}")]

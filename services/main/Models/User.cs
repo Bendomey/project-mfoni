@@ -7,7 +7,7 @@ public class User
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public ObjectId Id { get; set; }
+    public string Id { get; set; } = null!;
 
     [BsonElement("role")]
     public required string Role { get; set; } = "CLIENT"; // CLIENT | CREATOR

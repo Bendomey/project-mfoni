@@ -220,7 +220,10 @@ public class ProcessIndexContent
             .Set(r => r.RekognitionMetaData, new RekognitionMetaData
             {
                 Status = "NOT_INDEXED",
-                ErrorDetails = "{\"message\": \"{message}\"}".Replace("{message}", message),
+                ErrorDetails = new RekognitionMetaDataErrorDetails
+                {
+                    Message = message,
+                }
             })
             .Set(r => r.Status, "DONE");
         await _contentsCollection.UpdateOneAsync(filter, updates);

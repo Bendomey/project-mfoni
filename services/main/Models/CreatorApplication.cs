@@ -7,7 +7,7 @@ public class CreatorApplication
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public ObjectId Id { get; set; }
+    public string Id { get; set; } = null!;
 
     [BsonElement("status")]
     public required string Status { get; set; } = "PENDING"; // PENDING | REJECTED | APPROVED

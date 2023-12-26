@@ -7,7 +7,6 @@ public class Content
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-
     public string Id { get; set; } = null!;
     
     [BsonElement("type")]

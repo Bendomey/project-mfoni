@@ -10,9 +10,6 @@ public class AppConstants
     public string CreatorApplicatonCollection { get; set; } = null!;
     public string TagCollection { get; set; } = null!;
     public string BucketName { get; set; } = null!;
-    public string AWSRegion { get; set; } = null!;
-    public string AWSAccessKey { get; set; } = null!;
-    public string AWSSecretKey { get; set; } = null!;
     public string AWSRekognitionCollection { get; set; } = null!;
     public string ProcessImageQueueName { get; set; } = null!;
 

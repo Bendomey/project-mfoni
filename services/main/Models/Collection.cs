@@ -7,7 +7,7 @@ public class Collection
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public ObjectId Id { get; set; }
+    public string Id { get; set; } = null!;
 
     [BsonElement("name")]
     public required string Name { get; set; }
