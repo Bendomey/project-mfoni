@@ -5,8 +5,14 @@ namespace main.Models;
 
 public class S3MetaData
 {
+    public required string Location { get; set; }
 
-    public required string URL { get; set; }
+    public required string ETag { get; set; }
 
-    // TODO: Cross check with api docs and see what kind of data is returned
+    public required string Key { get; set; }
+
+    public required string ServerSideEncryption { get; set; }
+
+    public required string Bucket { get; set; }
+
 }
