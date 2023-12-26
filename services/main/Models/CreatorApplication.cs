@@ -7,8 +7,9 @@ public class CreatorApplication
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public ObjectId Id { get; set; }
+    public string Id { get; set; } = null!;
 
+    [BsonElement("status")]
     public required string Status { get; set; } = "PENDING"; // PENDING | REJECTED | APPROVED
     
     [BsonElement("rejected_at")]
@@ -23,10 +24,13 @@ public class CreatorApplication
     [BsonElement("approved_by_id")] // an admin
     public ObjectId? ApprovedById { get; set; }
 
+    [BsonElement("platform_aggrement_form")]
     public required S3MetaData PlatformAggrementForm { get; set; }
 
+    [BsonElement("ghana_card_front")]
     public required S3MetaData GhanaCardFront { get; set; }
 
+    [BsonElement("ghana_card_back")]
     public required S3MetaData GhanaCardBack { get; set; }
 
     [BsonElement("created_at")]

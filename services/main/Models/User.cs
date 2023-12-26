@@ -7,18 +7,24 @@ public class User
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public ObjectId Id { get; set; }
+    public string Id { get; set; } = null!;
 
+    [BsonElement("role")]
     public required string Role { get; set; } = "CLIENT"; // CLIENT | CREATOR
 
+    [BsonElement("type")]
     public required string Type { get; set; } // FB | Twitter | Google
 
+    [BsonElement("social_id")]
     public string? SocialId { get; set; } // if social returns an id.
 
+    [BsonElement("name")]
     public required string Name { get; set; }
 
+    [BsonElement("email")]
     public required string Email { get; set; }
 
+    [BsonElement("user_photo")]
     public string? UserPhoto { get; set; }
 
     [BsonElement("creator_application_id")]

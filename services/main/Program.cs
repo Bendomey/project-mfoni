@@ -1,8 +1,24 @@
 using Microsoft.OpenApi.Models;
+using main.Domains;
+using main.HostedServices;
+using main.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<DatabaseSettings>(
+    builder.Configuration.GetSection("Database"));
+
+builder.Services.Configure<RabbitMQConnection>(
+    builder.Configuration.GetSection("RabbitMQConnection"));
+
+builder.Services.Configure<AppConstants>(
+    builder.Configuration.GetSection("AppConstants"));
+
+builder.Services.AddSingleton<IndexContent>();
+builder.Services.AddSingleton<ProcessIndexContent>();
+
+builder.Services.AddHostedService<ConsumerHostedService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

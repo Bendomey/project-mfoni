@@ -7,10 +7,12 @@ public class Tag
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public ObjectId Id { get; set; }
+    public string Id { get; set; } = null!;
 
+    [BsonElement("name")]
     public required string Name { get; set; }
 
+    [BsonElement("description")]
     public string? Description { get; set; }
 
     [BsonElement("created_at")]

@@ -7,10 +7,12 @@ public class Admin
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public ObjectId Id { get; set; }
+    public string Id { get; set; } = null!;
 
+    [BsonElement("name")]
     public required string Name { get; set; }
 
+    [BsonElement("email")]
     public required string Email { get; set; }
 
     public required string Password { get; set; }
