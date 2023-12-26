@@ -1,6 +1,6 @@
+using main.Configuratons;
 using main.Models;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -34,6 +34,15 @@ public class ProcessIndexContent
         var _connection = CreateChannel();
 
         _model = _connection.CreateModel();
+
+        // create queue if it does not exist.
+        _model.QueueDeclare(
+            queue: _appConstantsConfiguration.ProcessImageQueueName,
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
+            arguments: null
+        );
 
         _rekognitionClient = new AmazonRekognitionClient();
 

@@ -1,7 +1,7 @@
 using Microsoft.OpenApi.Models;
 using main.Domains;
 using main.HostedServices;
-using main.Models;
+using main.Configuratons;
 
 var builder = WebApplication.CreateBuilder(args);
 

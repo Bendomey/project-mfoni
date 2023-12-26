@@ -1,4 +1,4 @@
-namespace main.Models;
+namespace main.Configuratons;
 
 public class AppConstants
 {
