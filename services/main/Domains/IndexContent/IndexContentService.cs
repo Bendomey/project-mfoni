@@ -93,7 +93,7 @@ public class IndexContent
 
             channel.BasicPublish(
                 exchange: "",
-                routingKey: "v1.mfoni.process-media",
+                routingKey: _appConstantsConfiguration.ProcessImageQueueName,
                 basicProperties: null,
                 body: body
             );
