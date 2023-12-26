@@ -5,8 +5,10 @@ namespace main.Models;
 
 public class Content
 {
-    [BsonElement("_id")]
-    public ObjectId Id { get; set; }
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+
+    public string Id { get; set; } = null!;
     
     [BsonElement("type")]
     public string Type { get; set; } = "IMAGE"; // IMAGE | VIDEO

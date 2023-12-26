@@ -67,9 +67,11 @@ public class ProcessIndexContent
         {
             var body = ea.Body.ToArray();
             var contentId = System.Text.Encoding.UTF8.GetString(body);
+            _logger.LogInformation($"Processing:ContentId:{contentId}");
             await ProcessMessage(contentId);
+            _logger.LogInformation($"Processed:ContentId:{contentId}");
             await Task.CompletedTask;
-            _model.BasicAck(ea.DeliveryTag, false);
+            _model.BasicAck(ea.DeliveryTag, true);
         };
 
         _model.BasicConsume(_appConstantsConfiguration.ProcessImageQueueName, false, consumer);
@@ -80,10 +82,10 @@ public class ProcessIndexContent
     {
         var content = await GetContent(contentId);
 
-        if(content == null)
+        if (content == null)
         {
             // TODO  : send to sentry for triaging :)
-            _logger.LogError($"Content with id {contentId} not found");
+            _logger.LogError($"Content with id:{contentId} not found");
             return;
         }
 
@@ -93,32 +95,42 @@ public class ProcessIndexContent
             var detectFacesResponse = await DetectFaces(content);
 
             var faceDetailsLength = detectFacesResponse.FaceDetails.Count;
+            _logger.LogInformation($"facesDetected: {faceDetailsLength}");
 
             if (faceDetailsLength == 0)
             {
-                await UpdateContentWithNoProcess(content.Id);
+                await UpdateContentWithNoProcess(content.Id, "No faces detected");
 
                 return;
             }
-            else if (faceDetailsLength > 1)
+            else
             {
 
                 // index face
-                var indexFaceResponse = await IndexFace(content);
-
-                var faces = indexFaceResponse.FaceRecords.Select(faceRecord => new RekognitionMetaDataFaceData
+                try
                 {
-                    ImageId = faceRecord.Face.ImageId,
-                    FaceId = faceRecord.Face.FaceId,
-                }).ToArray();
+                    var indexFaceResponse = await IndexFace(content);
 
-                await SaveRekognitionContent(content.Id, faces);
-                return;
+                    var faces = indexFaceResponse.FaceRecords.Select(faceRecord => new RekognitionMetaDataFaceData
+                    {
+                        ImageId = faceRecord.Face.ImageId,
+                        FaceId = faceRecord.Face.FaceId,
+                    }).ToArray();
+                    _logger.LogInformation($"FacesResolved: {faces}");
+
+                    await SaveRekognitionContent(content.Id, faces);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"ErrorIndexing: {ex.Message}");
+                    // TODO: send to sentry for triaging :) 
+                }
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError($"ErrorDetecting: {ex.Message}");
             // TODO: send to sentry for triaging :) 
         }
     }
@@ -172,13 +184,21 @@ public class ProcessIndexContent
 
     private async Task<Content?> GetContent(string contentId)
     {
-        var filter = Builders<Content>.Filter.Eq(r => r.Id.ToString(), contentId);
-        var content = await _contentsCollection.Find(filter).FirstOrDefaultAsync();
+        try
+        {
+            var filter = Builders<Content>.Filter.Eq(r => r.Id, contentId);
+            var content = await _contentsCollection.Find(filter).FirstOrDefaultAsync();
 
-        return content;
+            return content;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            throw;
+        }
     }
 
-    private async Task<bool> SaveRekognitionContent(ObjectId contentId, RekognitionMetaDataFaceData[] faceMetaData)
+    private async Task<bool> SaveRekognitionContent(string contentId, RekognitionMetaDataFaceData[] faceMetaData)
     {
         var filter = Builders<Content>.Filter.Eq(r => r.Id, contentId);
         var updates = Builders<Content>.Update
@@ -193,14 +213,14 @@ public class ProcessIndexContent
         return true;
     }
 
-    private async Task<bool> UpdateContentWithNoProcess(ObjectId contentId)
+    private async Task<bool> UpdateContentWithNoProcess(string contentId, string message)
     {
         var filter = Builders<Content>.Filter.Eq(r => r.Id, contentId);
         var updates = Builders<Content>.Update
             .Set(r => r.RekognitionMetaData, new RekognitionMetaData
             {
                 Status = "NOT_INDEXED",
-                // ErrorDetails = BsonDocument("{\n\t\"message\": \"No faces detected\"\n}")
+                ErrorDetails = "{\"message\": \"{message}\"}".Replace("{message}", message),
             })
             .Set(r => r.Status, "DONE");
         await _contentsCollection.UpdateOneAsync(filter, updates);

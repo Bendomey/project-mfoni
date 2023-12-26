@@ -10,7 +10,7 @@ public class RekognitionMetaData
     public string Status { get; set; } = "PENDING"; // PENDING, INDEXED, NOT_INDEXED, FAILED
     
     [BsonElement("error_details")]
-    public BsonDocument? ErrorDetails { get; set; }
+    public string? ErrorDetails { get; set; }
 
     [BsonElement("face_data")]
     public RekognitionMetaDataFaceData[]? FaceData { get; set; }
