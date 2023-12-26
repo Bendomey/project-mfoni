@@ -16,24 +16,21 @@ terraform {
     bucket                  = "mfoni-terraform-state"
     key                     = "mfoni"
     region                  = "us-east-1"
-    # FIXME: use aws credentials instead of vars
-    secret_key = var.aws_secret_key
-    access_key = var.aws_access_key
+#   Remove before commit
+    secret_key = "pdsFmWuAW4DYjiCR1GJOuRj0NItj0lvMU/mCB8o9"
+    access_key = "AKIAZUIHPYJKJKJMX2ZR"
   }
 }
 
 # Configure the AWS Provider
 provider "aws" {
   region = var.aws_region
-  # FIXME: use aws credentials instead of vars
   secret_key = var.aws_secret_key
   access_key = var.aws_access_key
 }
 
 provider "awscc" {
   region = var.aws_region
-  
-  # FIXME: use aws credentials instead of vars
   secret_key = var.aws_secret_key
   access_key = var.aws_access_key
 }
