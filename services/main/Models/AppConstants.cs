@@ -13,5 +13,7 @@ public class AppConstants
     public string AWSRegion { get; set; } = null!;
     public string AWSAccessKey { get; set; } = null!;
     public string AWSSecretKey { get; set; } = null!;
+    public string AWSRekognitionCollection { get; set; } = null!;
+    public string ProcessImageQueueName { get; set; } = null!;
 
 }

@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using main.Domains;
+using main.HostedServices;
 using main.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,9 @@ builder.Services.Configure<AppConstants>(
     builder.Configuration.GetSection("AppConstants"));
 
 builder.Services.AddSingleton<IndexContent>();
+builder.Services.AddSingleton<ProcessIndexContent>();
+
+builder.Services.AddHostedService<ConsumerHostedService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

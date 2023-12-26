@@ -13,6 +13,7 @@ public class IndexContent
     private readonly ILogger<IndexContent> _logger;
     private readonly IMongoCollection<Content> _contentsCollection;
     private readonly RabbitMQConnection _rabbitMqConfiguration;
+    private readonly AppConstants _appConstantsConfiguration;
 
     public IndexContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> bookStoreDatabaseSettings, IOptions<AppConstants> appConstants, IOptions<RabbitMQConnection> rabbitMQConnection)
     {
@@ -21,6 +22,8 @@ public class IndexContent
         _contentsCollection = connectToDatabase(bookStoreDatabaseSettings, appConstants);
 
         _rabbitMqConfiguration = rabbitMQConnection.Value;
+        
+        _appConstantsConfiguration = appConstants.Value;
 
         _logger.LogDebug("IndexContentService initialized");
     }
@@ -67,7 +70,7 @@ public class IndexContent
         using var channel = connection.CreateModel();
 
         channel.QueueDeclare(
-            queue: "v1.mfoni.process-media",
+            queue: _appConstantsConfiguration.ProcessImageQueueName,
             durable: true,
             exclusive: false,
             autoDelete: false,
