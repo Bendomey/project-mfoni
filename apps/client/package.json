@@ -29,8 +29,8 @@
   "dependencies": {
     "@aws-sdk/client-rekognition": "3.478.0",
     "@aws-sdk/client-s3": "3.478.0",
-    "@headlessui/react": "^1.7.17",
-    "@heroicons/react": "^2.1.1",
+    "@headlessui/react": "1.7.17",
+    "@heroicons/react": "2.1.1",
     "@remix-run/css-bundle": "2.4.1",
     "@remix-run/node": "2.4.1",
     "@remix-run/react": "2.4.1",
@@ -40,15 +40,15 @@
     "isbot": "3.6.8",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-intersection-observer": "^9.5.3",
-    "react-webcam": "^7.2.0"
+    "react-intersection-observer": "9.5.3",
+    "react-webcam": "7.2.0"
   },
   "devDependencies": {
     "@remix-run/dev": "2.4.1",
     "@types/node": "20.10.5",
     "@types/react": "18.2.45",
     "@types/react-dom": "18.2.18",
-    "@types/react-webcam": "^3.0.0",
+    "@types/react-webcam": "3.0.0",
     "eslint": "8.56.0",
     "eslint-config-kentcdodds": "20.5.0",
     "prettier": "3.1.1",
