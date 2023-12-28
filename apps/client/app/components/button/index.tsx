@@ -8,9 +8,10 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
     color?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'info' | 'light' | 'dark' | 'link'
     size?: 'sm' | 'md' | 'lg'
     type?: 'button' | 'submit' | 'reset'
+    externalClassName?: string
 }
 
-export const Button = ({ children, variant: propVariant = "solid", color: propColor = "primary", size: propSize = "md", isLink, type = 'button', ...props }: Props) => {
+export const Button = ({ children, variant: propVariant = "solid", color: propColor = "primary", size: propSize = "md", isLink, type = 'button', externalClassName = '', ...props }: Props) => {
 
     const getSize = useCallback(() => {
         if (propSize === 'sm') {
@@ -46,11 +47,11 @@ export const Button = ({ children, variant: propVariant = "solid", color: propCo
 
     const getVariantClassName = useCallback((color: string, size: string) => {
         if (propVariant === 'outline') {
-            return `rounded-md bg-white ${size} font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50`
+            return `rounded-md bg-white ${size} font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50`
         } else if (propVariant === 'solid') {
-            return `rounded-md bg-${color}-600 ${size} text-sm font-semibold text-white shadow-sm hover:bg-${color}-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-${color}-600`
+            return `rounded-md bg-${color}-600 ${size} text-sm font-semibold text-white hover:bg-${color}-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-${color}-600`
         } else if (propVariant === 'ghost') {
-            return `rounded-md bg-white/10 ${size} text-sm font-semibold text-white shadow-sm hover:bg-white/20`
+            return `rounded-md bg-white/10 ${size} text-sm font-semibold text-white hover:bg-white/20`
         }
 
         return ''
@@ -67,7 +68,7 @@ export const Button = ({ children, variant: propVariant = "solid", color: propCo
         return (
             <Link
                 to={props.href || '/'}
-                className={className}
+                className={`${className} ${externalClassName}`}
             >
                 {children}
             </Link>
@@ -78,7 +79,7 @@ export const Button = ({ children, variant: propVariant = "solid", color: propCo
         <button
             {...props}
             type={type}
-            className={className}
+            className={`${className} ${externalClassName}`}
         >
             {children}
         </button>

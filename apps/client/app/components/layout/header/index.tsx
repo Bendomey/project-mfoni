@@ -4,6 +4,8 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link } from "@remix-run/react";
 import { APP_NAME } from '@/constants/index.ts';
 import { Button } from '@/components/button/index.tsx';
+import { SearchPhotos } from './search/index.tsx';
+import { SearchPhotosForMobile } from './search-for-mobile/index.tsx';
 
 const navigation = [
   { name: 'Explore', href: '/explore' },
@@ -11,18 +13,27 @@ const navigation = [
   { name: 'Log in', href: '/login' },
 ]
 
-export const Header = () => {
+interface Props {
+  isHeroSearchInVisible: boolean
+}
+
+export const Header = ({ isHeroSearchInVisible }: Props) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className="bg-white">
-      <nav className="mx-auto flex max-w-8xl items-center justify-between py-6 lg:px-8" aria-label="Global">
+    <header className={isHeroSearchInVisible ? undefined : "sticky top-0 bg-white"}>
+      <nav className="mx-auto flex max-w-8xl items-center justify-between py-4 px-4 lg:px-8" aria-label="Global">
         <Link to="/" className="-m-1.5 p-1.5">
           <div className='flex flex-row items-end'>
-            <span className="text-4xl text-orange-500 font-extrabold">{APP_NAME.slice(0, 1)}</span>
+            <span className="text-4xl text-blue-700 font-extrabold">{APP_NAME.slice(0, 1)}</span>
             <span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
           </div>
         </Link>
+        <div className='flex-grow mx-8 hidden md:flex'>
+          {
+            isHeroSearchInVisible ? null : <SearchPhotos />
+          }
+        </div>
         <div className="flex lg:hidden">
           <button
             type="button"
@@ -35,24 +46,29 @@ export const Header = () => {
         </div>
         <div className="hidden lg:flex lg:justify-center lg:items-center lg:gap-x-12">
           {navigation.map((item) => (
-            <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-gray-900">
+            <Link key={item.name} to={item.href} className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-900">
               {item.name}
-            </a>
+            </Link>
           ))}
           <Button href='/upload' variant='outline' isLink>Upload a Photo <span aria-hidden="true">&rarr;</span></Button>
         </div>
       </nav>
+      {
+        isHeroSearchInVisible ? null : (
+          <div className='mt-20'>
+            <SearchPhotosForMobile />
+          </div>
+        )
+      }
       <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
         <div className="fixed inset-0 z-10" />
         <Dialog.Panel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
             <Link to="/" className="-m-1.5 p-1.5">
-              <span className="sr-only">{APP_NAME}</span>
-              <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                alt="app logo"
-              />
+              <div className='flex flex-row items-end'>
+                <span className="text-4xl text-blue-500 font-extrabold">{APP_NAME.slice(0, 1)}</span>
+                <span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
+              </div>
             </Link>
             <button
               type="button"
@@ -77,13 +93,7 @@ export const Header = () => {
                 ))}
               </div>
               <div className="py-6">
-
-                <Link
-                  to="/login"
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Log in
-                </Link>
+                <Button href='/upload' variant='outline' size='lg' isLink>Upload a Photo <span aria-hidden="true">&rarr;</span></Button>
               </div>
             </div>
           </div>
