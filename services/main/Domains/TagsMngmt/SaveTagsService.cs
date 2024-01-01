@@ -1,0 +1,66 @@
+using main.Configuratons;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+using MongoDB.Bson;
+using main.DTOs;
+
+namespace main.Domains;
+
+public class SaveTags
+{
+    private readonly ILogger<SaveTags> _logger;
+    private readonly IMongoCollection<Models.Tag> _tagsCollection;
+    private readonly SearchTag _searchTagService;
+
+    public SaveTags(ILogger<SaveTags> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants, SearchTag searchTagService)
+    {
+        _logger = logger;
+
+        var database = connectToDatabase(mfoniStoreDatabaseSettings);
+
+        _tagsCollection = database.GetCollection<Models.Tag>(appConstants.Value.TagCollection);
+
+        _searchTagService = searchTagService;
+
+        _logger.LogDebug("SaveTagsService initialized");
+    }
+
+    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> mfoniStoreDatabaseSettings)
+    {
+        var client = new MongoClient(mfoniStoreDatabaseSettings.Value.ConnectionString);
+        return client.GetDatabase(mfoniStoreDatabaseSettings.Value.DatabaseName);
+    }
+
+    public Models.Tag Create(CreateTagInput tag)
+    {
+        var tagToSave = new Models.Tag
+        {
+            Name = tag.Name,
+            Description = tag.Description
+        };
+        _tagsCollection.InsertOne(tagToSave);
+
+        return tagToSave;
+    }
+
+    public List<Models.Tag> ResolveTags(string[] inputTags)
+    {
+        var tags = new List<Models.Tag>();
+
+        inputTags.ToList().ForEach(tag =>
+        {
+            var existingTag = _searchTagService.GetByName(tag);
+            if (existingTag == null)
+            {
+                var newTag = Create(new CreateTagInput { Name = tag });
+                tags.Add(newTag);
+            }
+            else
+            {
+                tags.Add(existingTag);
+            }
+        });
+
+        return tags;
+    }
+}

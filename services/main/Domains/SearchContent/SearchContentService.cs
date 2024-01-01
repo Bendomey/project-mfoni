@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
-using Microsoft.OpenApi.Any;
 using MongoDB.Bson;
 
 namespace main.Domains;
@@ -14,23 +13,24 @@ public class SearchContent
     private readonly ILogger<IndexContent> _logger;
     private readonly IMongoCollection<Content> _contentsCollection;
     private readonly IMongoCollection<Collection> _collectionsCollection;
+    private readonly SearchTag _searchTagsService;
     private readonly AppConstants _appConstantsConfiguration;
     private readonly AmazonRekognitionClient _rekognitionClient;
 
-    public SearchContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants)
+    public SearchContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants, SearchTag searchTagService)
     {
         _logger = logger;
 
         var database = connectToDatabase(mfoniStoreDatabaseSettings);
 
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
-
         _collectionsCollection = database.GetCollection<Collection>(appConstants.Value.CollectionCollection);
 
         _appConstantsConfiguration = appConstants.Value;
 
         _rekognitionClient = new AmazonRekognitionClient();
 
+        _searchTagsService = searchTagService;
 
         _logger.LogDebug("SearchContentService initialized");
     }
@@ -69,7 +69,7 @@ public class SearchContent
         }
 
         // TODO: implement pagination
-        var contents = await _contentsCollection.Find(filter).ToListAsync();
+        var contents = await _contentsCollection.Find(filter).Skip(0).Limit(10).ToListAsync();
         return contents;
     }
 
@@ -97,6 +97,34 @@ public class SearchContent
             // TODO: send to sentry for triaging :) 
             throw;
         }
-
     }
+
+    public async Task<List<Content>> TextualSearch(string query)
+    {
+        var tags = await _searchTagsService.GetTagsBasedOnQuery(query);
+        if(tags.Count == 0)
+        {
+            return [];
+        }
+
+        FilterDefinitionBuilder<Content> builder = Builders<Content>.Filter;
+        var filter = builder.Empty;
+
+        tags.ToList().ForEach(tag =>
+        {
+            // check if id is in tags
+            var idFilter = builder.AnyIn("tags", tag.Id);
+            filter |= idFilter;
+        });
+
+        if (filter == builder.Empty)
+        {
+            return [];
+        }
+
+        // TODO: implement pagination
+        var contents = await _contentsCollection.Find(filter).Skip(0).Limit(10).ToListAsync();
+        return contents;
+    }
+
 }
