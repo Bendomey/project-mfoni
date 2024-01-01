@@ -43,6 +43,12 @@ if (!app.Environment.IsProduction())
 
 app.UseHttpsRedirection();
 
+// @TODO: secure based on our frontend setup.
+app.UseCors(builder => builder
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
+
 app.UseAuthorization();
 
 app.MapControllers();
