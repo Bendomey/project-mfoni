@@ -16,11 +16,11 @@ public class IndexContent
     private readonly RabbitMQConnection _rabbitMqConfiguration;
     private readonly AppConstants _appConstantsConfiguration;
 
-    public IndexContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> bookStoreDatabaseSettings, IOptions<AppConstants> appConstants, IOptions<RabbitMQConnection> rabbitMQConnection)
+    public IndexContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants, IOptions<RabbitMQConnection> rabbitMQConnection)
     {
         _logger = logger;
 
-        var database = connectToDatabase(bookStoreDatabaseSettings);
+        var database = connectToDatabase(mfoniStoreDatabaseSettings);
 
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
 
@@ -31,10 +31,10 @@ public class IndexContent
         _logger.LogDebug("IndexContentService initialized");
     }
 
-    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> bookStoreDatabaseSettings)
+    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> mfoniStoreDatabaseSettings)
     {
-        var client = new MongoClient(bookStoreDatabaseSettings.Value.ConnectionString);
-        return client.GetDatabase(bookStoreDatabaseSettings.Value.DatabaseName);
+        var client = new MongoClient(mfoniStoreDatabaseSettings.Value.ConnectionString);
+        return client.GetDatabase(mfoniStoreDatabaseSettings.Value.DatabaseName);
     }
 
     private IConnection CreateChannel()
@@ -49,12 +49,6 @@ public class IndexContent
         var channel = connection.CreateConnection();
         return channel;
     }
-
-    public string Index()
-    {
-        return "Hello World!";
-    }
-
 
     public List<Content> Save(SaveMedia[] mediaInput)
     {

@@ -176,7 +176,7 @@ public class ProcessIndexContent
             {
                 "ALL"
             },
-            ExternalImageId = content.Id.ToString(),
+            ExternalImageId = content.Id,
             Image = new Image
             {
                 S3Object = new S3Object
@@ -212,6 +212,8 @@ public class ProcessIndexContent
         var filter = Builders<Content>.Filter.Eq(r => r.Id, contentId);
         var updates = Builders<Content>.Update
             .Set(r => r.Status, "DONE")
+            .Set(r => r.DoneAt, DateTime.Now)
+            .Set(r => r.UpdatedAt, DateTime.Now)
             .Set(r => r.RekognitionMetaData, new RekognitionMetaData
             {
                 Status = "INDEXED",
@@ -234,7 +236,9 @@ public class ProcessIndexContent
                     Message = message,
                 }
             })
-            .Set(r => r.Status, "DONE");
+            .Set(r => r.Status, "DONE")
+            .Set(r => r.DoneAt, DateTime.Now)
+            .Set(r => r.UpdatedAt, DateTime.Now);
         await _contentsCollection.UpdateOneAsync(filter, updates);
         return true;
     }
