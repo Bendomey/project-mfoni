@@ -116,12 +116,7 @@ public class SearchContent
             var idFilter = builder.AnyIn("tags", tag.Id);
             filter |= idFilter;
         });
-
-        if (filter == builder.Empty)
-        {
-            return [];
-        }
-
+        
         // TODO: implement pagination
         var contents = await _contentsCollection.Find(filter).Skip(0).Limit(10).ToListAsync();
         return contents;
