@@ -20,27 +20,28 @@ public class MediaController : ControllerBase
     }
 
     [HttpPost]
-    public List<OutputContent> Save(SaveMedia[] mediaInput)
+    public OutputResponse<List<OutputContent>> Save(SaveMedia[] mediaInput)
     {
         var contents = _indexContentService.Save(mediaInput);
 
-        return contents.Select(content => {
+        var res = contents.Select(content => {
             var outputContent = new GetOutputContent(content);
             return outputContent.Result();
         }).ToList();
+        return new GetEntityResponse<List<OutputContent>>(res, null).Result();
     }
 
     [HttpGet()]
-    public bool Get()
+    public OutputResponse<bool> Get()
     {
         _logger.LogInformation("Getting media");
-        return true;
+        return new GetEntityResponse<bool>(true, null).Result();
     }
 
     [HttpGet("search/visual")]
-    public async Task<List<OutputContent>> VisualSearch([FromForm] IFormFile media)
+    public async Task<OutputResponse<List<OutputContent>>> VisualSearch([FromForm] IFormFile media)
     {
-        _logger.LogInformation("Getting content by visual search");
+        _logger.LogInformation("Getting contents by visual search");
 
         byte[] imageBytes;
         using (var memoryStream = new MemoryStream())
@@ -50,9 +51,26 @@ public class MediaController : ControllerBase
         }
         var contents = await _searchContentService.VisualSearch(imageBytes);
 
-        return contents.Select(content => {
+        var res = contents.Select(content => {
             var outputContent = new GetOutputContent(content);
             return outputContent.Result();
         }).ToList();
+
+        return new GetEntityResponse<List<OutputContent>>(res, null).Result();
+    }
+
+    [HttpGet("search/textual")]
+    public async Task<OutputResponse<List<OutputContent>>> TextualSearch([FromBody] TextualSearchBody body)
+    {
+        _logger.LogInformation("Getting contents by textual search");
+
+        var contents = await _searchContentService.TextualSearch(body.Query);
+
+        var res = contents.Select(content => {
+            var outputContent = new GetOutputContent(content);
+            return outputContent.Result();
+        }).ToList();
+
+        return new GetEntityResponse<List<OutputContent>>(res, null).Result();
     }
 }
