@@ -17,6 +17,7 @@ export const VisualSearch = () => {
             </div>
             <div className="p-3 bg-gray-50 h-[60vh] md:h-[40vh]">
                 <div className=' rounded-md p-1'>
+                    {/* @ts-expect-error - fix webcam types. */}
                     <Webcam className='h-full w-full rounded-lg'>
                         {
                             () => (
