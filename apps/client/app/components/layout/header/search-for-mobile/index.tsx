@@ -76,8 +76,9 @@ export const SearchPhotosForMobile = () => {
                 <Button
                     variant="unstyled"
                     onClick={() => setIsSearchFocused(true)}
-                    externalClassName="block w-full rounded-full text-lg font-medium py-2.5 px-5 text-gray-400 bg-white border border-zinc-400"
+                    externalClassName="block w-full rounded-full text-base flex flex-start items-center font-medium py-2 px-5 text-gray-400 bg-white border border-zinc-400"
                 >
+                    <MagnifyingGlassIcon className="h-5 w-5 mr-3 text-zinc-400" />
                     Search for photos
                 </Button>
             </div>

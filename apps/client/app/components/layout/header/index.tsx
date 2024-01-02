@@ -21,7 +21,7 @@ export const Header = ({ isHeroSearchInVisible }: Props) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className={isHeroSearchInVisible ? undefined : "sticky top-0 bg-white"}>
+    <header className={isHeroSearchInVisible ? undefined : "sticky top-0 z-50 bg-white"}>
       <nav className="mx-auto flex max-w-8xl items-center justify-between py-4 px-4 lg:px-8" aria-label="Global">
         <Link to="/" className="-m-1.5 p-1.5">
           <div className='flex flex-row items-end'>
@@ -33,8 +33,8 @@ export const Header = ({ isHeroSearchInVisible }: Props) => {
           {
             isHeroSearchInVisible ? null : <SearchPhotos />
           }
-        </div>
-        <div className="flex lg:hidden">
+        </div> 
+         <div className="flex lg:hidden">
           <button
             type="button"
             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
@@ -55,7 +55,7 @@ export const Header = ({ isHeroSearchInVisible }: Props) => {
       </nav>
       {
         isHeroSearchInVisible ? null : (
-          <div className='mt-20'>
+          <div className='mx-4 pb-4 md:pb-0'>
             <SearchPhotosForMobile />
           </div>
         )
