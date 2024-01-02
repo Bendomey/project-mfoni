@@ -9,9 +9,9 @@ import {SearchPhotosForMobile} from './search-for-mobile/index.tsx'
 import useScroll from '@/hooks/use-scroll.ts'
 
 const navigation = [
-  {name: 'Explore', href: '/explore'},
-  {name: 'Terms Of Use', href: '/terms'},
-  {name: 'Log in', href: '/login'},
+  { name: 'Explore', href: '/explore' },
+  { name: 'Terms Of Use', href: '/terms' },
+  { name: 'Log in', href: '/auth' },
 ]
 
 interface Props {
