@@ -37,7 +37,7 @@ public class Content
     public S3MetaData? BlurredMedia { get; set; }
 
     [BsonElement("tag_ids")]
-    public List<ObjectId>? Tags { get; set; }
+    public List<string>? Tags { get; set; }
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

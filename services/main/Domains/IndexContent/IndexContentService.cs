@@ -14,13 +14,14 @@ public class IndexContent
     private readonly ILogger<IndexContent> _logger;
     private readonly IMongoCollection<Content> _contentsCollection;
     private readonly RabbitMQConnection _rabbitMqConfiguration;
+    private readonly SaveTags _saveTagsService;
     private readonly AppConstants _appConstantsConfiguration;
 
-    public IndexContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> bookStoreDatabaseSettings, IOptions<AppConstants> appConstants, IOptions<RabbitMQConnection> rabbitMQConnection)
+    public IndexContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants, IOptions<RabbitMQConnection> rabbitMQConnection, SaveTags saveTagsService)
     {
         _logger = logger;
 
-        var database = connectToDatabase(bookStoreDatabaseSettings);
+        var database = connectToDatabase(mfoniStoreDatabaseSettings);
 
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
 
@@ -28,13 +29,15 @@ public class IndexContent
 
         _appConstantsConfiguration = appConstants.Value;
 
+        _saveTagsService = saveTagsService;
+
         _logger.LogDebug("IndexContentService initialized");
     }
 
-    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> bookStoreDatabaseSettings)
+    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> mfoniStoreDatabaseSettings)
     {
-        var client = new MongoClient(bookStoreDatabaseSettings.Value.ConnectionString);
-        return client.GetDatabase(bookStoreDatabaseSettings.Value.DatabaseName);
+        var client = new MongoClient(mfoniStoreDatabaseSettings.Value.ConnectionString);
+        return client.GetDatabase(mfoniStoreDatabaseSettings.Value.DatabaseName);
     }
 
     private IConnection CreateChannel()
@@ -50,23 +53,21 @@ public class IndexContent
         return channel;
     }
 
-    public string Index()
-    {
-        return "Hello World!";
-    }
-
-
     public List<Content> Save(SaveMedia[] mediaInput)
     {
         List<Content> contents = [];
 
         mediaInput.ToList().ForEach(media =>
         {
+            var tags = new List<string>();
+            var dbTags = _saveTagsService.ResolveTags(media.Tags ?? []);
+
             var content = new Content
             {
                 Visibility = media.Visibility,
                 Amount = Convert.ToInt32(media.Amount * 100),
                 Media = media.Content,
+                Tags =  dbTags.Select(tag => tag.Id).ToList()
             };
 
             _contentsCollection.InsertOne(content);
