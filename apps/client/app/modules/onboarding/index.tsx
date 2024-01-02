@@ -1,47 +1,59 @@
 import { Button } from "@/components/button/index.tsx";
 import { APP_NAME } from "@/constants/index.ts";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { Link } from "@remix-run/react";
 import creatorImage from '@/assets/creator.jpg';
-
+import userImage from '@/assets/user.jpeg';
+import { useState } from "react";
 
 export const OnboardingModule = () => {
+    const [selectedType, setSelected] = useState<"USER" | "CREATOR">()
     return (
         <div className="h-screen w-full flex flex-col">
-            <div className="border-b border-zinc-200  px-10 py-5 flex flex-row items-center justify-between">
+            <div className="border-b border-zinc-200 px-5 md:px-10 py-5 flex flex-row items-center justify-between">
                 <Link to="/" className="">
                     <div className='flex flex-row items-end'>
                         <span className="text-4xl text-blue-700 font-extrabold">{APP_NAME.slice(0, 1)}</span>
                         <span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
                     </div>
                 </Link>
-                <Button size="lg" variant="outline" externalClassName="flex flex-row items-center">
-                    Continue <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
-                </Button>
+                {
+                    selectedType ? (
+                        <Button size="lg" variant="outline" externalClassName="hidden md:flex flex-row items-center">
+                            Continue <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
+                        </Button>
+                    ) : null
+                }
+
             </div>
             <div className="h-full bg-zinc-50 flex flex-col justify-center items-center">
-                <h1 className="font-bold text-5xl">What is your primary goal?</h1>
-                <div className="my-10 w-2/3">
-                    <div className="grid grid-cols-2 gap-8">
-                        <div className="border border-dashed border-zinc-300 p-5 rounded-lg">
-                            <img className="rounded-lg max-w-full h-auto" src="https://images.unsplash.com/photo-1576266394503-4999348b5447?q=80&w=1472&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
-                            <div className="mt-4">
-                                <h3 className="font-bold text-2xl">User</h3>
-                                <h3 className="text-zinc-500 ">I&apos;m here to download free photos and videos.</h3>
+                <h1 className="font-bold  text-center text-4xl w-2/3 md:w-auto md:text-5xl">What is your primary goal?</h1>
+                <div className="my-10 w-3/3 sm:w-3/3 md:w-2/3 px-5 md:px-0">
+                    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+                        <Button onClick={() => setSelected("USER")} variant="unstyled" externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${selectedType === "USER" ? "border-zinc-600" : "border-dashed border-zinc-300"} p-5 rounded-lg`}>
+                            <img className="hidden md:block rounded-lg max-w-full h-auto" src={userImage} alt="" />
+                            <div className="mt-0 md:mt-4">
+                                <h3 className="font-bold text-2xl text-start">User</h3>
+                                <h3 className="text-zinc-500 text-start">I&apos;m here to download free photos and videos.</h3>
                             </div>
-                        </div>
-                        <div className="border border-dashed border-zinc-300 p-5 rounded-lg">
-                            <img className="rounded-lg max-w-full h-auto" src={creatorImage} alt="" />
-                            <div className="mt-4">
-                                <h3 className="font-bold text-2xl">Creator</h3>
-                                <h3 className="text-zinc-500 ">I&apos;m here to share my photos and videos with the world.</h3>
+                        </Button>
+                        <Button onClick={() => setSelected("CREATOR")} variant="unstyled" externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${selectedType === "CREATOR" ? "border-zinc-600" : "border-dashed border-zinc-300"} p-5 rounded-lg cursor-pointer`}>
+                            <img className="hidden md:block rounded-lg max-w-full h-auto" src={creatorImage} alt="" />
+                            <div className="mt-0 md:mt-4">
+                                <h3 className="font-bold text-2xl text-start">Creator</h3>
+                                <h3 className="text-zinc-500 text-start">I&apos;m here to share my photos and videos with the world.</h3>
                             </div>
-
-                        </div>
+                        </Button>
                     </div>
+                    {
+                        selectedType ? (
+                            <Button size="lg" variant="outline" externalClassName="flex md:hidden flex-row items-center justify-center mt-10 w-full">
+                                Continue <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
+                            </Button>
+                        ) : null
+                    }
                 </div>
-                <div className="w-3/6">
+                <div className="w-5/6 md:w-3/6">
                     <p className="text-center font-medium text-zinc-500">We’ll use this info to personalize your experience. You’ll always be able to both download and upload photos and videos, no matter which option you choose.</p>
                 </div>
             </div>
