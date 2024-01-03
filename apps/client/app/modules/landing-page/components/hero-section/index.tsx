@@ -3,13 +3,14 @@ import {SearchPhotosForMobile} from '@/components/layout/header/search-for-mobil
 import {SearchPhotos} from '@/components/layout/header/search/index.tsx'
 import {Link} from '@remix-run/react'
 import {FadeIn} from '@/components/animation/FadeIn.tsx'
+import heroBg from '@/assets/hero-bg.jpeg'
 
 export const HeroSection = () => {
   return (
     <div
       style={{
         backgroundImage:
-          'url(https://images.pexels.com/photos/1166644/pexels-photo-1166644.jpeg)',
+          `url(${heroBg})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'left',

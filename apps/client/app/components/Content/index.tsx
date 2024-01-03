@@ -1,5 +1,6 @@
 import { Button } from "../button/index.tsx"
 import { LockClosedIcon, HeartIcon } from "@heroicons/react/24/outline"
+import useAsyncImage from "@/hooks/use-async-image.ts"
 
 
 interface Props {
@@ -7,10 +8,16 @@ interface Props {
 }
 
 export const Content = ({ content }: Props) => {
+    const { pending } = useAsyncImage(content.url)
 
     return (
         <div title="Photo by Benjamin Domey" className=" cursor-zoom-in mb-5 relative ">
             <img className="h-auto max-w-full rounded-lg" src={content.url} alt="" />
+            {
+                pending ? (
+                    <div className="bg-black/50 animate-pulse w-full h-[30vh] z-10 rounded-lg mb-5" />
+                ) : null
+            }
 
             <div className="group hover:bg-black/50 w-full h-full z-10 rounded-lg absolute top-0">
                 <div className="p-2 flex flex-col justify-between h-full w-full">
