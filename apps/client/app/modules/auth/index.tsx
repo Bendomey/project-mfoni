@@ -1,8 +1,41 @@
 import { Button } from "@/components/button/index.tsx"
 import { APP_NAME } from "@/constants/index.ts"
 import { ArrowLeftIcon } from "@heroicons/react/24/outline"
+import { useLoaderData } from "@remix-run/react"
+import { useCallback, useEffect } from "react"
+
+declare global {
+    interface Window {
+        // @TODO: type it later.
+        google: any
+    }
+}
 
 export const LoginModule = () => {
+    const data = useLoaderData<{ GOOGLE_AUTH_CLIENT_ID: string }>();
+
+    function onLoginWithGoogle(res: any) {
+        console.log(res)
+    }
+
+    const init = useCallback(() => {
+        window.google.accounts.id.initialize({
+            client_id: data.GOOGLE_AUTH_CLIENT_ID,
+            callback: onLoginWithGoogle,
+        });
+
+    }, [data.GOOGLE_AUTH_CLIENT_ID])
+
+    const onInitiateGoogleLogin = useCallback(() => {
+        if (window.google) {
+            window.google.accounts.id.prompt();
+        }
+    }, [])
+
+    useEffect(() => {
+        init()
+    }, [init])
+
     return (
         <div className="flex h-screen flex-1">
             <div className="relative hidden w-1/3 lg:block">
@@ -60,16 +93,18 @@ export const LoginModule = () => {
                                     </svg>
                                     <span className="text-sm font-semibold leading-6">Facebook</span>
                                 </a>
-                                <a
-                                    href="/"
-                                    className="flex w-full items-center justify-center gap-3 rounded-md bg-red-600 px-3 py-3 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
+
+                                <Button
+                                    variant="unstyled"
+                                    onClick={onInitiateGoogleLogin}
+                                    externalClassName="flex w-full items-center justify-center gap-3 rounded-md bg-red-600 px-3 py-3 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" strokeWidth="4" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                         <path d="M17.788 5.108a9 9 0 1 0 3.212 6.892h-8" />
                                     </svg>
                                     <span className="text-sm font-semibold leading-6">Google</span>
-                                </a>
+                                </Button>
 
                                 <a
                                     href="/"

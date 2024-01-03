@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 /// <reference types="@remix-run/dev" />
 /// <reference types="@remix-run/node/globals" />
 
@@ -12,3 +13,10 @@ type BooleanRecord = Record<string, boolean>
 type StringMap = Map<string, string>
 type NumberMap = Map<string, number>
 type BooleanMap = Map<string, boolean>
+
+
+
+declare global {
+    interface Window {
+    }
+}
