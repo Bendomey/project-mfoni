@@ -28,7 +28,7 @@ type IAsyncImage = (
  *
  * Finally, render the image and it'll pull from cache.
  */
-const useAsyncImage: IAsyncImage = (url) => {
+export const useAsyncImage: IAsyncImage = (url) => {
   const [pending, setPending] = React.useState<boolean>(true)
   const [ready, setIsReady] = React.useState<boolean | null>(null)
   const [error, setError] = React.useState<string | Event | null>(null)
@@ -84,5 +84,3 @@ const useAsyncImage: IAsyncImage = (url) => {
     error,
   }
 }
-
-export default useAsyncImage

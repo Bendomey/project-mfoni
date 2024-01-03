@@ -1,6 +1,6 @@
 import { Button } from "../button/index.tsx"
 import { LockClosedIcon, HeartIcon } from "@heroicons/react/24/outline"
-import useAsyncImage from "@/hooks/use-async-image.ts"
+import { useAsyncImage } from "@/hooks/use-async-image.ts"
 
 
 interface Props {
