@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import config from 'tailwindcss/defaultConfig.js';
+import config from 'tailwindcss/defaultConfig.js'
 import * as React from 'react'
 import {isBrowser, useIsomorphicEffect} from '@/lib/is-browser.ts'
-
 
 export type CreatorReturnType = {
   /**
@@ -93,7 +92,6 @@ function create(screens?: any) {
 
   function useBreakpoint(breakpoint: string, defaultValue: boolean = false) {
     const [match, setMatch] = React.useState(() => defaultValue)
-
 
     useIsomorphicEffect(() => {
       if (!(isBrowser && 'matchMedia' in window)) return undefined

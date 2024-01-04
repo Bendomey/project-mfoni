@@ -1,8 +1,7 @@
-import { useEffect, useLayoutEffect } from "react";
+import {useEffect, useLayoutEffect} from 'react'
 
-export const isSSR =
-  typeof window === "undefined" || !window.navigator
+export const isSSR = typeof window === 'undefined' || !window.navigator
 
-export const isBrowser = !isSSR;
+export const isBrowser = !isSSR
 
-export const useIsomorphicEffect = isBrowser ? useLayoutEffect : useEffect;
+export const useIsomorphicEffect = isBrowser ? useLayoutEffect : useEffect

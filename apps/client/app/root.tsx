@@ -34,9 +34,9 @@ export const links: LinksFunction = () => {
     //   sizes: '16x16',
     //   href: '/favicons/favicon-16x16.png',
     // },
-    { rel: 'icon', href: '/favicon.ico' },
-    { rel: 'stylesheet', href: tailwindStyles },
-    ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
+    {rel: 'icon', href: '/favicon.ico'},
+    {rel: 'stylesheet', href: tailwindStyles},
+    ...(cssBundleHref ? [{rel: 'stylesheet', href: cssBundleHref}] : []),
   ]
 }
 
@@ -62,7 +62,12 @@ function Document({children}: PropsWithChildren) {
       <body className="h-full">
         {children}
         <ScrollRestoration />
-        <script src="https://accounts.google.com/gsi/client" async defer data-nscript="afterInteractive" />
+        <script
+          src="https://accounts.google.com/gsi/client"
+          async
+          defer
+          data-nscript="afterInteractive"
+        />
         <Scripts />
         {NODE_ENV === 'development' ? <LiveReload /> : null}
       </body>

@@ -14,9 +14,6 @@ type StringMap = Map<string, string>
 type NumberMap = Map<string, number>
 type BooleanMap = Map<string, boolean>
 
-
-
 declare global {
-    interface Window {
-    }
+  interface Window {}
 }
