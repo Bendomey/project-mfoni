@@ -13,6 +13,7 @@ import {
 } from '@remix-run/react'
 import {NODE_ENV} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
+import { Toaster } from 'sonner';
 
 export const links: LinksFunction = () => {
   return [
@@ -61,6 +62,7 @@ function Document({children}: PropsWithChildren) {
       </head>
       <body className="h-full">
         {children}
+        <Toaster position='bottom-center' />
         <ScrollRestoration />
         <script
           src="https://accounts.google.com/gsi/client"

@@ -1,10 +1,32 @@
 import { initiateTwitterAuth } from "@/api/auth/index.ts"
 import { Button } from "@/components/button/index.tsx"
-
+import { TWITTER_BASE_URL } from "@/constants/index.ts";
+import { useSearchParams } from "@remix-run/react";
+import { useCallback, useEffect } from "react";
 
 export const TwitterButton = () => {
+    const [params] = useSearchParams()
+
+    const checkForTwitterResponse = useCallback(() => {
+        const oAuthToken = params.get("oauth_token")
+        const oAuthVerifier = params.get("oauth_verifier")
+        if (oAuthToken?.length && oAuthVerifier?.length) {
+            // @TODO: Make request to our api to authorize
+        }
+    }, [params])
+
+
+    useEffect(() => {
+        checkForTwitterResponse()
+    }, [checkForTwitterResponse])
+
     const initiateLogin = async () => {
-        await initiateTwitterAuth()
+        const requestTokenData = await initiateTwitterAuth()
+        if (
+            requestTokenData.oauth_callback_confirmed === "true"
+        ) {
+            window.location.replace(`${TWITTER_BASE_URL}/oauth/authorize?oauth_token=${requestTokenData.oauth_token}`)
+        }
     }
 
     return (

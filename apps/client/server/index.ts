@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 import * as build from '../build/index.js'
 import {router} from './routes/index.js'
 
@@ -8,8 +9,14 @@ import getPort, {portNumbers} from 'get-port'
 import closeWithGrace from 'close-with-grace'
 import address from 'address'
 import chalk from 'chalk'
+import path from 'path'
+import chokidar from 'chokidar'
+import {fileURLToPath} from 'url'
 
 const MODE = process.env.NODE_ENV
+const BUILD_PATH = '../build/index.js'
+
+let devBuild = build
 
 const app = express()
 
@@ -20,7 +27,7 @@ app.use(express.static('public'))
 
 app.use("/api", router)
 
-app.all('*', createRequestHandler({build: build as any, mode: MODE}))
+app.all('*', createRequestHandler({build: devBuild as any, mode: MODE}))
 
 
 const desiredPort = Number(process.env.PORT ?? 3000)
@@ -65,7 +72,6 @@ const server = app.listen(portToUse, () => {
   if (MODE === 'development') {
     void broadcastDevReady(build as any)
   }
-  console.log(`App listening on http://localhost:${portToUse}`)
 })
 
 closeWithGrace(() => {
@@ -75,3 +81,16 @@ closeWithGrace(() => {
     }),
   ])
 })
+
+// during dev, we'll keep the build module up to date with the changes
+if (process.env.NODE_ENV === 'development') {
+  async function reloadBuild() {
+    devBuild = await import(`${BUILD_PATH}?update=${Date.now()}`)
+    void broadcastDevReady(devBuild as any)
+  }
+
+  const dirname = path.dirname(fileURLToPath(import.meta.url))
+  const watchPath = path.join(dirname, BUILD_PATH).replace(/\\/g, '/')
+  const watcher = chokidar.watch(watchPath, {ignoreInitial: true})
+  watcher.on('all', reloadBuild)
+}
