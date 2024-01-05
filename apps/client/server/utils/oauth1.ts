@@ -3,18 +3,22 @@ import {requestTokenSignature, accessTokenSignature} from './signature.js'
 interface RequestTokenResponse {
   oauth_token: string
   oauth_token_secret: string
-  oauth_callback_confirmed?: string
+  oauth_callback_confirmed: string
 }
 
 const parseOAuthRequestToken = (responseText: string) =>
-  responseText.split('&').reduce((prev, el) => {
+  responseText.split('&').reduce<RequestTokenResponse>((prev, el) => {
     const [key, value] = el.split('=')
     if (key && value) {
       return {...prev, [key]: value}
     }
 
     return prev
-  }, {} as RequestTokenResponse)
+  }, {
+    oauth_token: '',
+    oauth_token_secret: '',
+    oauth_callback_confirmed: 'false',
+  })
 
 export const obtainOauthRequestToken = async ({
   consumerKey,

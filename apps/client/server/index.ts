@@ -1,4 +1,5 @@
 /* eslint-disable no-inner-declarations */
+// @ts-expect-error - Available only when app is run!
 import * as build from '../build/index.js'
 import {router} from './routes/index.js'
 
