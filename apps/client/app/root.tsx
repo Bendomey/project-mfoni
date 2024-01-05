@@ -13,7 +13,7 @@ import {
 } from '@remix-run/react'
 import {NODE_ENV} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
-import { Toaster } from 'sonner';
+import { Toaster } from 'react-hot-toast';
 
 export const links: LinksFunction = () => {
   return [

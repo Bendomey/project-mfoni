@@ -1,19 +1,35 @@
 import { initiateTwitterAuth } from "@/api/auth/index.ts"
 import { Button } from "@/components/button/index.tsx"
 import { TWITTER_BASE_URL } from "@/constants/index.ts";
-import { useSearchParams } from "@remix-run/react";
+import { useSearchParams, useLocation, useNavigate } from "@remix-run/react";
 import { useCallback, useEffect } from "react";
+import { useLoginAuth } from "../context/index.tsx";
+import { toast } from "react-hot-toast";
 
 export const TwitterButton = () => {
+    const { setErrorMessage, setIsLoading } = useLoginAuth()
+    const navigate = useNavigate()
+    const location = useLocation()
     const [params] = useSearchParams()
 
     const checkForTwitterResponse = useCallback(() => {
         const oAuthToken = params.get("oauth_token")
         const oAuthVerifier = params.get("oauth_verifier")
-        if (oAuthToken?.length && oAuthVerifier?.length) {
+
+        const isDenied = Boolean(params.get("denied"))
+        if (isDenied) {
+            params.delete("denied")
+            navigate({
+                ...location,
+                search: params.toString()
+            })
+
+            setErrorMessage("Twitter login was unsuccessful")
+        } else if (oAuthToken?.length && oAuthVerifier?.length) {
             // @TODO: Make request to our api to authorize
+
         }
-    }, [params])
+    }, [location, navigate, params, setErrorMessage])
 
 
     useEffect(() => {
@@ -21,11 +37,21 @@ export const TwitterButton = () => {
     }, [checkForTwitterResponse])
 
     const initiateLogin = async () => {
-        const requestTokenData = await initiateTwitterAuth()
-        if (
-            requestTokenData.oauth_callback_confirmed === "true"
-        ) {
-            window.location.replace(`${TWITTER_BASE_URL}/oauth/authorize?oauth_token=${requestTokenData.oauth_token}`)
+        try {
+            setIsLoading(true)
+            const requestTokenData = await initiateTwitterAuth()
+            if (
+
+                requestTokenData.oauth_callback_confirmed === "true"
+            ) {
+                window.location.replace(`${TWITTER_BASE_URL}/oauth/authorize?oauth_token=${requestTokenData.oauth_token}`)
+            }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error(error.message)
+            }
+        } finally {
+            setIsLoading(false)
         }
     }
 

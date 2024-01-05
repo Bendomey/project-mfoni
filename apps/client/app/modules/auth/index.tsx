@@ -3,9 +3,28 @@ import { APP_NAME } from '@/constants/index.ts'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { TwitterButton } from './twitter/index.tsx'
 import { GoogleButton } from './google/index.tsx'
+import { LoginAuthProvider, useLoginAuth } from './context/index.tsx'
+import { Loader } from '@/components/loader/index.tsx'
+import { Transition } from '@headlessui/react'
+import { Fragment, useEffect } from 'react'
 
 
-export const LoginModule = () => {
+export const LoginComponent = () => {
+  const { isLoading, errorMessage, setErrorMessage } = useLoginAuth()
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+    if (errorMessage.length) {
+      timeoutId = setTimeout(() => {
+        setErrorMessage('')
+      }, 5000)
+    }
+
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [errorMessage, setErrorMessage])
+
   return (
     <div className="flex h-screen flex-1">
       <div className="relative hidden w-1/3 lg:block">
@@ -34,7 +53,14 @@ export const LoginModule = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-1 flex-col w-2/3 justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+      <div className="relative flex flex-1 flex-col w-2/3 justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+        {
+          isLoading ? (
+            <div className='absolute z-10 w-full h-full flex justify-center items-center bg-black/70 top-0 left-0'>
+              <Loader color='fill-white' />
+            </div>
+          ) : null
+        }
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
             <div className="flex">
@@ -54,6 +80,23 @@ export const LoginModule = () => {
             <p className="mt-2 ml-2 leading-6 text-gray-500">
               Continue with your favorite social.
             </p>
+            <Transition
+              as={Fragment}
+              show={Boolean(errorMessage.length)}
+              enter="transition ease-out duration-200"
+              enterFrom="opacity-0 translate-y-1"
+              enterTo="opacity-100 translate-y-0"
+              leave="transition ease-in duration-150"
+              leaveFrom="opacity-100 translate-y-0"
+              leaveTo="opacity-0 translate-y-1"
+            >
+              <div className='mt-4'>
+                <div className='bg-red-400 rounded-lg p-2 text-sm text-white'>
+                  {errorMessage}
+                </div>
+              </div>
+            </Transition>
+
           </div>
 
           <div className="mt-16">
@@ -102,5 +145,14 @@ export const LoginModule = () => {
         </div>
       </div>
     </div>
+  )
+}
+
+
+export const LoginModule = () => {
+  return (
+    <LoginAuthProvider>
+      <LoginComponent />
+    </LoginAuthProvider>
   )
 }
