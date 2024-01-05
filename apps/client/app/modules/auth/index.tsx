@@ -7,6 +7,7 @@ import { LoginAuthProvider, useLoginAuth } from './context/index.tsx'
 import { Loader } from '@/components/loader/index.tsx'
 import { Transition } from '@headlessui/react'
 import { Fragment, useEffect } from 'react'
+import { FacebookButton } from './facebook/index.tsx'
 
 
 export const LoginComponent = () => {
@@ -104,23 +105,7 @@ export const LoginComponent = () => {
               <div className="mt-6 grid grid-cols-1 gap-4">
                 <GoogleButton />
 
-                <Button
-                  variant="unstyled"
-                  externalClassName="flex w-full items-center justify-center gap-3 rounded-md bg-blue-600 px-3 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" />
-                  </svg>
-                  <span className="text-sm font-semibold leading-6">
-                    Facebook
-                  </span>
-                </Button>
+                <FacebookButton />
 
                 <TwitterButton />
 

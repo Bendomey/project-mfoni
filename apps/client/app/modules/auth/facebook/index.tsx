@@ -1,0 +1,76 @@
+/* eslint-disable func-names */
+import { Button } from "@/components/button/index.tsx";
+import { useLoaderData } from "@remix-run/react";
+import { useEffect } from "react";
+
+declare global {
+    interface Window {
+        // @TODO: type it later.
+        fbAsyncInit: any
+        FB: any
+    }
+}
+
+export const FacebookButton = () => {
+    const data = useLoaderData<{ FACEBOOK_APP_ID: string }>()
+    useEffect(() => {
+        window.fbAsyncInit = function () {
+            window.FB.init({
+                appId: data.FACEBOOK_APP_ID,
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v10.0'
+            });
+        };
+
+        (function (d, s, id) {
+            let js: any = d.getElementsByTagName(s)[0];
+            const fjs: any = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    }, [data.FACEBOOK_APP_ID]);
+
+    const handleLoginInitiation = () => {
+        if (window.FB) {
+            window.FB.getLoginStatus((loginStatusResponse: any) => {
+                console.log({ loginStatusResponse })
+                if (loginStatusResponse.status === 'connected') {
+                    // TODO: pass response.authResponse to backend!
+                    // let backend decode the token and get the user info.
+                    // window.FB.api('/me', (user: any) => {
+                    //     console.log({ user })
+                    // })
+                } else {
+                    window.FB.login((loginResponse: any) => {
+                        console.log({ loginResponse })
+                    }, { scope: 'public_profile,email' })
+                }
+            });
+        }
+    }
+
+    return (
+        <Button
+            onClick={handleLoginInitiation}
+            variant="unstyled"
+            externalClassName="flex w-full items-center justify-center gap-3 rounded-md bg-blue-600 px-3 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+            >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" />
+            </svg>
+            <span className="text-sm font-semibold leading-6">
+                Facebook
+            </span>
+        </Button>
+    )
+}
