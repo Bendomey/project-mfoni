@@ -109,7 +109,8 @@ export const LoginComponent = () => {
 
                 <TwitterButton />
 
-                <Button
+                {/* TODO: work on this later! */}
+                {/* <Button
                   variant="unstyled"
                   externalClassName="flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
                 >
@@ -123,7 +124,7 @@ export const LoginComponent = () => {
                     <path d="M12 4a2 2 0 0 0 2 -2a2 2 0 0 0 -2 2" />
                   </svg>
                   <span className="text-sm font-semibold leading-6">Apple</span>
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>
