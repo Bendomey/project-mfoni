@@ -1,6 +1,6 @@
 import {cssBundleHref} from '@remix-run/css-bundle'
-import { type PropsWithChildren } from "react";
-import { type LinksFunction } from "@remix-run/node";
+import {type PropsWithChildren} from 'react'
+import {type LinksFunction} from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -9,14 +9,14 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteError,
-  isRouteErrorResponse
-} from "@remix-run/react";
-import { NODE_ENV } from "./constants/index.ts";
+  isRouteErrorResponse,
+} from '@remix-run/react'
+import {NODE_ENV} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
 
 export const links: LinksFunction = () => {
   return [
-    //@TODO: Include assets. 
+    //@TODO: Include assets.
     // {
     //   rel: 'apple-touch-icon',
     //   sizes: '180x180',
@@ -48,11 +48,9 @@ export default function App() {
   )
 }
 
-function Document({
-  children,
-}: PropsWithChildren) {
+function Document({children}: PropsWithChildren) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -61,18 +59,18 @@ function Document({
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="h-full">
         {children}
         <ScrollRestoration />
         <Scripts />
         {NODE_ENV === 'development' ? <LiveReload /> : null}
       </body>
     </html>
-  );
+  )
 }
 
 export function ErrorBoundary() {
-  const error = useRouteError();
+  const error = useRouteError()
 
   if (isRouteErrorResponse(error)) {
     return (
@@ -82,7 +80,7 @@ export function ErrorBoundary() {
         </h1>
         <p>{error.data}</p>
       </div>
-    );
+    )
   } else if (error instanceof Error) {
     return (
       <div>
@@ -91,9 +89,8 @@ export function ErrorBoundary() {
         <p>The stack trace is:</p>
         <pre>{error.stack}</pre>
       </div>
-    );
+    )
   } else {
-    return <h1>Unknown Error</h1>;
+    return <h1>Unknown Error</h1>
   }
 }
-
