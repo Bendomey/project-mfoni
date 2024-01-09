@@ -9,7 +9,6 @@ export const meta: MetaFunction = () => {
 }
 
 export function loader() {
-  // process.env is available here because loader runs only on the server side
   return {
     GOOGLE_AUTH_CLIENT_ID: process.env.GOOGLE_AUTH_CLIENT_ID,
     FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID,

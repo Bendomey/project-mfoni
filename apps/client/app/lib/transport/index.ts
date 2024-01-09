@@ -1,5 +1,14 @@
 import { auth } from '../cookies.config.ts';
-import { API_ADDRESS, USER_CIPHER } from '@/constants/index.ts';
+import { USER_CIPHER } from '@/constants/index.ts';
+
+declare global {
+  interface Window {
+      ENV: {
+        API_ADDRESS: string;
+      }
+  }
+}
+
 
 /**
  * Fetch wrapper to treat 4xx - 5xx status codes as errors.
@@ -54,7 +63,7 @@ export function fetchClient<T>(
   config?: FetchClientConfig
 ): Promise<HttpResponse<T>> {
   return new Promise(async (resolve, reject) => {
-    const baseUrl = config?.baseUrl ?? API_ADDRESS; // Defaults to api address.
+    const baseUrl = config?.baseUrl ?? window.ENV.API_ADDRESS; // Defaults to api address.
 
     const headers = new Headers({
       Accept: 'application/json',
