@@ -18,7 +18,7 @@ export const LoginComponent = () => {
     if (errorMessage.length) {
       timeoutId = setTimeout(() => {
         setErrorMessage('')
-      }, 5000)
+      }, 7000)
     }
 
     return () => {
@@ -32,7 +32,7 @@ export const LoginComponent = () => {
         <img
           className="absolute inset-0 h-full w-full object-cover"
           src="https://images.unsplash.com/photo-1496917756835-20cb06e75b4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1908&q=80"
-          alt=""
+          alt="auth page background"
         />
         <div className="absolute top-0 z-1 bg-black/70 w-full h-full p-10">
           <div className="flex flex-col h-full justify-between">

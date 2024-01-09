@@ -4,6 +4,8 @@ interface RequestTokenResponse {
   oauth_token: string
   oauth_token_secret: string
   oauth_callback_confirmed: string
+  screen_name?: string
+  user_id?: string
 }
 
 const parseOAuthRequestToken = (responseText: string) =>
@@ -80,5 +82,6 @@ export const obtainOauthAccessToken = async ({
     },
   })
   const responseText = await res.text()
+  console.log(responseText)
   return parseOAuthRequestToken(responseText)
 }

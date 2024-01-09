@@ -1,6 +1,6 @@
 import {useMutation} from '@tanstack/react-query'
 import {fetchClient} from '@/lib/transport/index.ts'
-import { QUERY_KEYS } from '@/constants/index.ts'
+import {QUERY_KEYS} from '@/constants/index.ts'
 
 export const initiateTwitterAuth = async () => {
   const res = await fetch('/api/auth/twitter', {
@@ -8,17 +8,17 @@ export const initiateTwitterAuth = async () => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({callbackUrl: window.location.href}),
+    body: JSON.stringify({callbackUrl: window.location.origin + window.location.pathname}),
   })
   const data = await res.json()
   return data
 }
 
 interface AuthenticateInputProps {
-  type: 'GOOGLE' | 'TWITTER' | 'FACEBOOK'
-  google: PossiblyUndefined<{}>
-  twitter: PossiblyUndefined<{}>
-  facebook: PossiblyUndefined<{}>
+  provider: 'GOOGLE' | 'TWITTER' | 'FACEBOOK'
+  google?: PossiblyUndefined<{authToken: string}>
+  facebook?: PossiblyUndefined<{accessToken: string}>
+  twitter?: PossiblyUndefined<{oAuthToken: string; oAuthVerifier: string}>
 }
 
 interface AuthenticateOutputProps {
@@ -28,25 +28,23 @@ interface AuthenticateOutputProps {
 
 export const authenticate = async (props: AuthenticateInputProps) => {
   try {
-    const response = await fetchClient<AuthenticateOutputProps>(
-      '/v1/authenticate',
-      {
-        method: 'POST',
-        body: JSON.stringify(props),
-        isUnAuthorizedRequest: true,
+    const response = await fetch('/api/auth', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+      body: JSON.stringify(props),
+    })
+    const data = await response.json()
 
-    return response.parsedBody
+    if (data.status) {
+      return data.data as AuthenticateOutputProps
+    }
+
+    throw new Error(data.errorMessage)
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw error
-    }
-
-    // Error from server.
-    if (error instanceof Response) {
-      const response = await error.json()
-      throw new Error(response.message)
     }
   }
 }

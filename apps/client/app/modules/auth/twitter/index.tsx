@@ -1,12 +1,14 @@
-import { initiateTwitterAuth } from "@/api/auth/index.ts"
+import { initiateTwitterAuth, useAuthenticate } from "@/api/auth/index.ts"
 import { Button } from "@/components/button/index.tsx"
 import { TWITTER_BASE_URL } from "@/constants/index.ts";
 import { useSearchParams, useLocation, useNavigate } from "@remix-run/react";
 import { useCallback, useEffect } from "react";
 import { useLoginAuth } from "../context/index.tsx";
 import { toast } from "react-hot-toast";
+import { errorMessagesWrapper } from "@/constants/error-messages.ts";
 
 export const TwitterButton = () => {
+    const { mutate } = useAuthenticate()
     const { setErrorMessage, setIsLoading } = useLoginAuth()
     const navigate = useNavigate()
     const location = useLocation()
@@ -26,10 +28,29 @@ export const TwitterButton = () => {
 
             setErrorMessage("Twitter login was unsuccessful")
         } else if (oAuthToken?.length && oAuthVerifier?.length) {
-            // @TODO: Make request to our api to authorize
+            setIsLoading(true)
+
+            mutate({
+                provider: 'TWITTER',
+                twitter: { oAuthToken, oAuthVerifier }
+            }, {
+                onError: (error) => {
+                    if (error.message) {
+                        setErrorMessage(errorMessagesWrapper(error.message))
+                    }
+                },
+                onSuccess: (successRes) => {
+                    console.log(successRes)
+                    toast.success(`Welcome ${successRes?.user.name ?? ''}`)
+                    //save token to cookies
+                },
+                onSettled: () => {
+                    setIsLoading(false)
+                }
+            })
 
         }
-    }, [location, navigate, params, setErrorMessage])
+    }, [location, mutate, navigate, params, setErrorMessage, setIsLoading])
 
 
     useEffect(() => {

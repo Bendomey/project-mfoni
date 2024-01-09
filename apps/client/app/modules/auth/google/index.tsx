@@ -1,7 +1,11 @@
+import { useAuthenticate } from '@/api/auth/index.ts'
 import { useBreakpoint } from '@/hooks/tailwind.ts'
 import { isBrowser } from '@/lib/is-browser.ts'
 import { useLoaderData } from '@remix-run/react'
 import { useCallback, useEffect, useRef } from 'react'
+import { useLoginAuth } from '../context/index.tsx'
+import { errorMessagesWrapper } from '@/constants/error-messages.ts'
+import { toast } from 'react-hot-toast'
 
 declare global {
     interface Window {
@@ -11,15 +15,39 @@ declare global {
 }
 
 export const GoogleButton = () => {
+    const { mutate } = useAuthenticate()
+    const { setIsLoading, setErrorMessage } = useLoginAuth()
 
     const signInRef = useRef(null)
     const data = useLoaderData<{ GOOGLE_AUTH_CLIENT_ID: string }>()
     const isMobileBreakPoint = useBreakpoint('sm')
 
 
-    function onLoginWithGoogle(res: any) {
-        console.log(res)
-    }
+    const onLoginWithGoogle = useCallback(async (res: any) => {
+        if (res.credential) {
+            setIsLoading(true)
+            mutate({
+                provider: 'GOOGLE',
+                google: {
+                    authToken: res.credential,
+                }
+            }, {
+                onError: (error) => {
+                    if (error.message) {
+                        setErrorMessage(errorMessagesWrapper(error.message))
+                    }
+                },
+                onSuccess: (successRes) => {
+                    console.log(successRes)
+                    toast.success(`Welcome ${successRes?.user.name ?? ''}`)
+                    //save token to cookies
+                },
+                onSettled: () => {
+                    setIsLoading(false)
+                }
+            })
+        }
+    }, [mutate, setErrorMessage, setIsLoading])
 
     const init = useCallback(() => {
         if (window.google) {
@@ -38,7 +66,7 @@ export const GoogleButton = () => {
                 width: isMobileBreakPoint ? '355' : '385',
             })
         }
-    }, [data.GOOGLE_AUTH_CLIENT_ID, isMobileBreakPoint])
+    }, [data.GOOGLE_AUTH_CLIENT_ID, isMobileBreakPoint, onLoginWithGoogle])
 
     useEffect(() => {
         if (isBrowser) {

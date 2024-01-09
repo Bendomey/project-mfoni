@@ -15,6 +15,9 @@ builder.Services.Configure<RabbitMQConnection>(
 builder.Services.Configure<AppConstants>(
     builder.Configuration.GetSection("AppConstants"));
 
+// auth services
+builder.Services.AddSingleton<Auth>();
+
 // search services
 builder.Services.AddSingleton<SearchTag>();
 builder.Services.AddSingleton<SearchContent>();
@@ -25,6 +28,7 @@ builder.Services.AddSingleton<SaveTags>();
 builder.Services.AddSingleton<IndexContent>();
 builder.Services.AddSingleton<ProcessIndexContent>();
 
+// hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();
 
 builder.Services.AddControllers();
@@ -46,7 +50,7 @@ if (!app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 // @TODO: secure based on our frontend setup.
 app.UseCors(builder => builder

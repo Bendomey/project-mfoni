@@ -1,7 +1,11 @@
 /* eslint-disable func-names */
+import { useAuthenticate } from "@/api/auth/index.ts";
 import { Button } from "@/components/button/index.tsx";
 import { useLoaderData } from "@remix-run/react";
 import { useEffect } from "react";
+import { useLoginAuth } from "../context/index.tsx";
+import { errorMessagesWrapper } from "@/constants/error-messages.ts";
+import { toast } from "react-hot-toast";
 
 declare global {
     interface Window {
@@ -13,6 +17,10 @@ declare global {
 
 export const FacebookButton = () => {
     const data = useLoaderData<{ FACEBOOK_APP_ID: string }>()
+
+    const { mutate } = useAuthenticate()
+    const { setIsLoading, setErrorMessage } = useLoginAuth()
+
     useEffect(() => {
         window.fbAsyncInit = function () {
             window.FB.init({
@@ -34,24 +42,46 @@ export const FacebookButton = () => {
         }(document, 'script', 'facebook-jssdk'));
     }, [data.FACEBOOK_APP_ID]);
 
+
+    const handleLogin = (res: any) => {
+        setIsLoading(true)
+
+        mutate({
+            provider: 'FACEBOOK',
+            facebook: {
+                accessToken: res.authResponse.accessToken,
+            }
+        }, {
+            onError: (error) => {
+                if (error.message) {
+                    setErrorMessage(errorMessagesWrapper(error.message))
+                }
+            },
+            onSuccess: (successRes) => {
+                console.log(successRes)
+                toast.success(`Welcome ${successRes?.user.name ?? ''}`)
+                //save token to cookies
+            },
+            onSettled: () => {
+                setIsLoading(false)
+            }
+        })
+    }
+
     const handleLoginInitiation = () => {
         if (window.FB) {
             window.FB.getLoginStatus((loginStatusResponse: any) => {
-                console.log({ loginStatusResponse })
                 if (loginStatusResponse.status === 'connected') {
-                    // TODO: pass response.authResponse to backend!
-                    // let backend decode the token and get the user info.
-                    // window.FB.api('/me', (user: any) => {
-                    //     console.log({ user })
-                    // })
+                    handleLogin(loginStatusResponse)
                 } else {
                     window.FB.login((loginResponse: any) => {
-                        console.log({ loginResponse })
+                        handleLogin(loginResponse)
                     }, { scope: 'public_profile,email' })
                 }
             });
         }
     }
+
 
     return (
         <Button

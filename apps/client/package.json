@@ -61,6 +61,7 @@
     "framer-motion": "10.15.2",
     "fs-extra": "11.1.1",
     "get-port": "7.0.0",
+    "google-auth-library": "9.4.1",
     "isbot": "3.6.8",
     "js-cookie": "3.0.5",
     "react": "18.2.0",

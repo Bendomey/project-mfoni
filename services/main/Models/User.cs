@@ -10,25 +10,31 @@ public class User
     public string Id { get; set; } = null!;
 
     [BsonElement("role")]
-    public required string Role { get; set; } = "CLIENT"; // CLIENT | CREATOR
+    public string Role { get; set; } = "CLIENT"; // CLIENT | CREATOR
 
-    [BsonElement("type")]
-    public required string Type { get; set; } // FB | Twitter | Google
+    [BsonElement("provider")]
+    public required string Provider { get; set; } // FACEBOOK | TWITTER | GOOGLE
 
-    [BsonElement("social_id")]
-    public string? SocialId { get; set; } // if social returns an id.
+    [BsonElement("oauth_id")]
+    public required string OAuthId { get; set; } // if social returns an id.
 
     [BsonElement("name")]
     public required string Name { get; set; }
 
-    [BsonElement("email")]
-    public required string Email { get; set; }
+    [BsonElement("username")]
+    public string? Username { get; set; }
 
-    [BsonElement("user_photo")]
-    public string? UserPhoto { get; set; }
+    [BsonElement("email")]
+    public string? Email { get; set; }
+
+    [BsonElement("photo")]
+    public string? Photo { get; set; }
 
     [BsonElement("creator_application_id")]
-    public ObjectId? CreatorApplicationId { get; set; } // only set after user is approved as creator
+    public ObjectId? CreatorApplication { get; set; } // only set after user is approved as creator
+
+    [BsonElement("account_setup_at")]
+    public DateTime? AccountSetupAt { get; set; }
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

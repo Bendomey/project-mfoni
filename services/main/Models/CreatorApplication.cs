@@ -8,21 +8,24 @@ public class CreatorApplication
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
+    
+    [BsonElement("user_id")]
+    public required ObjectId UserId { get; set; }
 
     [BsonElement("status")]
     public required string Status { get; set; } = "PENDING"; // PENDING | REJECTED | APPROVED
-    
+
     [BsonElement("rejected_at")]
     public DateTime? RejectedAt { get; set; }
 
     [BsonElement("rejected_by_id")] // an admin
-    public ObjectId? RejectedById { get; set; }
-    
+    public ObjectId? RejectedBy { get; set; }
+
     [BsonElement("approved_at")]
     public DateTime? ApprovedAt { get; set; }
 
     [BsonElement("approved_by_id")] // an admin
-    public ObjectId? ApprovedById { get; set; }
+    public ObjectId? ApprovedBy { get; set; }
 
     [BsonElement("platform_aggrement_form")]
     public required S3MetaData PlatformAggrementForm { get; set; }
@@ -37,8 +40,8 @@ public class CreatorApplication
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [BsonElement("created_by_id")]
-    public required ObjectId CreatedById { get; set; }
+    public required ObjectId CreatedBy { get; set; }
 
     [BsonElement("updated_at")]
-    public DateTime UpdatedAt { get; set; }  = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }
