@@ -27,6 +27,11 @@
       "yarn lint"
     ]
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn precommit"
+    }
+  },
   "keywords": [
     "experimental",
     "remix"
@@ -59,7 +64,7 @@
     "@types/react-webcam": "3.0.0",
     "eslint": "8.56.0",
     "eslint-config-kentcdodds": "20.5.0",
-    "husky": "^8.0.3",
+    "husky": "8.0.3",
     "lint-staged": "^15.2.0",
     "prettier": "3.1.1",
     "prettier-plugin-tailwindcss": "0.5.9",
