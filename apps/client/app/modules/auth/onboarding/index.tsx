@@ -4,13 +4,16 @@ import { ArrowRightIcon } from '@heroicons/react/24/solid'
 import { Link, useNavigate } from '@remix-run/react'
 import creatorImage from '@/assets/creator.jpg'
 import userImage from '@/assets/user.jpeg'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@/providers/auth/index.tsx'
+import { useDisclosure } from '@/hooks/use-disclosure.tsx'
+import { SetupAccountModal } from './setup-modal/index.tsx'
 
 export const OnboardingModule = () => {
-  const [selectedType, setSelected] = useState<'USER' | 'CREATOR'>()
+  const [selectedType, setSelected] = useState<'CLIENT' | 'CREATOR'>()
   const navigate = useNavigate()
-  const {getToken} = useAuth()
+  const { getToken } = useAuth()
+  const { onToggle, isOpen } = useDisclosure()
 
 
   useEffect(() => {
@@ -20,92 +23,101 @@ export const OnboardingModule = () => {
     }
   }, [getToken, navigate])
 
+  const handleContinue = useCallback(() => {
+    onToggle()
+  }, [onToggle])
+
   return (
-    <div className="h-screen w-full flex flex-col">
-      <div className="border-b border-zinc-200 px-5 md:px-10 py-5 flex flex-row items-center justify-between">
-        <Link to="/" className="">
-          <div className="flex flex-row items-end">
-            <span className="text-4xl text-blue-700 font-extrabold">
-              {APP_NAME.slice(0, 1)}
-            </span>
-            <span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
-          </div>
-        </Link>
-        {selectedType ? (
-          <Button
-            size="lg"
-            variant="outline"
-            externalClassName="hidden md:flex flex-row items-center"
-          >
-            Continue <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
-          </Button>
-        ) : null}
-      </div>
-      <div className="h-full bg-zinc-50 flex flex-col justify-center items-center">
-        <h1 className="font-bold  text-center text-4xl w-2/3 md:w-auto md:text-5xl">
-          What is your primary goal?
-        </h1>
-        <div className="my-10 w-3/3 sm:w-3/3 md:w-2/3 px-5 md:px-0">
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
-            <Button
-              onClick={() => setSelected('USER')}
-              variant="unstyled"
-              externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${selectedType === 'USER'
-                ? 'border-zinc-600'
-                : 'border-dashed border-zinc-300'
-                } p-5 rounded-lg`}
-            >
-              <img
-                className="hidden md:block rounded-lg max-w-full h-auto"
-                src={userImage}
-                alt=""
-              />
-              <div className="mt-0 md:mt-4">
-                <h3 className="font-bold text-2xl text-start">User</h3>
-                <h3 className="text-zinc-500 text-start">
-                  I&apos;m here to download free photos and videos.
-                </h3>
-              </div>
-            </Button>
-            <Button
-              onClick={() => setSelected('CREATOR')}
-              variant="unstyled"
-              externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${selectedType === 'CREATOR'
-                ? 'border-zinc-600'
-                : 'border-dashed border-zinc-300'
-                } p-5 rounded-lg cursor-pointer`}
-            >
-              <img
-                className="hidden md:block rounded-lg max-w-full h-auto"
-                src={creatorImage}
-                alt=""
-              />
-              <div className="mt-0 md:mt-4">
-                <h3 className="font-bold text-2xl text-start">Creator</h3>
-                <h3 className="text-zinc-500 text-start">
-                  I&apos;m here to share my photos and videos with the world.
-                </h3>
-              </div>
-            </Button>
-          </div>
+    <>
+      <div className="h-screen w-full flex flex-col relative">
+        <div className="border-b border-zinc-200 px-5 md:px-10 py-5 flex flex-row items-center justify-between">
+          <Link to="/" className="">
+            <div className="flex flex-row items-end">
+              <span className="text-4xl text-blue-700 font-extrabold">
+                {APP_NAME.slice(0, 1)}
+              </span>
+              <span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
+            </div>
+          </Link>
           {selectedType ? (
             <Button
+              onClick={handleContinue}
               size="lg"
               variant="outline"
-              externalClassName="flex md:hidden flex-row items-center justify-center mt-10 w-full"
+              externalClassName="hidden md:flex flex-row items-center"
             >
               Continue <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
             </Button>
           ) : null}
         </div>
-        <div className="w-5/6 md:w-3/6">
-          <p className="text-center font-medium text-zinc-500">
-            We’ll use this info to personalize your experience. You’ll always be
-            able to both download and upload photos and videos, no matter which
-            option you choose.
-          </p>
+        <div className="h-full bg-zinc-50 flex flex-col justify-center items-center">
+          <h1 className="font-bold  text-center text-4xl w-2/3 md:w-auto md:text-5xl">
+            What is your primary goal?
+          </h1>
+          <div className="my-10 w-3/3 sm:w-3/3 md:w-2/3 px-5 md:px-0">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+              <Button
+                onClick={() => setSelected('CLIENT')}
+                variant="unstyled"
+                externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${selectedType === 'CLIENT'
+                  ? 'border-zinc-600'
+                  : 'border-dashed border-zinc-300'
+                  } p-5 rounded-lg`}
+              >
+                <img
+                  className="hidden md:block rounded-lg max-w-full h-auto"
+                  src={userImage}
+                  alt=""
+                />
+                <div className="mt-0 md:mt-4">
+                  <h3 className="font-bold text-2xl text-start">User</h3>
+                  <h3 className="text-zinc-500 text-start">
+                    I&apos;m here to download free photos and videos.
+                  </h3>
+                </div>
+              </Button>
+              <Button
+                onClick={() => setSelected('CREATOR')}
+                variant="unstyled"
+                externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${selectedType === 'CREATOR'
+                  ? 'border-zinc-600'
+                  : 'border-dashed border-zinc-300'
+                  } p-5 rounded-lg cursor-pointer`}
+              >
+                <img
+                  className="hidden md:block rounded-lg max-w-full h-auto"
+                  src={creatorImage}
+                  alt=""
+                />
+                <div className="mt-0 md:mt-4">
+                  <h3 className="font-bold text-2xl text-start">Creator</h3>
+                  <h3 className="text-zinc-500 text-start">
+                    I&apos;m here to share my photos and videos with the world.
+                  </h3>
+                </div>
+              </Button>
+            </div>
+            {selectedType ? (
+              <Button
+                size="lg"
+                onClick={handleContinue}
+                variant="outline"
+                externalClassName="flex md:hidden flex-row items-center justify-center mt-10 w-full"
+              >
+                Continue <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
+              </Button>
+            ) : null}
+          </div>
+          <div className="w-5/6 md:w-3/6">
+            <p className="text-center font-medium text-zinc-500">
+              We’ll use this info to personalize your experience. You’ll always be
+              able to both download and upload photos and videos, no matter which
+              option you choose.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+      <SetupAccountModal open={isOpen} onClose={onToggle} />
+    </>
   )
 }

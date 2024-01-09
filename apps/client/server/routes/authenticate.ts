@@ -59,7 +59,6 @@ authRouter.post('/', async (req, res) => {
     const data = await apiReq.json()
     return res.status(200).json(data)
   } catch (error: unknown) {
-    console.log({error})
     return res.status(400).json({data: error})
   }
 })

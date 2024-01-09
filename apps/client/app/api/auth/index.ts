@@ -49,6 +49,38 @@ export const authenticate = async (props: AuthenticateInputProps) => {
   }
 }
 
+interface SetupAccountInputProps {
+  role: "CLIENT" | "CREATOR"
+  name?: string
+  username?: string
+}
+
+
+export const setupAccount = async (input: SetupAccountInputProps) => {
+  try {
+    const response = await fetchClient<boolean>('/v1/auth/setup', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    })
+
+    return response.parsedBody
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw error
+    }
+
+    // Error from server.
+    if (error instanceof Response) {
+      const response = await error.json()
+      throw new Error(response.message)
+    }
+  }
+}
+export const useSetupAccount = () =>
+  useMutation({
+    mutationFn: setupAccount,
+  })
+
 export const useAuthenticate = () =>
   useMutation({
     mutationFn: authenticate,

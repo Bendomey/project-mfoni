@@ -82,6 +82,5 @@ export const obtainOauthAccessToken = async ({
     },
   })
   const responseText = await res.text()
-  console.log(responseText)
   return parseOAuthRequestToken(responseText)
 }
