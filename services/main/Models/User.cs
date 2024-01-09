@@ -30,8 +30,9 @@ public class User
     [BsonElement("photo")]
     public string? Photo { get; set; }
 
+    [BsonRepresentation(BsonType.ObjectId)]
     [BsonElement("creator_application_id")]
-    public ObjectId? CreatorApplication { get; set; } // only set after user is approved as creator
+    public string? CreatorApplication { get; set; } // only set after user is approved as creator
 
     [BsonElement("account_setup_at")]
     public DateTime? AccountSetupAt { get; set; }

@@ -14,5 +14,6 @@ public class AppConstants
     public string ProcessImageQueueName { get; set; } = null!;
     public string UserJwtSecret { get; set; } = null!;
     public string AdminJwtSecret { get; set; } = null!;
+    public string JwtIssuer { get; set; } = null!;
 
 }

@@ -13,6 +13,7 @@ public class Auth
 {
     private readonly ILogger<SaveTags> _logger;
     private readonly IMongoCollection<Models.User> _usersCollection;
+    private readonly IMongoCollection<Models.CreatorApplication> _creatorsCollection;
     private readonly AppConstants _appConstantsConfiguration;
 
     public Auth(ILogger<SaveTags> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants)
@@ -22,6 +23,8 @@ public class Auth
         var database = connectToDatabase(mfoniStoreDatabaseSettings);
 
         _usersCollection = database.GetCollection<Models.User>(appConstants.Value.UserCollection);
+
+        _creatorsCollection = database.GetCollection<Models.CreatorApplication>(appConstants.Value.CreatorApplicatonCollection);
 
         _appConstantsConfiguration = appConstants.Value;
 
@@ -52,7 +55,7 @@ public class Auth
                     throw new Exception("UserAlreadyExistsWithAnotherProvider");
                 }
             }
-            
+
             // create new user
             __user = new Models.User
             {
@@ -79,6 +82,35 @@ public class Auth
         return null;
     }
 
+    public bool SetupAccount(SetupAccountInput accountInput, CurrentUserOutput userInput)
+    {
+        var user = _usersCollection.Find<Models.User>(user => user.Id == userInput.Id).FirstOrDefault();
+
+        if (user is null)
+        {
+            throw new Exception("UserNotFound");
+        }
+
+        user.Name = accountInput.Name;
+        user.Role = accountInput.Role;
+        user.Username = accountInput.Username;
+        user.AccountSetupAt = DateTime.UtcNow;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        _usersCollection.ReplaceOne(user => user.Id == userInput.Id, user);
+
+        if (accountInput.Role == "CREATOR" && user.CreatorApplication is null)
+        {
+            var __newCreatorApplication = new Models.CreatorApplication
+            {
+                CreatedBy = user.Id,
+            };
+            _creatorsCollection.InsertOne(__newCreatorApplication);
+        }
+
+        return true;
+    }
+
     private string generateToken(Models.User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -87,11 +119,11 @@ public class Auth
         {
             Subject = new ClaimsIdentity(new Claim[]
             {
-                new Claim(ClaimTypes.Name, user.Id.ToString()),
+                new Claim("id", user.Id.ToString()),
                 new Claim(ClaimTypes.Role, "USER"), // Either a USER or ADMIN
             }),
-            Issuer = "mfoni.com",
-            Expires = DateTime.UtcNow.AddDays(7),
+            Issuer = _appConstantsConfiguration.JwtIssuer,
+            Audience = _appConstantsConfiguration.JwtIssuer,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 

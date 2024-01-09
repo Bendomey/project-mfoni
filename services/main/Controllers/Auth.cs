@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using main.Domains;
 using main.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using main.Middlewares;
 
 namespace main.Controllers;
 
@@ -40,6 +43,31 @@ public class AuthController : ControllerBase
             _logger.LogError(e, "Error authenticating user");
             return new GetEntityResponse<AuthenticateResponse>(null, e.Message).Result();
         }
+    }
+
+    [Authorize]
+    [HttpPost("auth/setup")]
+    public OutputResponse<bool?> SetupAccount([FromBody] SetupAccountInput input)
+    {
+        _logger.LogInformation("Setting up account." + input);
+        var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+        if (currentUser is not null)
+        {
+            try
+            {
+                var res = _authService.SetupAccount(input, currentUser);
+
+                return new GetEntityResponse<bool?>(true, null).Result();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error setting up account");
+                return new GetEntityResponse<bool?>(null, e.Message).Result();
+            }
+
+        }
+
+        return new GetEntityResponse<bool?>(null, "UserNotFound").Result();
     }
 
 }
