@@ -3,13 +3,15 @@ import { Button } from "@/components/button/index.tsx"
 import { TWITTER_BASE_URL } from "@/constants/index.ts";
 import { useSearchParams, useLocation, useNavigate } from "@remix-run/react";
 import { useCallback, useEffect } from "react";
-import { useLoginAuth } from "../context/index.tsx";
 import { toast } from "react-hot-toast";
 import { errorMessagesWrapper } from "@/constants/error-messages.ts";
+import { useLoginAuth } from "../context/index.tsx";
+import { useAuth } from "@/providers/auth/index.tsx";
 
 export const TwitterButton = () => {
     const { mutate } = useAuthenticate()
     const { setErrorMessage, setIsLoading } = useLoginAuth()
+    const { onSignin } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
     const [params] = useSearchParams()
@@ -40,9 +42,18 @@ export const TwitterButton = () => {
                     }
                 },
                 onSuccess: (successRes) => {
-                    console.log(successRes)
-                    toast.success(`Welcome ${successRes?.user.name ?? ''}`)
-                    //save token to cookies
+                    if (successRes) {
+                        onSignin(successRes)
+
+                        if (successRes.user.accountSetupAt) {
+                            navigate('/')
+                            toast.success(`Welcome ${successRes.user.name}`)
+                        } else {
+                            navigate('/auth/onboarding')
+                            toast.success('Setup account')
+                        }
+
+                    }
                 },
                 onSettled: () => {
                     setIsLoading(false)
@@ -50,7 +61,7 @@ export const TwitterButton = () => {
             })
 
         }
-    }, [location, mutate, navigate, params, setErrorMessage, setIsLoading])
+    }, [location, mutate, navigate, onSignin, params, setErrorMessage, setIsLoading])
 
 
     useEffect(() => {

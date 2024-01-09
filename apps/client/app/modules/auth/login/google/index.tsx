@@ -1,11 +1,12 @@
 import { useAuthenticate } from '@/api/auth/index.ts'
 import { useBreakpoint } from '@/hooks/tailwind.ts'
 import { isBrowser } from '@/lib/is-browser.ts'
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData, useNavigate } from '@remix-run/react'
 import { useCallback, useEffect, useRef } from 'react'
 import { useLoginAuth } from '../context/index.tsx'
 import { errorMessagesWrapper } from '@/constants/error-messages.ts'
 import { toast } from 'react-hot-toast'
+import { useAuth } from '@/providers/auth/index.tsx'
 
 declare global {
     interface Window {
@@ -17,6 +18,8 @@ declare global {
 export const GoogleButton = () => {
     const { mutate } = useAuthenticate()
     const { setIsLoading, setErrorMessage } = useLoginAuth()
+    const { onSignin } = useAuth()
+    const navigate = useNavigate()
 
     const signInRef = useRef(null)
     const data = useLoaderData<{ GOOGLE_AUTH_CLIENT_ID: string }>()
@@ -38,16 +41,25 @@ export const GoogleButton = () => {
                     }
                 },
                 onSuccess: (successRes) => {
-                    console.log(successRes)
-                    toast.success(`Welcome ${successRes?.user.name ?? ''}`)
-                    //save token to cookies
+                    if (successRes) {
+                        onSignin(successRes)
+
+                        if (successRes.user.accountSetupAt) {
+                            navigate('/')
+                            toast.success(`Welcome ${successRes.user.name}`)
+                        } else {
+                            navigate('/auth/onboarding')
+                            toast.success('Setup account')
+                        }
+
+                    }
                 },
                 onSettled: () => {
                     setIsLoading(false)
                 }
             })
         }
-    }, [mutate, setErrorMessage, setIsLoading])
+    }, [mutate, navigate, onSignin, setErrorMessage, setIsLoading])
 
     const init = useCallback(() => {
         if (window.google) {

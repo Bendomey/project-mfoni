@@ -1,13 +1,25 @@
-import {Button} from '@/components/button/index.tsx'
-import {APP_NAME} from '@/constants/index.ts'
-import {ArrowRightIcon} from '@heroicons/react/24/solid'
-import {Link} from '@remix-run/react'
+import { Button } from '@/components/button/index.tsx'
+import { APP_NAME } from '@/constants/index.ts'
+import { ArrowRightIcon } from '@heroicons/react/24/solid'
+import { Link, useNavigate } from '@remix-run/react'
 import creatorImage from '@/assets/creator.jpg'
 import userImage from '@/assets/user.jpeg'
-import {useState} from 'react'
+import { useEffect, useState } from 'react'
+import { useAuth } from '@/providers/auth/index.tsx'
 
 export const OnboardingModule = () => {
   const [selectedType, setSelected] = useState<'USER' | 'CREATOR'>()
+  const navigate = useNavigate()
+  const {getToken} = useAuth()
+
+
+  useEffect(() => {
+    const token = getToken()
+    if (!token) {
+      navigate('/auth')
+    }
+  }, [getToken, navigate])
+
   return (
     <div className="h-screen w-full flex flex-col">
       <div className="border-b border-zinc-200 px-5 md:px-10 py-5 flex flex-row items-center justify-between">
@@ -38,11 +50,10 @@ export const OnboardingModule = () => {
             <Button
               onClick={() => setSelected('USER')}
               variant="unstyled"
-              externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${
-                selectedType === 'USER'
-                  ? 'border-zinc-600'
-                  : 'border-dashed border-zinc-300'
-              } p-5 rounded-lg`}
+              externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${selectedType === 'USER'
+                ? 'border-zinc-600'
+                : 'border-dashed border-zinc-300'
+                } p-5 rounded-lg`}
             >
               <img
                 className="hidden md:block rounded-lg max-w-full h-auto"
@@ -59,11 +70,10 @@ export const OnboardingModule = () => {
             <Button
               onClick={() => setSelected('CREATOR')}
               variant="unstyled"
-              externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${
-                selectedType === 'CREATOR'
-                  ? 'border-zinc-600'
-                  : 'border-dashed border-zinc-300'
-              } p-5 rounded-lg cursor-pointer`}
+              externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${selectedType === 'CREATOR'
+                ? 'border-zinc-600'
+                : 'border-dashed border-zinc-300'
+                } p-5 rounded-lg cursor-pointer`}
             >
               <img
                 className="hidden md:block rounded-lg max-w-full h-auto"

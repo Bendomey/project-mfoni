@@ -1,17 +1,25 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Button } from '@/components/button/index.tsx'
 import { APP_NAME } from '@/constants/index.ts'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { TwitterButton } from './twitter/index.tsx'
-import { GoogleButton } from './google/index.tsx'
-import { LoginAuthProvider, useLoginAuth } from './context/index.tsx'
 import { Loader } from '@/components/loader/index.tsx'
 import { Transition } from '@headlessui/react'
 import { Fragment, useEffect } from 'react'
 import { FacebookButton } from './facebook/index.tsx'
+import { LoginAuthProvider, useLoginAuth } from './context/index.tsx'
+import { GoogleButton } from './google/index.tsx'
+import { useAuth } from '@/providers/auth/index.tsx'
 
 
 export const LoginComponent = () => {
   const { isLoading, errorMessage, setErrorMessage } = useLoginAuth()
+  const {onSignout} = useAuth()
+
+  useEffect(() => {
+    // signout when a user visits this page.
+    onSignout()
+  }, [])
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout

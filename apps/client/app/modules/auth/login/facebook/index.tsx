@@ -1,11 +1,12 @@
 /* eslint-disable func-names */
 import { useAuthenticate } from "@/api/auth/index.ts";
 import { Button } from "@/components/button/index.tsx";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 import { useLoginAuth } from "../context/index.tsx";
 import { errorMessagesWrapper } from "@/constants/error-messages.ts";
 import { toast } from "react-hot-toast";
+import { useAuth } from "@/providers/auth/index.tsx";
 
 declare global {
     interface Window {
@@ -20,6 +21,8 @@ export const FacebookButton = () => {
 
     const { mutate } = useAuthenticate()
     const { setIsLoading, setErrorMessage } = useLoginAuth()
+    const { onSignin } = useAuth()
+    const navigate = useNavigate()
 
     useEffect(() => {
         window.fbAsyncInit = function () {
@@ -58,9 +61,18 @@ export const FacebookButton = () => {
                 }
             },
             onSuccess: (successRes) => {
-                console.log(successRes)
-                toast.success(`Welcome ${successRes?.user.name ?? ''}`)
-                //save token to cookies
+                if (successRes) {
+                    onSignin(successRes)
+
+                    if (successRes.user.accountSetupAt) {
+                        navigate('/')
+                        toast.success(`Welcome ${successRes.user.name}`)
+                    } else {
+                        navigate('/auth/onboarding')
+                        toast.success('Setup account')
+                    }
+
+                }
             },
             onSettled: () => {
                 setIsLoading(false)
