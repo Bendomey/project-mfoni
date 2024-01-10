@@ -68,7 +68,7 @@ export const useAsyncImage: IAsyncImage = (url) => {
           }
         }
         image.src = url
-      } catch (e) {
+      } catch (e: unknown) {
         onError(e as string)
       }
     }
