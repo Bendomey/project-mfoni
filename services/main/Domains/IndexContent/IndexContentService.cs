@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System.Text;
 using RabbitMQ.Client;
+using System.Net.Security;
 
 namespace main.Domains;
 
@@ -43,10 +44,8 @@ public class IndexContent
     private IConnection CreateChannel()
     {
         ConnectionFactory connection = new ConnectionFactory()
-        {
-            UserName = _rabbitMqConfiguration.UserName,
-            Password = _rabbitMqConfiguration.Password,
-            HostName = _rabbitMqConfiguration.HostName
+       {
+            Uri = new Uri(_rabbitMqConfiguration.Uri)
         };
         connection.DispatchConsumersAsync = true;
         var channel = connection.CreateConnection();
