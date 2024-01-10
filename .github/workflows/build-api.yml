@@ -1,0 +1,27 @@
+name: Build Api
+
+on:
+  workflow_call:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+        - uses: actions/checkout@v4
+        - name: Setup dotnet
+          uses: actions/setup-dotnet@v3
+          with:
+            dotnet-version: '8.0'
+
+        - uses: actions/cache@v3
+          with:
+              path: ~/.nuget/packages
+              # Look to see if there is a cache hit for the corresponding requirements file
+              key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+              restore-keys: |
+                ${{ runner.os }}-nuget
+        - name: Install dependencies
+          run: dotnet restore
+        - name: Build Release
+          run: dotnet publish -c Release -o out

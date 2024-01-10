@@ -1,0 +1,17 @@
+name: Api CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - prod
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-api.yml

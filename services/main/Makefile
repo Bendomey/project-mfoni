@@ -13,3 +13,9 @@ run-staging:
 
 run:
 	dotnet run --launch-profile Production
+
+build-release:
+	dotnet publish -c Release -o out
+
+build-docker:
+	docker build -t mfoni-api -f Dockerfile .
