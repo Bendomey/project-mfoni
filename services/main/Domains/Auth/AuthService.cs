@@ -91,6 +91,13 @@ public class Auth
             throw new Exception("UserNotFound");
         }
 
+        var checkIfUsernameExists = _usersCollection.Find<Models.User>(user => user.Username == accountInput.Username).FirstOrDefault();
+
+        if (checkIfUsernameExists is not null)
+        {
+            throw new Exception("UsernameAlreadyTaken");
+        }
+
         user.Name = accountInput.Name;
         user.Role = accountInput.Role;
         user.Username = accountInput.Username;
@@ -109,6 +116,18 @@ public class Auth
         }
 
         return true;
+    }
+
+    public Models.User? Me(CurrentUserOutput userInput)
+    {
+        var user = _usersCollection.Find<Models.User>(user => user.Id == userInput.Id).FirstOrDefault();
+
+        if (user is null)
+        {
+            throw new Exception("UserNotFound");
+        }
+
+        return user;
     }
 
     private string generateToken(Models.User user)

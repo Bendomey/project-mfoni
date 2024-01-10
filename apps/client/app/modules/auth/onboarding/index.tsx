@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { SetupAccountModal } from './setup-modal/index.tsx'
+import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 
 export const OnboardingModule = () => {
   const [selectedType, setSelected] = useState<'CLIENT' | 'CREATOR'>()
@@ -31,24 +32,27 @@ export const OnboardingModule = () => {
     <>
       <div className="h-screen w-full flex flex-col relative">
         <div className="border-b border-zinc-200 px-5 md:px-10 py-5 flex flex-row items-center justify-between">
-          <Link to="/" className="">
-            <div className="flex flex-row items-end">
+          <Link to="/auth" className="ml-2 flex flex-row items-center">
+            <ArrowLeftIcon className='h-7 w-7 text-zinc-600' />
+            <div className="flex flex-row items-end ml-2">
               <span className="text-4xl text-blue-700 font-extrabold">
                 {APP_NAME.slice(0, 1)}
               </span>
               <span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
             </div>
           </Link>
-          {selectedType ? (
-            <Button
-              onClick={handleContinue}
-              size="lg"
-              variant="outline"
-              externalClassName="hidden md:flex flex-row items-center"
-            >
-              Continue <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
-            </Button>
-          ) : null}
+          <div>
+            {selectedType ? (
+              <Button
+                onClick={handleContinue}
+                size="lg"
+                variant="outline"
+                externalClassName="hidden md:flex flex-row items-center"
+              >
+                Continue <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
+              </Button>
+            ) : null}
+          </div>
         </div>
         <div className="h-full bg-zinc-50 flex flex-col justify-center items-center">
           <h1 className="font-bold  text-center text-4xl w-2/3 md:w-auto md:text-5xl">
@@ -67,12 +71,12 @@ export const OnboardingModule = () => {
                 <img
                   className="hidden md:block rounded-lg max-w-full h-auto"
                   src={userImage}
-                  alt=""
+                  alt="I'm here to download photos and videos"
                 />
                 <div className="mt-0 md:mt-4">
                   <h3 className="font-bold text-2xl text-start">User</h3>
                   <h3 className="text-zinc-500 text-start">
-                    I&apos;m here to download free photos and videos.
+                    I&apos;m here to download photos and videos.
                   </h3>
                 </div>
               </Button>
@@ -87,7 +91,7 @@ export const OnboardingModule = () => {
                 <img
                   className="hidden md:block rounded-lg max-w-full h-auto"
                   src={creatorImage}
-                  alt=""
+                  alt="I'm here to share my photos and videos with the world"
                 />
                 <div className="mt-0 md:mt-4">
                   <h3 className="font-bold text-2xl text-start">Creator</h3>
@@ -117,7 +121,7 @@ export const OnboardingModule = () => {
           </div>
         </div>
       </div>
-      <SetupAccountModal open={isOpen} onClose={onToggle} />
+      <SetupAccountModal open={isOpen} onClose={onToggle} selectedType={selectedType} />
     </>
   )
 }

@@ -70,4 +70,26 @@ public class AuthController : ControllerBase
         return new GetEntityResponse<bool?>(null, "UserNotFound").Result();
     }
 
+    [Authorize]
+    [HttpGet("auth/me")]
+    public OutputResponse<Models.User> Me(){
+        var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+        if (currentUser is not null)
+        {
+            try
+            {
+                var res = _authService.Me(currentUser);
+
+                return new GetEntityResponse<Models.User>(res, null).Result();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error fetching current user");
+                return new GetEntityResponse<Models.User>(null, e.Message).Result();
+            }
+        }
+
+        return new GetEntityResponse<Models.User>(null, "UserNotFound").Result();
+    }
+
 }

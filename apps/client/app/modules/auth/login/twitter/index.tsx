@@ -1,12 +1,13 @@
 import { initiateTwitterAuth, useAuthenticate } from "@/api/auth/index.ts"
 import { Button } from "@/components/button/index.tsx"
-import { TWITTER_BASE_URL } from "@/constants/index.ts";
+import { QUERY_KEYS, TWITTER_BASE_URL } from "@/constants/index.ts";
 import { useSearchParams, useLocation, useNavigate } from "@remix-run/react";
 import { useCallback, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { errorMessagesWrapper } from "@/constants/error-messages.ts";
 import { useLoginAuth } from "../context/index.tsx";
 import { useAuth } from "@/providers/auth/index.tsx";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const TwitterButton = () => {
     const { mutate } = useAuthenticate()
@@ -15,6 +16,7 @@ export const TwitterButton = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const [params] = useSearchParams()
+    const queryClient = useQueryClient()
 
     const checkForTwitterResponse = useCallback(() => {
         const oAuthToken = params.get("oauth_token")
@@ -44,6 +46,7 @@ export const TwitterButton = () => {
                 onSuccess: (successRes) => {
                     if (successRes) {
                         onSignin(successRes)
+                        queryClient.setQueryData([QUERY_KEYS.CURRENT_USER], successRes.user)
 
                         if (successRes.user.accountSetupAt) {
                             navigate('/')
@@ -61,7 +64,7 @@ export const TwitterButton = () => {
             })
 
         }
-    }, [location, mutate, navigate, onSignin, params, setErrorMessage, setIsLoading])
+    }, [location, mutate, navigate, onSignin, params, queryClient, setErrorMessage, setIsLoading])
 
 
     useEffect(() => {

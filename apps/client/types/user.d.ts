@@ -1,29 +1,30 @@
 interface User {
     id: string;
     role: "CLIENT" | "CREATOR";
-    type: "GOOGLE" | "TWITTER" | "FACEBOOK";
+    provider: "GOOGLE" | "TWITTER" | "FACEBOOK";
     name: string;
     oAuthId: string;
-    email: PossiblyUndefined<string>;
-    photo: PossiblyUndefined<string>;
-    creatorApplication: PossiblyUndefined<string>;
-    accountSetupAt: PossiblyUndefined<Date>;
+    email: Nullable<string>;
+    username: Nullable<string>;
+    photo: Nullable<string>;
+    creatorApplication: Nullable<string>;
+    accountSetupAt: Nullable<Date>;
     createdAt: Date;
     updatedAt: Date;
 }
 
 interface CreatorApplication {
     id: string;
-    userId: string;
-    status: "PENDING" | "APPROVED" | "REJECTED";
-    approvedAt: PossiblyUndefined<Date>;
-    approvedBy: PossiblyUndefined<string>;
-    rejectedAt: PossiblyUndefined<Date>;
-    rejectedBy: PossiblyUndefined<string>;
-    platformAggrementForm: PossiblyUndefined<string>;
-    ghanaCardFront: PossiblyUndefined<string>;
-    ghanaCardBack: PossiblyUndefined<string>;
+    status: "PENDING" | "SUBMITTED" | "APPROVED" | "REJECTED";
+    submittedAt: Nullable<Date>;
+    approvedAt: Nullable<Date>;
+    approvedBy: Nullable<string>;
+    rejectedAt: Nullable<Date>;
+    rejectedBy: Nullable<string>;
+    platformAggrementForm: Nullable<string>;
+    ghanaCardFront: Nullable<string>;
+    ghanaCardBack: Nullable<string>;
     createdAt: Date;
-    createdBy: PossiblyUndefined<string>;
+    createdBy: string;
     updatedAt: Date;
 }

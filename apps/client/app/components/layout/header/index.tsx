@@ -1,17 +1,19 @@
-import {useState} from 'react'
-import {Dialog} from '@headlessui/react'
-import {Bars3Icon, XMarkIcon} from '@heroicons/react/24/outline'
-import {Link} from '@remix-run/react'
-import {APP_NAME} from '@/constants/index.ts'
-import {Button} from '@/components/button/index.tsx'
-import {SearchPhotos} from './search/index.tsx'
-import {SearchPhotosForMobile} from './search-for-mobile/index.tsx'
+import { useState } from 'react'
+import { Dialog } from '@headlessui/react'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Link } from '@remix-run/react'
+import { APP_NAME } from '@/constants/index.ts'
+import { Button } from '@/components/button/index.tsx'
+import { SearchPhotos } from './search/index.tsx'
+import { SearchPhotosForMobile } from './search-for-mobile/index.tsx'
 import useScroll from '@/hooks/use-scroll.ts'
+import { useAuth } from '@/providers/auth/index.tsx'
 
-const navigation = [
-  {name: 'Explore', href: '/explore'},
-  {name: 'Terms Of Use', href: '/terms'},
-  {name: 'Log in', href: '/auth'},
+const navigation = (isLoggedIn: boolean) => [
+  { name: 'Explore', href: '/explore' },
+  { name: 'Terms Of Use', href: '/terms' },
+  isLoggedIn ? undefined : { name: 'Log in', href: '/auth' },
+  isLoggedIn ? { name: 'My Account', href: '/my-account' } : undefined,
 ]
 
 interface Props {
@@ -23,6 +25,7 @@ export const Header = ({
   isHeroSearchInVisible,
   shouldHeaderBlur = true,
 }: Props) => {
+  const { isLoggedIn } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const scrolled = useScroll(50)
 
@@ -64,7 +67,7 @@ export const Header = ({
           </button>
         </div>
         <div className="hidden lg:flex lg:justify-center lg:items-center lg:gap-x-12">
-          {navigation.map(item => (
+          {navigation(isLoggedIn).map(item => item ? (
             <Link
               key={item.name}
               to={item.href}
@@ -72,7 +75,7 @@ export const Header = ({
             >
               {item.name}
             </Link>
-          ))}
+          ) : null)}
           <Button href="/upload" variant="outline" isLink>
             Upload a Photo <span aria-hidden="true">&rarr;</span>
           </Button>
@@ -114,7 +117,7 @@ export const Header = ({
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
-                {navigation.map(item => (
+                {navigation(isLoggedIn).map(item => item ? (
                   <Link
                     key={item.name}
                     to={item.href}
@@ -122,7 +125,7 @@ export const Header = ({
                   >
                     {item.name}
                   </Link>
-                ))}
+                ) : null)}
               </div>
               <div className="py-6">
                 <Button href="/upload" variant="outline" size="lg" isLink>

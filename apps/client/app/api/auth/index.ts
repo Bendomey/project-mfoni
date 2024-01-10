@@ -1,4 +1,4 @@
-import {useMutation} from '@tanstack/react-query'
+import {useMutation, useQuery, type UndefinedInitialDataOptions, type QueryKey} from '@tanstack/react-query'
 import {fetchClient} from '@/lib/transport/index.ts'
 import {QUERY_KEYS} from '@/constants/index.ts'
 
@@ -8,7 +8,9 @@ export const initiateTwitterAuth = async () => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({callbackUrl: window.location.origin + window.location.pathname}),
+    body: JSON.stringify({
+      callbackUrl: window.location.origin + window.location.pathname,
+    }),
   })
   const data = await res.json()
   return data
@@ -49,21 +51,29 @@ export const authenticate = async (props: AuthenticateInputProps) => {
   }
 }
 
+export const useAuthenticate = () =>
+  useMutation({
+    mutationFn: authenticate,
+  })
+
 interface SetupAccountInputProps {
-  role: "CLIENT" | "CREATOR"
-  name?: string
+  role: 'CLIENT' | 'CREATOR'
+  name: string
   username?: string
 }
 
-
 export const setupAccount = async (input: SetupAccountInputProps) => {
   try {
-    const response = await fetchClient<boolean>('/v1/auth/setup', {
+    const response = await fetchClient<ApiResponse<boolean>>('/v1/auth/setup', {
       method: 'POST',
       body: JSON.stringify(input),
     })
 
-    return response.parsedBody
+    if (!response.status && response.parsedBody.errorMessage) {
+      throw new Error(response.parsedBody.errorMessage)
+    }
+
+    return response.parsedBody.data
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw error
@@ -81,15 +91,15 @@ export const useSetupAccount = () =>
     mutationFn: setupAccount,
   })
 
-export const useAuthenticate = () =>
-  useMutation({
-    mutationFn: authenticate,
-  })
-
 const getCurrentUser = async () => {
   try {
-    const response = await fetchClient<User>('/v1/users/current')
-    return response.parsedBody
+    const response = await fetchClient<ApiResponse<User>>('/v1/auth/me')
+
+    if (!response.status && response.parsedBody.errorMessage) {
+      throw new Error(response.parsedBody.errorMessage)
+    }
+
+    return response.parsedBody.data
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw error
@@ -102,8 +112,9 @@ const getCurrentUser = async () => {
     }
   }
 }
-export const useGetCurrentUser = () =>
-  useMutation({
-    mutationFn: getCurrentUser,
-    mutationKey: [QUERY_KEYS.CURRENT_USER],
+export const useGetCurrentUser = (opts?: Omit<UndefinedInitialDataOptions<User | undefined, Error, User | undefined, QueryKey>, 'queryKey'>) =>
+  useQuery({
+    queryFn: getCurrentUser,
+    queryKey: [QUERY_KEYS.CURRENT_USER],
+    ...opts,
   })
