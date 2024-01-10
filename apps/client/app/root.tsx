@@ -1,6 +1,6 @@
-import {cssBundleHref} from '@remix-run/css-bundle'
-import {type PropsWithChildren} from 'react'
-import {type LinksFunction} from '@remix-run/node'
+import { cssBundleHref } from '@remix-run/css-bundle'
+import { type PropsWithChildren } from 'react'
+import { json, type LinksFunction } from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -10,9 +10,12 @@ import {
   ScrollRestoration,
   useRouteError,
   isRouteErrorResponse,
+  useLoaderData,
 } from '@remix-run/react'
-import {NODE_ENV} from './constants/index.ts'
+import { NODE_ENV } from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
+import { Toaster } from 'react-hot-toast';
+import { Providers } from './providers/index.tsx'
 
 export const links: LinksFunction = () => {
   return [
@@ -34,21 +37,33 @@ export const links: LinksFunction = () => {
     //   sizes: '16x16',
     //   href: '/favicons/favicon-16x16.png',
     // },
-    {rel: 'icon', href: '/favicon.ico'},
-    {rel: 'stylesheet', href: tailwindStyles},
-    ...(cssBundleHref ? [{rel: 'stylesheet', href: cssBundleHref}] : []),
+    { rel: 'icon', href: '/favicon.ico' },
+    { rel: 'stylesheet', href: tailwindStyles },
+    ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
   ]
+}
+
+export async function loader() {
+  return json({
+    ENV: {
+      API_ADDRESS: `${process.env.API_ADDRESS}/api`,
+    },
+  });
 }
 
 export default function App() {
   return (
     <Document>
-      <Outlet />
+      <Providers>
+        <Outlet />
+      </Providers>
     </Document>
   )
 }
 
-function Document({children}: PropsWithChildren) {
+function Document({ children }: PropsWithChildren) {
+  const data = useLoaderData<typeof loader>()
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -61,7 +76,21 @@ function Document({children}: PropsWithChildren) {
       </head>
       <body className="h-full">
         {children}
+        <Toaster position='bottom-center' />
         <ScrollRestoration />
+        <script
+          src="https://accounts.google.com/gsi/client"
+          async
+          defer
+          data-nscript="afterInteractive"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(
+              data.ENV
+            )}`,
+          }}
+        />
         <Scripts />
         {NODE_ENV === 'development' ? <LiveReload /> : null}
       </body>

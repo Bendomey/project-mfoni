@@ -6,6 +6,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
+using Amazon.Runtime;
 
 namespace main.Domains;
 
@@ -44,7 +45,9 @@ public class ProcessIndexContent
             arguments: null
         );
 
-        _rekognitionClient = new AmazonRekognitionClient();
+        var credentials = new BasicAWSCredentials(_appConstantsConfiguration.AWSAccessKey, _appConstantsConfiguration.AWSSecretKey);
+        var region = Amazon.RegionEndpoint.USEast1;
+        _rekognitionClient = new AmazonRekognitionClient(credentials, region);
 
         _logger.LogDebug("ProcessIndexContentService initialized");
     }
@@ -60,9 +63,7 @@ public class ProcessIndexContent
     {
         ConnectionFactory connection = new ConnectionFactory()
         {
-            UserName = _rabbitMqConfiguration.UserName,
-            Password = _rabbitMqConfiguration.Password,
-            HostName = _rabbitMqConfiguration.HostName
+            Uri = new Uri(_rabbitMqConfiguration.Uri)
         };
         connection.DispatchConsumersAsync = true;
         var channel = connection.CreateConnection();

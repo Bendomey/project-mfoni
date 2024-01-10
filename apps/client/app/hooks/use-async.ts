@@ -71,7 +71,7 @@ export const useAsync: IUseAsync = (asyncFunction, immediate = true) => {
   // in an onClick handler.
   React.useEffect(() => {
     if (immediate) {
-      execute()
+      void execute()
     }
   }, [execute, immediate, isMounted])
 

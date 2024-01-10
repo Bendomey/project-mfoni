@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
 using MongoDB.Bson;
+using Amazon.Runtime;
 
 namespace main.Domains;
 
@@ -28,7 +29,10 @@ public class SearchContent
 
         _appConstantsConfiguration = appConstants.Value;
 
-        _rekognitionClient = new AmazonRekognitionClient();
+        var credentials = new BasicAWSCredentials(_appConstantsConfiguration.AWSAccessKey, _appConstantsConfiguration.AWSSecretKey);
+        var region = Amazon.RegionEndpoint.USEast1;
+        
+        _rekognitionClient = new AmazonRekognitionClient(credentials, region);
 
         _searchTagsService = searchTagService;
 
