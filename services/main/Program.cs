@@ -2,6 +2,9 @@ using Microsoft.OpenApi.Models;
 using main.Domains;
 using main.HostedServices;
 using main.Configuratons;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,32 @@ builder.Services.Configure<RabbitMQConnection>(
 builder.Services.Configure<AppConstants>(
     builder.Configuration.GetSection("AppConstants"));
 
+var userSecretKey = builder.Configuration.GetSection("AppConstants:UserJwtSecret").Get<string>();
+
+builder.Services.AddAuthentication(options =>
+    {
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+ {
+     options.TokenValidationParameters = new TokenValidationParameters
+     {
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppConstants:UserJwtSecret"]!)),
+        ValidIssuer = builder.Configuration["AppConstants:JwtIssuer"],
+        ValidAudience = builder.Configuration["AppConstants:JwtIssuer"],
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = false,
+        ValidateIssuerSigningKey = true
+     };
+ });
+
+builder.Services.AddAuthorization();
+
+// auth services
+builder.Services.AddSingleton<Auth>();
+
 // search services
 builder.Services.AddSingleton<SearchTag>();
 builder.Services.AddSingleton<SearchContent>();
@@ -25,6 +54,7 @@ builder.Services.AddSingleton<SaveTags>();
 builder.Services.AddSingleton<IndexContent>();
 builder.Services.AddSingleton<ProcessIndexContent>();
 
+// hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();
 
 builder.Services.AddControllers();
@@ -46,7 +76,7 @@ if (!app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 // @TODO: secure based on our frontend setup.
 app.UseCors(builder => builder
@@ -54,6 +84,7 @@ app.UseCors(builder => builder
     .AllowAnyMethod()
     .AllowAnyHeader());
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

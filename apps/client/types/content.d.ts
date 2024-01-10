@@ -1,3 +1,3 @@
 interface Content {
-    url: string
+  url: string
 }
