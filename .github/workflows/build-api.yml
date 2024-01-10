@@ -21,10 +21,18 @@ jobs:
               key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
               restore-keys: |
                 ${{ runner.os }}-nuget
-                
+
         - name: Install dependencies
           run: dotnet restore
           working-directory: services/main
+
+        - name: Prod Env
+          id: create-json
+          uses: jsdaniell/create-json@v1.2.2
+          with:
+            name: "appsettings.Production.json"
+            json: ${{ secrets.PRODUCTION_ENV }}
+            dir: 'services/main'
 
         - name: Build Release
           run: dotnet publish -c Release -o out
