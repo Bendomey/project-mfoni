@@ -21,7 +21,11 @@ jobs:
               key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
               restore-keys: |
                 ${{ runner.os }}-nuget
+                
         - name: Install dependencies
           run: dotnet restore
+          working-directory: services/main
+
         - name: Build Release
           run: dotnet publish -c Release -o out
+          working-directory: services/main
