@@ -16,8 +16,6 @@ Experimentation.
 
 - [Remix](https://remix.run/) – A web framework that lets you focus on the user interface and work back through web standards to deliver a fast, slick, and resilient user experience.
 - [TanStack Query](https://tanstack.com/query/latest/) – Powerful asynchronous state management for TS/JS, React, Solid, Vue and Svelte.
-- [Prisma](https://www.prisma.io/) – Typescript-first ORM for Node.js.
-- [React Email](https://react.email/) – Versatile email framework for efficient and flexible email development.
 
 ### Platforms
 
