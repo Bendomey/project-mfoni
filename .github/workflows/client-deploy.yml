@@ -22,7 +22,7 @@ jobs:
 
       defaults:
         run:
-          working-directory: services/main
+          working-directory: apps/client
       
       steps:
         - name: ⬇️ Checkout repo
