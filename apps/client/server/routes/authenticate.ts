@@ -1,7 +1,7 @@
 import * as express from 'express'
-import { authorizeFacebook } from 'server/utils/facebook/authorize.js'
-import { authorizeGoogle } from 'server/utils/google/authorize.js'
-import {authorizeTwitter} from 'server/utils/twitter/authorize.js'
+import { authorizeFacebook } from '../utils/facebook/authorize.js'
+import { authorizeGoogle } from '../utils/google/authorize.js'
+import {authorizeTwitter} from '../utils/twitter/authorize.js'
 
 const authRouter = express.Router()
 

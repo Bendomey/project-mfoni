@@ -10,7 +10,7 @@ on:
 
 jobs:
   deploy:
-      name: ⚙️ Build
+      name: ⚙️ Build And Deploy
       runs-on: ubuntu-latest
       concurrency: deploy-group
 
@@ -25,21 +25,6 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0'
-
-      - uses: actions/cache@v3
-        with:
-            path: ~/.nuget/packages
-            key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-            restore-keys: |
-              ${{ runner.os }}-nuget
-
-      - name: Install dependencies
-        run: dotnet restore
-
       - name: Setup Environment Variables
         id: create-json
         uses: jsdaniell/create-json@v1.2.2
@@ -47,9 +32,6 @@ jobs:
           name: "appsettings.Production.json"
           json: ${{ secrets.PRODUCTION_ENV }}
           dir: "services/main/"
-
-      - name: Build Release
-        run: dotnet publish -c Release -o out
 
       - name: 🎈 Setup Fly
         uses: superfly/flyctl-actions/setup-flyctl@master
