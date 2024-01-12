@@ -25,7 +25,7 @@ export const GoogleButton = () => {
     const queryClient = useQueryClient()
 
     const signInRef = useRef(null)
-    const data = useLoaderData<{ GOOGLE_AUTH_CLIENT_ID: string }>()
+    const data = useLoaderData<{ MFONI_GOOGLE_AUTH_CLIENT_ID: string }>()
     const isMobileBreakPoint = useBreakpoint('sm')
 
 
@@ -68,7 +68,7 @@ export const GoogleButton = () => {
     const init = useCallback(() => {
         if (window.google) {
             window.google.accounts.id.initialize({
-                client_id: data.GOOGLE_AUTH_CLIENT_ID,
+                client_id: data.MFONI_GOOGLE_AUTH_CLIENT_ID,
                 callback: onLoginWithGoogle,
             })
 
@@ -82,7 +82,7 @@ export const GoogleButton = () => {
                 width: isMobileBreakPoint ? '355' : '385',
             })
         }
-    }, [data.GOOGLE_AUTH_CLIENT_ID, isMobileBreakPoint, onLoginWithGoogle])
+    }, [data.MFONI_GOOGLE_AUTH_CLIENT_ID, isMobileBreakPoint, onLoginWithGoogle])
 
     useEffect(() => {
         if (isBrowser) {

@@ -2,13 +2,13 @@
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const fs = require('fs');
 
-const region = process.env.AWS_REGION;
+const region = process.env.MFONI_AWS_REGION;
 
 // Create an S3 instance
 const s3Client = new S3Client({
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY,
-        secretAccessKey:  process.env.AWS_SECRET_KEY,
+        accessKeyId: process.env.MFONI_AWS_ACCESS_KEY,
+        secretAccessKey:  process.env.MFONI_AWS_SECRET_KEY,
     },
     region,
 })

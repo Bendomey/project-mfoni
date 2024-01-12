@@ -1,6 +1,6 @@
 import {OAuth2Client} from 'google-auth-library'
 
-const CLIENT_ID_GOOGLE = process.env.GOOGLE_AUTH_CLIENT_ID
+const CLIENT_ID_GOOGLE = process.env.MFONI_GOOGLE_AUTH_CLIENT_ID
 
 export const authorizeGoogle = async (authToken: string) => {
   const client = new OAuth2Client(CLIENT_ID_GOOGLE)

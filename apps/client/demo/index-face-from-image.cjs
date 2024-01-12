@@ -1,15 +1,15 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { RekognitionClient, IndexFacesCommand } = require("@aws-sdk/client-rekognition");
 
-const region = process.env.AWS_REGION;
+const region = process.env.MFONI_AWS_REGION;
 
 const collection = process.env.REKOGNITION_COLLECTION;
 
 // Create rekognition instance
 const rekognitionClient = new RekognitionClient({
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY,
-        secretAccessKey:  process.env.AWS_SECRET_KEY,
+        accessKeyId: process.env.MFONI_AWS_ACCESS_KEY,
+        secretAccessKey:  process.env.MFONI_AWS_SECRET_KEY,
     },
     region,
 })
