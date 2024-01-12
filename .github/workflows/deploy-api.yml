@@ -8,6 +8,10 @@ jobs:
         name: ⚙️ Build
         runs-on: ubuntu-latest
 
+        defaults:
+          run:
+            working-directory: services/main
+
         steps:
         - uses: actions/checkout@v4
         - name: Setup dotnet
@@ -25,7 +29,6 @@ jobs:
 
         - name: Install dependencies
           run: dotnet restore
-          working-directory: services/main
 
         - name: Prod Env
           id: create-json
@@ -33,15 +36,17 @@ jobs:
           with:
             name: "appsettings.Production.json"
             json: ${{ secrets.PRODUCTION_ENV }}
-            dir: 'services/main'
 
         - name: Build Release
           run: dotnet publish -c Release -o out
-          working-directory: services/main
 
     deploy:
         name: 🚀 Deploy
         runs-on: ubuntu-latest
+
+        defaults:
+          run:
+            working-directory: services/main
 
         steps:
           - name: ⬇️ Checkout repo
