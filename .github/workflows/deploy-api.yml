@@ -13,7 +13,9 @@ jobs:
             working-directory: services/main
 
         steps:
-        - uses: actions/checkout@v4
+        - name: ⬇️ Checkout repo
+          uses: actions/checkout@v4
+
         - name: Setup dotnet
           uses: actions/setup-dotnet@v3
           with:
@@ -22,7 +24,6 @@ jobs:
         - uses: actions/cache@v3
           with:
               path: ~/.nuget/packages
-              # Look to see if there is a cache hit for the corresponding requirements file
               key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
               restore-keys: |
                 ${{ runner.os }}-nuget
@@ -30,7 +31,7 @@ jobs:
         - name: Install dependencies
           run: dotnet restore
 
-        - name: Prod Env
+        - name: Setup Environment Variables
           id: create-json
           uses: jsdaniell/create-json@v1.2.2
           with:
@@ -40,9 +41,6 @@ jobs:
         - name: Build Release
           run: dotnet publish -c Release -o out
 
-        - name: ⬇️ Checkout repo
-          uses: actions/checkout@v4
-
         - name: What's in the box?
           run: ls -la
 
@@ -50,7 +48,7 @@ jobs:
           uses: superfly/flyctl-actions/setup-flyctl@v1.4
 
         - name: 🚀 Deploy Staging
-          if: ${{ github.ref == 'refs/heads/dev' }}
+          # if: ${{ github.ref == 'refs/heads/dev' }}
           run:
             flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
           env:
