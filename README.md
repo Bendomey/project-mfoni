@@ -16,10 +16,11 @@ Experimentation.
 
 - [Remix](https://remix.run/) – A web framework that lets you focus on the user interface and work back through web standards to deliver a fast, slick, and resilient user experience.
 - [TanStack Query](https://tanstack.com/query/latest/) – Powerful asynchronous state management for TS/JS, React, Solid, Vue and Svelte.
-
+- [Dot Net](https://learn.microsoft.com/en-us/aspnet/core/?view=aspnetcore-8.0) - Learn to use ASP.NET Core to create web apps and services that are fast, secure, cross-platform, and cloud-based. Browse tutorials, sample code, fundamentals, API reference and more.
+  
 ### Platforms
 
-- [Vercel](https://vercel.com/) – Easily preview & deploy changes with git.
+- [Fly.io](https://fly.io/) – Easily deploy staging with actions.
 - [AWS](https://aws.amazon.com/) – Amazon Web Services offers reliable, scalable, and inexpensive cloud computing services.
 
 ### UI
