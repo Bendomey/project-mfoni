@@ -31,33 +31,30 @@ jobs:
         with:
           dotnet-version: '8.0'
 
-      - uses: actions/cache@v3
-        with:
-            path: ~/.nuget/packages
-            key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-            restore-keys: |
-              ${{ runner.os }}-nuget
+      # - uses: actions/cache@v3
+      #   with:
+      #       path: ~/.nuget/packages
+      #       key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+      #       restore-keys: |
+      #         ${{ runner.os }}-nuget
 
-      - name: Install dependencies
-        run: dotnet restore
+      # - name: Install dependencies
+      #   run: dotnet restore
 
-      - name: Setup Environment Variables
-        id: create-json
-        uses: jsdaniell/create-json@v1.2.2
-        with:
-          name: "appsettings.Production.json"
-          json: ${{ secrets.PRODUCTION_ENV }}
-          dir: "services/main/"
+      # - name: Setup Environment Variables
+      #   id: create-json
+      #   uses: jsdaniell/create-json@v1.2.2
+      #   with:
+      #     name: "appsettings.Production.json"
+      #     json: ${{ secrets.PRODUCTION_ENV }}
+      #     dir: "services/main/"
 
-      - name: Build Release
-        run: dotnet publish -c Release -o out
+      # - name: Build Release
+      #   run: dotnet publish -c Release -o out
 
-      - name: What's in the box?
-        run: ls -la
+      # - name: 🎈 Setup Fly
+      #   uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: 🎈 Setup Fly
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: 🚀 Deploy Staging
-        run:
-          flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
+      # - name: 🚀 Deploy Staging
+      #   run:
+      #     flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
