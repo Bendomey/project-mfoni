@@ -31,7 +31,7 @@ public class SearchContent
 
         var credentials = new BasicAWSCredentials(_appConstantsConfiguration.AWSAccessKey, _appConstantsConfiguration.AWSSecretKey);
         var region = Amazon.RegionEndpoint.USEast1;
-        
+
         _rekognitionClient = new AmazonRekognitionClient(credentials, region);
 
         _searchTagsService = searchTagService;
@@ -58,7 +58,7 @@ public class SearchContent
 
         matches.ToList().ForEach(match =>
         {
-            if(!ObjectId.TryParse(match, out _))
+            if (!ObjectId.TryParse(match, out _))
             {
                 return;
             }
@@ -106,7 +106,7 @@ public class SearchContent
     public async Task<List<Content>> TextualSearch(string query)
     {
         var tags = await _searchTagsService.GetTagsBasedOnQuery(query);
-        if(tags.Count == 0)
+        if (tags.Count == 0)
         {
             return [];
         }
@@ -120,7 +120,7 @@ public class SearchContent
             var idFilter = builder.AnyIn("tags", tag.Id);
             filter |= idFilter;
         });
-        
+
         // TODO: implement pagination
         var contents = await _contentsCollection.Find(filter).Skip(0).Limit(10).ToListAsync();
         return contents;

@@ -22,22 +22,22 @@ var userSecretKey = builder.Configuration.GetSection("AppConstants:UserJwtSecret
 
 builder.Services.AddAuthentication(options =>
     {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
- {
-     options.TokenValidationParameters = new TokenValidationParameters
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(options =>
      {
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppConstants:UserJwtSecret"]!)),
-        ValidIssuer = builder.Configuration["AppConstants:JwtIssuer"],
-        ValidAudience = builder.Configuration["AppConstants:JwtIssuer"],
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = false,
-        ValidateIssuerSigningKey = true
-     };
- });
+         options.TokenValidationParameters = new TokenValidationParameters
+         {
+             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppConstants:UserJwtSecret"]!)),
+             ValidIssuer = builder.Configuration["AppConstants:JwtIssuer"],
+             ValidAudience = builder.Configuration["AppConstants:JwtIssuer"],
+             ValidateIssuer = true,
+             ValidateAudience = true,
+             ValidateLifetime = false,
+             ValidateIssuerSigningKey = true
+         };
+     });
 
 builder.Services.AddAuthorization();
 
@@ -60,8 +60,10 @@ builder.Services.AddHostedService<ConsumerHostedService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options => {
-        options.SwaggerDoc("v1", new OpenApiInfo {
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
         Title = "Mfoni API",
         Version = "v1"
     });

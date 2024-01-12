@@ -1,0 +1,38 @@
+name: API CI
+
+on:
+  push:
+    paths:
+        - 'services/main/**'
+    branches:
+      - main
+      - prod
+  pull_request:
+    paths:
+      - 'services/main/**'
+
+jobs:
+  check-code:
+      name: 🧹 Lint
+      runs-on: ubuntu-latest
+
+      defaults:
+        run:
+          working-directory: services/main
+
+      # lint dot net app
+      steps:
+        - name: ⬇️ Checkout repo
+          uses: actions/checkout@v4
+
+        - name: Setup dotnet
+          uses: actions/setup-dotnet@v3
+          with:
+            dotnet-version: '8.0'
+
+        - name: .NET Lint
+          uses: zyactions/dotnet-lint@v1
+          with:
+            workspace: services/main/main.csproj
+            implicit-restore: true
+      

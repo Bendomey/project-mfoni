@@ -44,7 +44,7 @@ public class IndexContent
     private IConnection CreateChannel()
     {
         ConnectionFactory connection = new ConnectionFactory()
-       {
+        {
             Uri = new Uri(_rabbitMqConfiguration.Uri)
         };
         connection.DispatchConsumersAsync = true;
@@ -66,7 +66,7 @@ public class IndexContent
                 Visibility = media.Visibility,
                 Amount = Convert.ToInt32(media.Amount * 100),
                 Media = media.Content,
-                Tags =  dbTags.Select(tag => tag.Id).ToList()
+                Tags = dbTags.Select(tag => tag.Id).ToList()
             };
 
             _contentsCollection.InsertOne(content);

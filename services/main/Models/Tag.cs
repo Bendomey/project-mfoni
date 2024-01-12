@@ -19,5 +19,5 @@ public class Tag
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [BsonElement("updated_at")]
-    public DateTime UpdatedAt { get; set; }  = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

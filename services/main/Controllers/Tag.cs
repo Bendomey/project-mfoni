@@ -34,12 +34,12 @@ public class TagsController : ControllerBase
         _logger.LogInformation("Getting tag: " + id);
         var tag = await _searchTagsService.Get(id);
 
-        if(tag == null)
+        if (tag == null)
         {
             _logger.LogInformation("Tag not found: " + id);
             return new GetEntityResponse<Models.Tag>(null, "TagNotFound").Result();
         }
-        
+
         return new GetEntityResponse<Models.Tag>(tag, null).Result();
     }
 
@@ -51,5 +51,5 @@ public class TagsController : ControllerBase
 
         return new GetEntityResponse<List<Models.Tag>>(tags, null).Result();
     }
-    
+
 }
