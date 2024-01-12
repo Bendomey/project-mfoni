@@ -33,6 +33,6 @@ jobs:
         - name: .NET Lint
           uses: zyactions/dotnet-lint@v1
           with:
-            workspace: main.csproj
+            workspace: services/main/main.csproj
             implicit-restore: true
       
