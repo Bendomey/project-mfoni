@@ -30,12 +30,12 @@ jobs:
         - name: Install dependencies
           run: dotnet restore
 
-        - name: Prod Env
-          id: create-json
-          uses: jsdaniell/create-json@v1.2.2
-          with:
-            name: "appsettings.Production.json"
-            json: ${{ secrets.PRODUCTION_ENV }}
+        # - name: Prod Env
+        #   id: create-json
+        #   uses: jsdaniell/create-json@v1.2.2
+        #   with:
+        #     name: "appsettings.Production.json"
+        #     json: ${{ secrets.PRODUCTION_ENV }}
 
         - name: Build Release
           run: dotnet publish -c Release -o out
@@ -51,6 +51,9 @@ jobs:
         steps:
           - name: ⬇️ Checkout repo
             uses: actions/checkout@v4
+
+          - name: What's in the box?
+            run: ls -la
 
           - name: 👀 Read app name
             uses: SebRollen/toml-action@v1.0.0
