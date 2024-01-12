@@ -1,5 +1,5 @@
 import * as express from 'express'
-import {obtainOauthRequestToken} from 'server/utils/twitter/oauth1.js'
+import {obtainOauthRequestToken} from '../utils/twitter/oauth1.js'
 
 const BASE_URL = 'https://api.twitter.com'
 const twitterRouter = express.Router()

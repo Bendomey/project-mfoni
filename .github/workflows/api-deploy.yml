@@ -10,7 +10,7 @@ on:
 
 jobs:
   deploy:
-      name: ⚙️ Build
+      name: ⚙️ Build And Deploy
       runs-on: ubuntu-latest
       concurrency: deploy-group
 

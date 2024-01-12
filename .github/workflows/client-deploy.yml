@@ -1,0 +1,53 @@
+name: Client CI
+
+on:
+  push:
+    paths:
+      - 'apps/client/**'
+    branches:
+      - main
+      - prod
+  pull_request:
+    paths:
+      - 'apps/client/**'
+
+jobs:
+  deploy:
+      name: ⚙️ Build And Deploy
+      runs-on: ubuntu-latest
+      concurrency: deploy-group
+
+      env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      defaults:
+        run:
+          working-directory: services/main
+      
+      steps:
+        - name: ⬇️ Checkout repo
+          uses: actions/checkout@v4
+  
+        - name: ⎔ Setup node
+          uses: actions/setup-node@v4
+          with:
+            node-version: 18
+  
+        - name: 🎈 Setup Fly
+          uses: superfly/flyctl-actions/setup-flyctl@master
+    
+        - name: 🚀 Deploy Staging
+          run:
+            flyctl deploy --remote-only 
+              --build-arg COMMIT_SHA=${{ github.sha }} 
+              --build-arg API_ADDRESS=${{ secrets.API_ADDRESS }} 
+              --build-arg AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} 
+              --build-arg AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} 
+              --build-arg AWS_REGION=${{ secrets.AWS_REGION }} 
+              --build-arg S3_BUCKET=${{ secrets.S3_BUCKET }} 
+              --build-arg REKOGNITION_COLLECTION=${{ secrets.REKOGNITION_COLLECTION }} 
+              --build-arg GOOGLE_AUTH_CLIENT_ID=${{ secrets.GOOGLE_AUTH_CLIENT_ID }} 
+              --build-arg TWITTER_CONSUMER_KEY=${{ secrets.TWITTER_CONSUMER_KEY }} 
+              --build-arg TWITTER_CONSUMER_SECRET=${{ secrets.TWITTER_CONSUMER_SECRET }} 
+              --build-arg FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }} 
+              --build-arg FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
