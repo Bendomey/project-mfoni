@@ -1,3 +1,6 @@
 .envrc
 .env
 .husky
+
+yarn.lock
+node_modules
