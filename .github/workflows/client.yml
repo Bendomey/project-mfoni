@@ -9,7 +9,7 @@ on:
       - prod
   pull_request:
     paths:
-      - 'services/main/**'
+      - 'apps/client/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
