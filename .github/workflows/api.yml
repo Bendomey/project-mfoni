@@ -8,12 +8,58 @@ on:
       - main
       - prod
   pull_request:
-  workflow_dispatch:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 jobs:
-  deploy:
-    uses: ./.github/workflows/deploy-api.yml
+  build:
+      name: ⚙️ Build
+      runs-on: ubuntu-latest
+      concurrency: deploy-group
+      environment: production
+
+      env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      defaults:
+        run:
+          working-directory: services/main
+
+      steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0'
+
+      - uses: actions/cache@v3
+        with:
+            path: ~/.nuget/packages
+            key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+            restore-keys: |
+              ${{ runner.os }}-nuget
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Setup Environment Variables
+        id: create-json
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "appsettings.Production.json"
+          json: ${{ secrets.PRODUCTION_ENV }}
+
+      - name: Build Release
+        run: dotnet publish -c Release -o out
+
+      - name: What's in the box?
+        run: ls -la
+
+      - name: 🎈 Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: 🚀 Deploy Staging
+        run:
+          flyctl deploy --remote-only --build-arg COMMIT_SHA=${{ github.sha }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
