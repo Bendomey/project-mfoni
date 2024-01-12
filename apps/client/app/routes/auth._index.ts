@@ -10,7 +10,7 @@ export const meta: MetaFunction = () => {
 
 export function loader() {
   return {
-    GOOGLE_AUTH_CLIENT_ID: process.env.GOOGLE_AUTH_CLIENT_ID,
+    MFONI_GOOGLE_AUTH_CLIENT_ID: process.env.MFONI_GOOGLE_AUTH_CLIENT_ID,
     FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID,
   }
 }
