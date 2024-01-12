@@ -7,8 +7,10 @@ using main.Models;
 public class GetOutputContent
 {
     private OutputContent _content;
-    public GetOutputContent(Content content){
-        _content = new OutputContent{
+    public GetOutputContent(Content content)
+    {
+        _content = new OutputContent
+        {
             Id = content.Id,
             Type = content.Type,
             Status = content.Status,
@@ -23,7 +25,8 @@ public class GetOutputContent
         };
     }
 
-    public OutputContent Result(){
+    public OutputContent Result()
+    {
         return _content;
     }
 }

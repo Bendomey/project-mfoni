@@ -7,7 +7,7 @@ namespace main.Controllers;
 [ApiController]
 [Route("api/v1/contents")]
 public class MediaController : ControllerBase
-{ 
+{
     private readonly ILogger<MediaController> _logger;
     private readonly IndexContent _indexContentService;
     private readonly SearchContent _searchContentService;
@@ -24,7 +24,8 @@ public class MediaController : ControllerBase
     {
         var contents = _indexContentService.Save(mediaInput);
 
-        var res = contents.Select(content => {
+        var res = contents.Select(content =>
+        {
             var outputContent = new GetOutputContent(content);
             return outputContent.Result();
         }).ToList();
@@ -51,7 +52,8 @@ public class MediaController : ControllerBase
         }
         var contents = await _searchContentService.VisualSearch(imageBytes);
 
-        var res = contents.Select(content => {
+        var res = contents.Select(content =>
+        {
             var outputContent = new GetOutputContent(content);
             return outputContent.Result();
         }).ToList();
@@ -66,7 +68,8 @@ public class MediaController : ControllerBase
 
         var contents = await _searchContentService.TextualSearch(body.Query);
 
-        var res = contents.Select(content => {
+        var res = contents.Select(content =>
+        {
             var outputContent = new GetOutputContent(content);
             return outputContent.Result();
         }).ToList();

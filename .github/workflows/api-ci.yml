@@ -13,7 +13,7 @@ on:
 
 jobs:
   check-code:
-      name: ⬣ Lint
+      name: 🧹 Lint
       runs-on: ubuntu-latest
 
       defaults:
@@ -33,6 +33,6 @@ jobs:
         - name: .NET Lint
           uses: zyactions/dotnet-lint@v1
           with:
-            workspace: main
+            workspace: main.csproj
             implicit-restore: true
       

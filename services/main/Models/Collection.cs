@@ -34,5 +34,5 @@ public class Collection
     public required ObjectId CreatedById { get; set; }
 
     [BsonElement("updated_at")]
-    public DateTime UpdatedAt { get; set; }  = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

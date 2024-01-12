@@ -8,16 +8,16 @@ public class Content
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
-    
+
     [BsonElement("type")]
     public string Type { get; set; } = "IMAGE"; // IMAGE | VIDEO
 
     [BsonElement("status")]
     public string Status { get; set; } = "PROCESSING"; // PROCESSING | DONE
-    
+
     [BsonElement("rejected_at")]
     public DateTime? RejectedAt { get; set; }
-    
+
     [BsonElement("done_at")]
     public DateTime? DoneAt { get; set; }
 
@@ -46,5 +46,5 @@ public class Content
     public ObjectId? CreatedById { get; set; }
 
     [BsonElement("updated_at")]
-    public DateTime UpdatedAt { get; set; }  = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

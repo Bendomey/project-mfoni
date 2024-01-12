@@ -72,7 +72,8 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("auth/me")]
-    public OutputResponse<Models.User> Me(){
+    public OutputResponse<Models.User> Me()
+    {
         var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
         if (currentUser is not null)
         {
