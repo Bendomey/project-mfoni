@@ -5,7 +5,7 @@ import {Content} from '@/components/Content/index.tsx'
 import {FadeIn, FadeInStagger} from '@/components/animation/FadeIn.tsx'
 import {Fragment} from 'react'
 
-const imageUrls = [
+export const imageUrls = [
   'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image.jpg',
   'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg',
   'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg',
