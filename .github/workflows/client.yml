@@ -3,12 +3,13 @@ name: Client CI
 on:
   push:
     paths:
-      - "apps/client/**"
-  #   branches:
-  #     - main
-  #     - prod
-  # pull_request:
-  # workflow_dispatch:
+      - 'apps/client/**'
+    branches:
+      - main
+      - prod
+  pull_request:
+    paths:
+      - 'services/main/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
