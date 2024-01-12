@@ -7,7 +7,7 @@ import {Button} from '@/components/button/index.tsx'
 import {SearchPhotos} from './search/index.tsx'
 import {SearchPhotosForMobile} from './search-for-mobile/index.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
-import {UserAccountNav} from './user-account/index.tsx'
+import {UserAccountMobileNav, UserAccountNav} from './user-account/index.tsx'
 import useScroll from '@/hooks/use-scroll.ts'
 
 const navigation = (isLoggedIn: boolean) => [
@@ -139,9 +139,16 @@ export const Header = ({
                 )}
               </div>
               <div className="py-6">
-                <Button href="/upload" variant="outline" size="lg" isLink>
-                  Upload a Photo <span aria-hidden="true">&rarr;</span>
-                </Button>
+                {isLoggedIn ? (
+                  <UserAccountMobileNav />
+                ) : (
+                  <Button href="/upload" variant="outline" size="lg" isLink>
+                    Sign In
+                    <span className="pl-1" aria-hidden="true">
+                      &rarr;
+                    </span>
+                  </Button>
+                )}
               </div>
             </div>
           </div>

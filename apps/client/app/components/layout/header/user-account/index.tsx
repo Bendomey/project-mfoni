@@ -72,3 +72,41 @@ export const UserAccountNav = () => {
     </Menu>
   )
 }
+
+export const UserAccountMobileNav = () => {
+  const {currentUser, onSignout} = useAuth()
+
+  return (
+    <div className=" pb-3 pt-2">
+      <div className="flex items-center">
+        <div className="flex-shrink-0">
+          <img
+            className="h-10 w-10 rounded-full"
+            src={currentUser?.photo ?? user.imageUrl}
+            alt=""
+          />
+        </div>
+        <div className="ml-3">
+          <div className="text-base font-medium text-gray-800">
+            {currentUser?.name ?? user.name}
+          </div>
+          <div className="text-sm font-medium text-gray-500">
+            {currentUser?.email ?? user.email}
+          </div>
+        </div>
+      </div>
+      <div className="mt-6 space-y-1">
+        <button className="flex items-start w-full  py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+          Settings
+        </button>
+        <button
+          type="button"
+          onClick={onSignout}
+          className="flex focus:outline-none items-start w-full  py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
+  )
+}
