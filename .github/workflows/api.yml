@@ -3,11 +3,11 @@ name: Api CI/CD
 on:
   push:
     paths:
-        - services/main/**
-    branches:
-      - main
-      - prod
-  pull_request:
+        - "services/main/**"
+  #   branches:
+  #     - main
+  #     - prod
+  # pull_request:
 
 jobs:
   deploy:
