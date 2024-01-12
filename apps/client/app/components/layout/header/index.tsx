@@ -6,13 +6,13 @@ import {APP_NAME} from '@/constants/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {SearchPhotos} from './search/index.tsx'
 import {SearchPhotosForMobile} from './search-for-mobile/index.tsx'
-import useScroll from '@/hooks/use-scroll.ts'
 import {useAuth} from '@/providers/auth/index.tsx'
+import {UserAccountMobileNav, UserAccountNav} from './user-account/index.tsx'
+import useScroll from '@/hooks/use-scroll.ts'
 
 const navigation = (isLoggedIn: boolean) => [
   {name: 'Explore', href: '/explore'},
   {name: 'Terms Of Use', href: '/terms'},
-  isLoggedIn ? undefined : {name: 'Log in', href: '/auth'},
   isLoggedIn ? {name: 'My Account', href: '/account'} : undefined,
 ]
 
@@ -78,9 +78,16 @@ export const Header = ({
               </Link>
             ) : null,
           )}
-          <Button href="/upload" variant="outline" isLink>
-            Upload a Photo <span aria-hidden="true">&rarr;</span>
-          </Button>
+          {isLoggedIn ? (
+            <UserAccountNav />
+          ) : (
+            <Button href="/auth" variant="outline" isLink>
+              Sign In{' '}
+              <span className="pl-1" aria-hidden="true">
+                &rarr;
+              </span>
+            </Button>
+          )}
         </div>
       </nav>
       {isHeroSearchInVisible ? null : (
@@ -132,9 +139,16 @@ export const Header = ({
                 )}
               </div>
               <div className="py-6">
-                <Button href="/upload" variant="outline" size="lg" isLink>
-                  Upload a Photo <span aria-hidden="true">&rarr;</span>
-                </Button>
+                {isLoggedIn ? (
+                  <UserAccountMobileNav />
+                ) : (
+                  <Button href="/upload" variant="outline" size="lg" isLink>
+                    Sign In
+                    <span className="pl-1" aria-hidden="true">
+                      &rarr;
+                    </span>
+                  </Button>
+                )}
               </div>
             </div>
           </div>
