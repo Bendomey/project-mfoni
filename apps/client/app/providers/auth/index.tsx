@@ -2,6 +2,7 @@
 import {useGetCurrentUser} from '@/api/auth/index.ts'
 import {USER_CIPHER} from '@/constants/index.ts'
 import {auth} from '@/lib/cookies.config.ts'
+import {useQueryClient} from '@tanstack/react-query'
 import {type PropsWithChildren, createContext, useMemo, useContext} from 'react'
 import {toast} from 'react-hot-toast'
 
@@ -24,6 +25,7 @@ export const AuthContext = createContext<AuthContextProps>({
 
 export const AuthProvider = ({children}: PropsWithChildren) => {
   const authCipher = auth.getCipher(USER_CIPHER)
+  const queryClient = useQueryClient()
 
   const {data: currentUser} = useGetCurrentUser({
     enabled: Boolean(authCipher),
@@ -34,10 +36,12 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
       onSignin: ({token}: {user: User; token: string}) => {
         auth.setCipher(USER_CIPHER, token)
       },
-      onSignout: () => {
+      onSignout: async () => {
         const token = auth.getCipher(USER_CIPHER)
         if (token) {
           auth.clearCipher(USER_CIPHER)
+          // @TODO: do we need to invalidate all queries?
+          await queryClient.invalidateQueries()
           toast.success('Logged out successfully', {id: 'logout-success'})
         }
       },
@@ -46,7 +50,7 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         return token ?? null
       },
     }),
-    [],
+    [queryClient],
   )
 
   return (

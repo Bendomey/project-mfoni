@@ -1,19 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button } from '@/components/button/index.tsx'
-import { APP_NAME } from '@/constants/index.ts'
-import { ArrowLeftIcon } from '@heroicons/react/24/outline'
-import { TwitterButton } from './twitter/index.tsx'
-import { Loader } from '@/components/loader/index.tsx'
-import { Transition } from '@headlessui/react'
-import { Fragment, useEffect } from 'react'
-import { FacebookButton } from './facebook/index.tsx'
-import { LoginAuthProvider, useLoginAuth } from './context/index.tsx'
-import { GoogleButton } from './google/index.tsx'
-import { useAuth } from '@/providers/auth/index.tsx'
-
+import {Button} from '@/components/button/index.tsx'
+import {APP_NAME} from '@/constants/index.ts'
+import {ArrowLeftIcon} from '@heroicons/react/24/outline'
+import {TwitterButton} from './twitter/index.tsx'
+import {Loader} from '@/components/loader/index.tsx'
+import {Transition} from '@headlessui/react'
+import {Fragment, useEffect} from 'react'
+import {FacebookButton} from './facebook/index.tsx'
+import {LoginAuthProvider, useLoginAuth} from './context/index.tsx'
+import {GoogleButton} from './google/index.tsx'
+import {useAuth} from '@/providers/auth/index.tsx'
 
 export const LoginComponent = () => {
-  const { isLoading, errorMessage, setErrorMessage } = useLoginAuth()
+  const {isLoading, errorMessage, setErrorMessage} = useLoginAuth()
   const {onSignout} = useAuth()
 
   useEffect(() => {
@@ -56,20 +55,18 @@ export const LoginComponent = () => {
                 </span>
               </div>
               <h2 className="font-bold text-2xl text-blue-100">
-                The best photo gallery shared by creators in ghana.
+                The best photo gallery shared by creators in Ghana.
               </h2>
             </div>
           </div>
         </div>
       </div>
       <div className="relative flex flex-1 flex-col w-2/3 justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-        {
-          isLoading ? (
-            <div className='absolute z-10 w-full h-full flex justify-center items-center bg-black/70 top-0 left-0'>
-              <Loader color='fill-white' />
-            </div>
-          ) : null
-        }
+        {isLoading ? (
+          <div className="absolute z-10 w-full h-full flex justify-center items-center bg-black/70 top-0 left-0">
+            <Loader color="fill-white" />
+          </div>
+        ) : null}
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
             <div className="flex">
@@ -83,11 +80,11 @@ export const LoginComponent = () => {
                 <span className="font-bold">Go Back</span>
               </Button>
             </div>
-            <h2 className="mt-8 text-4xl md:text-5xl font-bold leading-9 tracking-tight text-gray-900">
+            <h2 className="mt-8 text-3xl md:text-4xl font-bold leading-9 tracking-tight text-gray-900">
               Welcome back 👋🏽
             </h2>
             <p className="mt-2 ml-2 leading-6 text-gray-500">
-              Continue with your favorite social.
+              Continue with your favorite social media platform.
             </p>
             <Transition
               as={Fragment}
@@ -99,13 +96,12 @@ export const LoginComponent = () => {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <div className='mt-4'>
-                <div className='bg-red-400 rounded-lg p-2 text-sm text-white'>
+              <div className="mt-4">
+                <div className="bg-red-400 rounded-lg p-2 text-sm text-white">
                   {errorMessage}
                 </div>
               </div>
             </Transition>
-
           </div>
 
           <div className="mt-16">
@@ -141,7 +137,6 @@ export const LoginComponent = () => {
     </div>
   )
 }
-
 
 export const LoginModule = () => {
   return (
