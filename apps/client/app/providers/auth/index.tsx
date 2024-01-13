@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import {useGetCurrentUser} from '@/api/auth/index.ts'
-import {USER_CIPHER} from '@/constants/index.ts'
+import {QUERY_KEYS, USER_CIPHER} from '@/constants/index.ts'
 import {auth} from '@/lib/cookies.config.ts'
 import {useQueryClient} from '@tanstack/react-query'
 import {type PropsWithChildren, createContext, useMemo, useContext} from 'react'
@@ -39,10 +39,13 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
       onSignout: async () => {
         const token = auth.getCipher(USER_CIPHER)
         if (token) {
+          toast.loading('Logging out...', {id: 'logout-loading'})
           auth.clearCipher(USER_CIPHER)
-          // @TODO: do we need to invalidate all queries?
-          await queryClient.invalidateQueries()
+          await queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.CURRENT_USER],
+          })
           toast.success('Logged out successfully', {id: 'logout-success'})
+          window.location.reload()
         }
       },
       getToken: () => {
