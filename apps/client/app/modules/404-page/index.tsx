@@ -5,7 +5,7 @@ import {Link} from '@remix-run/react'
 
 export const NotFoundModule = () => {
   return (
-    <div className="grid min-h-full grid-cols-1 grid-rows-[1fr,auto,1fr] bg-white lg:grid-cols-[max(50%,36rem),1fr]">
+    <div className="grid h-[100dvh] lg:h-[100vh] grid-cols-1 grid-rows-[1fr,auto,1fr] bg-white lg:grid-cols-[max(50%,36rem),1fr]">
       <header className="mx-auto w-full max-w-7xl px-6 pt-6 sm:pt-10 lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:px-8">
         <Link to="/" className="-m-1.5 p-1.5">
           <div className="flex flex-row items-end">
