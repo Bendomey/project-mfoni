@@ -9,8 +9,7 @@ export const HeroSection = () => {
   return (
     <div
       style={{
-        backgroundImage:
-          `url(${heroBg})`,
+        backgroundImage: `url(${heroBg})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'left',
@@ -34,7 +33,7 @@ export const HeroSection = () => {
           </div>
           <div className="text">
             <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-              The best photo gallery shared by creators in ghana.
+              The best photo gallery shared by creators in Ghana.
             </h1>
             <div className="block md:hidden mt-5">
               <SearchPhotosForMobile />

@@ -1,6 +1,6 @@
-import { cssBundleHref } from '@remix-run/css-bundle'
-import { type PropsWithChildren } from 'react'
-import { json, type LinksFunction } from '@remix-run/node'
+import {cssBundleHref} from '@remix-run/css-bundle'
+import {type PropsWithChildren} from 'react'
+import {json, type LinksFunction} from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -12,10 +12,10 @@ import {
   isRouteErrorResponse,
   useLoaderData,
 } from '@remix-run/react'
-import { NODE_ENV } from './constants/index.ts'
+import {NODE_ENV} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
-import { Toaster } from 'react-hot-toast';
-import { Providers } from './providers/index.tsx'
+import {Toaster} from 'react-hot-toast'
+import {Providers} from './providers/index.tsx'
 
 export const links: LinksFunction = () => {
   return [
@@ -37,9 +37,9 @@ export const links: LinksFunction = () => {
     //   sizes: '16x16',
     //   href: '/favicons/favicon-16x16.png',
     // },
-    { rel: 'icon', href: '/favicon.ico' },
-    { rel: 'stylesheet', href: tailwindStyles },
-    ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
+    {rel: 'icon', href: '/favicon.ico'},
+    {rel: 'stylesheet', href: tailwindStyles},
+    ...(cssBundleHref ? [{rel: 'stylesheet', href: cssBundleHref}] : []),
   ]
 }
 
@@ -48,7 +48,7 @@ export async function loader() {
     ENV: {
       API_ADDRESS: `${process.env.API_ADDRESS}/api`,
     },
-  });
+  })
 }
 
 export default function App() {
@@ -61,11 +61,11 @@ export default function App() {
   )
 }
 
-function Document({ children }: PropsWithChildren) {
+function Document({children}: PropsWithChildren) {
   const data = useLoaderData<typeof loader>()
 
   return (
-    <html lang="en" className="h-full">
+    <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -74,9 +74,9 @@ function Document({ children }: PropsWithChildren) {
         <Meta />
         <Links />
       </head>
-      <body className="h-full">
+      <body>
         {children}
-        <Toaster position='bottom-center' />
+        <Toaster position="bottom-center" />
         <ScrollRestoration />
         <script
           src="https://accounts.google.com/gsi/client"
@@ -86,9 +86,7 @@ function Document({ children }: PropsWithChildren) {
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(
-              data.ENV
-            )}`,
+            __html: `window.ENV = ${JSON.stringify(data.ENV)}`,
           }}
         />
         <Scripts />
