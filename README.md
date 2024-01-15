@@ -2,6 +2,10 @@
 
 Experimentation.
 
+# Run
+> Run both frontend and api simultaneously with make
+`make -j 2 run-api run-fe`
+
 ## Structure
 
 `apps` - Where our frontend apps live. It's a remix application.
