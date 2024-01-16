@@ -3,9 +3,9 @@ import {type MetaFunction} from '@remix-run/node'
 
 export const meta: MetaFunction = () => {
   return [
-    {title: 'Terms | ProjectMfoni'},
-    {name: 'description', content: 'Welcome to ProjectMfoni!'},
-    {name: 'keywords', content: 'ProjectMfoni, Mfoni'},
+    {title: 'Terms | mfoni'},
+    {name: 'description', content: 'Welcome to mfoni!'},
+    {name: 'keywords', content: 'mfoni, Mfoni'},
   ]
 }
 

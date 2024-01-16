@@ -70,7 +70,7 @@ function Document({children}: PropsWithChildren) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-        <title>Project MFoni</title>
+        <title>mfoni</title>
         <Meta />
         <Links />
       </head>

@@ -3,9 +3,9 @@ import {NotFoundModule} from '@/modules/index.tsx'
 
 export const meta: MetaFunction = () => {
   return [
-    {title: 'Page Not Found | ProjectMfoni'},
-    {name: 'description', content: 'Welcome to ProjectMfoni!'},
-    {name: 'keywords', content: 'ProjectMfoni, Mfoni'},
+    {title: 'Page Not Found | mfoni'},
+    {name: 'description', content: 'Welcome to mfoni!'},
+    {name: 'keywords', content: 'mfoni, Mfoni'},
   ]
 }
 
