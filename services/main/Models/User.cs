@@ -27,6 +27,12 @@ public class User
     [BsonElement("email")]
     public string? Email { get; set; }
 
+    [BsonElement("phone_number")]
+    public string? PhoneNumber { get; set; }
+
+    [BsonElement("verified_phone_number_at")]
+    public DateTime? VerifiedPhoneNumberAt { get; set; }
+
     [BsonElement("photo")]
     public string? Photo { get; set; }
 
