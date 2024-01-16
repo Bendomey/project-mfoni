@@ -10,33 +10,16 @@ public class CreatorApplication
     public string Id { get; set; } = null!;
 
     [BsonElement("status")]
-    public string Status { get; set; } = "PENDING"; // PENDING | SUBMITTED | REJECTED | APPROVED
+    public string Status { get; set; } = "PENDING"; // PENDING | REJECTED | APPROVED
 
     [BsonElement("rejected_at")]
     public DateTime? RejectedAt { get; set; }
 
-    [BsonRepresentation(BsonType.ObjectId)]
-    [BsonElement("rejected_by_id")] // an admin
-    public string? RejectedBy { get; set; }
-
-    [BsonElement("submitted_at")]
-    public DateTime? SubmittedAt { get; set; }
-
     [BsonElement("approved_at")]
     public DateTime? ApprovedAt { get; set; }
 
-    [BsonRepresentation(BsonType.ObjectId)]
-    [BsonElement("approved_by_id")] // an admin
-    public string? ApprovedBy { get; set; }
-
-    [BsonElement("platform_aggrement_form")]
-    public S3MetaData? PlatformAggrementForm { get; set; }
-
-    [BsonElement("ghana_card_front")]
-    public S3MetaData? GhanaCardFront { get; set; }
-
-    [BsonElement("ghana_card_back")]
-    public S3MetaData? GhanaCardBack { get; set; }
+    [BsonElement("smile_identity_response")]
+    public string? SmileIdentityResponse { get; set; } // Gunna verify the json structure when implementing!
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

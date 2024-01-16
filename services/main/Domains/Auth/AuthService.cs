@@ -104,7 +104,6 @@ public class Auth
         user.AccountSetupAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
 
-        _usersCollection.ReplaceOne(user => user.Id == userInput.Id, user);
 
         if (accountInput.Role == "CREATOR" && user.CreatorApplication is null)
         {
@@ -113,8 +112,11 @@ public class Auth
                 CreatedBy = user.Id,
             };
             _creatorsCollection.InsertOne(__newCreatorApplication);
+
+            user.CreatorApplication = __newCreatorApplication.Id;
         }
 
+        _usersCollection.ReplaceOne(user => user.Id == userInput.Id, user);
         return true;
     }
 
