@@ -3,7 +3,7 @@ import {LoginModule} from '@/modules/index.tsx'
 
 export const meta: MetaFunction = () => {
   return [
-    {title: 'Login | ProjectMfoni'},
+    {title: 'Login | mfoni'},
     {name: 'description', content: 'Login to your account'},
   ]
 }
