@@ -36,7 +36,6 @@ export const FacebookButton = () => {
         version: 'v10.0',
       })
     }
-
     ;(function (d, s, id) {
       let js: any = d.getElementsByTagName(s)[0]
       const fjs: any = d.getElementsByTagName(s)[0]

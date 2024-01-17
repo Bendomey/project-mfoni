@@ -26,10 +26,9 @@ app.use(express.urlencoded({extended: true}))
 
 app.use(express.static('public'))
 
-app.use("/api", router)
+app.use('/api', router)
 
 app.all('*', createRequestHandler({build: devBuild as any, mode: MODE}))
-
 
 const desiredPort = Number(process.env.PORT ?? 3000)
 const portToUse = await getPort({
@@ -62,13 +61,13 @@ const server = app.listen(portToUse, () => {
     lanUrl = `http://${localIp}:${portUsed}`
   }
 
-    console.log(
-      `
+  console.log(
+    `
   ${chalk.bold('Local:')}            ${chalk.cyan(localUrl)}
   ${lanUrl ? `${chalk.bold('On Your Network:')}  ${chalk.cyan(lanUrl)}` : ''}
   ${chalk.bold('Press Ctrl+C to stop')}
   		`.trim(),
-    )
+  )
 
   if (MODE === 'development') {
     void broadcastDevReady(build as any)

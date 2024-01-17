@@ -1,4 +1,9 @@
-import {useMutation, useQuery, type UndefinedInitialDataOptions, type QueryKey} from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  type UndefinedInitialDataOptions,
+  type QueryKey,
+} from '@tanstack/react-query'
 import {fetchClient} from '@/lib/transport/index.ts'
 import {QUERY_KEYS} from '@/constants/index.ts'
 
@@ -112,7 +117,17 @@ const getCurrentUser = async () => {
     }
   }
 }
-export const useGetCurrentUser = (opts?: Omit<UndefinedInitialDataOptions<User | undefined, Error, User | undefined, QueryKey>, 'queryKey'>) =>
+export const useGetCurrentUser = (
+  opts?: Omit<
+    UndefinedInitialDataOptions<
+      User | undefined,
+      Error,
+      User | undefined,
+      QueryKey
+    >,
+    'queryKey'
+  >,
+) =>
   useQuery({
     queryFn: getCurrentUser,
     queryKey: [QUERY_KEYS.CURRENT_USER],

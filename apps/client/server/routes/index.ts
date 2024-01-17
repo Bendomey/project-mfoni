@@ -1,6 +1,6 @@
 import * as express from 'express'
 import {twitterRouter} from './twitter.js'
-import { authRouter } from './authenticate.js'
+import {authRouter} from './authenticate.js'
 
 const router = express.Router()
 

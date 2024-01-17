@@ -1,6 +1,6 @@
 import * as express from 'express'
-import { authorizeFacebook } from '../utils/facebook/authorize.js'
-import { authorizeGoogle } from '../utils/google/authorize.js'
+import {authorizeFacebook} from '../utils/facebook/authorize.js'
+import {authorizeGoogle} from '../utils/google/authorize.js'
 import {authorizeTwitter} from '../utils/twitter/authorize.js'
 
 const authRouter = express.Router()
@@ -43,10 +43,9 @@ authRouter.post('/', async (req, res) => {
         break
       }
       default: {
-        return res.json({data: "InvalidProvider"}).status(400)
+        return res.json({data: 'InvalidProvider'}).status(400)
       }
     }
-
 
     const apiReq = await fetch(`${process.env.API_ADDRESS}/api/v1/auth`, {
       method: 'POST',

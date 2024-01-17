@@ -1,5 +1,5 @@
 interface ApiResponse<T> {
-    data: T
-    errorMessage: Nullable<string>
-    status: boolean
+  data: T
+  errorMessage: Nullable<string>
+  status: boolean
 }
