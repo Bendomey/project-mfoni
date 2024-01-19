@@ -6665,7 +6665,7 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-pin-field@^3.1.5:
+react-pin-field@3.1.5:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/react-pin-field/-/react-pin-field-3.1.5.tgz#aef73bb06513e3db523a8612b23044ba4ef9f669"
   integrity sha512-0WqQkLP3SdBEI08ykZxRNAPnZLEZ7iOm/EE/MNQuFmJAYcUfeNbjc7KB2VvcE/b1iWnS/spmFHpd9eSxvJJQ+g==
