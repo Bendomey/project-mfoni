@@ -5,11 +5,10 @@ import {
   CheckIcon,
   EnvelopeIcon,
   RocketLaunchIcon,
-  UserIcon,
 } from '@heroicons/react/24/outline'
 import {useCallback, useMemo} from 'react'
 
-export type Step = 'name' | 'phone' | 'id' | 'welcome'
+export type Step = 'phone' | 'id' | 'welcome'
 
 interface Props {
   activeStep: Step
@@ -24,13 +23,13 @@ export function Steps({activeStep, onChange}: Props) {
 
   const steps = useMemo(() => {
     return [
-      {
-        name: 'Your details',
-        id: 'name',
-        description: 'Provide your name and username',
-        icon: UserIcon,
-        status: getStepStatus('name'),
-      },
+      // {
+      //   name: 'Your details',
+      //   id: 'name',
+      //   description: 'Provide your name and username',
+      //   icon: UserIcon,
+      //   status: getStepStatus('name'),
+      // },
       {
         name: 'Verify your phone',
         description: 'Enter your verification code',
