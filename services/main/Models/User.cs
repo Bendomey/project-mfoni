@@ -27,6 +27,9 @@ public class User
     [BsonElement("email")]
     public string? Email { get; set; }
 
+    [BsonElement("phone_number")]
+    public string? PhoneNumber { get; set; } = string.Empty;
+
     [BsonElement("photo")]
     public string? Photo { get; set; }
 
