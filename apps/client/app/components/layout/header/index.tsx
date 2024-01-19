@@ -142,7 +142,7 @@ export const Header = ({
                 {isLoggedIn ? (
                   <UserAccountMobileNav />
                 ) : (
-                  <Button href="/upload" variant="outline" size="lg" isLink>
+                  <Button href="/auth" variant="outline" size="lg" isLink>
                     Sign In
                     <span className="pl-1" aria-hidden="true">
                       &rarr;

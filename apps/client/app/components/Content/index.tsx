@@ -24,7 +24,7 @@ export const Content = ({content}: Props) => {
           <div className="flex flex-row items-center justify-between p-2">
             <div>
               <div className="bg-black px-3 py-1 rounded-full text-white text-sm font-semibold">
-                Mfoni+
+                mfoni+
               </div>
             </div>
             <div className="group-hover:block hidden">
