@@ -11,13 +11,9 @@ on:
     paths:
       - 'apps/client/**'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  lint:
-      name: ⬣ ESLint
+  code-checks:
+      name: ⬣ ESLint & ʦ TypeScript
       runs-on: ubuntu-latest
       
       steps:
@@ -38,23 +34,6 @@ jobs:
           run: yarn lint
           working-directory: apps/client
 
-  typecheck:
-      name: ʦ TypeScript
-      runs-on: ubuntu-latest
-      steps:
-        - name: ⬇️ Checkout repo
-          uses: actions/checkout@v4
-  
-        - name: ⎔ Setup node
-          uses: actions/setup-node@v4
-          with:
-              node-version: 18
-  
-        - name: 📥 Download deps
-          uses: bahmutov/npm-install@v1
-          with:
-            working-directory: apps/client
-  
         - name: 🔎 Type check
           run: yarn types:check
           working-directory: apps/client
