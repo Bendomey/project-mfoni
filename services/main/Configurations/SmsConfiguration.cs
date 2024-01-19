@@ -27,9 +27,7 @@ public class SmsConfiguration
         using (HttpClient client = new HttpClient())
         {
             client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-            HttpResponseMessage response = 
-                await client.PostAsync(
-                apiUrl,
+            HttpResponseMessage response = await client.PostAsync(apiUrl, 
                 new StringContent(jsonBody, Encoding.UTF8, "application/json"));
 
             if (response.IsSuccessStatusCode)
