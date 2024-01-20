@@ -6,14 +6,15 @@ public class SmsConfiguration
 {
     public static async Task<string> SendSms(string phoneNumber, string smsText)
     {
+        IConfiguration configuration = AppSettingsDevConfiguration.DevConfig();
+
         string jsonBody = $@"{{
             ""from"": ""Mfoni"",
             ""to"": ""{phoneNumber}""
             ""type"": ""1"",
             ""message"": ""{smsText}"",
-            ""callback_url"": ""http://example.com/handle_callback/"",
-            ""app_id"": ""xxx-xxxx-xxxx-xxxxx-xxxxx"",
-            ""app_secret"": ""xxyyxyxyxyxyxyxyxyxyxyxyzzz""
+            ""app_id"": ""{configuration["AppConstants.SmsAppId"]}"",
+            ""app_secret"": ""{configuration["AppConstants.SmsAppSecret"]}""
         }}";
 
         string apiUrl = "https://api.wittyflow.com/v1/messages/send";

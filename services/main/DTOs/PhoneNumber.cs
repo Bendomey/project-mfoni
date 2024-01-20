@@ -1,4 +1,4 @@
 ﻿namespace main.DTOs;
 
-public record PhoneNumber(string phoneNumber);
+public record PhoneNumberInput(string phoneNumber);
 

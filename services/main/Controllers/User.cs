@@ -22,8 +22,8 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("savePhoneNumber")]
-    public async Task<OutputResponse<bool?>> SavePhoneNumber([FromBody] PhoneNumber userPhoneNumber)
+    [HttpPost("phone")]
+    public async Task<OutputResponse<bool?>> SavePhoneNumber([FromBody] PhoneNumberInput userPhoneNumber)
     {
         logger.LogInformation($"saving user phone number {userPhoneNumber}");
         var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
