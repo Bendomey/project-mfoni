@@ -16,11 +16,11 @@ public class Auth
     private readonly IMongoCollection<Models.CreatorApplication> _creatorsCollection;
     private readonly AppConstants _appConstantsConfiguration;
 
-    public Auth(ILogger<SaveTags> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants)
+    public Auth(ILogger<SaveTags> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
     {
         _logger = logger;
 
-        var database = connectToDatabase(mfoniStoreDatabaseSettings);
+        var database = databaseConfig.Database;
 
         _usersCollection = database.GetCollection<Models.User>(appConstants.Value.UserCollection);
 
@@ -29,12 +29,6 @@ public class Auth
         _appConstantsConfiguration = appConstants.Value;
 
         _logger.LogDebug("AuthService initialized");
-    }
-
-    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> mfoniStoreDatabaseSettings)
-    {
-        var client = new MongoClient(mfoniStoreDatabaseSettings.Value.ConnectionString);
-        return client.GetDatabase(mfoniStoreDatabaseSettings.Value.DatabaseName);
     }
 
     public AuthenticateResponse? Authenticate(AuthenticateInput input)

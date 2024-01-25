@@ -10,21 +10,15 @@ public class SearchTag
     private readonly ILogger<IndexContent> _logger;
     private readonly IMongoCollection<Models.Tag> _tagsCollection;
 
-    public SearchTag(ILogger<IndexContent> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants)
+    public SearchTag(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
     {
         _logger = logger;
 
-        var database = connectToDatabase(mfoniStoreDatabaseSettings);
+        var database = databaseConfig.Database;
 
         _tagsCollection = database.GetCollection<Models.Tag>(appConstants.Value.TagCollection);
 
         _logger.LogDebug("SearchTagService initialized");
-    }
-
-    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> mfoniStoreDatabaseSettings)
-    {
-        var client = new MongoClient(mfoniStoreDatabaseSettings.Value.ConnectionString);
-        return client.GetDatabase(mfoniStoreDatabaseSettings.Value.DatabaseName);
     }
 
     public async Task<Models.Tag?> Get(string id)

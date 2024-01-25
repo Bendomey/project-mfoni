@@ -3,42 +3,60 @@ using MongoDB.Driver;
 using main.Configuratons;
 using NanoidDotNet;
 using main.Configurations;
+using Microsoft.Extensions.Caching.Distributed;
 
-namespace main.Domains.UserMngmt;
+namespace main.Domains;
 
 public class UserService
 {
-    private readonly ILogger<UserService> logger;
-    private readonly IMongoCollection<Models.User> userCollection;
+    private readonly ILogger<UserService> _logger;
+    private readonly IMongoCollection<Models.User> _userCollection;
+    private readonly CacheProvider _cacheProvider;
+    private readonly AppConstants _appConstantsConfiguration;
+
 
     public UserService(
         ILogger<UserService> logger,
-        IOptions<DatabaseSettings> mfoniStoreDatabaseSettings,
-        IOptions<AppConstants> appConstants)
+        DatabaseSettings databaseConfig,
+        IOptions<AppConstants> appConstants,
+        CacheProvider cacheProvider
+    )
     {
-        this.logger = logger;
-        var database = DatabaseSettings.connectToDatabase(mfoniStoreDatabaseSettings);
-        userCollection = database.GetCollection<Models.User>(appConstants.Value.UserCollection);
+        _logger = logger;
+        _userCollection = databaseConfig.Database.GetCollection<Models.User>(appConstants.Value.UserCollection);
+        _cacheProvider = cacheProvider;
+        _appConstantsConfiguration = appConstants.Value;
 
         logger.LogDebug("User service initialized");
     }
 
     public async Task<bool> SavePhoneNumber(string phoneNumber, string userId)
     {
-        var user = await userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
         if (user is null)
         {
-            throw new Exception($"UserNotFound");
+            throw new Exception("UserNotFound");
         }
 
-        var phoneNumberToUpdate = Builders<Models.User>.Update.Set(x => x.PhoneNumber, phoneNumber);
-        _ = await userCollection.UpdateOneAsync(user.Id, phoneNumberToUpdate);
+        var filter = Builders<Models.User>.Filter.Eq(u => u.Id, userId);
+        var updates = Builders<Models.User>.Update
+            .Set(r => r.PhoneNumber, phoneNumber);
+
+        await _userCollection.UpdateOneAsync(filter, updates);
 
         var code = Nanoid.Generate("1234567890", 5);
-        var redisDb = RedisDataBaseConfiguration.RedisDbConfig();
-        redisDb.StringSet(user.Id.ToString(), code, TimeSpan.FromHours(1));
+        await _cacheProvider.SetCache($"verify-{user.Id}", code, new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+        });
 
-        _ = SmsConfiguration.SendSms(phoneNumber, $"Hello {user.Name}, Your OTP is {code}. Please use this code to complete your action. Thank you.");
+        await SmsConfiguration.SendSms(new SendSmsInput
+        {
+            PhoneNumber = phoneNumber,
+            Message = $"Hello {user.Name},\\n\\nYour OTP is {code}. Please use this code to complete your action.\\n\\nThank you.",
+            AppId = _appConstantsConfiguration.SmsAppId,
+            AppSecret = _appConstantsConfiguration.SmsAppSecret
+        });
 
         return true;
     }

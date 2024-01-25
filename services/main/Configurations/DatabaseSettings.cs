@@ -5,14 +5,12 @@ namespace main.Configuratons;
 
 public class DatabaseSettings
 {
-    public string ConnectionString { get; set; } = null!;
+    public IMongoDatabase Database;
 
-    public string DatabaseName { get; set; } = null!;
-
-    public static IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> mfoniStoreDatabaseSettings)
+    public DatabaseSettings(IOptions<AppConstants> appConstants)
     {
-        var client = new MongoClient(mfoniStoreDatabaseSettings.Value.ConnectionString);
-        return client.GetDatabase(mfoniStoreDatabaseSettings.Value.DatabaseName);
+        var client = new MongoClient(appConstants.Value.DatabaseConnectionString);
+        Database = client.GetDatabase(appConstants.Value.DatabaseName);
     }
 
 }

@@ -1,28 +1,29 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using main.DTOs;
+using main.Domains;
 using main.Middlewares;
 using System.Security.Claims;
 
 namespace main.Controllers;
 
 [ApiController]
-[Route("api/v1/user")]
+[Route("api/v1/users")]
 public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> logger;
-    private readonly Domains.UserMngmt.UserService userService;
+    private readonly UserService userService;
 
     public UserController(
         ILogger<UserController> logger,
-        Domains.UserMngmt.UserService userService)
+        UserService userService)
     {
         this.logger = logger;
         this.userService = userService;
     }
 
     [Authorize]
-    [HttpPost("phone")]
+    [HttpPatch("phone")]
     public async Task<OutputResponse<bool?>> SavePhoneNumber([FromBody] PhoneNumberInput userPhoneNumber)
     {
         logger.LogInformation($"saving user phone number {userPhoneNumber}");

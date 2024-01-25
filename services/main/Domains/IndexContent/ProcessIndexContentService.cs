@@ -22,11 +22,11 @@ public class ProcessIndexContent
 
     private readonly AmazonRekognitionClient _rekognitionClient;
 
-    public ProcessIndexContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> bookStoreDatabaseSettings, IOptions<AppConstants> appConstants, IOptions<RabbitMQConnection> rabbitMQConnection)
+    public ProcessIndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, IOptions<RabbitMQConnection> rabbitMQConnection)
     {
         _logger = logger;
 
-        _contentsCollection = connectToDatabase(bookStoreDatabaseSettings, appConstants);
+        _contentsCollection = databaseConfig.Database.GetCollection<Content>(appConstants.Value.ContentCollection);
 
         _rabbitMqConfiguration = rabbitMQConnection.Value;
 
@@ -50,13 +50,6 @@ public class ProcessIndexContent
         _rekognitionClient = new AmazonRekognitionClient(credentials, region);
 
         _logger.LogDebug("ProcessIndexContentService initialized");
-    }
-
-    private IMongoCollection<Content> connectToDatabase(IOptions<DatabaseSettings> bookStoreDatabaseSettings, IOptions<AppConstants> appConstants)
-    {
-        var client = new MongoClient(bookStoreDatabaseSettings.Value.ConnectionString);
-        var database = client.GetDatabase(bookStoreDatabaseSettings.Value.DatabaseName);
-        return database.GetCollection<Content>(appConstants.Value.ContentCollection);
     }
 
     private IConnection CreateChannel()

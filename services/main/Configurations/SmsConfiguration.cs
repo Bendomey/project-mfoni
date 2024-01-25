@@ -1,41 +1,39 @@
-﻿using System.Text;
+﻿namespace main.Configurations;
 
-namespace main.Configurations;
+public class SendSmsInput
+{
+    public required string PhoneNumber { get; set; }
+    public required string Message { get; set; }
+    public required string AppId { get; set; }
+    public required string AppSecret { get; set; }
+}
 
 public class SmsConfiguration
 {
-    public static async Task<string> SendSms(string phoneNumber, string smsText)
+    public static async Task SendSms(SendSmsInput input)
     {
-        IConfiguration configuration = AppSettingsDevConfiguration.DevConfig();
 
-        string jsonBody = $@"{{
-            ""from"": ""Mfoni"",
-            ""to"": ""{phoneNumber}""
-            ""type"": ""1"",
-            ""message"": ""{smsText}"",
-            ""app_id"": ""{configuration["AppConstants.SmsAppId"]}"",
-            ""app_secret"": ""{configuration["AppConstants.SmsAppSecret"]}""
-        }}";
+        string jsonBody = "{\n    \"from\": \"Mfoni\",\n    \"to\": \"{phoneNumber}\",\n    \"type\": \"1\",\n    \"message\": \"{message}\",\n    \"app_id\":  \"{app_id}\",\n    \"app_secret\": \"{app_secret}\"\n}"
+            .Replace("{phoneNumber}", input.PhoneNumber)
+            .Replace("{message}", input.Message)
+            .Replace("{app_id}", input.AppId)
+            .Replace("{app_secret}", input.AppSecret);
 
-        string apiUrl = "https://api.wittyflow.com/v1/messages/send";
-        var response = await PostRequest(apiUrl, jsonBody);
-
-        return response;
+        await Send(jsonBody);
     }
 
-    public static async Task<string> PostRequest(string apiUrl, string jsonBody)
+    public static async Task Send(string jsonBody)
     {
         using (HttpClient client = new HttpClient())
         {
-            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-            HttpResponseMessage response = await client.PostAsync(apiUrl, new StringContent(jsonBody, Encoding.UTF8, "application/json"));
+            client.BaseAddress = new Uri("https://api.wittyflow.com");
 
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadAsStringAsync();
-            }
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "/v1/messages/send");
+            request.Content = new StringContent(jsonBody, null, "application/json");
 
-            return response.StatusCode.ToString();
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            Console.WriteLine("Response: {0}", await response.Content.ReadAsStringAsync());
         }
     }
 }

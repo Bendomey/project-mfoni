@@ -9,9 +9,6 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.Configure<DatabaseSettings>(
-    builder.Configuration.GetSection("Database"));
-
 builder.Services.Configure<RabbitMQConnection>(
     builder.Configuration.GetSection("RabbitMQConnection"));
 
@@ -19,6 +16,11 @@ builder.Services.Configure<AppConstants>(
     builder.Configuration.GetSection("AppConstants"));
 
 var userSecretKey = builder.Configuration.GetSection("AppConstants:UserJwtSecret").Get<string>();
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetSection("AppConstants:RedisConnectionString").Get<string>();
+});
 
 builder.Services.AddAuthentication(options =>
     {
@@ -41,8 +43,13 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+// configurations
+builder.Services.AddSingleton<DatabaseSettings>();
+builder.Services.AddSingleton<CacheProvider>();
+
 // auth services
 builder.Services.AddSingleton<Auth>();
+builder.Services.AddSingleton<UserService>();
 
 // search services
 builder.Services.AddSingleton<SearchTag>();
