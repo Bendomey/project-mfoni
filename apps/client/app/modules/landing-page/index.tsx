@@ -37,7 +37,7 @@ export const LandingPageModule = () => {
             {imageUrls.map((url, index) => (
               <Fragment key={index}>
                 <FadeIn>
-                  <Content content={{url}} showTooltip />
+                  <Content content={{url}} showFlyout />
                 </FadeIn>
               </Fragment>
             ))}

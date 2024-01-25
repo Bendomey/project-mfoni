@@ -2,14 +2,14 @@ import {Button} from '../button/index.tsx'
 import {LockClosedIcon, HeartIcon} from '@heroicons/react/24/outline'
 import {useAsyncImage} from '@/hooks/use-async-image.ts'
 import {PhotographerCreatorCard} from '../creator-card/index.tsx'
-import {TooltipContainer} from '../tooltip/tooltip-container.tsx'
+import {FlyoutContainer} from '../flyout/flyout-container.tsx'
 
 interface Props {
   content: Content
-  showTooltip?: boolean
+  showFlyout?: boolean
 }
 
-export const Content = ({content, showTooltip = false}: Props) => {
+export const Content = ({content, showFlyout = false}: Props) => {
   const {pending} = useAsyncImage(content.url)
 
   return (
@@ -34,8 +34,8 @@ export const Content = ({content, showTooltip = false}: Props) => {
             </div>
           </div>
           <div className="group-hover:flex hidden flex-row items-center justify-between">
-            {showTooltip ? (
-              <TooltipContainer ToolTipContent={PhotographerCreatorCard}>
+            {showFlyout ? (
+              <FlyoutContainer FlyoutContent={PhotographerCreatorCard}>
                 <div className="flex items-center">
                   <img
                     className="inline-block h-7 w-7 rounded-full"
@@ -46,7 +46,7 @@ export const Content = ({content, showTooltip = false}: Props) => {
                     Domey Benjamin
                   </span>
                 </div>
-              </TooltipContainer>
+              </FlyoutContainer>
             ) : (
               <div />
             )}
