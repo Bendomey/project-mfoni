@@ -1,21 +1,16 @@
 import {Button} from '../button/index.tsx'
 import {LockClosedIcon, HeartIcon} from '@heroicons/react/24/outline'
 import {useAsyncImage} from '@/hooks/use-async-image.ts'
-import {useBoolean} from '@/hooks/use-boolean.ts'
-import {useCallback} from 'react'
 import {PhotographerCreatorCard} from '../creator-card/index.tsx'
+import {TooltipContainer} from '../tooltip/tooltip-container.tsx'
 
 interface Props {
   content: Content
+  showTooltip?: boolean
 }
 
-export const Content = ({content}: Props) => {
+export const Content = ({content, showTooltip = false}: Props) => {
   const {pending} = useAsyncImage(content.url)
-  const {value, setTrue, setFalse} = useBoolean(false)
-
-  const handleOnMouseEnter = useCallback(() => setTrue(), [setTrue])
-
-  const handleOnMouseLeave = useCallback(() => setFalse(), [setFalse])
 
   return (
     <div className="cursor-zoom-in mb-5 relative ">
@@ -24,7 +19,7 @@ export const Content = ({content}: Props) => {
         <div className="bg-black/20 animate-pulse w-full h-[30vh] z-10 rounded-lg mb-5" />
       ) : null}
 
-      <div className="group hover:bg-black/50 w-full h-full z-10 rounded-lg absolute top-0">
+      <div className="group hover:bg-black/50 w-full h-full rounded-lg absolute top-0">
         <div className="p-2 flex flex-col justify-between h-full w-full">
           <div className="flex flex-row items-center justify-between p-2">
             <div>
@@ -39,21 +34,22 @@ export const Content = ({content}: Props) => {
             </div>
           </div>
           <div className="group-hover:flex hidden flex-row items-center justify-between">
-            <button
-              onMouseEnter={handleOnMouseEnter}
-              onMouseLeave={handleOnMouseLeave}
-              type="button"
-              className="flex items-center focus:cursor-pointer"
-            >
-              <img
-                className="inline-block h-7 w-7 rounded-full"
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt="creator"
-              />
-              <span className="ml-2 text-white font-medium text-sm">
-                Domey Benjamin
-              </span>
-            </button>
+            {showTooltip ? (
+              <TooltipContainer ToolTipContent={PhotographerCreatorCard}>
+                <div className="flex items-center">
+                  <img
+                    className="inline-block h-7 w-7 rounded-full"
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    alt="creator"
+                  />
+                  <span className="ml-2 text-white font-medium text-sm">
+                    Domey Benjamin
+                  </span>
+                </div>
+              </TooltipContainer>
+            ) : (
+              <div />
+            )}
             <div>
               <Button
                 variant="outline"
@@ -66,7 +62,6 @@ export const Content = ({content}: Props) => {
           </div>
         </div>
       </div>
-      <PhotographerCreatorCard show={value} />
     </div>
   )
 }

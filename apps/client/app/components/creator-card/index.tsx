@@ -1,75 +1,59 @@
-import {Transition} from '@headlessui/react'
-import {Fragment} from 'react'
-
-type Props = {
-  show: boolean
-}
-
-const activeOption = {
-  id: 1,
-  name: 'Leslie Alexander',
-  phone: '1 (493) 747 9031',
-  email: 'leslie@example.com',
-  role: 'Accra, Ghana',
-  url: 'https://example.com',
-  profileUrl: '#',
+const person = {
+  name: 'Leonard Krasner',
+  role: 'Senior Designer',
   imageUrl:
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+    'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80',
+  xUrl: '#',
+  linkedinUrl: '#',
 }
 
-export const PhotographerCreatorCard = ({show}: Props) => {
+export const PhotographerCreatorCard = () => {
   return (
-    <Transition
-      as={Fragment}
-      show={show}
-      enter="transition ease-out duration-200"
-      enterFrom="opacity-0"
-      enterTo="opacity-100"
-      leave="transition ease-in duration-150"
-      leaveFrom="opacity-100"
-      leaveTo="opacity-0"
-    >
-      <div className="absolute z-50 inset-x-0 top-0 -mt-8  bg-white/60 backdrop-blur-xl pb-4 shadow-xl sm:px-2 lg:left-auto lg:right-12 lg:top-full lg:-mr-1.5 lg:mt-3 lg:w-80 lg:rounded-lg lg:ring-0 lg:ring-opacity-5">
-        <h2 className="sr-only">Creator</h2>
-        <div className="hidden flex-none flex-col divide-y divide-gray-50 overflow-y-auto sm:flex">
-          <div className="flex flex-row p-4 space-x-4 items-center justify-start">
-            <img
-              src={activeOption.imageUrl}
-              alt=""
-              className="h-12 w-12 rounded-full"
-            />
-            <div>
-              <h2 className="mt-1 font-semibold text-gray-900">
-                {activeOption.name}
-              </h2>
-              <p className="text-sm leading-6 text-gray-500">
-                {activeOption.role}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-auto flex-col justify-between p-5">
-            <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm text-gray-700">
-              <dt className="col-end-1 font-semibold text-gray-900">Phone</dt>
-              <dd>{activeOption.phone}</dd>
-              <dt className="col-end-1 font-semibold text-gray-900">Email</dt>
-              <dd className="truncate">
-                <a
-                  href={`mailto:${activeOption.email}`}
-                  className="text-blue-600 underline"
-                >
-                  {activeOption.email}
-                </a>
-              </dd>
-            </dl>
-            <button
-              type="button"
-              className="mt-6 w-full rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+    <div className="rounded-2xl flex-col z-50 bg-black flex justify-center items-center  px-6 py-8 w-64 shadow-xl">
+      <img
+        className="mx-auto h-16 w-16 rounded-full md:h-24 md:w-24"
+        src={person.imageUrl}
+        alt=""
+      />
+      <h3 className="mt-6 text-base font-semibold leading-7 tracking-tight text-white">
+        {person.name}
+      </h3>
+      <p className="text-sm leading-6 text-gray-400">{person.role}</p>
+      <ul className="mt-6 flex justify-center gap-x-6">
+        <li>
+          <a href={person.xUrl} className="text-gray-400 hover:text-gray-300">
+            <span className="sr-only">X</span>
+            <svg
+              className="h-5 w-5"
+              aria-hidden="true"
+              fill="currentColor"
+              viewBox="0 0 20 20"
             >
-              View Profile
-            </button>
-          </div>
-        </div>
-      </div>
-    </Transition>
+              <path d="M11.4678 8.77491L17.2961 2H15.915L10.8543 7.88256L6.81232 2H2.15039L8.26263 10.8955L2.15039 18H3.53159L8.87581 11.7878L13.1444 18H17.8063L11.4675 8.77491H11.4678ZM9.57608 10.9738L8.95678 10.0881L4.02925 3.03974H6.15068L10.1273 8.72795L10.7466 9.61374L15.9156 17.0075H13.7942L9.57608 10.9742V10.9738Z" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a
+            href={person.linkedinUrl}
+            className="text-gray-400 hover:text-gray-300"
+          >
+            <span className="sr-only">LinkedIn</span>
+            <svg
+              className="h-5 w-5"
+              aria-hidden="true"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
   )
 }
