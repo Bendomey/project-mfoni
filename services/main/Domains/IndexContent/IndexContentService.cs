@@ -18,11 +18,11 @@ public class IndexContent
     private readonly SaveTags _saveTagsService;
     private readonly AppConstants _appConstantsConfiguration;
 
-    public IndexContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants, IOptions<RabbitMQConnection> rabbitMQConnection, SaveTags saveTagsService)
+    public IndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, IOptions<RabbitMQConnection> rabbitMQConnection, SaveTags saveTagsService)
     {
         _logger = logger;
 
-        var database = connectToDatabase(mfoniStoreDatabaseSettings);
+        var database = databaseConfig.Database;
 
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
 
@@ -33,12 +33,6 @@ public class IndexContent
         _saveTagsService = saveTagsService;
 
         _logger.LogDebug("IndexContentService initialized");
-    }
-
-    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> mfoniStoreDatabaseSettings)
-    {
-        var client = new MongoClient(mfoniStoreDatabaseSettings.Value.ConnectionString);
-        return client.GetDatabase(mfoniStoreDatabaseSettings.Value.DatabaseName);
     }
 
     private IConnection CreateChannel()

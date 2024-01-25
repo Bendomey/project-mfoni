@@ -1,9 +1,17 @@
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+
 namespace main.Configuratons;
 
 public class DatabaseSettings
 {
-    public string ConnectionString { get; set; } = null!;
+    public IMongoDatabase Database;
 
-    public string DatabaseName { get; set; } = null!;
+    public DatabaseSettings(IOptions<AppConstants> appConstants)
+    {
+        var client = new MongoClient(appConstants.Value.DatabaseConnectionString);
+        Database = client.GetDatabase(appConstants.Value.DatabaseName);
+    }
 
 }
+

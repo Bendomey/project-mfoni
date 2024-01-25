@@ -18,11 +18,11 @@ public class SearchContent
     private readonly AppConstants _appConstantsConfiguration;
     private readonly AmazonRekognitionClient _rekognitionClient;
 
-    public SearchContent(ILogger<IndexContent> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants, SearchTag searchTagService)
+    public SearchContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTag searchTagService)
     {
         _logger = logger;
 
-        var database = connectToDatabase(mfoniStoreDatabaseSettings);
+        var database = databaseConfig.Database;
 
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
         _collectionsCollection = database.GetCollection<Collection>(appConstants.Value.CollectionCollection);
@@ -37,12 +37,6 @@ public class SearchContent
         _searchTagsService = searchTagService;
 
         _logger.LogDebug("SearchContentService initialized");
-    }
-
-    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> mfoniStoreDatabaseSettings)
-    {
-        var client = new MongoClient(mfoniStoreDatabaseSettings.Value.ConnectionString);
-        return client.GetDatabase(mfoniStoreDatabaseSettings.Value.DatabaseName);
     }
 
     public async Task<List<Content>> VisualSearch(byte[] imageBytes)

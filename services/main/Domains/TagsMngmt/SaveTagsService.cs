@@ -12,23 +12,17 @@ public class SaveTags
     private readonly IMongoCollection<Models.Tag> _tagsCollection;
     private readonly SearchTag _searchTagService;
 
-    public SaveTags(ILogger<SaveTags> logger, IOptions<DatabaseSettings> mfoniStoreDatabaseSettings, IOptions<AppConstants> appConstants, SearchTag searchTagService)
+    public SaveTags(ILogger<SaveTags> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTag searchTagService)
     {
         _logger = logger;
 
-        var database = connectToDatabase(mfoniStoreDatabaseSettings);
+        var database = databaseConfig.Database;
 
         _tagsCollection = database.GetCollection<Models.Tag>(appConstants.Value.TagCollection);
 
         _searchTagService = searchTagService;
 
         _logger.LogDebug("SaveTagsService initialized");
-    }
-
-    private IMongoDatabase connectToDatabase(IOptions<DatabaseSettings> mfoniStoreDatabaseSettings)
-    {
-        var client = new MongoClient(mfoniStoreDatabaseSettings.Value.ConnectionString);
-        return client.GetDatabase(mfoniStoreDatabaseSettings.Value.DatabaseName);
     }
 
     public Models.Tag Create(CreateTagInput tag)
