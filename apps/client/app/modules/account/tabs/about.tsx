@@ -33,22 +33,9 @@ const SocialLink = ({
 
 export const ProfileAbout = () => {
   return (
-    <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12">
-      {/* <div className="lg:pl-20">
-        <div className="max-w-xs px-2.5 lg:max-w-none">
-          <img
-            src={profile.imageUrl}
-            alt=""
-            className="aspect-square rotate-3 rounded-2xl bg-zinc-100 object-cover "
-            sizes="(min-width: 1024px) 32rem, 20rem"
-          />
-        </div>
-      </div> */}
-      <div className="lg:order-first lg:row-span-2">
-        {/* <h1 className="text-4xl font-bold  text-zinc-800 sm:text-5xl">
-          I’m Ron. I live in Accra where I design the future.
-        </h1> */}
-        <div className="mt-6 space-y-7 text-base text-zinc-600 mr-0 lg:mr-12 ">
+    <div className="sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
+      <div className="min-w-0 flex-1 block">
+        <div className="space-y-7 text-base text-zinc-600 ">
           <p>
             I’ve loved making things for as long as I can remember, and wrote my
             first program when I was 6 years old, just two weeks after my mom
@@ -64,7 +51,7 @@ export const ProfileAbout = () => {
           </p>
         </div>
       </div>
-      <div className="lg:mt-8 mt-0 ">
+      <div className="mt-8 sm:mt-12  flex flex-col justify-center space-y-3 sm:flex-col sm:space-y-4 ">
         <ul>
           <SocialLink href="#" icon={TwitterIcon}>
             Follow on Twitter
