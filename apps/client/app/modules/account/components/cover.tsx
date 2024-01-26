@@ -1,4 +1,4 @@
-import {EnvelopeIcon, PhoneIcon} from '@heroicons/react/24/outline'
+import {MapPinIcon, ShareIcon, UserIcon} from '@heroicons/react/24/outline'
 
 export const profile = {
   name: 'Ricardo Cooper',
@@ -46,27 +46,43 @@ export const AccountCover = () => {
               <h1 className="truncate text-2xl font-bold text-gray-900">
                 {profile.name}
               </h1>
+              <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-8">
+                <div className="mt-2 flex items-center text-sm text-gray-500">
+                  <UserIcon
+                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  20k followers
+                </div>
+                <div className="mt-2 flex items-center text-sm text-gray-500">
+                  <MapPinIcon
+                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  East Legon, Accra - Ghana
+                </div>
+              </div>
             </div>
-            <div className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
+            <div className="mt-6 sm:mt-14  flex flex-col justify-center space-y-3 sm:flex-col sm:space-y-4 ">
               <button
                 type="button"
-                className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                className="inline-flex w-full sm:w-36 justify-center gap-x-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-gray-100 shadow-sm ring-0 ring-inset hover:bg-blue-700"
               >
-                <EnvelopeIcon
-                  className="-ml-0.5 h-5 w-5 text-gray-400"
+                <UserIcon
+                  className="-ml-0.5 h-5 w-5 text-gray-100"
                   aria-hidden="true"
                 />
-                Message
+                Follow
               </button>
               <button
                 type="button"
-                className="inline-flex justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                className="inline-flex w-full sm:w-36 justify-center gap-x-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-0 ring-inset  hover:bg-gray-200"
               >
-                <PhoneIcon
+                <ShareIcon
                   className="-ml-0.5 h-5 w-5 text-gray-400"
                   aria-hidden="true"
                 />
-                Call
+                Share
               </button>
             </div>
           </div>
@@ -75,6 +91,22 @@ export const AccountCover = () => {
           <h1 className="truncate text-2xl font-bold text-gray-900">
             {profile.name}
           </h1>
+          <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-8">
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <UserIcon
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              20k followers
+            </div>
+            <div className="mt-2 flex items-center text-sm text-gray-500">
+              <MapPinIcon
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              East Legon, Accra - Ghana
+            </div>
+          </div>
         </div>
       </div>
     </div>
