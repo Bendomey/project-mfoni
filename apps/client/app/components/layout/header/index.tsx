@@ -56,7 +56,7 @@ export const Header = ({
             <span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
           </div>
         </Link>
-        <div className="flex-grow mx-8 hidden md:flex">
+        <div className="flex-grow mx-8 hidden md:flex h-11">
           {isHeroSearchInVisible ? null : <SearchPhotos />}
         </div>
         <div className="flex lg:hidden">
