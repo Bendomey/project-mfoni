@@ -15,7 +15,7 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
     | 'light'
     | 'dark'
     | 'link'
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | "xl"
   type?: 'button' | 'submit' | 'reset'
   externalClassName?: string
 }
@@ -34,7 +34,9 @@ export const Button = ({
     if (propSize === 'sm') {
       return 'px-3 py-1 text-xs'
     } else if (propSize === 'lg') {
-      return 'px-6 py-3 text-base'
+      return 'px-6 py-3 text-lg'
+    } else if (propSize === 'xl') {
+      return 'px-8 py-4 text-xl'
     }
 
     return 'px-4 py-2 text-sm'
