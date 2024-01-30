@@ -39,13 +39,9 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
       onSignout: async () => {
         const token = auth.getCipher(USER_CIPHER)
         if (token) {
-          toast.loading('Logging out...', {id: 'logout-loading'})
           auth.clearCipher(USER_CIPHER)
-          await queryClient.invalidateQueries({
-            queryKey: [QUERY_KEYS.CURRENT_USER],
-          })
+          queryClient.setQueryData([QUERY_KEYS.CURRENT_USER], null)
           toast.success('Logged out successfully', {id: 'logout-success'})
-          window.location.reload()
         }
       },
       getToken: () => {
