@@ -7,7 +7,7 @@ interface User {
   email: Nullable<string>
   username: Nullable<string>
   photo: Nullable<string>
-  creatorApplication: Nullable<string>
+  creatorApplication: Nullable<string> | CreatorApplication
   accountSetupAt: Nullable<Date>
   createdAt: Date
   updatedAt: Date
