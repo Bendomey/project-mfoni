@@ -70,7 +70,8 @@ public class UserService
         }
 
         var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
-        if (code != verificationCode) {
+        if (code != verificationCode)
+        {
             throw new Exception("CodeIsInCorrectOrHasExpired");
         }
 
