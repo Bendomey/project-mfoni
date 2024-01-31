@@ -36,7 +36,7 @@ export const Button = ({
     } else if (propSize === 'lg') {
       return 'px-6 py-3 text-lg'
     } else if (propSize === 'xl') {
-      return 'px-8 py-4 text-xl'
+      return 'px-8 py-2 md:py-4 text-lg md:text-xl'
     }
 
     return 'px-4 py-2 text-sm'
