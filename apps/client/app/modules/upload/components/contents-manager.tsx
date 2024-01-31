@@ -1,8 +1,10 @@
+/* eslint-disable react/no-unstable-nested-components */
 import { Button } from "@/components/button/index.tsx"
 import { PlusIcon } from "@heroicons/react/24/outline"
 import { ExclamationCircleIcon, ExclamationTriangleIcon, TrashIcon } from "@heroicons/react/24/solid"
 import { type Content } from "../index.tsx"
 import { useMemo } from "react"
+import { FlyoutContainer } from "@/components/flyout/flyout-container.tsx"
 
 
 interface ContentManagerProps {
@@ -18,27 +20,39 @@ const AddNewContentButton = ({ open }: { open: ContentManagerProps['open'] }) =>
     )
 }
 
+
+
 const ContentSideViewer = ({ content }: { content: Content }) => {
     const imageUrl = useMemo(() => URL.createObjectURL(content.file), [content.file])
     const isRejected = useMemo(() => content.status === 'rejected', [content.status])
 
+    const ErrorTag = () => {
+        return (
+            <div className="bg-red-600 z-10 p-5 w-[45vw] rounded-xl">
+                <h1 className="text-white font-bold">{content.message}</h1>
+            </div>
+        )
+    }
+
     return (
-        <div className="relative bg-zinc-100 h-[12vh] w-[7vw] mx-5 flex justify-center items-center rounded-lg"
-            style={{
-                backgroundImage: `url(${imageUrl})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            }}
-        > {
-                isRejected ? (
+        <FlyoutContainer intendedPosition="x" FlyoutContent={isRejected ? ErrorTag : undefined} arrowColor="bg-red-600">
+            <div className="relative bg-zinc-100 h-[12vh] w-[7vw] mx-5 flex justify-center items-center rounded-lg"
+                style={{
+                    backgroundImage: `url(${imageUrl})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }}
+            >
+                {isRejected ? (
                     <div className="absolute top-0 z-1 h-full w-full bg-red-600 bg-opacity-90 rounded-lg">
                         <div className="flex justify-center items-center h-full w-full">
                             <ExclamationTriangleIcon className='text-white h-10 w-auto' />
                         </div>
                     </div>
                 ) : null
-            }
-        </div>
+                }
+            </div>
+        </FlyoutContainer>
     )
 }
 

@@ -29,6 +29,11 @@ export const UploadModule = () => {
         for (let i = 0; i < acceptedFiles.length; i++) {
             const file = acceptedFiles[i]
             if (file) {
+                const isDuplicate = contents.find(content => content.file.name === file.name)
+                if(isDuplicate){
+                    continue
+                }
+
                 // eslint-disable-next-line no-await-in-loop
                 const validationResponse = await acceptFile(file)
                 newContents.push(validationResponse as Content)
@@ -42,7 +47,7 @@ export const UploadModule = () => {
             }
         }
 
-    }, [])
+    }, [contents])
 
     const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
         onDrop,
@@ -57,7 +62,7 @@ export const UploadModule = () => {
     const areContentsAdded = useMemo(() => Boolean(contents.length), [contents])
 
     return (
-        <div {...getRootProps()}>
+        <div {...getRootProps()} className="relative">
             <Header isHeroSearchInVisible={false} />
             <input {...getInputProps()} />
 
@@ -71,7 +76,7 @@ export const UploadModule = () => {
             
             {
                 isDragActive ? (
-                    <div className="absolute h-full w-full top-0 z-50 bg-black bg-opacity-70   backdrop-blur flex justify-center items-center">
+                    <div className="fixed h-screen w-screen overflow-hidden top-0 z-50 bg-black bg-opacity-70   backdrop-blur flex justify-center items-center">
                         <h1 className="font-extrabold text-white text-6xl">Drop your images here.</h1>
                     </div>
                 ) : null

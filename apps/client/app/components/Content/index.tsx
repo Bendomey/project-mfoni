@@ -35,7 +35,7 @@ export const Content = ({content, showFlyout = false}: Props) => {
           </div>
           <div className="group-hover:flex hidden flex-row items-center justify-between">
             {showFlyout ? (
-              <FlyoutContainer FlyoutContent={PhotographerCreatorCard}>
+              <FlyoutContainer intendedPosition='y' FlyoutContent={PhotographerCreatorCard}>
                 <div className="flex items-center">
                   <img
                     className="inline-block h-7 w-7 rounded-full"
