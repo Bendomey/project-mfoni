@@ -33,7 +33,7 @@ export const Header = ({
   const scrolled = useScroll(50)
 
   const headerBlurred = shouldHeaderBlur
-    ? 'bg-white/50 backdrop-blur-xl sticky top-0 z-50'
+    ? 'bg-white/95 backdrop-blur-xl sticky top-0 z-50'
     : 'sticky top-0 z-50 bg-white'
 
   return (
@@ -41,7 +41,7 @@ export const Header = ({
       className={
         isHeroSearchInVisible
           ? undefined
-          : `${scrolled ? headerBlurred : 'sticky top-0 z-50 bg-white'}`
+          : `${scrolled ? headerBlurred : 'sticky top-0 z-50 bg-white '}`
       }
     >
       <nav
