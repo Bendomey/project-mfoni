@@ -66,7 +66,7 @@ public class UserService
         var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
         if (user.VerifiedPhoneNumberAt is not null)
         {
-            throw new Exception("Phone number has already been verified");
+            throw new Exception("PhoneNumberAlreadyVerified");
         }
 
         var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
