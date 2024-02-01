@@ -72,7 +72,7 @@ public class UserService
         var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
         if (code != verificationCode)
         {
-            throw new Exception("CodeIsInCorrectOrHasExpired");
+            throw new Exception("CodeIsIncorrectOrHasExpired");
         }
 
         var filter = Builders<Models.User>.Filter.Eq(r => r.Id, user.Id);
