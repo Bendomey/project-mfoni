@@ -44,5 +44,28 @@ public class UserController : ControllerBase
             return new GetEntityResponse<bool?>(null, e.Message).Result();
         }
     }
+
+    [Authorize]
+    [HttpPatch("phone/verify")]
+    public async Task<OutputResponse<bool?>> VerifyPhoneNumber([FromBody] VerificationCodeInput code)
+    {
+        logger.LogInformation("verifying user phone number");
+        var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+        if (currentUser == null)
+        {
+            throw new Exception("UserNotFound");
+        }
+
+        try
+        {
+            var verifyPhoneNumber = await userService.VerifyPhoneNumber(code.verificationCode, currentUser.Id);
+            return new GetEntityResponse<bool?>(verifyPhoneNumber, null).Result();
+        }
+        catch (Exception e)
+        {
+            logger.LogError($"{e.Message}");
+            return new GetEntityResponse<bool?>(null, e.Message).Result();
+        }
+    }
 }
 

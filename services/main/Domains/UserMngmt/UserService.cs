@@ -60,5 +60,27 @@ public class UserService
 
         return true;
     }
+
+    public async Task<bool> VerifyPhoneNumber(string code, string userId)
+    {
+        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+        if (user.VerifiedPhoneNumberAt is not null)
+        {
+            throw new Exception("PhoneNumberAlreadyVerified");
+        }
+
+        var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
+        if (code != verificationCode)
+        {
+            throw new Exception("CodeIsIncorrectOrHasExpired");
+        }
+
+        var filter = Builders<Models.User>.Filter.Eq(r => r.Id, user.Id);
+        var updates = Builders<Models.User>.Update.Set(v => v.VerifiedPhoneNumberAt, DateTime.Now);
+        await _userCollection.UpdateOneAsync(filter, updates);
+
+        await _cacheProvider.ClearCache($"verify-{user.Id}");
+        return true;
+    }
 }
 
