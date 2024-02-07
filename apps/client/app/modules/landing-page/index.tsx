@@ -4,6 +4,7 @@ import {useInView} from 'react-intersection-observer'
 import {Content} from '@/components/Content/index.tsx'
 import {FadeIn, FadeInStagger} from '@/components/animation/FadeIn.tsx'
 import {Fragment} from 'react'
+import {Pricing} from './components/pricing/index.tsx'
 
 export const imageUrls = [
   'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image.jpg',
@@ -43,6 +44,7 @@ export const LandingPageModule = () => {
             ))}
           </div>
         </FadeInStagger>
+        <Pricing />
       </div>
     </div>
   )
