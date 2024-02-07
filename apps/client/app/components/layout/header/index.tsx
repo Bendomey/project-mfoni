@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {Fragment, useState} from 'react'
 import {Dialog} from '@headlessui/react'
 import {Bars3Icon, XMarkIcon} from '@heroicons/react/24/outline'
 import {Link} from '@remix-run/react'
@@ -11,9 +11,12 @@ import {UserAccountMobileNav, UserAccountNav} from './user-account/index.tsx'
 import useScroll from '@/hooks/use-scroll.ts'
 
 const navigation = (isLoggedIn: boolean) => [
-  {name: 'Explore', href: '/explore'},
-  {name: 'Terms Of Use', href: '/terms'},
-  isLoggedIn ? {name: 'My Account', href: '/account'} : undefined,
+  {name: 'Explore', href: '/explore', routeType: 'link'},
+  {name: 'Pricing', href: '#pricing', routeType: 'href'},
+  {name: 'Terms Of Use', href: '/terms', routeType: 'link'},
+  isLoggedIn
+    ? {name: 'My Account', href: '/account', routeType: 'link'}
+    : undefined,
 ]
 
 interface Props {
@@ -67,17 +70,27 @@ export const Header = ({
           </button>
         </div>
         <div className="hidden lg:flex lg:justify-center lg:items-center lg:gap-x-12">
-          {navigation(isLoggedIn).map(item =>
-            item ? (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-900"
-              >
-                {item.name}
-              </Link>
-            ) : null,
-          )}
+          {navigation(isLoggedIn).map((item, idx) => {
+            return (
+              <Fragment key={idx}>
+                {item && item.routeType === 'link' ? (
+                  <Link
+                    to={item.href}
+                    className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-900"
+                  >
+                    {item.name}
+                  </Link>
+                ) : item && item.routeType === 'href' ? (
+                  <a
+                    href={item.href}
+                    className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-900"
+                  >
+                    {item.name}
+                  </a>
+                ) : null}
+              </Fragment>
+            )
+          })}
           {isLoggedIn ? (
             <UserAccountNav />
           ) : (
@@ -126,17 +139,29 @@ export const Header = ({
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
-                {navigation(isLoggedIn).map(item =>
-                  item ? (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                    >
-                      {item.name}
-                    </Link>
-                  ) : null,
-                )}
+                {navigation(isLoggedIn).map((item, idx) => {
+                  return (
+                    <Fragment key={idx}>
+                      {item && item.routeType === 'link' ? (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                        >
+                          {item.name}
+                        </Link>
+                      ) : item && item.routeType === 'href' ? (
+                        <a
+                          onClick={() => setMobileMenuOpen(false)}
+                          href={item.href}
+                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                        >
+                          {item.name}
+                        </a>
+                      ) : null}
+                    </Fragment>
+                  )
+                })}
               </div>
               <div className="py-6">
                 {isLoggedIn ? (

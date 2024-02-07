@@ -3,48 +3,50 @@ import {CheckIcon} from '@heroicons/react/24/outline'
 
 const tiers = [
   {
-    name: 'Hobby',
+    name: 'Silver Snapshot Plan',
     id: 'tier-hobby',
     href: '#',
-    priceMonthly: '$19',
+    priceMonthly: '$9.99',
     description:
       "The perfect plan if you're just getting started with our product.",
     features: [
-      '25 products',
-      'Up to 10,000 subscribers',
-      'Advanced analytics',
-      '24-hour support response time',
+      'Unlimited photo uploads',
+      'Basic AI-powered image recognition',
+      'Access to client management tools',
+      'Monthly analytics report',
+      'Standard customer support',
     ],
     featured: false,
   },
   {
-    name: 'Enterprise',
+    name: 'Platinum Portfolio Plan',
     id: 'tier-enterprise',
     href: '#',
-    priceMonthly: '$49',
-    description: 'Dedicated support and infrastructure for your company.',
+    priceMonthly: '$39.99',
+    description:
+      'Grow your photography business with premium support and exclusive opportunities.',
     features: [
-      'Unlimited products',
-      'Unlimited subscribers',
-      'Advanced analytics',
-      'Dedicated support representative',
-      'Marketing automations',
-      'Custom integrations',
+      'All Golden Capture features',
+      'Enhanced client engagement tools',
+      'Premium analytics and insights',
+      'Dedicated account manager',
+      'Exclusive access to industry events and workshops',
     ],
     featured: true,
   },
   {
-    name: 'Hobby',
+    name: 'Golden Capture Plan',
     id: 'tier-hobby',
     href: '#',
-    priceMonthly: '$19',
+    priceMonthly: '$19.99',
     description:
-      "The perfect plan if you're just getting started with our product.",
+      'Elevate your brand and streamline workflow with advanced features.',
     features: [
-      '25 products',
-      'Up to 10,000 subscribers',
-      'Advanced analytics',
-      '24-hour support response time',
+      'All Silver Snapshot features',
+      'Advanced AI-powered image recognition',
+      'Dedicated support representative',
+      'Priority customer support',
+      'Integration with popular photography tools',
     ],
     featured: false,
   },
@@ -52,7 +54,10 @@ const tiers = [
 
 export const Pricing = () => {
   return (
-    <div className="relative isolate mt-32 bg-white px-6 sm:mt-56 lg:px-8">
+    <div
+      id="pricing"
+      className="relative isolate mt-32 bg-white px-6 sm:mt-56 lg:px-8"
+    >
       <div
         className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
         aria-hidden="true"
