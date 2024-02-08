@@ -36,6 +36,7 @@ public class Content
     [BsonElement("blurred_media")]
     public S3MetaData? BlurredMedia { get; set; }
 
+    // TODO: remove this
     [BsonElement("tag_ids")]
     public List<string>? Tags { get; set; }
 
