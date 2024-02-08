@@ -56,7 +56,7 @@ export const Pricing = () => {
   return (
     <div
       id="pricing"
-      className="relative isolate mt-32 bg-white px-6 sm:mt-56 lg:px-8"
+      className="relative isolate mt-32 bg-white px-6 lg:mt-40 2xl:mt-56 lg:px-8"
     >
       <div
         className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"
@@ -85,7 +85,7 @@ export const Pricing = () => {
       <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-none 2xl:max-w-7xl lg:grid-cols-3">
         {tiers.map((tier, tierIdx) => (
           <div
-            key={tier.id}
+            key={tierIdx}
             className={classNames(
               tier.featured
                 ? 'relative bg-black shadow-2xl'

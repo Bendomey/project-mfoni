@@ -12,7 +12,7 @@ import useScroll from '@/hooks/use-scroll.ts'
 
 const navigation = (isLoggedIn: boolean) => [
   {name: 'Explore', href: '/explore', routeType: 'link'},
-  {name: 'Pricing', href: '#pricing', routeType: 'href'},
+  {name: 'Pricing', href: '/#pricing', routeType: 'href'},
   {name: 'Terms Of Use', href: '/terms', routeType: 'link'},
   isLoggedIn
     ? {name: 'My Account', href: '/account', routeType: 'link'}
