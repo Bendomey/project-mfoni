@@ -16,6 +16,7 @@ import {NODE_ENV} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
 import {Toaster} from 'react-hot-toast'
 import {Providers} from './providers/index.tsx'
+import {RouteLoader} from './components/loader/route-loader.tsx'
 
 export const links: LinksFunction = () => {
   return [
@@ -55,6 +56,7 @@ export default function App() {
   return (
     <Document>
       <Providers>
+        <RouteLoader />
         <Outlet />
       </Providers>
     </Document>
