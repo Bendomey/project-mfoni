@@ -20,4 +20,12 @@ public class Tag
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    [BsonElement("created_by_admin_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? CreatedByAdminId { get; set; }
+
+    [BsonElement("created_by_user_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? CreatedByUserId { get; set; }
 }
