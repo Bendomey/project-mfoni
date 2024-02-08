@@ -4,7 +4,7 @@ import {imageUrls} from '@/modules/index.tsx'
 
 export const ProfileMuse = () => {
   return (
-    <div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8 ">
+    <div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8 ">
       {imageUrls.map((url, index) => (
         <Fragment key={index}>
           <Content content={{url}} />
