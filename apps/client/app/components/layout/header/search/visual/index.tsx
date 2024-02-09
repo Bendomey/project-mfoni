@@ -29,7 +29,7 @@ export const VisualSearch = () => {
           <span>Need Help?</span>
         </Button>
       </div>
-      <div className="p-3 bg-gray-50 relative h-[50vh] md:h-[42vh] lg:[40vh] 2xl:[15vh]">
+      <div className="p-3 bg-gray-50 relative h-[55vh] md:h-[48vh] lg:[44vh] 2xl:[15vh]">
         <div className=" rounded-md p-1">
           {imgSrc ? (
             <img
