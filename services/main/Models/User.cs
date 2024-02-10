@@ -52,7 +52,7 @@ public class User
     [BsonRepresentation(BsonType.ObjectId)]
     [BsonElement("creator_application_id")]
     public string? CreatorApplicationId { get; set; } // only set after user is approved as creator
-    
+
     [BsonIgnore]
     public CreatorApplication? CreatorApplication { get; set; }
 

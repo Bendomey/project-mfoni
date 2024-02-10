@@ -31,7 +31,7 @@ public class Tag
     [BsonElement("created_by_user_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? CreatedByUserId { get; set; }
-    
+
     [BsonIgnore]
     public User? CreatedByUser { get; set; }
 }

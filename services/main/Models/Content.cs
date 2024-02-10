@@ -69,7 +69,7 @@ public class Content
     [BsonElement("created_by_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public required string CreatedById { get; set; }
-    
+
     [BsonIgnore]
     public User? CreatedBy { get; set; }
 
