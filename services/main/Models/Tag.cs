@@ -25,7 +25,13 @@ public class Tag
     [BsonRepresentation(BsonType.ObjectId)]
     public string? CreatedByAdminId { get; set; }
 
+    [BsonIgnore]
+    public Admin? CreatedByAdmin { get; set; }
+
     [BsonElement("created_by_user_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? CreatedByUserId { get; set; }
+
+    [BsonIgnore]
+    public User? CreatedByUser { get; set; }
 }

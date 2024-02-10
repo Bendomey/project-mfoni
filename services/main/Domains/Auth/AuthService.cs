@@ -6,6 +6,7 @@ using System.Text;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
+using main.Models;
 
 namespace main.Domains;
 
@@ -99,15 +100,15 @@ public class Auth
         user.UpdatedAt = DateTime.UtcNow;
 
 
-        if (accountInput.Role == "CREATOR" && user.CreatorApplication is null)
+        if (accountInput.Role == UserRole.CREATOR && user.CreatorApplication is null)
         {
             var __newCreatorApplication = new Models.CreatorApplication
             {
-                CreatedBy = user.Id,
+                CreatedById = user.Id,
             };
             _creatorsCollection.InsertOne(__newCreatorApplication);
 
-            user.CreatorApplication = __newCreatorApplication.Id;
+            user.CreatorApplicationId = __newCreatorApplication.Id;
         }
 
         _usersCollection.ReplaceOne(user => user.Id == userInput.Id, user);

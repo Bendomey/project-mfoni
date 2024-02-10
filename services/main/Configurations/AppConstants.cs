@@ -5,6 +5,7 @@ public class AppConstants
     public string DatabaseConnectionString { get; set; } = null!;
     public string DatabaseName { get; set; } = null!;
     public string RedisConnectionString { get; set; } = null!;
+    public string RabbitMQConnectionString { get; set; } = null!;
     public string AdminCollection { get; set; } = null!;
     public string UserCollection { get; set; } = null!;
     public string CollectionCollection { get; set; } = null!;

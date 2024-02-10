@@ -3,6 +3,19 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace main.Models;
 
+public static class UserRole
+{
+    public static readonly string CLIENT = "CLIENT";
+    public static readonly string CREATOR = "CREATOR";
+}
+
+public static class UserProvider
+{
+    public static readonly string FACEBOOK = "FACEBOOK";
+    public static readonly string TWITTER = "TWITTER";
+    public static readonly string GOOGLE = "GOOGLE";
+}
+
 public class User
 {
     [BsonId]
@@ -10,7 +23,7 @@ public class User
     public string Id { get; set; } = null!;
 
     [BsonElement("role")]
-    public string Role { get; set; } = "CLIENT"; // CLIENT | CREATOR
+    public string Role { get; set; } = UserRole.CLIENT;
 
     [BsonElement("provider")]
     public required string Provider { get; set; } // FACEBOOK | TWITTER | GOOGLE
@@ -38,7 +51,10 @@ public class User
 
     [BsonRepresentation(BsonType.ObjectId)]
     [BsonElement("creator_application_id")]
-    public string? CreatorApplication { get; set; } // only set after user is approved as creator
+    public string? CreatorApplicationId { get; set; } // only set after user is approved as creator
+
+    [BsonIgnore]
+    public CreatorApplication? CreatorApplication { get; set; }
 
     [BsonElement("account_setup_at")]
     public DateTime? AccountSetupAt { get; set; }

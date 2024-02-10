@@ -45,6 +45,7 @@ builder.Services.AddAuthorization();
 
 // configurations
 builder.Services.AddSingleton<DatabaseSettings>();
+builder.Services.AddSingleton<RabbitMQConnection>();
 builder.Services.AddSingleton<CacheProvider>();
 
 // auth services
@@ -56,6 +57,9 @@ builder.Services.AddSingleton<SearchTag>();
 builder.Services.AddSingleton<SearchContent>();
 
 builder.Services.AddSingleton<SaveTags>();
+
+builder.Services.AddSingleton<CollectionService>();
+builder.Services.AddSingleton<CollectionContentService>();
 
 // indexing content services
 builder.Services.AddSingleton<IndexContent>();
