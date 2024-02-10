@@ -16,9 +16,11 @@ public class IndexContent
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly RabbitMQ.Client.IConnection _rabbitMqChannel;
     private readonly SaveTags _saveTagsService;
+    private readonly CollectionService _collectionService;
+    private readonly CollectionContentService _collectionContentService;
     private readonly AppConstants _appConstantsConfiguration;
 
-    public IndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants, SaveTags saveTagsService)
+    public IndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants, SaveTags saveTagsService, CollectionService collectionService, CollectionContentService collectionContentService)
     {
         _logger = logger;
 
@@ -32,6 +34,10 @@ public class IndexContent
         _appConstantsConfiguration = appConstants.Value;
 
         _saveTagsService = saveTagsService;
+
+        _collectionService = collectionService;
+        
+        _collectionContentService = collectionContentService;
 
         _logger.LogDebug("IndexContentService initialized");
     }
@@ -48,6 +54,20 @@ public class IndexContent
         if (user.Role != UserRole.CREATOR)
         {
             throw new Exception("NotEnoughPermission");
+        }
+
+        // resolve upload collection
+        var collection = _collectionService.ResolveCollection(new SaveCollection
+        {
+            Name = $"{user.Id}::Uploads",
+            Description = $"{user.Name}'s collection for all their uploads",
+            Type = CollectionType.USER,
+            Visibility = CollectionVisibility.PRIVATE,
+        }, user.Id);
+
+        if(collection is null)
+        {
+            throw new Exception("CollectionNotFound");
         }
 
         List<Content> contents = [];
@@ -80,8 +100,18 @@ public class IndexContent
 
             content.Tags = dbTags;
 
+            // create collection content
+            _collectionContentService.SaveCollectionContent(new SaveCollectionContent
+            {
+                CollectionId = collection.Id,
+                ContentId = content.Id
+            }, user.Id);
+
             contents.Add(content);
         });
+
+        // save count on collection
+        _collectionService.UpdateCollectionContentsCount(collection.Id, contents.Count);
 
         // push to queue for image processing
         using var channel = _rabbitMqChannel.CreateModel();

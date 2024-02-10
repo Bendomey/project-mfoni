@@ -21,20 +21,17 @@ public class Collection
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
 
+    [BsonElement("contents_count")]
+    public required int ContentsCount { get; set; } = 0;
+
     [BsonElement("name")]
     public required string Name { get; set; }
 
     [BsonElement("description")]
     public string? Description { get; set; }
 
-    [BsonElement("tag_ids")]
-    public List<ObjectId>? Tags { get; set; }
-
     [BsonElement("type")]
     public required string Type { get; set; } = CollectionType.USER;
-
-    [BsonElement("status")]
-    public required string Status { get; set; } = "PROCESSING"; // PROCESSING | PROCESSED_WITH_ERRORS | PUBLISHED
 
     [BsonElement("visibility")]
     public required string Visibility { get; set; } = CollectionVisibility.PRIVATE;

@@ -10,13 +10,25 @@ public class CollectionContent
     public string Id { get; set; } = null!;
 
     [BsonElement("collection_id")]
-    public required ObjectId CollectionId { get; set; }
+    [BsonRepresentation(BsonType.ObjectId)]
+    public required string CollectionId { get; set; }
+
+    [BsonIgnore]
+    public Collection? Collection { get; set; }
 
     [BsonElement("content_id")]
-    public ObjectId? ContentId { get; set; }
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? ContentId { get; set; }
+
+    [BsonIgnore]
+    public Content? Content { get; set; }
 
     [BsonElement("child_collection_id")]
-    public ObjectId? ChildCollectionId { get; set; } // a collection can have a child collections
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? ChildCollectionId { get; set; } // a collection can have a child collections
+
+    [BsonIgnore]
+    public CollectionContent? ChildCollection { get; set; }
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -24,7 +36,7 @@ public class CollectionContent
     [BsonElement("created_by_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public required string CreatedById { get; set; }
-    
+
     [BsonIgnore]
     public User? CreatedBy { get; set; }
 
