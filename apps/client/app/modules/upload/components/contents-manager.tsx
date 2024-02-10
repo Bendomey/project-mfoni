@@ -3,9 +3,10 @@ import { Button } from "@/components/button/index.tsx"
 import { PlusIcon } from "@heroicons/react/24/outline"
 import { ExclamationCircleIcon, ExclamationTriangleIcon, TrashIcon } from "@heroicons/react/24/solid"
 import { type Content } from "../index.tsx"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { FlyoutContainer } from "@/components/flyout/flyout-container.tsx"
-
+import { RadioGroup } from '@headlessui/react'
+import { classNames } from "@/lib/classNames.ts"
 
 interface ContentManagerProps {
     open: VoidFunction
@@ -25,17 +26,18 @@ const ContentSideViewer = ({ content }: { content: Content }) => {
     const imageUrl = useMemo(() => URL.createObjectURL(content.file), [content.file])
     const isRejected = useMemo(() => content.status === 'rejected', [content.status])
 
-    const ErrorTag = () => {
-        return (
-            <div className="bg-red-600 z-10 p-5 w-[45vw] rounded-xl">
-                <h1 className="text-white font-bold">{content.message}</h1>
-            </div>
-        )
-    }
+    // TODO: add error flyout in the future.
+    // const ErrorTag = () => {
+    //     return (
+    //         <div className="bg-red-600 z-10 p-5 w-[45vw] rounded-xl">
+    //             <h1 className="text-white font-bold">{content.message}</h1>
+    //         </div>
+    //     )
+    // }
 
     return (
-        <FlyoutContainer intendedPosition="x" FlyoutContent={isRejected ? ErrorTag : undefined} arrowColor="bg-red-600">
-            <div className="relative bg-zinc-100 h-[12vh] w-[23vw] md:w-[7vw] md:mx-5 flex justify-center items-center rounded-lg"
+        <FlyoutContainer intendedPosition="x" FlyoutContent={undefined} arrowColor="bg-red-600">
+            <div className="relative bg-zinc-100 h-[12vh] w-[23vw] md:w-[7vw] flex justify-center items-center rounded-lg"
                 style={{
                     backgroundImage: `url(${imageUrl})`,
                     backgroundSize: 'cover',
@@ -118,6 +120,53 @@ const Footer = ({ contents }: { contents: ContentManagerProps['contents'] }) => 
     )
 }
 
+
+const memoryOptions = [
+    { name: 'PUBLIC', inStock: true },
+    { name: 'PRIVATE', inStock: true },
+]
+
+export default function Example() {
+    const [mem, setMem] = useState(memoryOptions[0])
+
+    return (
+        <div>
+            <div className="flex items-center justify-between">
+                <label htmlFor="email" className="block font-semibold text-lg leading-6 text-gray-500">
+                    Visibility
+                </label>
+            </div>
+
+            <RadioGroup value={mem} onChange={setMem} className="mt-2">
+                <RadioGroup.Label className="sr-only">Choose a memory option</RadioGroup.Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 ">
+                    {memoryOptions.map((option) => (
+                        <RadioGroup.Option
+                            key={option.name}
+                            value={option}
+                            className={({ active, checked }) =>
+                                classNames(
+                                    'cursor-pointer focus:outline-none',
+                                    active ? 'ring-2 ring-blue-600 ring-offset-2' : '',
+                                    checked
+                                        ? 'bg-blue-600 text-white hover:bg-blue-500'
+                                        : 'ring-1 ring-inset ring-gray-300 bg-white text-gray-900 hover:bg-gray-50',
+                                    'flex items-center justify-center rounded-md py-3 px-3 text-sm font-bold uppercase sm:flex-1'
+                                )
+                            }
+                            disabled={!option.inStock}
+                        >
+                            <RadioGroup.Label as="span">{option.name}</RadioGroup.Label>
+                        </RadioGroup.Option>
+                    ))}
+                </div>
+            </RadioGroup>
+        </div>
+    )
+}
+
+
+
 const ContentEditor = ({ content }: { content: Content }) => {
     const imageUrl = useMemo(() => URL.createObjectURL(content.file), [content.file])
     const isRejected = useMemo(() => content.status === 'rejected', [content.status])
@@ -143,7 +192,7 @@ const ContentEditor = ({ content }: { content: Content }) => {
                                     <p className="mt-2 font-medium text-red-600">{content.message}</p>
                                     <Button externalClassName="bg-red-600 mt-5" size="xl">Remove</Button>
                                 </>) : (
-                                    <div className="flex flex-col gap-10">
+                                    <div className="flex flex-col gap-5">
                                         <div>
                                             <label htmlFor="email" className="block font-semibold text-lg leading-6 text-gray-500">
                                                 Title <span className="text-gray-300">(optional)</span>
@@ -175,17 +224,22 @@ const ContentEditor = ({ content }: { content: Content }) => {
 
                                         <div>
                                             <label htmlFor="email" className="block font-semibold text-lg leading-6 text-gray-500">
-                                                Collections <span className="text-gray-300">(optional)</span>
+                                                Amount <span className="text-gray-300">(optional)</span>
                                             </label>
                                             <div className="mt-2">
                                                 <input
-                                                    type="email"
-                                                    name="email"
-                                                    id="email"
+                                                    type="number"
+                                                    name="number"
+                                                    id="amount"
+                                                    step={0.01}
                                                     className="block w-full rounded-md border-0 py-3 placeholder:font-medium  font-bold text-lg text-gray-900  ring-0 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:leading-6"
-                                                    placeholder="Enter Collections"
+                                                    placeholder="Free"
                                                 />
                                             </div>
+                                        </div>
+
+                                        <div>
+                                            <Example />
                                         </div>
                                     </div>
                                 )
@@ -220,7 +274,7 @@ export const ContentManager = ({ open, contents }: ContentManagerProps) => {
             </div>
             <div className="grid grid-cols-8 gap-4 items-start mt-4 md:mt-0">
                 <div className="col-span-8 md:col-span-1">
-                    <div className="max-h-[87vh] overflow-y-scroll md:pb-40 md:pl-5 scrollContainer">
+                    <div className="max-h-[87vh] overflow-y-auto md:pb-40 md:pl-5 scrollContainer">
                         <div className="flex flex-row md:flex-col justify-start md:justify-center items-center gap-2 md:gap-4">
                             <AddNewContentButton open={open} />
                             {
@@ -230,7 +284,7 @@ export const ContentManager = ({ open, contents }: ContentManagerProps) => {
                     </div>
                 </div>
                 <div className="col-span-8 md:col-span-7">
-                    <div className="md:max-h-[87vh] md:overflow-y-scroll pb-24 md:pb-40 md:pr-10 scrollContainer">
+                    <div className="md:max-h-[87vh] md:overflow-y-scroll pb-10 md:pb-40 md:pr-10 scrollContainer">
                         <div className="hidden md:block">
                             <HeaderDetails />
                         </div>

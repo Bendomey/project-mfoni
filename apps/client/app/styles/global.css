@@ -1,5 +1,5 @@
 .scrollContainer::-webkit-scrollbar {
-  width: 7px;
+  width: 5px;
 }
 
 /* Track */
@@ -19,7 +19,7 @@
 }
 
 .scrollContainerForSidebar::-webkit-scrollbar {
-  width: 7px;
+  width: 5px;
 }
 
 /* Track */
