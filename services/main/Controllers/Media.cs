@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using main.Domains;
 using main.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using main.Middlewares;
+using System.Security.Claims;
+using MongoDB.Driver;
 
 namespace main.Controllers;
 
@@ -19,20 +23,39 @@ public class MediaController : ControllerBase
         _searchContentService = searchContentService;
     }
 
+    [Authorize]
     [HttpPost]
     public OutputResponse<List<OutputContent>> Save(SaveMedia[] mediaInput)
     {
-        var contents = _indexContentService.Save(mediaInput);
 
-        var res = contents.Select(content =>
+        _logger.LogInformation("Saving media");
+        var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+        if (currentUser == null)
         {
-            var outputContent = new GetOutputContent(content);
-            return outputContent.Result();
-        }).ToList();
-        return new GetEntityResponse<List<OutputContent>>(res, null).Result();
+            throw new Exception("UserNotFound");
+        }
+
+        try
+        {
+            var contents = _indexContentService.Save(mediaInput, currentUser.Id);
+
+            var res = contents.Select(content =>
+            {
+                var outputContent = new GetOutputContent(content);
+                return outputContent.Result();
+            }).ToList();
+
+            return new GetEntityResponse<List<OutputContent>>(res, null).Result();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"{e.Message}");
+            return new GetEntityResponse<List<OutputContent>>(null, e.Message).Result();
+        }
+
     }
 
-    [HttpGet()]
+    [HttpGet]
     public OutputResponse<bool> Get()
     {
         _logger.LogInformation("Getting media");

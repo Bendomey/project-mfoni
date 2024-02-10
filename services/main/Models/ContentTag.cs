@@ -9,13 +9,19 @@ public class ContenTag
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
 
-    [BsonElement("content")]
+    [BsonElement("content_id")]
     [BsonRepresentation(BsonType.ObjectId)]
-    public required string Content { get; set; }
+    public required string ContentId { get; set; }
 
-    [BsonElement("tag")]
+    [BsonIgnore]
+    public Content? Content { get; set; }
+
+    [BsonElement("tag_id")]
     [BsonRepresentation(BsonType.ObjectId)]
-    public required string Tag { get; set; }
+    public required string TagId { get; set; }
+
+    [BsonIgnore]
+    public Tag? Tag { get; set; }
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

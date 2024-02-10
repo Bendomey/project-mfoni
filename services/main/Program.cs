@@ -45,6 +45,7 @@ builder.Services.AddAuthorization();
 
 // configurations
 builder.Services.AddSingleton<DatabaseSettings>();
+builder.Services.AddSingleton<RabbitMQConnection>();
 builder.Services.AddSingleton<CacheProvider>();
 
 // auth services

@@ -22,7 +22,11 @@ public class CollectionContent
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [BsonElement("created_by_id")]
-    public required ObjectId CreatedById { get; set; }
+    [BsonRepresentation(BsonType.ObjectId)]
+    public required string CreatedById { get; set; }
+    
+    [BsonIgnore]
+    public User? CreatedBy { get; set; }
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

@@ -3,11 +3,19 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace main.Models;
 
+public static class RekognitionMetaDataStatus
+{
+    public static readonly string PENDING = "PENDING";
+    public static readonly string INDEXED = "INDEXED";
+    public static readonly string NOT_INDEXED = "NOT_INDEXED";
+    public static readonly string FAILED = "FAILED";
+}
+
 public class RekognitionMetaData
 {
 
     [BsonElement("status")]
-    public string Status { get; set; } = "PENDING"; // PENDING, INDEXED, NOT_INDEXED, FAILED
+    public string Status { get; set; } = RekognitionMetaDataStatus.PENDING; // PENDING, INDEXED, NOT_INDEXED, FAILED
 
     [BsonElement("error_details")]
     public RekognitionMetaDataErrorDetails? ErrorDetails { get; set; }
