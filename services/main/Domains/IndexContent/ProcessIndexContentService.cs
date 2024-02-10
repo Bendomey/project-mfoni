@@ -114,7 +114,7 @@ public class ProcessIndexContent
                     ImageId = faceRecord.Face.ImageId,
                     FaceId = faceRecord.Face.FaceId,
                 }).ToArray();
-                
+
                 _logger.LogInformation($"FacesResolved: {faces}");
 
                 await SaveRekognitionContent(content.Id, faces);

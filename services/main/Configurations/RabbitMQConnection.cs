@@ -15,7 +15,7 @@ public class RabbitMQConnection
         };
 
         connection.DispatchConsumersAsync = true;
-        
+
         Channel = connection.CreateConnection();
     }
 

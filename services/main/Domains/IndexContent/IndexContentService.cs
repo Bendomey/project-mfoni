@@ -36,7 +36,7 @@ public class IndexContent
         _saveTagsService = saveTagsService;
 
         _collectionService = collectionService;
-        
+
         _collectionContentService = collectionContentService;
 
         _logger.LogDebug("IndexContentService initialized");
@@ -65,7 +65,7 @@ public class IndexContent
             Visibility = CollectionVisibility.PRIVATE,
         }, user.Id);
 
-        if(collection is null)
+        if (collection is null)
         {
             throw new Exception("CollectionNotFound");
         }
@@ -91,11 +91,11 @@ public class IndexContent
             // save tags
             dbTags.ForEach(tag =>
             {
-               var contentTag = new Models.ContenTag
-               {
-                   ContentId = content.Id,
-                   TagId = tag.Id
-               };
+                var contentTag = new Models.ContenTag
+                {
+                    ContentId = content.Id,
+                    TagId = tag.Id
+                };
             });
 
             content.Tags = dbTags;

@@ -33,7 +33,7 @@ public class CollectionContentService
         filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ContentId, input.ContentId);
 
         var oldCollection = _collectionContentCollection.Find(filter).FirstOrDefault();
-        
+
         if (oldCollection is not null)
         {
             throw new Exception("CollectionContentAlreadyExists");
@@ -61,5 +61,5 @@ public class CollectionContentService
 
         return collectionContent;
     }
-    
+
 }
