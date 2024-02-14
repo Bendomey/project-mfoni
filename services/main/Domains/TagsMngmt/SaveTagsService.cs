@@ -33,8 +33,8 @@ public class SaveTags
             Description = tag.Description,
             CreatedByUserId = userId
         };
-         _tagsCollection.InsertOne(tagToSave);
 
+        _tagsCollection.InsertOne(tagToSave);
         return tagToSave;
     }
 
