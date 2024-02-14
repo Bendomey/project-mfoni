@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using main.Middlewares;
 using main.Domains;
 using main.DTOs;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace main.Controllers;
 
@@ -19,11 +22,17 @@ public class TagsController : ControllerBase
         _searchTagsService = searchTagService;
     }
 
-    [HttpPost]
-    public OutputResponse<Models.Tag> Create([FromBody] CreateTagInput input)
+    [Authorize]
+    [HttpPost("create/tag")]
+    public async Task<OutputResponse<Models.Tag>> Create([FromBody] CreateTagInput input)
     {
         _logger.LogInformation("Saving tag: " + input);
-        var tag = _saveTagsService.Create(input);
+        var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+        if (currentUser == null)
+        {
+            throw new Exception("UserNotFound");
+        }
+        var tag = await _saveTagsService.Create(input, currentUser.Id);
 
         return new GetEntityResponse<Models.Tag>(tag, null).Result();
     }
