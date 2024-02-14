@@ -43,11 +43,11 @@ public class TagsController : ControllerBase
         return new GetEntityResponse<Models.Tag>(tag, null).Result();
     }
 
-    [HttpGet]
-    public async Task<OutputResponse<List<Models.Tag>>> GetAll()
+    [HttpGet("tags")]
+    public async Task<OutputResponse<List<Models.Tag>>> GetAll(FilterInput query)
     {
         _logger.LogInformation("Getting all tags");
-        var tags = await _searchTagsService.GetAll();
+        var tags = await _searchTagsService.GetAll(query.tagsQuery);
 
         return new GetEntityResponse<List<Models.Tag>>(tags, null).Result();
     }

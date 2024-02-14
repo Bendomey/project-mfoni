@@ -33,11 +33,20 @@ public class SearchTag
         return tag;
     }
 
-    public async Task<List<Models.Tag>> GetAll()
+    public async Task<List<Models.Tag>> GetAll(string? searchTag = null)
     {
-        // TODO: Add pagination
-        var tags = await _tagsCollection.Find(tag => true).Skip(0).Limit(10).ToListAsync();
-        return tags ?? [];
+        if (searchTag is not null)
+        {
+            var filter = Builders<Models.Tag>.Filter.Or(
+                Builders<Models.Tag>.Filter.Eq(t => t.Name, searchTag),
+                Builders<Models.Tag>.Filter.Eq(t => t.Description, searchTag));
+
+            var result = _tagsCollection.Find(filter).ToList();
+            return result;
+        }
+
+        var tags = await _tagsCollection.Find(tag => true).Skip(0).Limit(50).ToListAsync();
+        return tags ?? []; 
     }
 
     public async Task<List<Models.Tag>> GetTagsBasedOnQuery(string query)
