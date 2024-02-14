@@ -37,8 +37,8 @@ public class SearchTag
     {
         if (searchTag is not null)
         {
-            var filter = Builders<Models.Tag>.Filter.Or(
-                Builders<Models.Tag>.Filter.Eq(t => t.Name, searchTag),
+            var filter = Builders<Models.Tag>.Filter
+                .Or(Builders<Models.Tag>.Filter.Eq(t => t.Name, searchTag),
                 Builders<Models.Tag>.Filter.Eq(t => t.Description, searchTag));
 
             var result = _tagsCollection.Find(filter).ToList();
