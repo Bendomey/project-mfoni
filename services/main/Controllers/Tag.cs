@@ -23,7 +23,7 @@ public class TagsController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("create/tag")]
+    [HttpPost]
     public async Task<OutputResponse<Models.Tag>> Create([FromBody] CreateTagInput input)
     {
         _logger.LogInformation("Saving tag: " + input);
@@ -32,7 +32,7 @@ public class TagsController : ControllerBase
         {
             throw new Exception("UserNotFound");
         }
-        var tag = await _saveTagsService.Create(input, currentUser.Id);
+        var tag = _saveTagsService.Create(input, currentUser.Id);
 
         return new GetEntityResponse<Models.Tag>(tag, null).Result();
     }

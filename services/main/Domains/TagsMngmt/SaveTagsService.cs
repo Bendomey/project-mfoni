@@ -25,7 +25,7 @@ public class SaveTags
         _logger.LogDebug("SaveTagsService initialized");
     }
 
-    public async Task<Models.Tag> Create(CreateTagInput tag, string userId)
+    public Models.Tag Create(CreateTagInput tag, string userId)
     {
         var tagToSave = new Models.Tag
         {
@@ -33,21 +33,21 @@ public class SaveTags
             Description = tag.Description,
             CreatedByUserId = userId
         };
-        await _tagsCollection.InsertOneAsync(tagToSave);
+         _tagsCollection.InsertOne(tagToSave);
 
         return tagToSave;
     }
 
-    public Task<List<Models.Tag>> ResolveTags(string[] inputTags)
+    public List<Models.Tag> ResolveTags(string[] inputTags)
     {
         var tags = new List<Models.Tag>();
 
-        inputTags.ToList().ForEach(async tag =>
+        inputTags.ToList().ForEach(tag =>
         {
             var existingTag = _searchTagService.GetByName(tag);
             if (existingTag == null)
             {
-                var newTag = await Create(new CreateTagInput { Name = tag }, "a_user_id");
+                var newTag = Create(new CreateTagInput { Name = tag }, "a_user_id");
                 tags.Add(newTag);
             }
             else
@@ -56,6 +56,6 @@ public class SaveTags
             }
         });
 
-        return Task.FromResult(tags);
+        return tags;
     }
 }
