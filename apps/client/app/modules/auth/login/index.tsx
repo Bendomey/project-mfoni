@@ -10,6 +10,19 @@ import {FacebookButton} from './facebook/index.tsx'
 import {LoginAuthProvider, useLoginAuth} from './context/index.tsx'
 import {GoogleButton} from './google/index.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
+import {TypewriterEffectSmooth} from '@/components/animation/TypeWriteEffect.tsx'
+
+const words = [
+  {
+    text: 'Welcome',
+  },
+  {
+    text: 'back',
+  },
+  {
+    text: '👋🏽',
+  },
+]
 
 export const LoginComponent = () => {
   const {isLoading, errorMessage, setErrorMessage} = useLoginAuth()
@@ -69,7 +82,7 @@ export const LoginComponent = () => {
         ) : null}
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
-            <div className="flex">
+            <div className="flex mb-8">
               <Button
                 isLink
                 href="/"
@@ -80,10 +93,11 @@ export const LoginComponent = () => {
                 <span className="font-bold">Go Back</span>
               </Button>
             </div>
-            <h2 className="mt-8 text-3xl md:text-4xl font-bold leading-9 tracking-tight text-gray-900">
-              Welcome back 👋🏽
-            </h2>
-            <p className="mt-2 ml-2 leading-6 text-gray-500">
+            <TypewriterEffectSmooth
+              words={words}
+              wordClassName=" text-3xl md:text-4xl font-bold leading-9 tracking-tight text-gray-900"
+            />
+            <p className=" ml-2 leading-6 text-gray-500">
               Continue with your favorite social media platform.
             </p>
             <Transition

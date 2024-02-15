@@ -1,21 +1,39 @@
-import { Button } from '@/components/button/index.tsx'
-import { APP_NAME } from '@/constants/index.ts'
-import { ArrowRightIcon } from '@heroicons/react/24/solid'
-import { Link, useNavigate } from '@remix-run/react'
+import {Button} from '@/components/button/index.tsx'
+import {APP_NAME} from '@/constants/index.ts'
+import {ArrowRightIcon} from '@heroicons/react/24/solid'
+import {Link, useNavigate} from '@remix-run/react'
 import creatorImage from '@/assets/creator.jpg'
 import userImage from '@/assets/user.jpeg'
-import { useCallback, useEffect, useState } from 'react'
-import { useAuth } from '@/providers/auth/index.tsx'
-import { useDisclosure } from '@/hooks/use-disclosure.tsx'
-import { SetupAccountModal } from './setup-modal/index.tsx'
-import { ArrowLeftIcon } from '@heroicons/react/20/solid'
+import {useCallback, useEffect, useState} from 'react'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {useDisclosure} from '@/hooks/use-disclosure.tsx'
+import {SetupAccountModal} from './setup-modal/index.tsx'
+import {ArrowLeftIcon} from '@heroicons/react/20/solid'
+import {TypewriterEffectSmooth} from '@/components/animation/TypeWriteEffect.tsx'
+
+const words = [
+  {
+    text: 'What',
+  },
+  {
+    text: 'is',
+  },
+  {
+    text: 'your',
+  },
+  {
+    text: 'primary',
+  },
+  {
+    text: 'goal?',
+  },
+]
 
 export const OnboardingModule = () => {
   const [selectedType, setSelected] = useState<'CLIENT' | 'CREATOR'>()
   const navigate = useNavigate()
-  const { getToken } = useAuth()
-  const { onToggle, isOpen } = useDisclosure()
-
+  const {getToken} = useAuth()
+  const {onToggle, isOpen} = useDisclosure()
 
   useEffect(() => {
     const token = getToken()
@@ -33,12 +51,14 @@ export const OnboardingModule = () => {
       <div className="h-screen w-full flex flex-col relative">
         <div className="border-b border-zinc-200 px-5 md:px-10 py-5 flex flex-row items-center justify-between">
           <Link to="/auth" className="ml-2 flex flex-row items-center">
-            <ArrowLeftIcon className='h-7 w-7 text-zinc-600' />
+            <ArrowLeftIcon className="h-7 w-7 text-zinc-600" />
             <div className="flex flex-row items-end ml-2">
               <span className="text-4xl text-blue-700 font-extrabold">
                 {APP_NAME.slice(0, 1)}
               </span>
-              <span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
+              <span className="text-4xl font-extrabold">
+                {APP_NAME.slice(1)}
+              </span>
             </div>
           </Link>
           <div>
@@ -49,24 +69,27 @@ export const OnboardingModule = () => {
                 variant="outline"
                 externalClassName="hidden md:flex flex-row items-center"
               >
-                Continue <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
+                Continue{' '}
+                <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
               </Button>
             ) : null}
           </div>
         </div>
         <div className="h-full bg-zinc-50 flex flex-col justify-center items-center">
-          <h1 className="font-bold  text-center text-4xl w-2/3 md:w-auto md:text-5xl">
+          {/* <h1 className="font-bold  text-center text-4xl w-2/3 md:w-auto md:text-5xl">
             What is your primary goal?
-          </h1>
+          </h1> */}
+          <TypewriterEffectSmooth words={words} />
           <div className="my-10 w-3/3 sm:w-3/3 md:w-2/3 px-5 md:px-0">
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
               <Button
                 onClick={() => setSelected('CLIENT')}
                 variant="unstyled"
-                externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${selectedType === 'CLIENT'
-                  ? 'border-zinc-600'
-                  : 'border-dashed border-zinc-300'
-                  } p-5 rounded-lg`}
+                externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${
+                  selectedType === 'CLIENT'
+                    ? 'border-zinc-600'
+                    : 'border-dashed border-zinc-300'
+                } p-5 rounded-lg`}
               >
                 <img
                   className="hidden md:block rounded-lg max-w-full h-auto"
@@ -83,10 +106,11 @@ export const OnboardingModule = () => {
               <Button
                 onClick={() => setSelected('CREATOR')}
                 variant="unstyled"
-                externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${selectedType === 'CREATOR'
-                  ? 'border-zinc-600'
-                  : 'border-dashed border-zinc-300'
-                  } p-5 rounded-lg cursor-pointer`}
+                externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${
+                  selectedType === 'CREATOR'
+                    ? 'border-zinc-600'
+                    : 'border-dashed border-zinc-300'
+                } p-5 rounded-lg cursor-pointer`}
               >
                 <img
                   className="hidden md:block rounded-lg max-w-full h-auto"
@@ -108,20 +132,25 @@ export const OnboardingModule = () => {
                 variant="outline"
                 externalClassName="flex md:hidden flex-row items-center justify-center mt-10 w-full"
               >
-                Continue <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
+                Continue{' '}
+                <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
               </Button>
             ) : null}
           </div>
           <div className="w-5/6 md:w-3/6">
             <p className="text-center font-medium text-zinc-500">
-              We’ll use this info to personalize your experience. You’ll always be
-              able to both download and upload photos and videos, no matter which
-              option you choose.
+              We’ll use this info to personalize your experience. You’ll always
+              be able to both download and upload photos and videos, no matter
+              which option you choose.
             </p>
           </div>
         </div>
       </div>
-      <SetupAccountModal open={isOpen} onClose={onToggle} selectedType={selectedType} />
+      <SetupAccountModal
+        open={isOpen}
+        onClose={onToggle}
+        selectedType={selectedType}
+      />
     </>
   )
 }
