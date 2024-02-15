@@ -3,6 +3,7 @@ import {SearchPhotosForMobile} from '@/components/layout/header/search-for-mobil
 import {SearchPhotos} from '@/components/layout/header/search/index.tsx'
 import {Link} from '@remix-run/react'
 import {FadeIn} from '@/components/animation/FadeIn.tsx'
+
 import heroBg from '@/assets/hero-bg.jpeg'
 
 export const HeroSection = () => {
@@ -31,17 +32,14 @@ export const HeroSection = () => {
               </Link>
             </div>
           </div>
-          <div className="text">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-              The best photo gallery shared by creators in Ghana.
-            </h1>
-            <div className="block md:hidden mt-5">
-              <SearchPhotosForMobile />
-            </div>
-
-            <div className="hidden md:block mt-5">
-              <SearchPhotos isSittingOnADarkBackground />
-            </div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 leading-8 sm:text-5xl">
+            The best photo gallery shared by creators in Ghana.
+          </h1>{' '}
+          <div className="block md:hidden mt-5">
+            <SearchPhotosForMobile />
+          </div>
+          <div className="hidden md:block mt-5">
+            <SearchPhotos isSittingOnADarkBackground />
           </div>
         </div>
       </FadeIn>

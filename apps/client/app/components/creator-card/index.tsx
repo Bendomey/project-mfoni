@@ -9,17 +9,17 @@ const person = {
 
 export const PhotographerCreatorCard = () => {
   return (
-    <div className="rounded-2xl flex-col z-50 bg-black flex justify-center items-center  px-6 py-8 w-64 shadow-xl">
-      <img
+    <div className="rounded-2xl flex-col z-50 bg-black flex justify-center items-center  px-3 py-4 w-48 shadow-xl">
+      {/* <img
         className="mx-auto h-16 w-16 rounded-full md:h-24 md:w-24"
         src={person.imageUrl}
         alt=""
-      />
-      <h3 className="mt-6 text-base font-semibold leading-7 tracking-tight text-white">
+      /> */}
+      <h3 className="text-base font-semibold leading-7 tracking-tight text-white">
         {person.name}
       </h3>
       <p className="text-sm leading-6 text-gray-400">{person.role}</p>
-      <ul className="mt-6 flex justify-center gap-x-6">
+      <ul className="mt-3 flex justify-center gap-x-6">
         <li>
           <a href={person.xUrl} className="text-gray-400 hover:text-gray-300">
             <span className="sr-only">X</span>
