@@ -7,11 +7,11 @@ import {
   useState,
   useEffect,
 } from 'react'
-import {type Step} from './components/steps.tsx'
-import {useAuth} from '@/providers/auth/index.tsx'
-import {toast} from 'react-hot-toast'
-import {useNavigate} from '@remix-run/react'
-import {Loader} from '@/components/loader/index.tsx'
+import { type Step } from './components/steps.tsx'
+import { useAuth } from '@/providers/auth/index.tsx'
+import { toast } from 'react-hot-toast'
+import { useNavigate } from '@remix-run/react'
+import { Loader } from '@/components/loader/index.tsx'
 
 interface VerifyCreatorContextProps {
   activeStep: Step
@@ -20,31 +20,37 @@ interface VerifyCreatorContextProps {
 
 const VerifyCreatorContext = createContext<VerifyCreatorContextProps>({
   activeStep: 'phone',
-  setActiveStep: () => {},
+  setActiveStep: () => { },
 })
 
-export const VerifyCreatorProvider = ({children}: PropsWithChildren) => {
+export const VerifyCreatorProvider = ({ children }: PropsWithChildren) => {
   const navigate = useNavigate()
   const [activeStep, setActiveStep] = useState<Step>('phone')
 
-  const {getToken, currentUser, isLoading} = useAuth()
+  const { getToken, currentUser, isLoading } = useAuth()
 
   useEffect(() => {
     const token = getToken()
     if (!token) {
       navigate(`/auth?return_to=${window.location}`)
-      toast.error('Kindly login to access page', {id: 'login-to-access-page'})
+      toast.error('Kindly login to access page', { id: 'login-to-access-page' })
+      return
+    }
+
+    const isAppliedToBeACreator = currentUser && currentUser.role === "CLIENT" && Boolean(currentUser.creatorApplicationId)
+
+    if (!isAppliedToBeACreator) {
+      navigate('/')
       return
     }
 
     const isCreatorApplicationApproved =
-      currentUser?.creatorApplication &&
-      (currentUser.creatorApplication as CreatorApplication).status ===
-        'APPROVED'
+      currentUser.creatorApplication && currentUser.creatorApplication.status ===
+      'APPROVED'
 
     if (isCreatorApplicationApproved) {
       setActiveStep('welcome')
-    } else if (currentUser?.verifiedPhoneNumberAt) {
+    } else if (currentUser.verifiedPhoneNumberAt) {
       setActiveStep('id')
     }
   }, [currentUser, getToken, navigate])

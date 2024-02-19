@@ -9,7 +9,8 @@ interface User {
   verifiedPhoneNumberAt: Nullable<Date>
   username: Nullable<string>
   photo: Nullable<string>
-  creatorApplication: Nullable<string> | CreatorApplication
+  creatorApplicationId: Nullable<string>
+  creatorApplication: Nullable<CreatorApplication>
   accountSetupAt: Nullable<Date>
   createdAt: Date
   updatedAt: Date

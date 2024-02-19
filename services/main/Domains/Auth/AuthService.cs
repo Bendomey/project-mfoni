@@ -136,7 +136,7 @@ public class Auth
         // }
 
         // return users[0];
-         var user = _usersCollection.Find<Models.User>(user => user.Id == userInput.Id).FirstOrDefault();
+        var user = _usersCollection.Find<Models.User>(user => user.Id == userInput.Id).FirstOrDefault();
 
         if (user is null)
         {
