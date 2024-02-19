@@ -85,6 +85,7 @@ function Document({children}: PropsWithChildren) {
           defer
           data-nscript="afterInteractive"
         />
+        <script type="text/javascript" src="https://sdk.dev.metric.africa/v1" />
         <script
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify(data.ENV)}`,

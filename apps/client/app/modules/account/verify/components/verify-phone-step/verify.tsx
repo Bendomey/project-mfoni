@@ -1,15 +1,96 @@
 import {PinField} from 'react-pin-field'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {Button} from '@/components/button/index.tsx'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {useUpdatePhone, useVerifyPhone} from '@/api/users/index.ts'
+import {Loader} from '@/components/loader/index.tsx'
+import {useVerifyCreator} from '../../context.tsx'
+import {toast} from 'react-hot-toast'
+import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 
-export const VerifyOtp = () => {
-  const [, setCode] = useState('')
+interface Props {
+  setPage: React.Dispatch<React.SetStateAction<'SendOTP' | 'VerifyOTP'>>
+}
+
+export const VerifyOtp = ({setPage}: Props) => {
+  const {setActiveStep} = useVerifyCreator()
+  const [countDown, setCountdown] = useState(59)
+  const [code, setCode] = useState('')
+  const {currentUser} = useAuth()
+  const {mutate: verifyPhone, isPending: isVerifying} = useVerifyPhone()
+  const {mutate: resendCode, isPending: isResending} = useUpdatePhone()
+
+  const verifyCode = () => {
+    verifyPhone(
+      {
+        verificationCode: code,
+      },
+      {
+        onSuccess() {
+          toast.success('Phone number verified successfully', {
+            id: 'phone-verified',
+          })
+          setActiveStep('id')
+        },
+        onError(error) {
+          if (error.message) {
+            toast.error(errorMessagesWrapper(error.message), {
+              id: 'phone-verify-error',
+            })
+          }
+        },
+      },
+    )
+  }
+
+  const resendCodeHandler = () => {
+    if (currentUser?.phoneNumber) {
+      resendCode(
+        {
+          phoneNumber: currentUser.phoneNumber,
+        },
+        {
+          onSuccess() {
+            setCountdown(59)
+            toast.success('Verification code sent successfully', {
+              id: 'phone-resend-successful',
+            })
+          },
+          onError(error) {
+            if (error.message) {
+              toast.error(errorMessagesWrapper(error.message), {
+                id: 'phone-resend-error',
+              })
+            }
+          },
+        },
+      )
+    }
+  }
+
+  useEffect(() => {
+    let timer: any
+    if (countDown > 0) {
+      timer = setTimeout(() => setCountdown(countDown - 1), 1000)
+    }
+    return () => clearTimeout(timer)
+  }, [countDown])
 
   return (
     <>
-      <p className="mt-4 text-zinc-600">
-        We sent a code to <span className="font-bold">+233200000000</span>.
-      </p>
+      <div className="mt-4 flex flex-row items-end">
+        <p className=" text-zinc-600">
+          We sent a code to{' '}
+          <span className="font-bold">{currentUser?.phoneNumber ?? 'N/A'}</span>
+        </p>
+        <button
+          type="button"
+          onClick={() => setPage('SendOTP')}
+          className="ml-1 text-blue-600 text-xs"
+        >
+          Change
+        </button>
+      </div>
 
       <div className="mt-10">
         <PinField
@@ -17,12 +98,45 @@ export const VerifyOtp = () => {
           validate={/^[0-9]$/}
           className="pin-field"
           onChange={setCode}
+          autoFocus
+          disabled={isVerifying}
         />
       </div>
 
-      <Button externalClassName="w-full mt-5" size="lg">
-        Verify
-      </Button>
+      {isVerifying ? (
+        <div className="mt-10">
+          <Loader color="fill-blue-600" />
+        </div>
+      ) : (
+        <>
+          <Button
+            onClick={verifyCode}
+            externalClassName="w-full lg:w-1/3 mt-10"
+            size="lg"
+          >
+            Verify
+          </Button>
+          <div className="mt-4 flex items-center flex-row ">
+            <span className="text-gray-500">
+              Didn&apos;t receive a verification code?
+            </span>
+            {countDown === 0 ? (
+              <button
+                type="button"
+                onClick={resendCodeHandler}
+                disabled={isResending}
+                className="text-blue-600 ml-2"
+              >
+                {isResending ? 'resending...' : 'resend'}
+              </button>
+            ) : (
+              <span className="text-blue-600 ml-2">
+                0:{countDown < 10 ? `0${countDown}` : countDown}
+              </span>
+            )}
+          </div>
+        </>
+      )}
     </>
   )
 }

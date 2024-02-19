@@ -1,15 +1,13 @@
-import { Button } from '@/components/button/index.tsx'
-import { APP_NAME } from '@/constants/index.ts'
-import { ArrowLeftIcon } from '@heroicons/react/24/outline'
-import { type Step, Steps } from './components/steps.tsx'
-import { useEffect, useMemo, useState } from 'react'
-import { VerifyPhoneStep } from './components/verify-phone-step/index.tsx'
-import { VerifyIdStep } from './components/verify-id-step/index.tsx'
-import { classNames } from '@/lib/classNames.ts'
-import { WelcomeStep } from './components/welcome-step/index.tsx'
-import { useAuth } from '@/providers/auth/index.tsx'
-import { useNavigate } from '@remix-run/react'
-import {toast} from 'react-hot-toast'
+import {Button} from '@/components/button/index.tsx'
+import {APP_NAME} from '@/constants/index.ts'
+import {ArrowLeftIcon} from '@heroicons/react/24/outline'
+import {type Step, Steps} from './components/steps.tsx'
+import {useMemo} from 'react'
+import {VerifyPhoneStep} from './components/verify-phone-step/index.tsx'
+import {VerifyIdStep} from './components/verify-id-step/index.tsx'
+import {classNames} from '@/lib/classNames.ts'
+import {WelcomeStep} from './components/welcome-step/index.tsx'
+import {VerifyCreatorProvider, useVerifyCreator} from './context.tsx'
 
 const StepComponents: Record<Step, () => JSX.Element> = {
   phone: VerifyPhoneStep,
@@ -19,26 +17,8 @@ const StepComponents: Record<Step, () => JSX.Element> = {
 
 const steps = Object.keys(StepComponents)
 
-export const VerifyAccountModule = () => {
-  const navigate = useNavigate()
-  const [activeStep, setActiveStep] = useState<Step>('phone')
-  const { isLoggedIn, currentUser } = useAuth()
-
-  useEffect(() => {
-    if (!isLoggedIn || !currentUser) {
-      navigate(`/auth?return_to=${window.location}`)
-      toast.error("Kindly login to access page", {id: "login-to-access-page"})
-      return
-    }
-
-    const isCreatorApplicationNotApproved = (currentUser.creatorApplication as CreatorApplication).status !== "APPROVED"
-    
-    if(isCreatorApplicationNotApproved){
-      navigate(`/account`)
-      toast.success("You're already an approved creator", {id: "already-approved-creator"})
-    }
-
-  }, [currentUser, isLoggedIn, navigate])
+const VerifyAccount = () => {
+  const {activeStep} = useVerifyCreator()
 
   const Step = useMemo(() => StepComponents[activeStep], [activeStep])
 
@@ -63,7 +43,7 @@ export const VerifyAccountModule = () => {
               </Button>
 
               <div className="mt-20">
-                <Steps activeStep={activeStep} onChange={setActiveStep} />
+                <Steps activeStep={activeStep} />
               </div>
             </div>
 
@@ -92,7 +72,7 @@ export const VerifyAccountModule = () => {
             </span>
           </div>
         </div>
-        <div className="w-[80vw] md:w-[25vw] ">
+        <div className="w-[80vw] md:w-[50vw] xl:w-[40vw] ">
           <Step />
         </div>
         <div className="flex items-center justify-center">
@@ -110,5 +90,13 @@ export const VerifyAccountModule = () => {
         </div>
       </div>
     </div>
+  )
+}
+
+export const VerifyAccountModule = () => {
+  return (
+    <VerifyCreatorProvider>
+      <VerifyAccount />
+    </VerifyCreatorProvider>
   )
 }

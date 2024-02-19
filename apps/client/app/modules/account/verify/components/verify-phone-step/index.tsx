@@ -13,15 +13,15 @@ const screens = {
 }
 
 export const VerifyPhoneStep = () => {
-  const [page] = useState<IPage>('SendOTP')
+  const [page, setPage] = useState<IPage>('SendOTP')
 
   const Page = useMemo(() => screens[page], [page])
 
   return (
-    <div className="flex flex-col items-center ">
+    <div className="flex flex-col items-center">
       <CheckBadgeIcon className="h-20 w-auto text-zinc-400 mb-5" />
       <h1 className="text-3xl font-bold">Verify your phone</h1>
-      <Page />
+      <Page setPage={setPage} />
     </div>
   )
 }

@@ -5,6 +5,8 @@ interface User {
   name: string
   oAuthId: string
   email: Nullable<string>
+  phoneNumber: Nullable<string>
+  verifiedPhoneNumberAt: Nullable<Date>
   username: Nullable<string>
   photo: Nullable<string>
   creatorApplication: Nullable<string> | CreatorApplication

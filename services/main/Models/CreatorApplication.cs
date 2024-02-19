@@ -25,18 +25,11 @@ public class CreatorApplication
     [BsonElement("approved_at")]
     public DateTime? ApprovedAt { get; set; }
 
-    [BsonElement("smile_identity_response")]
-    public string? SmileIdentityResponse { get; set; } // Gunna verify the json structure when implementing!
+    [BsonElement("identity_provider_response")]
+    public string? IdentityProviderResponse { get; set; } // Gunna verify the json structure when implementing!
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    [BsonRepresentation(BsonType.ObjectId)]
-    [BsonElement("created_by_id")]
-    public required string CreatedById { get; set; }
-
-    [BsonIgnore]
-    public User? CreatedBy { get; set; }
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

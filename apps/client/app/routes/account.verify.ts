@@ -12,4 +12,11 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => [{rel: 'stylesheet', href: styles}]
 
+export function loader() {
+  return {
+    METRIC_CLIENT_ID: process.env.METRIC_CLIENT_ID,
+    METRIC_CLIENT_SECRET: process.env.METRIC_CLIENT_SECRET,
+  }
+}
+
 export default VerifyAccountModule

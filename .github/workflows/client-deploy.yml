@@ -43,3 +43,5 @@ jobs:
               --build-arg TWITTER_CONSUMER_SECRET=${{ secrets.TWITTER_CONSUMER_SECRET }} 
               --build-arg FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }} 
               --build-arg FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
+              --build-arg METRIC_CLIENT_ID=${{ secrets.METRIC_CLIENT_ID }}
+              --build-arg METRIC_CLIENT_SECRET=${{ secrets.METRIC_CLIENT_SECRET }}

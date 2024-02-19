@@ -1,5 +1,4 @@
 /* eslint-disable no-negated-condition */
-import {Button} from '@/components/button/index.tsx'
 import {classNames} from '@/lib/classNames.ts'
 import {
   CheckIcon,
@@ -12,10 +11,9 @@ export type Step = 'phone' | 'id' | 'welcome'
 
 interface Props {
   activeStep: Step
-  onChange: (step: Step) => void
 }
 
-export function Steps({activeStep, onChange}: Props) {
+export function Steps({activeStep}: Props) {
   const getStepStatus = useCallback(
     (step: Step) => (step === activeStep ? 'active' : 'inactive'),
     [activeStep],
@@ -73,10 +71,8 @@ export function Steps({activeStep, onChange}: Props) {
                     aria-hidden="true"
                   />
                 ) : null}
-                <Button
-                  variant="unstyled"
-                  onClick={() => onChange(step.id as Step)}
-                  externalClassName="group relative flex items-start"
+                <div
+                  className="group relative flex items-start"
                   aria-current="step"
                 >
                   <span className="flex h-9 items-center" aria-hidden="true">
@@ -95,7 +91,7 @@ export function Steps({activeStep, onChange}: Props) {
                       {step.description}
                     </span>
                   </span>
-                </Button>
+                </div>
               </>
             ) : (
               <>
@@ -105,11 +101,7 @@ export function Steps({activeStep, onChange}: Props) {
                     aria-hidden="true"
                   />
                 ) : null}
-                <Button
-                  variant="unstyled"
-                  onClick={() => onChange(step.id as Step)}
-                  externalClassName="group relative flex items-start"
-                >
+                <div className="group relative flex items-start">
                   <span className="flex h-9 items-center" aria-hidden="true">
                     <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-zinc-200">
                       <step.icon
@@ -126,7 +118,7 @@ export function Steps({activeStep, onChange}: Props) {
                       {step.description}
                     </span>
                   </span>
-                </Button>
+                </div>
               </>
             )}
           </li>
