@@ -37,20 +37,20 @@ export const VerifyCreatorProvider = ({ children }: PropsWithChildren) => {
       return
     }
 
-    const isAppliedToBeACreator = currentUser && currentUser.role === "CLIENT" && Boolean(currentUser.creatorApplicationId)
+    // const isAppliedToBeACreator = currentUser && currentUser.role === "CLIENT" && Boolean(currentUser.creatorApplicationId)
 
-    if (!isAppliedToBeACreator) {
-      navigate('/')
-      return
-    }
+    // if (!isAppliedToBeACreator) {
+    //   navigate('/')
+    //   return
+    // }
 
     const isCreatorApplicationApproved =
-      currentUser.creatorApplication && currentUser.creatorApplication.status ===
+    currentUser?.creatorApplication && currentUser.creatorApplication.status ===
       'APPROVED'
 
     if (isCreatorApplicationApproved) {
       setActiveStep('welcome')
-    } else if (currentUser.verifiedPhoneNumberAt) {
+    } else if (currentUser?.verifiedPhoneNumberAt) {
       setActiveStep('id')
     }
   }, [currentUser, getToken, navigate])
