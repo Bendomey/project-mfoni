@@ -87,6 +87,7 @@ public class UserController : ControllerBase
         try
         {
 
+            // log request body
             foreach (var kvp in keyValuePairs)
             {
                 logger.LogInformation($"Key: {kvp.Key}, Value: {kvp.Value}");
