@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
-import {useSetupAccount} from '@/api/auth/index.ts'
-import {Button} from '@/components/button/index.tsx'
-import {Loader} from '@/components/loader/index.tsx'
-import {useAuth} from '@/providers/auth/index.tsx'
-import {Transition, Dialog} from '@headlessui/react'
-import {Fragment, useEffect} from 'react'
-import {useForm} from 'react-hook-form'
+import { useSetupAccount } from '@/api/auth/index.ts'
+import { Button } from '@/components/button/index.tsx'
+import { Loader } from '@/components/loader/index.tsx'
+import { useAuth } from '@/providers/auth/index.tsx'
+import { Transition, Dialog } from '@headlessui/react'
+import { Fragment, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import * as Yup from 'yup'
-import {yupResolver} from '@hookform/resolvers/yup'
-import {ExclamationCircleIcon} from '@heroicons/react/24/outline'
-import {classNames} from '@/lib/classNames.ts'
-import {toast} from 'react-hot-toast'
-import {useNavigate} from '@remix-run/react'
-import {useQueryClient} from '@tanstack/react-query'
-import {QUERY_KEYS} from '@/constants/index.ts'
-import {errorMessagesWrapper} from '@/constants/error-messages.ts'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
+import { classNames } from '@/lib/classNames.ts'
+import { toast } from 'react-hot-toast'
+import { useNavigate } from '@remix-run/react'
+import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS } from '@/constants/index.ts'
+import { errorMessagesWrapper } from '@/constants/error-messages.ts'
 
 interface Props {
   open: boolean
@@ -37,16 +37,16 @@ const schema = Yup.object().shape({
   username: Yup.string(),
 })
 
-export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
-  const {isPending, mutate} = useSetupAccount()
-  const {currentUser} = useAuth()
+export const SetupAccountModal = ({ onClose, open, selectedType }: Props) => {
+  const { isPending, mutate } = useSetupAccount()
+  const { currentUser } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const {
     register,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
     setValue,
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
@@ -72,7 +72,7 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
 
   const onSubmit = (data: FormValues) => {
     if (selectedType === 'CREATOR' && !data.username) {
-      return toast.error('Username is required', {id: 'username-required'})
+      return toast.error('Username is required', { id: 'username-required' })
     }
 
     mutate(data, {
@@ -81,10 +81,16 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
           queryKey: [QUERY_KEYS.CURRENT_USER],
         })
 
-        navigate('/')
+
         toast.success('Account setup successfully', {
           id: 'account-setup-success',
         })
+
+        if (selectedType === 'CREATOR') {
+          navigate('/account/verify')
+        } else {
+          navigate('/')
+        }
       },
       onError: error => {
         toast.error(errorMessagesWrapper(error.message), {
@@ -96,7 +102,7 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
 
   return (
     <Transition appear show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={() => {}}>
+      <Dialog as="div" className="relative z-10" onClose={() => { }}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
