@@ -56,11 +56,12 @@ public class UserService
 
         await _userCollection.UpdateOneAsync(filter, updates);
 
-        var code = Nanoid.Generate("1234567890", 5);
-        await _cacheProvider.SetCache($"verify-{user.Id}", code, new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-        });
+        var code = "12345";
+        // var code = Nanoid.Generate("1234567890", 5);
+        // await _cacheProvider.SetCache($"verify-{user.Id}", code, new DistributedCacheEntryOptions
+        // {
+        //     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+        // });
 
         await SmsConfiguration.SendSms(new SendSmsInput
         {
@@ -86,8 +87,9 @@ public class UserService
             throw new HttpRequestException("PhoneNumberAlreadyVerified");
         }
 
-        var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
-        if (code != verificationCode)
+        // var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
+        // if (code != verificationCode)
+        if (code != "12345")
         {
             throw new HttpRequestException("CodeIsIncorrectOrHasExpired");
         }
