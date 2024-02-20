@@ -77,11 +77,6 @@ export const SetupAccountModal = ({ onClose, open, selectedType }: Props) => {
 
     mutate(data, {
       onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.CURRENT_USER],
-        })
-
-
         toast.success('Account setup successfully', {
           id: 'account-setup-success',
         })
@@ -91,6 +86,10 @@ export const SetupAccountModal = ({ onClose, open, selectedType }: Props) => {
         } else {
           navigate('/')
         }
+
+        await queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.CURRENT_USER],
+        })
       },
       onError: error => {
         toast.error(errorMessagesWrapper(error.message), {
