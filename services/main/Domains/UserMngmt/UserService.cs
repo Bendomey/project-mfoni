@@ -98,7 +98,7 @@ public class UserService
         var updates = Builders<Models.User>.Update.Set(v => v.VerifiedPhoneNumberAt, DateTime.Now);
         await _userCollection.UpdateOneAsync(filter, updates);
 
-        await _cacheProvider.ClearCache($"verify-{user.Id}");
+        // await _cacheProvider.ClearCache($"verify-{user.Id}");
         return true;
     }
 }
