@@ -1,4 +1,4 @@
-import {TermsModule} from '@/modules/index.tsx'
+import {TermsModule} from '@/modules/index.ts'
 import {type MetaFunction} from '@remix-run/node'
 
 export const meta: MetaFunction = () => {

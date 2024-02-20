@@ -1,4 +1,4 @@
-import {AccountModule} from '@/modules/index.tsx'
+import {AccountModule} from '@/modules/index.ts'
 import {type MetaFunction} from '@remix-run/node'
 
 export const meta: MetaFunction = () => {

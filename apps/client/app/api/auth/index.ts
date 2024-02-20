@@ -1,4 +1,9 @@
-import {useMutation, useQuery, type UndefinedInitialDataOptions, type QueryKey} from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  type UndefinedInitialDataOptions,
+  type QueryKey,
+} from '@tanstack/react-query'
 import {fetchClient} from '@/lib/transport/index.ts'
 import {QUERY_KEYS} from '@/constants/index.ts'
 
@@ -69,7 +74,7 @@ export const setupAccount = async (input: SetupAccountInputProps) => {
       body: JSON.stringify(input),
     })
 
-    if (!response.status && response.parsedBody.errorMessage) {
+    if (!response.parsedBody.status && response.parsedBody.errorMessage) {
       throw new Error(response.parsedBody.errorMessage)
     }
 
@@ -82,7 +87,7 @@ export const setupAccount = async (input: SetupAccountInputProps) => {
     // Error from server.
     if (error instanceof Response) {
       const response = await error.json()
-      throw new Error(response.message)
+      throw new Error(response.errorMessage)
     }
   }
 }
@@ -95,7 +100,7 @@ const getCurrentUser = async () => {
   try {
     const response = await fetchClient<ApiResponse<User>>('/v1/auth/me')
 
-    if (!response.status && response.parsedBody.errorMessage) {
+    if (!response.parsedBody.status && response.parsedBody.errorMessage) {
       throw new Error(response.parsedBody.errorMessage)
     }
 
@@ -108,11 +113,21 @@ const getCurrentUser = async () => {
     // Error from server.
     if (error instanceof Response) {
       const response = await error.json()
-      throw new Error(response.message)
+      throw new Error(response.errorMessage)
     }
   }
 }
-export const useGetCurrentUser = (opts?: Omit<UndefinedInitialDataOptions<User | undefined, Error, User | undefined, QueryKey>, 'queryKey'>) =>
+export const useGetCurrentUser = (
+  opts?: Omit<
+    UndefinedInitialDataOptions<
+      User | undefined,
+      Error,
+      User | undefined,
+      QueryKey
+    >,
+    'queryKey'
+  >,
+) =>
   useQuery({
     queryFn: getCurrentUser,
     queryKey: [QUERY_KEYS.CURRENT_USER],

@@ -9,18 +9,21 @@ interface RequestTokenResponse {
 }
 
 const parseOAuthRequestToken = (responseText: string) =>
-  responseText.split('&').reduce<RequestTokenResponse>((prev, el) => {
-    const [key, value] = el.split('=')
-    if (key && value) {
-      return {...prev, [key]: value}
-    }
+  responseText.split('&').reduce<RequestTokenResponse>(
+    (prev, el) => {
+      const [key, value] = el.split('=')
+      if (key && value) {
+        return {...prev, [key]: value}
+      }
 
-    return prev
-  }, {
-    oauth_token: '',
-    oauth_token_secret: '',
-    oauth_callback_confirmed: 'false',
-  })
+      return prev
+    },
+    {
+      oauth_token: '',
+      oauth_token_secret: '',
+      oauth_callback_confirmed: 'false',
+    },
+  )
 
 export const obtainOauthRequestToken = async ({
   consumerKey,

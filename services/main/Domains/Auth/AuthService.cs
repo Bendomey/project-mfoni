@@ -94,7 +94,6 @@ public class Auth
         }
 
         user.Name = accountInput.Name;
-        user.Role = accountInput.Role;
         user.Username = accountInput.Username;
         user.AccountSetupAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
@@ -102,10 +101,7 @@ public class Auth
 
         if (accountInput.Role == UserRole.CREATOR && user.CreatorApplication is null)
         {
-            var __newCreatorApplication = new Models.CreatorApplication
-            {
-                CreatedById = user.Id,
-            };
+            var __newCreatorApplication = new Models.CreatorApplication { };
             _creatorsCollection.InsertOne(__newCreatorApplication);
 
             user.CreatorApplicationId = __newCreatorApplication.Id;
@@ -117,11 +113,40 @@ public class Auth
 
     public Models.User? Me(CurrentUserOutput userInput)
     {
+        // TODO: make aggregate query to get user with creator application
+        // var pipeline = _usersCollection
+        //     .Aggregate()
+        //     .Match(user => user.Id == userInput.Id)
+        //     .Lookup<Models.User, Models.CreatorApplication, Models.User>(
+        //         foreignCollection: _creatorsCollection,
+        //         localField: user => user.CreatorApplicationId,
+        //         foreignField: creator => creator.Id,
+        //         //  @as: (user, creatorApplications) => new Models.UserWithCreatorApplication
+        //         //  {
+        //         //      CreatorApplication = user,
+        //         //      User = creatorApplications.FirstOrDefault()
+        //         //  }
+        //     );
+
+        // var users = pipeline.ToList();
+
+        // if (users.Count == 0)
+        // {
+        //     throw new Exception("UserNotFound");
+        // }
+
+        // return users[0];
         var user = _usersCollection.Find<Models.User>(user => user.Id == userInput.Id).FirstOrDefault();
 
         if (user is null)
         {
             throw new Exception("UserNotFound");
+        }
+
+        if (user.CreatorApplicationId is not null)
+        {
+            var creatorApplication = _creatorsCollection.Find<Models.CreatorApplication>(creator => creator.Id == user.CreatorApplicationId).FirstOrDefault();
+            user.CreatorApplication = creatorApplication;
         }
 
         return user;

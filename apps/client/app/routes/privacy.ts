@@ -1,4 +1,4 @@
-import {PolicyModule} from '@/modules/index.tsx'
+import {PolicyModule} from '@/modules/index.ts'
 import {type MetaFunction} from '@remix-run/node'
 
 export const meta: MetaFunction = () => {

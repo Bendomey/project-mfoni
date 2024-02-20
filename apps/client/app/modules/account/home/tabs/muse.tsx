@@ -1,6 +1,6 @@
 import {Fragment} from 'react'
 import {Content} from '@/components/Content/index.tsx'
-import {imageUrls} from '@/modules/index.tsx'
+import {imageUrls} from '@/modules/index.ts'
 
 export const ProfileMuse = () => {
   return (

@@ -72,7 +72,6 @@ function Document({children}: PropsWithChildren) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-        <title>mfoni</title>
         <Meta />
         <Links />
       </head>
@@ -86,6 +85,7 @@ function Document({children}: PropsWithChildren) {
           defer
           data-nscript="afterInteractive"
         />
+        <script type="text/javascript" src="https://sdk.dev.metric.africa/v1" />
         <script
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify(data.ENV)}`,

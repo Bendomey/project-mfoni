@@ -34,11 +34,10 @@ export const authorizeTwitter = async ({
     throw new Error('NoUserNameFound')
   }
 
-
   return {
     uid: accessTokenData.user_id,
     name: accessTokenData.screen_name,
-    
+
     // @TODO: verify dets after twitter approves our app!
     // email: payload?.email,
     // userPhoto: payload?.picture,

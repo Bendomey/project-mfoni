@@ -35,12 +35,24 @@ public class UserService
         var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
         if (user is null)
         {
-            throw new Exception("UserNotFound");
+            throw new HttpRequestException("UserNotFound");
+        }
+
+        // verify if phone number has been taken already
+        var userExistsWithPhoneNumber = await _userCollection.Find(user => user.PhoneNumber == phoneNumber).FirstOrDefaultAsync();
+        if (userExistsWithPhoneNumber != null && userExistsWithPhoneNumber.Id != userId)
+        {
+            throw new HttpRequestException("PhoneNumberAlreadyExists");
         }
 
         var filter = Builders<Models.User>.Filter.Eq(u => u.Id, userId);
         var updates = Builders<Models.User>.Update
             .Set(r => r.PhoneNumber, phoneNumber);
+
+        if (phoneNumber != user.PhoneNumber)
+        {
+            updates = updates.Set(r => r.VerifiedPhoneNumberAt, null);
+        }
 
         await _userCollection.UpdateOneAsync(filter, updates);
 
@@ -64,15 +76,20 @@ public class UserService
     public async Task<bool> VerifyPhoneNumber(string code, string userId)
     {
         var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            throw new HttpRequestException("UserNotFound");
+        }
+
         if (user.VerifiedPhoneNumberAt is not null)
         {
-            throw new Exception("PhoneNumberAlreadyVerified");
+            throw new HttpRequestException("PhoneNumberAlreadyVerified");
         }
 
         var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
         if (code != verificationCode)
         {
-            throw new Exception("CodeIsIncorrectOrHasExpired");
+            throw new HttpRequestException("CodeIsIncorrectOrHasExpired");
         }
 
         var filter = Builders<Models.User>.Filter.Eq(r => r.Id, user.Id);

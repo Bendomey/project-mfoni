@@ -3,10 +3,10 @@ import {useInView} from 'react-intersection-observer'
 import {ExploreHeroSection} from './components/hero/index.tsx'
 import {WebTabComponent} from './components/tabs/web.tsx'
 import {FadeIn, FadeInStagger} from '@/components/animation/FadeIn.tsx'
-import {imageUrls} from '../index.tsx'
 import {Fragment} from 'react'
 import {Content} from '@/components/Content/index.tsx'
 import {MobileTabComponent} from './components/tabs/mobile.tsx'
+import {imageUrls} from '../landing-page/index.tsx'
 
 export const ExploreModule = () => {
   const {ref: heroRef, inView} = useInView({

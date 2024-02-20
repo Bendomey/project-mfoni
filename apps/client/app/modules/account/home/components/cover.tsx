@@ -1,4 +1,10 @@
-import {MapPinIcon, ShareIcon, UserIcon} from '@heroicons/react/24/outline'
+import {
+  MapPinIcon,
+  ShareIcon,
+  UserIcon,
+  CheckIcon,
+} from '@heroicons/react/24/outline'
+import {Button} from '@/components/button/index.tsx'
 
 export const profile = {
   name: 'Ricardo Cooper',
@@ -84,6 +90,15 @@ export const AccountCover = () => {
                 />
                 Share
               </button>
+              <Button
+                isLink
+                href="/account/verify"
+                variant="solid"
+                externalClassName="flex flex-row items-center"
+              >
+                <CheckIcon className="h-5 w-auto text-white mr-2" /> Verify
+                Account
+              </Button>
             </div>
           </div>
         </div>

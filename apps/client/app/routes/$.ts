@@ -1,5 +1,5 @@
 import {type MetaFunction} from '@remix-run/node'
-import {NotFoundModule} from '@/modules/index.tsx'
+import {NotFoundModule} from '@/modules/index.ts'
 
 export const meta: MetaFunction = () => {
   return [
