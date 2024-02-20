@@ -87,11 +87,9 @@ public class UserController : ControllerBase
         try
         {
 
-            // For example, you can iterate through the dictionary and do something with each key-value pair
             foreach (var kvp in keyValuePairs)
             {
                 logger.LogInformation($"Key: {kvp.Key}, Value: {kvp.Value}");
-                // Add more checks for other types if needed
             }
             return new GetEntityResponse<bool?>(true, null).Result();
         }

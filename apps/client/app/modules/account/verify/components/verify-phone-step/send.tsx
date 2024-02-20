@@ -117,7 +117,7 @@ export const SendOtp = ({ setPage }: Props) => {
 
 
         {isLoading ? (
-          <div className="mt-10">
+          <div className="mt-10 flex justify-center items-center">
             <Loader color="fill-blue-600" />
           </div>
         ) : (
