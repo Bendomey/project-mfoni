@@ -116,7 +116,7 @@ public class UserService
         {
             throw new HttpRequestException("UserNotFound");
         }
-        
+
         var creatorApplication = await _creatorApplicationCollection.Find(creatorApplication => creatorApplication.Id == user.CreatorApplicationId).FirstOrDefaultAsync();
         if (creatorApplication is null)
         {
@@ -129,13 +129,15 @@ public class UserService
         }
 
         // check the status of the identity response
-        if(input.Status == IdentityVerificationInputStatus.FAILED)
+        if (input.Status == IdentityVerificationInputStatus.FAILED)
         {
             // once its a failed status, we create a new creatorApplication for the applicant and reject it. We need to create records for all failed transactions.
-            var __newCreatorApplication = new CreatorApplication {
+            var __newCreatorApplication = new CreatorApplication
+            {
                 ApplicantId = user.Id,
                 Status = CreatorApplicationStatus.REJECTED,
-                IdentityProviderResponse = new IdentityProviderResponse {
+                IdentityProviderResponse = new IdentityProviderResponse
+                {
                     TransactionNumber = input.TransactionNumber,
                     PictureMatchScore = input.PictureMatchScore,
                     LivenessVerificationScore = input.LivenessVerificationScore,
@@ -149,9 +151,10 @@ public class UserService
                     VerificationResult = input.VerificationResult
                 }
             };
-            
+
             _creatorApplicationCollection.InsertOne(__newCreatorApplication);
-        } else if(input.Status == IdentityVerificationInputStatus.SUCCESSFUL)
+        }
+        else if (input.Status == IdentityVerificationInputStatus.SUCCESSFUL)
         {
             // if its successful, we update the creatorApplication status to approved
             var filter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
@@ -159,7 +162,8 @@ public class UserService
                 .Set(r => r.Status, CreatorApplicationStatus.APPROVED)
                 .Set(r => r.ApprovedAt, DateTime.UtcNow)
                 .Set(r => r.UpdatedAt, DateTime.UtcNow)
-                .Set(r => r.IdentityProviderResponse, new IdentityProviderResponse {
+                .Set(r => r.IdentityProviderResponse, new IdentityProviderResponse
+                {
                     TransactionNumber = input.TransactionNumber,
                     PictureMatchScore = input.PictureMatchScore,
                     LivenessVerificationScore = input.LivenessVerificationScore,

@@ -101,7 +101,8 @@ public class Auth
 
         if (accountInput.Role == UserRole.CREATOR && user.CreatorApplication is null)
         {
-            var __newCreatorApplication = new Models.CreatorApplication {
+            var __newCreatorApplication = new Models.CreatorApplication
+            {
                 ApplicantId = user.Id,
             };
             _creatorsCollection.InsertOne(__newCreatorApplication);

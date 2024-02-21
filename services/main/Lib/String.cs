@@ -8,10 +8,11 @@ public class StringLib
 
     public static string NormalizePhoneNumber(string phoneNumber)
     {
-        if(phoneNumber.Length < 10){
-			throw new Exception("PhoneNumber is invalid");
-		}
-		
+        if (phoneNumber.Length < 10)
+        {
+            throw new Exception("PhoneNumber is invalid");
+        }
+
         var last9Digits = phoneNumber.Substring(phoneNumber.Length - 9);
         return "233" + last9Digits;
     }
