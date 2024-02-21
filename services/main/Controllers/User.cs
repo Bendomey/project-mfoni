@@ -81,27 +81,25 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("identity/verify")]
-    public OutputResponse<bool?> VerifyIdentity([FromBody] Dictionary<string, object> keyValuePairs)
+    public async Task<OutputResponse<bool?>> VerifyIdentity([FromBody] IdentityVerificationInput input)
     {
-        logger.LogInformation($"verify user identity {keyValuePairs}");
+        logger.LogInformation($"verify user identity {input}");
         try
         {
-
-            // log request body
-            foreach (var kvp in keyValuePairs)
-            {
-                logger.LogInformation($"Key: {kvp.Key}, Value: {kvp.Value}");
-            }
+            await userService.VerifyIdentity(input);
             return new GetEntityResponse<bool?>(true, null).Result();
         }
 
         catch (HttpRequestException e)
         {
+            // sentry error
+            logger.LogError($"{e.Message}");
             return new GetEntityResponse<bool?>(null, e.Message).Result();
         }
 
         catch (Exception e)
         {
+            // sentry error
             logger.LogError($"{e.Message}");
             return new GetEntityResponse<bool?>(null, e.Message).Result();
         }

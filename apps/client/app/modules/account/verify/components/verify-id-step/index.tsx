@@ -11,6 +11,8 @@ import {useForm} from 'react-hook-form'
 import {yupResolver} from '@hookform/resolvers/yup'
 import {classNames} from '@/lib/classNames.ts'
 import {toast} from 'react-hot-toast'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {useVerifyCreator} from '../../context.tsx'
 
 type MetricVerify = (type: string, payload: any, callback: any) => void
 
@@ -59,6 +61,8 @@ export const VerifyIdStep = () => {
     METRIC_CLIENT_SECRET: string
   }>()
   const [metric, setMetric] = useState<{verify: MetricVerify}>()
+  const {currentUser} = useAuth()
+  const {setActiveStep} = useVerifyCreator()
 
   const {
     register,
@@ -87,18 +91,37 @@ export const VerifyIdStep = () => {
       return toast.error('Date of Birth is required', {id: 'dob-required'})
     }
 
+    if (!currentUser?.phoneNumber) {
+      return toast.error('Kindly verify your phone number to proceed', {
+        id: 'phone-number-required',
+      })
+    }
+
     if (metric?.verify) {
+      const phoneNumber = `0${currentUser.phoneNumber.slice(-9)}`
       metric.verify(
         data.type,
         {
           card_number: data.cardNumber,
-          reference_id: '0201080802',
-          purpose: 'Verifying creator identity.',
-          phone_number: '0201080802',
+          reference_id: phoneNumber,
+          purpose: `Verifying ${currentUser.name}'s identity.`,
+          phone_number: phoneNumber,
           date_of_birth: data.dob ?? undefined,
         },
-        (results: any) => {
-          console.log(results.status, results.transaction_number)
+        (results: {status: 'FAILED' | 'SUCCESSFUL'}) => {
+          if (results.status === 'SUCCESSFUL') {
+            setActiveStep('welcome')
+            return toast.success('Your identity was verified successfully', {
+              id: 'identity-verification-success',
+            })
+          } else {
+            return toast.error(
+              'Failed to verify your account. Please try again.',
+              {
+                id: 'identity-verification-failed',
+              },
+            )
+          }
         },
       )
     } else {
