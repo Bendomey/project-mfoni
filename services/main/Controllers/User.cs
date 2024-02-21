@@ -80,37 +80,13 @@ public class UserController : ControllerBase
         }
     }
 
-    // [HttpPost("identity/verify")]
-    // public async Task<OutputResponse<bool?>> VerifyIdentity([FromBody] IdentityVerificationInput input)
-    // {
-    //     logger.LogInformation($"verify user identity {input}");
-    //     try
-    //     {
-    //         await userService.VerifyIdentity(input);
-    //         return new GetEntityResponse<bool?>(true, null).Result();
-    //     }
-
-    //     catch (HttpRequestException e)
-    //     {
-    //         // sentry error
-    //         logger.LogError($"{e.Message}");
-    //         return new GetEntityResponse<bool?>(null, e.Message).Result();
-    //     }
-
-    //     catch (Exception e)
-    //     {
-    //         // sentry error
-    //         logger.LogError($"{e.Message}");
-    //         return new GetEntityResponse<bool?>(null, e.Message).Result();
-    //     }
-    // }
-
     [HttpPost("identity/verify")]
-    public OutputResponse<bool?> VerifyIdentity([FromBody] dynamic input)
+    public async Task<OutputResponse<bool?>> VerifyIdentity([FromBody] IdentityVerificationInput input)
     {
         logger.LogInformation($"verify user identity {input}");
         try
         {
+            await userService.VerifyIdentity(input);
             return new GetEntityResponse<bool?>(true, null).Result();
         }
 
