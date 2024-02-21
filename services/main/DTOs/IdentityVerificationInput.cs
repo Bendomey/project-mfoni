@@ -61,7 +61,7 @@ public class VerificationResult
     [JsonPropertyName("success")]
     [BsonElement("success")]
     public required bool Success { get; set; }
-    
+
     [JsonPropertyName("code")]
     [BsonElement("code")]
     public required string Code { get; set; }
