@@ -14,68 +14,141 @@ export const PolicyModule = () => {
         <div className="bg-gray-50 max-w-8xl py-8 px-6 lg:px-8 text-base leading-7 text-gray-700">
           <div className="mx-auto max-w-3xl">
             <p className="mt-6 leading-8">
-              Welcome to mfoni.app (the "Site"), hosted by Mfoni ("Mfoni", "we",
-              "us", and/or "our"). Mfoni provides the concept of capturing
-              moments and images, aligning with your goal of providing a
-              platform for photographers and users to easily access and connect
-              through facial recognition technology. (the "Services")​. We value
-              your privacy and are dedicated to protecting your personal data.
-              This Privacy Policy covers how we collect, handle, and disclose
-              personal data on our Platform. If you have any questions,
-              comments, or concerns regarding this Privacy Policy, our data
-              practices, or would like to exercise your rights, do not hesitate
-              to contact us.
+              We appreciate you utilising the mfoni App (also known as "the
+              App"). This privacy statement aims to explain to you how we
+              gather, utilise, and protect your personal data when you use the
+              application. You acknowledge and agree to the terms of this
+              Privacy Policy by using or accessing the App.
             </p>
             <div className="mt-10 max-w-2xl">
               <h2 className="mt-16 text-2xl font-bold  text-gray-900">
-                To Whom Does This Privacy Policy Apply
+                Information We Collect
               </h2>
-              <p className="mt-6">
-                This Privacy Policy applies to customers and site visitors. Each
-                customer is responsible for posting its own terms, conditions,
-                and privacy policies, and ensuring compliance with all
-                applicable laws and regulations.
-              </p>
             </div>
 
             <div className="mt-16 max-w-2xl">
               <h2 className="text-2xl font-bold  text-gray-900">
-                Changes To This Privacy Policy
+                i. User-Provided Information:
               </h2>
               <p className="mt-6">
-                This Privacy Policy may change from time to time, as our
-                Platform and our business may change. Your continued use of the
-                Platform after any changes to this Privacy Policy indicates your
-                agreement with the terms of the revised Privacy Policy.
+                When you create an account, we may collect personal information
+                such as your name, email address, and profile picture.
               </p>
             </div>
             <div className="mt-16 max-w-2xl">
               <h2 className="text-2xl font-bold  text-gray-900">
-                What Information Do We Collect
+                ii. Photographic Data:
               </h2>
               <p className="mt-6">
-                We collect information directly from you when you provide it to
-                us explicitly on our Site. We do not use third-party cookies on
-                our Site.
+                The app analyses images uploaded by photographers using object
+                recognition technologies. Instead of storing the photos, our
+                technique extracts pertinent information for search queries.
               </p>
             </div>
             <div className="mt-16 max-w-2xl">
               <h2 className="text-2xl font-bold  text-gray-900">
-                What We Use Your Information For
+                How We Use Your Information
+              </h2>
+            </div>
+            <div className="mt-16 max-w-2xl">
+              <h2 className="text-2xl font-bold  text-gray-900">
+                i. Facilitating Photo Lookups:
               </h2>
               <p className="mt-6">
-                We use your information to provide our Services, to improve our
-                Platform, to understand how you use our Platform, and to
-                communicate with you.
+                The main objective of the application is to allow users to
+                search for their photos that were taken by event photographers.
+                Object recognition technology is employed by matching relevant
+                photographs with user-provided details.
               </p>
             </div>
             <div className="mt-16 max-w-2xl">
               <h2 className="text-2xl font-bold  text-gray-900">
-                How to Contact Us
+                ii. User Accounts:
               </h2>
               <p className="mt-6">
-                For privacy-related questions, please contact us at
-                privacy@mfoni.app.
+                The personal data gathered during account creation is utilised
+                for communication, account administration, and app experience
+                customisation.
+              </p>
+            </div>
+            <div className="mt-16 max-w-2xl">
+              <h2 className="text-2xl font-bold  text-gray-900">
+                iii. Improving App Performance:
+              </h2>
+              <p className="mt-6">
+                The functionality, efficiency, and user experience of the App
+                may all be improved with the usage of aggregated and anonymised
+                data.
+              </p>
+            </div>
+            <div className="mt-16 max-w-2xl">
+              <h2 className="text-2xl font-bold  text-gray-900">
+                Information Sharing
+              </h2>
+            </div>
+            <div className="mt-16 max-w-2xl">
+              <h2 className="text-2xl font-bold  text-gray-900">
+                i. Photographer Collaboration:
+              </h2>
+              <p className="mt-6">
+                Photographers who upload photographs to the app will be able to
+                receive aggregated data on downloads, views, and other pertinent
+                information. However, individual user data is not shared with
+                photographers.
+              </p>
+            </div>
+            <div className="mt-16 max-w-2xl">
+              <h2 className="text-2xl font-bold  text-gray-900">
+                ii. Legal Compliance:
+              </h2>
+              <p className="mt-6">
+                We may disclose information when required by law or in response
+                to valid legal processes.
+              </p>
+            </div>
+            <div className="mt-16 max-w-2xl">
+              <h2 className="text-2xl font-bold  text-gray-900">
+                Data Security
+              </h2>
+            </div>
+            <div className="mt-16 max-w-2xl">
+              <h2 className="text-2xl font-bold  text-gray-900">
+                i. Encryption:
+              </h2>
+              <p className="mt-6">
+                We employ industry-standard encryption to safeguard your
+                personal information during transmission and storage.
+              </p>
+            </div>
+            <div className="mt-16 max-w-2xl">
+              <h2 className="text-2xl font-bold  text-gray-900">
+                ii. Opt-Out:
+              </h2>
+              <p className="mt-6">
+                You have the option to opt-out of certain data processing
+                activities. However, opting out may limit your access to certain
+                features of the App.
+              </p>
+            </div>
+            <div className="mt-16 max-w-2xl">
+              <h2 className="text-2xl font-bold  text-gray-900">
+                iii. Updates to Privacy Policy:
+              </h2>
+              <p className="mt-6">
+                We might occasionally alter our privacy statement. Any
+                significant changes will be communicated to you through the App
+                or through other means. You will be deemed to have accepted the
+                updated Privacy Policy if you keep using the app after these
+                changes.
+              </p>
+            </div>
+            <div className="mt-16 max-w-2xl">
+              <h2 className="text-2xl font-bold  text-gray-900">Contact Us</h2>
+              <p className="mt-6">
+                If you have any questions or concerns about this Privacy Policy
+                or the App, please contact us at team@mfoni.app. By using the
+                App, you agree to the terms of this Privacy Policy. If you do
+                not agree with these terms, please do not use the App.
               </p>
             </div>
           </div>
