@@ -1,5 +1,5 @@
 {
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx", "index.js"],
+  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx", "index.js", "app/components/image-slider/index.jsx"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "isolatedModules": true,
