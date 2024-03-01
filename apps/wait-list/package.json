@@ -4,13 +4,13 @@
   "private": true,
   "sideEffects": false,
   "description": "Getting stuff ready...",
+  "type": "module",
   "engines": {
-    "node": "18",
+    "node": ">=18",
     "npm": ">=8"
   },
-  "type": "module",
   "scripts": {
-    "clean": "rimraf ./node_modules/.cache ./build ./public/build",
+    "clean": "rimraf ./node_modules/.cache ./build ./.cache ./public/build",
     "prebuild": "yarn clean && echo All clean ✨",
     "build": "remix build",
     "dev": "remix dev",
