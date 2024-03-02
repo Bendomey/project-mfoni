@@ -19,7 +19,7 @@ export const LandingPageModule = () => {
           </p>
           <MovingBorderButton
             borderRadius="1.25rem"
-            className="bg-white text-base font-medium text-black border-gray-200 border dark:bg-slate"
+            className="bg-white text-base font-medium text-black border-gray-200 border "
           >
             Join waitlist{' '}
             <span className="pl-1" aria-hidden="true">
