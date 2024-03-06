@@ -12,7 +12,7 @@ export const SpringModal = ({
   isOpen,
   setIsOpen,
   children,
-  className = 'bg-white text-gray-800 p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden',
+  className = 'bg-white text-gray-800 p-6 rounded-lg w-full max-w-xl shadow-xl cursor-default relative overflow-hidden',
 }: Props) => {
   return (
     <AnimatePresence>

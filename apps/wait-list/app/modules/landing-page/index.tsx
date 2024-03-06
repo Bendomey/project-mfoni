@@ -2,8 +2,12 @@ import {PhotoGrid} from '@/components/image-slider/index.jsx'
 import {BackgroundContainer} from '@/components/layout/container.tsx'
 import {Header} from '@/components/layout/header.tsx'
 import {MovingBorderButton} from '@/components/moving-border/index.tsx'
+import {useBoolean} from '@/hooks/use-boolean.ts'
+import WaitListForm from './modals/wait-list-form/index.tsx'
 
 export const LandingPageModule = () => {
+  const {value: showWaitListForm, setValue, setFalse, setTrue} = useBoolean()
+
   return (
     <BackgroundContainer>
       <div className="h-[60dvh] md:h-[50vh] lg:h-[50vh] flex flex-col justify-center items-center">
@@ -19,6 +23,7 @@ export const LandingPageModule = () => {
           </p>
           <MovingBorderButton
             borderRadius="1.25rem"
+            onClick={setTrue}
             className="bg-white text-base font-medium text-black border-gray-200 border "
           >
             Join waitlist{' '}
@@ -29,6 +34,11 @@ export const LandingPageModule = () => {
         </div>
       </div>
       <PhotoGrid />
+      <WaitListForm
+        show={showWaitListForm}
+        setShow={setValue}
+        handleClose={setFalse}
+      />
     </BackgroundContainer>
   )
 }
