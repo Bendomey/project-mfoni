@@ -14,8 +14,9 @@ export const links: LinksFunction = () => [{rel: 'stylesheet', href: styles}]
 
 export function loader() {
   return {
-    METRIC_CLIENT_ID: process.env.METRIC_CLIENT_ID,
-    METRIC_CLIENT_SECRET: process.env.METRIC_CLIENT_SECRET,
+    SMILEID_ENVIRONMENT: process.env.SMILEID_ENVIRONMENT,
+    SMILEID_PARTNER_ID: process.env.SMILEID_PARTNER_ID,
+    API_ADDRESS: process.env.API_ADDRESS,
   }
 }
 

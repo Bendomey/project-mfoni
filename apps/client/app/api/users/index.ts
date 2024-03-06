@@ -74,3 +74,21 @@ export const useVerifyPhone = () =>
   useMutation({
     mutationFn: verifyPhone,
   })
+
+const getWebToken = async (user_id: string) => {
+  const response = await fetch('/api/smileid/token/', {
+    body: JSON.stringify({user_id}),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  const data = await response.json()
+  return data
+}
+
+export const useGenerateSmileIdToken = () =>
+  useMutation({
+    mutationFn: getWebToken,
+  })
