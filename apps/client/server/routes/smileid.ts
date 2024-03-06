@@ -19,7 +19,7 @@ smileIdRouter.post('/token', async (req, res) => {
   }
 
   const jobId = uuidv4()
-  const callbackUrl = `${MFONI_API_ADDRESS}/api/v1/users/smileid/verify/${jobId}/${req.body.user_id}`
+  const callbackUrl = `${MFONI_API_ADDRESS}/api/v1/users/smileid/verify`
   const product = 'biometric_kyc'
   
   const requestParams = {

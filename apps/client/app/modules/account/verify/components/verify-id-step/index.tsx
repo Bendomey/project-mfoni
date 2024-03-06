@@ -39,7 +39,7 @@ export const VerifyIdStep = () => {
           window.SmileIdentity({
             token: data.token,
             product: data.product,
-            callback_url: `${loader.API_ADDRESS}/api/v1/users/smileid/verify/${data.jobId}/${currentUser.id}`,
+            callback_url: `${loader.API_ADDRESS}/api/v1/users/smileid/verify`,
             environment: loader.SMILEID_ENVIRONMENT,
             partner_details: {
               partner_id: loader.SMILEID_PARTNER_ID,
