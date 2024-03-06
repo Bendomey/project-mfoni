@@ -3,10 +3,11 @@ import { Button } from "@/components/button/index.tsx"
 import { PlusIcon } from "@heroicons/react/24/outline"
 import { ExclamationCircleIcon, ExclamationTriangleIcon, TrashIcon } from "@heroicons/react/24/solid"
 import { type Content } from "../index.tsx"
-import { useMemo, useState } from "react"
-import { FlyoutContainer } from "@/components/flyout/flyout-container.tsx"
+import { useEffect, useMemo, useRef, useState } from "react"
+// import { FlyoutContainer } from "@/components/flyout/flyout-container.tsx"
 import { RadioGroup } from '@headlessui/react'
 import { classNames } from "@/lib/classNames.ts"
+import { useMediaQuery } from "@uidotdev/usehooks";
 
 interface ContentManagerProps {
     open: VoidFunction
@@ -22,7 +23,7 @@ const AddNewContentButton = ({ open }: { open: ContentManagerProps['open'] }) =>
 }
 
 
-const ContentSideViewer = ({ content }: { content: Content }) => {
+const ContentSideViewer = ({ content, activeContent, onSelect }: { content: Content; activeContent: boolean; onSelect: VoidFunction}) => {
     const imageUrl = useMemo(() => URL.createObjectURL(content.file), [content.file])
     const isRejected = useMemo(() => content.status === 'rejected', [content.status])
 
@@ -36,24 +37,24 @@ const ContentSideViewer = ({ content }: { content: Content }) => {
     // }
 
     return (
-        <FlyoutContainer intendedPosition="x" FlyoutContent={undefined} arrowColor="bg-red-600">
-            <div className="relative bg-zinc-100 h-[12vh] w-[23vw] md:w-[7vw] flex justify-center items-center rounded-lg"
-                style={{
-                    backgroundImage: `url(${imageUrl})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                }}
-            >
-                {isRejected ? (
-                    <div className="absolute top-0 z-1 h-full w-full bg-red-600 bg-opacity-90 rounded-lg">
-                        <div className="flex justify-center items-center h-full w-full">
-                            <ExclamationTriangleIcon className='text-white h-10 w-auto' />
-                        </div>
+        // <FlyoutContainer intendedPosition="x" FlyoutContent={undefined} arrowColor="bg-red-600">
+        <div onClick={onSelect} aria-hidden="true" className={`relative cursor-pointer bg-zinc-100 h-[12vh] w-[23vw] md:w-[7vw] flex justify-center items-center rounded-lg ring-offset-2 ${isRejected ? "ring-red-600 " : "ring-blue-400"} ${activeContent ? "ring" : "ring-0"}`}
+            style={{
+                backgroundImage: `url(${imageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}
+        >
+            {isRejected ? (
+                <div className="absolute top-0 z-1 h-full w-full bg-red-600 bg-opacity-90 rounded-lg">
+                    <div className="flex justify-center items-center h-full w-full">
+                        <ExclamationTriangleIcon className='text-white h-10 w-auto' />
                     </div>
-                ) : null
-                }
-            </div>
-        </FlyoutContainer>
+                </div>
+            ) : null
+            }
+        </div>
+        // </FlyoutContainer>
     )
 }
 
@@ -126,15 +127,16 @@ const memoryOptions = [
     { name: 'PRIVATE', inStock: true },
 ]
 
-export default function Example() {
+function VisibilitySetter() {
     const [mem, setMem] = useState(memoryOptions[0])
 
     return (
         <div>
-            <div className="flex items-center justify-between">
+            <div className="">
                 <label htmlFor="email" className="block font-semibold text-lg leading-6 text-gray-500">
                     Visibility
                 </label>
+                <small>Users will still find it by visual search if it&apos;s private.</small>
             </div>
 
             <RadioGroup value={mem} onChange={setMem} className="mt-2">
@@ -239,7 +241,7 @@ const ContentEditor = ({ content }: { content: Content }) => {
                                         </div>
 
                                         <div>
-                                            <Example />
+                                            <VisibilitySetter />
                                         </div>
                                     </div>
                                 )
@@ -267,30 +269,53 @@ const HeaderDetails = () => {
 }
 
 export const ContentManager = ({ open, contents }: ContentManagerProps) => {
+    const scrollRef = useRef<HTMLDivElement>(null)
+    const [activeContent, setActiveContent] = useState<number>(0)
+    const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
+
+    useEffect(() => {
+        if(!isSmallDevice && scrollRef.current){
+            const element = Array.from(scrollRef.current.children)[activeContent]
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            }
+        }
+    }, [activeContent, isSmallDevice])
+
+    function scrollToPosition(contentIdx: number) {
+        if (scrollRef.current) {
+            const element = Array.from(scrollRef.current.children)[contentIdx]
+            if (element && !isSmallDevice) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            }
+            setActiveContent(contentIdx)
+        }
+    }
+
     return (
         <div className=" pt-0 md:pt-5">
             <div className="block md:hidden">
                 <HeaderDetails />
             </div>
             <div className="grid grid-cols-8 gap-4 items-start mt-4 md:mt-0">
-                <div className="col-span-8 md:col-span-1">
+                <div className="md:sticky md:top-20 col-span-8 md:col-span-1">
                     <div className="max-h-[87vh] overflow-y-auto md:pb-40 md:pl-5 scrollContainer">
-                        <div className="flex flex-row md:flex-col justify-start md:justify-center items-center gap-2 md:gap-4">
+                        <div className=" flex flex-row md:flex-col justify-start md:justify-center items-center gap-2 md:gap-4">
                             <AddNewContentButton open={open} />
                             {
-                                contents.map((content, contentIdx) => <ContentSideViewer content={content} key={contentIdx} />)
+                                contents.map((content, contentIdx) => <ContentSideViewer activeContent={activeContent  === contentIdx} onSelect={() => scrollToPosition(contentIdx)} content={content} key={contentIdx} />)
                             }
                         </div>
                     </div>
                 </div>
                 <div className="col-span-8 md:col-span-7">
-                    <div className="md:max-h-[87vh] md:overflow-y-scroll pb-10 md:pb-40 md:pr-10 scrollContainer">
+                    <div className="pb-10 md:pb-40 md:pr-10 ">
                         <div className="hidden md:block">
                             <HeaderDetails />
                         </div>
-                        <div className="mt-10 flex flex-col gap-4">
+                        <div ref={scrollRef} className="mt-10 flex flex-col gap-4">
                             {
-                                contents.map((content, contentIdx) => <ContentEditor content={content} key={contentIdx} />)
+                                contents.map((content, contentIdx) => isSmallDevice ? activeContent == contentIdx ? <ContentEditor content={content} key={contentIdx} /> : null : <ContentEditor content={content} key={contentIdx} /> )
                             }
                         </div>
                     </div>
