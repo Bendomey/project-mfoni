@@ -1,1 +1,1 @@
-cd apps/client && yarn format
+npm run format
