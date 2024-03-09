@@ -6,7 +6,7 @@ mfoni is a platform revolutionizing event photography, our app empowers photogra
 
 In an era with abundant public events, we address the challenge of strangers missing out on their event photos. By leveraging advertising, photographers direct users to our platform, where cutting-edge facial recognition technology ensures a seamless connection between photographers and event attendees. Capture and relive moments effortlessly with our innovative image recognition and facial identification features
 
-# Run
+## Run
 
 > Run both frontend and api simultaneously with make
 > `make run`
@@ -18,6 +18,11 @@ In an era with abundant public events, we address the challenge of strangers mis
 `services` - Where our backend services live. It's a dotnet application
 
 `infrastructure` - Where our terraform/ansible configuration files live.
+
+## Linting
+
+In our development environment, we utilize pre-commit hooks to automatically format and lint your changes. To enable this feature, you'll need to run `yarn install` in the root directory to install the Husky package.
+> Skipping this step could result in errors when committing your changes.
 
 ## Tech Stack + Features
 
