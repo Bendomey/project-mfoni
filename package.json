@@ -9,5 +9,8 @@
       "post-applypatch": "echo \"[Husky] post-applypatch\"",
       "pre-commit": "echo \"[Husky] pre-commit\""
     }
+  },
+  "scripts": {
+    "prepare": "husky"
   }
 }
