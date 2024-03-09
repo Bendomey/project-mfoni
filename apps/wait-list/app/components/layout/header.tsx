@@ -19,7 +19,7 @@ export const Header = () => {
         </Link>
 
         <div className="flex justify-center items-center gap-x-12">
-          <Button variant="outline" isLink>
+          <Button href="/learn-more" variant="outline" isLink>
             Learn more{' '}
             <span className="pl-1" aria-hidden="true">
               &rarr;
