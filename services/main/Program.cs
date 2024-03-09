@@ -65,6 +65,7 @@ builder.Services.AddSingleton<CollectionContentService>();
 builder.Services.AddSingleton<IndexContent>();
 builder.Services.AddSingleton<ProcessIndexContent>();
 
+builder.Services.AddScoped<WaitlistService>();
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();
 
