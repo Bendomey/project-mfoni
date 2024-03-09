@@ -19,6 +19,12 @@ public class WaitlistService
     {
         this.logger.LogInformation("Adding waitlist entry into database.");
 
+        var filter = Builders<WaitlistEntry>.Filter.Eq(existing => existing.Email, entry.Email);
+        var existingEntry = await this.database.Find(filter).FirstOrDefaultAsync();
+        if (existingEntry is not null){
+            Console.WriteLine(existingEntry);
+            throw new Exception("Entry already exists.");
+        }
         await this.database.InsertOneAsync(entry);
     }
 }
