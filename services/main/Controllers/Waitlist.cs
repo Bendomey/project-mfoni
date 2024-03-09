@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace main.Controllers;
 
+[ApiController]
+[Route("api/v1/waitlists")]
 public class WaitlistController : ControllerBase
 {
     private readonly ILogger<WaitlistController> logger;
