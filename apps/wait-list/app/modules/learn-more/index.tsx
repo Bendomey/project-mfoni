@@ -1,6 +1,11 @@
 import {AnimatedTooltip} from '@/components/animated-tooltip/index.tsx'
 import {BackgroundContainer} from '@/components/layout/container.tsx'
 import {Header} from '@/components/layout/header.tsx'
+import Domey from '@/images/ben.jpeg'
+import Fiifi from '@/images/fiifi.jpeg'
+import Ronnie from '@/images/ronnie.jpeg'
+import Audrey from '@/images/audrey.jpeg'
+import Nkay from '@/images/nkay.jpg'
 
 const faqs = [
   {
@@ -35,51 +40,46 @@ const people = [
     id: 1,
     name: 'Domey',
     designation: 'Software Engineer',
-    image:
-      'https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3387&q=80',
+    image: Domey,
   },
   {
     id: 2,
     name: 'Fiifi Jr.',
     designation: 'Software Engineer',
-    image:
-      'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXZhdGFyfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
+    image: Fiifi,
   },
-  {
-    id: 3,
-    name: 'Edward',
-    designation: 'Software Engineer',
-    image:
-      'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YXZhdGFyfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
-  },
+  // {
+  //   id: 3,
+  //   name: 'Edward',
+  //   designation: 'Software Engineer',
+  //   image:
+  //     'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YXZhdGFyfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
+  // },
   {
     id: 4,
     name: 'Ronnie',
     designation: 'Project Manager',
-    image:
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGF2YXRhcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    image: Ronnie,
   },
   {
     id: 5,
     name: 'Audrey',
     designation: 'Product Manager',
-    image:
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3540&q=80',
+    image: Audrey,
   },
   {
     id: 6,
-    name: 'Nkay',
+    name: 'Nana Anikuabe',
     designation: 'Software Engineer',
-    image:
-      'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3534&q=80',
+    image: Nkay,
   },
-  {
-    id: 7,
-    name: 'Noah',
-    designation: 'Software Engineer',
-    image:
-      'https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3387&q=80',
-  },
+  // {
+  //   id: 7,
+  //   name: 'Noah',
+  //   designation: 'Software Engineer',
+  //   image:
+  //     'https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3387&q=80',
+  // },
 ]
 
 export const LearnMoreModule = () => {
@@ -96,9 +96,14 @@ export const LearnMoreModule = () => {
               <p className="mt-6 text-base leading-7 text-gray-600">
                 Have a different question and can’t find the answer you’re
                 looking for? Reach out to our support team by{' '}
-                <span className="font-semibold text-blue-600 hover:text-blue-500">
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href="mailto:support@mfoni.app"
+                  className="font-semibold text-blue-600 hover:text-blue-500"
+                >
                   sending us an email
-                </span>{' '}
+                </a>{' '}
                 and we’ll get back to you as soon as we can.
               </p>
             </div>
