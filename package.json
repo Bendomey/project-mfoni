@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "husky": "9.0.11",
+    "npm-run-all": "4.1.5"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "format": "run-s format:*",
+    "format:frontend-client": "cd apps/client && yarn format",
+    "format:frontend-waitlist": "cd apps/wait-list && yarn format",
+    "format:services-main": "cd services/main && make lint"
+  }
+}

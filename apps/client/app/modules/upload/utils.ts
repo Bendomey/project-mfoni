@@ -26,7 +26,7 @@ export const acceptFile = async (file: File) => {
       size: 400, // 4 megapixels
       imageUrl: URL.createObjectURL(file),
     })
-    
+
     status = 'accepted'
     message = 'File accepted'
   } catch (error: unknown) {

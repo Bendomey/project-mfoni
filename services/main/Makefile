@@ -19,3 +19,6 @@ build-release:
 
 build-docker:
 	docker build -t mfoni-api -f Dockerfile .
+
+lint:
+	dotnet format main.sln
