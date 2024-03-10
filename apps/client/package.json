@@ -6,7 +6,6 @@
   "description": "Where all users interact with the system.",
   "type": "module",
   "engines": {
-    "node": "18",
     "npm": ">=8"
   },
   "scripts": {
