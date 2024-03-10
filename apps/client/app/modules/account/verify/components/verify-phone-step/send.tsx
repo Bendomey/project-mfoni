@@ -1,17 +1,17 @@
-import { useUpdatePhone } from '@/api/users/index.ts'
-import { Button } from '@/components/button/index.tsx'
-import { yupResolver } from '@hookform/resolvers/yup'
+import {useUpdatePhone} from '@/api/users/index.ts'
+import {Button} from '@/components/button/index.tsx'
+import {yupResolver} from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
-import { useForm } from 'react-hook-form'
-import { classNames } from '@/lib/classNames.ts'
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
-import { errorMessagesWrapper } from '@/constants/error-messages.ts'
-import { toast } from 'react-hot-toast'
-import { useEffect } from 'react'
-import { useAuth } from '@/providers/auth/index.tsx'
-import { useQueryClient } from '@tanstack/react-query'
-import { QUERY_KEYS } from '@/constants/index.ts'
-import { Loader } from '@/components/loader/index.tsx'
+import {useForm} from 'react-hook-form'
+import {classNames} from '@/lib/classNames.ts'
+import {ExclamationCircleIcon} from '@heroicons/react/24/outline'
+import {errorMessagesWrapper} from '@/constants/error-messages.ts'
+import {toast} from 'react-hot-toast'
+import {useEffect} from 'react'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {useQueryClient} from '@tanstack/react-query'
+import {QUERY_KEYS} from '@/constants/index.ts'
+import {Loader} from '@/components/loader/index.tsx'
 
 const schema = Yup.object().shape({
   phoneNumber: Yup.string()
@@ -28,15 +28,15 @@ interface Props {
   setPage: React.Dispatch<React.SetStateAction<'SendOTP' | 'VerifyOTP'>>
 }
 
-export const SendOtp = ({ setPage }: Props) => {
-  const { currentUser } = useAuth()
+export const SendOtp = ({setPage}: Props) => {
+  const {currentUser} = useAuth()
   const queryClient = useQueryClient()
-  const { mutate, isPending: isLoading } = useUpdatePhone()
+  const {mutate, isPending: isLoading} = useUpdatePhone()
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: {errors},
     setValue,
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
@@ -96,7 +96,7 @@ export const SendOtp = ({ setPage }: Props) => {
             </div>
             <input
               type="text"
-              {...register('phoneNumber', { required: true })}
+              {...register('phoneNumber', {required: true})}
               className={classNames(
                 'block w-full rounded-md border-0 py-3 pl-16 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6',
                 errors.phoneNumber ? 'ring-red-500' : 'ring-gray-300',
@@ -113,8 +113,6 @@ export const SendOtp = ({ setPage }: Props) => {
             ) : null}
           </div>
         </div>
-
-
 
         {isLoading ? (
           <div className="mt-10 flex justify-center items-center">

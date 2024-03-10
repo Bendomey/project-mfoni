@@ -15,7 +15,7 @@ interface Props extends React.HTMLAttributes<HTMLButtonElement> {
     | 'light'
     | 'dark'
     | 'link'
-  size?: 'sm' | 'md' | 'lg' | "xl"
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   type?: 'button' | 'submit' | 'reset'
   externalClassName?: string
 }
