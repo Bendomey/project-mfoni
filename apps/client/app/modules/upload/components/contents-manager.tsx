@@ -1,186 +1,14 @@
 /* eslint-disable react/no-unstable-nested-components */
 import {Button} from '@/components/button/index.tsx'
-import {PlusIcon} from '@heroicons/react/24/outline'
-import {
-  ExclamationCircleIcon,
-  ExclamationTriangleIcon,
-  TrashIcon,
-} from '@heroicons/react/24/solid'
-import {type Content} from '../index.tsx'
+import {TrashIcon} from '@heroicons/react/24/solid'
 import {useEffect, useMemo, useRef, useState} from 'react'
-// import { FlyoutContainer } from "@/components/flyout/flyout-container.tsx"
 import {RadioGroup} from '@headlessui/react'
 import {classNames} from '@/lib/classNames.ts'
 import {useMediaQuery} from '@uidotdev/usehooks'
-
-interface ContentManagerProps {
-  open: VoidFunction
-  contents: Array<Content>
-}
-
-const AddNewContentButton = ({open}: {open: ContentManagerProps['open']}) => {
-  return (
-    <Button
-      onClick={open}
-      variant="unstyled"
-      externalClassName="bg-zinc-100 h-[12vh] w-[23vw] md:w-[7vw] mx-1 md:mx-5 flex justify-center items-center rounded-lg"
-    >
-      <PlusIcon className="h-7 text-zinc-500 w-auto" strokeWidth={4} />
-    </Button>
-  )
-}
-
-const ContentSideViewer = ({
-  content,
-  activeContent,
-  onSelect,
-}: {
-  content: Content
-  activeContent: boolean
-  onSelect: VoidFunction
-}) => {
-  const imageUrl = useMemo(
-    () => URL.createObjectURL(content.file),
-    [content.file],
-  )
-  const isRejected = useMemo(
-    () => content.status === 'rejected',
-    [content.status],
-  )
-
-  // TODO: add error flyout in the future.
-  // const ErrorTag = () => {
-  //     return (
-  //         <div className="bg-red-600 z-10 p-5 w-[45vw] rounded-xl">
-  //             <h1 className="text-white font-bold">{content.message}</h1>
-  //         </div>
-  //     )
-  // }
-
-  return (
-    // <FlyoutContainer intendedPosition="x" FlyoutContent={undefined} arrowColor="bg-red-600">
-    <div
-      onClick={onSelect}
-      aria-hidden="true"
-      className={`relative cursor-pointer bg-zinc-100 h-[12vh] w-[23vw] md:w-[7vw] flex justify-center items-center rounded-lg ring-offset-2 ${
-        isRejected ? 'ring-red-600 ' : 'ring-blue-400'
-      } ${activeContent ? 'ring' : 'ring-0'}`}
-      style={{
-        backgroundImage: `url(${imageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      {isRejected ? (
-        <div className="absolute top-0 z-1 h-full w-full bg-red-600 bg-opacity-90 rounded-lg">
-          <div className="flex justify-center items-center h-full w-full">
-            <ExclamationTriangleIcon className="text-white h-10 w-auto" />
-          </div>
-        </div>
-      ) : null}
-    </div>
-    // </FlyoutContainer>
-  )
-}
-
-const CircularProgress = ({progress}: {progress: number}) => {
-  const circumference = ((2 * 22) / 7) * 15
-  return (
-    <div className="flex items-center justify-center ">
-      <svg className="transform -rotate-90 w-10 h-10">
-        <circle
-          cx="20"
-          cy="20"
-          r="15"
-          stroke="currentColor"
-          strokeWidth="5"
-          fill="transparent"
-          className="text-zinc-200"
-        />
-
-        <circle
-          cx="20"
-          cy="20"
-          r="15"
-          stroke="currentColor"
-          strokeWidth="5"
-          fill="transparent"
-          strokeDasharray={circumference}
-          strokeDashoffset={circumference - (progress / 100) * circumference}
-          className="text-emerald-700 "
-        />
-      </svg>
-    </div>
-  )
-}
-
-const Footer = ({contents}: {contents: ContentManagerProps['contents']}) => {
-  const rejectedContentLength = useMemo(
-    () => contents.filter(content => content.status === 'rejected').length,
-    [contents],
-  )
-
-  const contentLength = useMemo(() => contents.length, [contents])
-  const acceptedContentsLength = useMemo(
-    () => contentLength - rejectedContentLength,
-    [contentLength, rejectedContentLength],
-  )
-
-  return (
-    <div className="fixed bottom-0 left-0 w-full z-10 bg-blue-50 flex justify-center">
-      <div className="grid grid-cols-3 gap-4 mx-6 md:mx-12 py-5 md:py-10 w-full">
-        <div>
-          <div className="flex flex-row gap-3">
-            <div className="flex flex-row gap-2 items-center">
-              <CircularProgress
-                progress={Math.ceil(
-                  (acceptedContentsLength / contentLength) * 100,
-                )}
-              />
-              <div className="block md:hidden text-emerald-800 font-bold">
-                {acceptedContentsLength} / {contentLength}
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <h1 className="text-emerald-700 font-bold text-xl">
-                Content uploaded
-              </h1>
-              <h1 className="font-semibold text-emerald-500  mt-1">
-                {acceptedContentsLength} of {contentLength} photos and videos
-                are uploaded
-              </h1>
-            </div>
-          </div>
-        </div>
-        <div>
-          {rejectedContentLength > 0 ? (
-            <div className="flex flex-row gap-3">
-              <div className="flex flex-row gap-2 items-center">
-                <ExclamationCircleIcon className="text-red-600 h-9 w-auto" />
-                <div className="block md:hidden text-red-600 font-bold">
-                  {rejectedContentLength} / {contentLength}
-                </div>
-              </div>
-              <div className="hidden md:block">
-                <h1 className="text-red-600 font-bold text-xl">
-                  Content failed
-                </h1>
-                <h1 className="font-semibold text-red-400 mt-1">
-                  {rejectedContentLength} of {contentLength} photos are uploaded
-                </h1>
-              </div>
-            </div>
-          ) : null}
-        </div>
-        <div className="flex justify-end">
-          <Button size="xl" externalClassName="flex flex-row items-center">
-            Submit <span className="hidden md:block ml-1.5">your content</span>
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
-}
+import {useContentUpload, type Content} from '../context.tsx'
+import {AddNewContentButton} from './add-new-content.tsx'
+import {ContentSideViewer} from './content-side-viewer.tsx'
+import {Footer} from './footer.tsx'
 
 const memoryOptions = [
   {name: 'PUBLIC', inStock: true},
@@ -376,7 +204,8 @@ const HeaderDetails = () => {
   )
 }
 
-export const ContentManager = ({open, contents}: ContentManagerProps) => {
+export const ContentManager = () => {
+  const {contents} = useContentUpload()
   const scrollRef = useRef<HTMLDivElement>(null)
   const [activeContent, setActiveContent] = useState<number>(0)
   const isSmallDevice = useMediaQuery('only screen and (max-width : 768px)')
@@ -409,8 +238,8 @@ export const ContentManager = ({open, contents}: ContentManagerProps) => {
         <div className="md:sticky md:top-20 col-span-8 md:col-span-1">
           <div className="max-h-[87vh] overflow-y-auto md:pb-40 md:pl-5 scrollContainer">
             <div className=" flex flex-row md:flex-col justify-start md:justify-center items-center gap-2 md:gap-4">
-              <AddNewContentButton open={open} />
-              {contents.map((content, contentIdx) => (
+              <AddNewContentButton />
+              {Object.values(contents).map((content, contentIdx) => (
                 <ContentSideViewer
                   activeContent={activeContent === contentIdx}
                   onSelect={() => scrollToPosition(contentIdx)}
@@ -427,7 +256,7 @@ export const ContentManager = ({open, contents}: ContentManagerProps) => {
               <HeaderDetails />
             </div>
             <div ref={scrollRef} className="mt-10 flex flex-col gap-4">
-              {contents.map((content, contentIdx) =>
+              {Object.values(contents).map((content, contentIdx) =>
                 isSmallDevice ? (
                   activeContent == contentIdx ? (
                     <ContentEditor content={content} key={contentIdx} />
@@ -440,7 +269,7 @@ export const ContentManager = ({open, contents}: ContentManagerProps) => {
           </div>
         </div>
       </div>
-      <Footer contents={contents} />
+      <Footer contents={Object.values(contents)} />
     </div>
   )
 }

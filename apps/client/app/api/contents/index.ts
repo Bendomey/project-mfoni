@@ -1,0 +1,28 @@
+import {useMutation} from '@tanstack/react-query'
+
+interface IGenerateSignedUrlInput {
+  filename: string
+  contentType: string
+}
+
+interface IGenerateSignedUrlOutput {
+  fileLink: string
+  signedUrl: string
+}
+
+export const generateSignedUrl = async (props: IGenerateSignedUrlInput) => {
+  const res = await fetch('/api/s3', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(props),
+  })
+  const data = await res.json()
+  return data as IGenerateSignedUrlOutput
+}
+
+export const useSignS3UploadUrl = () =>
+  useMutation({
+    mutationFn: generateSignedUrl,
+  })

@@ -2,12 +2,10 @@ import {Button} from '@/components/button/index.tsx'
 import {ArrowUpTrayIcon} from '@heroicons/react/24/outline'
 import {CheckBadgeIcon} from '@heroicons/react/24/solid'
 import {Link} from '@remix-run/react'
+import {useContentUpload} from '../context.tsx'
 
-interface ContentUploaderProps {
-  open: VoidFunction
-}
-
-export const ContentUploader = ({open}: ContentUploaderProps) => {
+export const ContentUploader = () => {
+  const {openFileSelector} = useContentUpload()
   return (
     <>
       <div className="flex justify-center">
@@ -26,7 +24,11 @@ export const ContentUploader = ({open}: ContentUploaderProps) => {
             <h1 className="font-bold text-xl md:text-4xl w-3/3 md:w-72 text-center mt-5">
               Drag and drop to upload, or
             </h1>
-            <Button onClick={open} size="lg" externalClassName="mt-7">
+            <Button
+              onClick={openFileSelector}
+              size="lg"
+              externalClassName="mt-7"
+            >
               Browse
             </Button>
             <div className="mt-5">
