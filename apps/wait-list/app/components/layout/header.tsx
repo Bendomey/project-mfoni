@@ -1,8 +1,15 @@
 import {Link} from '@remix-run/react'
 import {APP_NAME} from '@/constants/index.ts'
 import {Button} from '@/components/button/index.tsx'
+import {useWaitListModal} from '@/providers/walt-list-popup/index.tsx'
 
-export const Header = () => {
+type Props = {
+  showWaitlist?: boolean
+}
+
+export const Header = ({showWaitlist = false}: Props) => {
+  const {handleShowWaitListForm} = useWaitListModal()
+
   return (
     <header className="absolute top-0 z-50 bg-white/10 w-full">
       <nav
@@ -19,12 +26,25 @@ export const Header = () => {
         </Link>
 
         <div className="flex justify-center items-center gap-x-12">
-          <Button href="/learn-more" variant="outline" isLink>
-            Learn more{' '}
-            <span className="pl-1" aria-hidden="true">
-              &rarr;
-            </span>
-          </Button>
+          {showWaitlist ? (
+            <Button
+              onClick={handleShowWaitListForm}
+              type="button"
+              variant="outline"
+            >
+              Join waitlist{' '}
+              <span className="pl-1" aria-hidden="true">
+                &rarr;
+              </span>
+            </Button>
+          ) : (
+            <Button href="/learn-more" variant="outline" isLink>
+              Learn more{' '}
+              <span className="pl-1" aria-hidden="true">
+                &rarr;
+              </span>
+            </Button>
+          )}
         </div>
       </nav>
     </header>
