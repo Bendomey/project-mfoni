@@ -6,6 +6,7 @@ import Fiifi from '@/images/fiifi.jpeg'
 import Ronnie from '@/images/ronnie.jpeg'
 import Audrey from '@/images/audrey.jpeg'
 import Nkay from '@/images/nkay.jpg'
+import Edward from '@/images/Edward.png'
 
 const faqs = [
   {
@@ -48,13 +49,12 @@ const people = [
     designation: 'Software Engineer',
     image: Fiifi,
   },
-  // {
-  //   id: 3,
-  //   name: 'Edward',
-  //   designation: 'Software Engineer',
-  //   image:
-  //     'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YXZhdGFyfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
-  // },
+  {
+    id: 3,
+    name: 'Edward',
+    designation: 'Software Engineer',
+    image: Edward,
+  },
   {
     id: 4,
     name: 'Ronnie',
@@ -87,7 +87,7 @@ export const LearnMoreModule = () => {
     <BackgroundContainer>
       <div className="flex flex-col justify-between items-center h-full">
         <div className="flex flex-col justify-center items-center ">
-          <Header />
+          <Header showWaitlist />
           <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-2xl font-bold leading-10 tracking-tight text-black">
