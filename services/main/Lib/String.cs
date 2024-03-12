@@ -1,3 +1,5 @@
+using System.Net;
+
 public class StringLib
 {
     public static string Base64Encode(string plainText)
@@ -10,7 +12,7 @@ public class StringLib
     {
         if (phoneNumber.Length < 10)
         {
-            throw new Exception("PhoneNumber is invalid");
+            throw new HttpRequestException("PhoneNumber is invalid", null, HttpStatusCode.UnprocessableEntity);
         }
 
         var last9Digits = phoneNumber.Substring(phoneNumber.Length - 9);
