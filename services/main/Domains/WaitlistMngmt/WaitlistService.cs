@@ -1,30 +1,44 @@
 
 using main.Configurations;
 using main.Configuratons;
+using main.Models;
 using main.DTOs;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 public class WaitlistService
 {
-    private readonly ILogger<WaitlistService> logger;
-    private readonly IMongoCollection<WaitlistEntry> database;
+    private readonly ILogger<WaitlistService> _logger;
+    private readonly IMongoCollection<Waitlist> _waitlistCollection;
 
-    public WaitlistService(ILogger<WaitlistService> logger, DatabaseSettings databaseSettings)
+    public WaitlistService(ILogger<WaitlistService> logger, DatabaseSettings databaseSettings, IOptions<AppConstants> appConstants)
     {
-        this.logger = logger;
-        this.database = databaseSettings.Database.GetCollection<WaitlistEntry>(DataBaseCollectionConstants.WaitlistCollectionName);
+        this._logger = logger;
+        this._waitlistCollection = databaseSettings.Database.GetCollection<Waitlist>(appConstants.Value.WaitlistCollection);
     }
 
-    public async Task SaveWaitlistDetails(WaitlistEntry entry)
+    public async Task<Waitlist> SaveWaitlistDetails(CreateWaitlistInput entry)
     {
-        this.logger.LogInformation("Adding waitlist entry into database.");
+        this._logger.LogInformation("Adding waitlist entry into database.");
+        var normalizedPhoneNumber = StringLib.NormalizePhoneNumber(entry.PhoneNumber);
 
-        var filter = Builders<WaitlistEntry>.Filter.Eq(existing => existing.Email, entry.Email);
-        var existingEntry = await this.database.Find(filter).FirstOrDefaultAsync();
-        if (existingEntry is not null){
-            Console.WriteLine(existingEntry);
-            throw new Exception("Entry already exists.");
+        var filter = Builders<Waitlist>.Filter.Eq(existing => existing.PhoneNumber, normalizedPhoneNumber);
+        var existingEntry = await this._waitlistCollection.Find(filter).FirstOrDefaultAsync();
+        if (existingEntry is not null)
+        {
+            // if they already exist, return old record!
+            return existingEntry;
         }
-        await this.database.InsertOneAsync(entry);
+
+        var __waitlist = new Waitlist
+        {
+            Name = entry.Name,
+            PhoneNumber = normalizedPhoneNumber,
+            Email = entry.Email,
+            Type = entry.UserType
+        };
+
+        await _waitlistCollection.InsertOneAsync(__waitlist);
+        return __waitlist;
     }
 }

@@ -13,6 +13,7 @@ public class AppConstants
     public string ContentCollection { get; set; } = null!;
     public string CreatorApplicatonCollection { get; set; } = null!;
     public string TagCollection { get; set; } = null!;
+    public string WaitlistCollection { get; set; } = "waitlists";
     public string BucketName { get; set; } = null!;
     public string AWSRekognitionCollection { get; set; } = null!;
     public string ProcessImageQueueName { get; set; } = null!;

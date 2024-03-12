@@ -17,14 +17,19 @@ public class WaitlistController : ControllerBase
         this.waitlistService = waitlistService;
     }
 
-    [HttpPost("create")]
-    public async Task<ActionResult> AddWaitlistUser([FromBody] WaitlistEntry waitlistEntry)
+    [HttpPost]
+    public async Task<ActionResult> AddWaitlistUser([FromBody] CreateWaitlistInput waitlistEntry)
     {
         try
         {
-            await this.waitlistService.SaveWaitlistDetails(waitlistEntry);
-            return this.Ok();
-        } 
+            var waitlist = await waitlistService.SaveWaitlistDetails(waitlistEntry);
+            return Ok(new GetEntityResponse<Models.Waitlist>(waitlist, null).Result());
+
+        }
+        catch (HttpRequestException e)
+        {
+            return BadRequest(new GetEntityResponse<Models.Waitlist>(null, e.Message).Result());
+        }
         catch (Exception e)
         {
             this.logger.LogError($"Failed to save waitlist entry into database. Exception: {e}");
