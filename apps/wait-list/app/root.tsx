@@ -16,6 +16,7 @@ import {NODE_ENV} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
 import {Providers} from './providers/index.tsx'
 import {RouteLoader} from './components/loader/route-loader.tsx'
+import {Toaster} from 'react-hot-toast'
 
 export const links: LinksFunction = () => {
   return [
@@ -76,6 +77,8 @@ function Document({children}: PropsWithChildren) {
       </head>
       <body>
         {children}
+        <Toaster position="bottom-center" />
+
         <ScrollRestoration />
         <script
           src="https://accounts.google.com/gsi/client"
