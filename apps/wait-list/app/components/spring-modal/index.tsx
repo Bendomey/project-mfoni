@@ -6,13 +6,15 @@ type Props = {
   setIsOpen: Dispatch<SetStateAction<boolean>>
   children: ReactNode
   className?: string
+  canClose?: boolean
 }
 
 export const SpringModal = ({
   isOpen,
   setIsOpen,
   children,
-  className = 'bg-white text-gray-800 p-6 rounded-lg w-full max-w-xl shadow-xl cursor-default relative overflow-hidden',
+  canClose = true,
+  className = 'relative w-full max-w-xl p-6 overflow-hidden text-gray-800 bg-white rounded-lg shadow-xl cursor-default',
 }: Props) => {
   return (
     <AnimatePresence>
@@ -21,8 +23,8 @@ export const SpringModal = ({
           initial={{opacity: 0}}
           animate={{opacity: 1}}
           exit={{opacity: 0}}
-          onClick={() => setIsOpen(false)}
-          className="bg-slate-900/20 backdrop-blur p-8 fixed inset-0 z-50 grid place-items-center overflow-y-scroll cursor-pointer"
+          onClick={canClose ? () => setIsOpen(false) : () => null}
+          className="fixed inset-0 z-50 grid p-8 overflow-y-scroll cursor-pointer bg-slate-900/20 backdrop-blur place-items-center"
         >
           <motion.div
             initial={{scale: 0, rotate: '12.5deg'}}
