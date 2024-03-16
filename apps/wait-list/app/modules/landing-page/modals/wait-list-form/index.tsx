@@ -117,8 +117,10 @@ export default function WaitListForm({show, setShow, handleClose}: Props) {
               </h3>
               <div className="mt-2">
                 <p className="text-sm text-gray-500">
-                  Thank you joining our waitlist, while you wait, you will
-                  receive details of any next steps via SMS or email.{' '}
+                  We&apos;re thrilled to have you join our exclusive waitlist!
+                  While you eagerly anticipate the launch, expect exciting
+                  updates and sneak peeks delivered straight to your inbox or
+                  via SMS.
                 </p>
               </div>
             </div>

@@ -4,7 +4,7 @@ import {Button} from '@/components/button/index.tsx'
 import {useWaitListModal} from '@/providers/walt-list-popup/index.tsx'
 import {TwitterSvg} from '../svgs/twitter.tsx'
 
-export const MFONI_X_URL = 'https://twitter.com/home'
+export const MFONI_X_URL = 'https://twitter.com/mfoniapp'
 
 type Props = {
   showWaitlist?: boolean
