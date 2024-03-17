@@ -2,6 +2,9 @@ import {Link} from '@remix-run/react'
 import {APP_NAME} from '@/constants/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {useWaitListModal} from '@/providers/walt-list-popup/index.tsx'
+import {TwitterSvg} from '../svgs/twitter.tsx'
+
+export const MFONI_X_URL = 'https://twitter.com/mfoniapp'
 
 type Props = {
   showWaitlist?: boolean
@@ -24,8 +27,18 @@ export const Header = ({showWaitlist = false}: Props) => {
             <span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
           </div>
         </Link>
-
-        <div className="flex justify-center items-center gap-x-12">
+        <div className="flex justify-center items-center mt-3 lg:mt-0 gap-x-4 lg:gap-x-5">
+          <a
+            className="flex items-center space-x-2"
+            rel="noreferrer"
+            href={MFONI_X_URL}
+            target="_blank"
+          >
+            <span className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-900">
+              Follow us
+            </span>
+            <TwitterSvg />
+          </a>
           {showWaitlist ? (
             <Button
               onClick={handleShowWaitListForm}
