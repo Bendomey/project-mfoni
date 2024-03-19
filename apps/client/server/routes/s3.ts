@@ -20,10 +20,10 @@ const s3Client = new S3Client({
 s3Router.post(
   '/',
   async (
-    req: express.Request<{}, {}, {fileName: string; contentType: string}>,
+    req: express.Request<{}, {}, {filename: string; contentType: string}>,
     res,
   ) => {
-    const key = req.body.fileName
+    const key = req.body.filename
     const command = new PutObjectCommand({
       Bucket: BUCKET_NAME,
       Key: key,

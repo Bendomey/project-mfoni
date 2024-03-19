@@ -17,7 +17,7 @@ export interface Content {
   id: string
   file: File
   status: 'accepted' | 'rejected'
-  uploadStatus?: 'pending' | 'uploading' | 'completed' | 'failed'
+  uploadStatus?: 'uploading' | 'completed' | 'failed'
   message: string
   filUploadedUrl?: string
   progress?: number
@@ -92,7 +92,10 @@ export const ContentUploadProvider = () => {
     maxSize: megabytesToBytes(MAX_SIZE),
   })
 
-  const areContentsAdded = useMemo(() => Boolean(contents.length), [contents])
+  const areContentsAdded = useMemo(
+    () => Boolean(Object.values(contents).length),
+    [contents],
+  )
 
   return (
     <ContentUploadContext.Provider

@@ -21,6 +21,11 @@ export const ContentSideViewer = ({
     [content.status],
   )
 
+  const isUploading = useMemo(
+    () => content.uploadStatus === 'uploading',
+    [content.uploadStatus],
+  )
+
   // TODO: add error flyout in the future.
   // const ErrorTag = () => {
   //     return (
@@ -44,6 +49,9 @@ export const ContentSideViewer = ({
         backgroundPosition: 'center',
       }}
     >
+      {isUploading ? (
+        <div className="absolute animate-pulse top-0 z-1 h-full w-full bg-black bg-opacity-50 rounded-lg" />
+      ) : null}
       {isRejected ? (
         <div className="absolute top-0 z-1 h-full w-full bg-red-600 bg-opacity-90 rounded-lg">
           <div className="flex justify-center items-center h-full w-full">

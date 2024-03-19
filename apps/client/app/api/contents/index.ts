@@ -3,6 +3,7 @@ import {useMutation} from '@tanstack/react-query'
 interface IGenerateSignedUrlInput {
   filename: string
   contentType: string
+  abortController: AbortController
 }
 
 interface IGenerateSignedUrlOutput {
@@ -16,7 +17,11 @@ export const generateSignedUrl = async (props: IGenerateSignedUrlInput) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(props),
+    body: JSON.stringify({
+      filename: props.filename,
+      contentType: props.contentType,
+    }),
+    signal: props.abortController.signal,
   })
   const data = await res.json()
   return data as IGenerateSignedUrlOutput
