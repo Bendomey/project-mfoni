@@ -1,9 +1,15 @@
-export const Loader = ({color = 'fill-blue-600'}: {color?: string}) => {
+export const Loader = ({
+  color = 'fill-blue-600',
+  size = '8',
+}: {
+  color?: string
+  size?: string
+}) => {
   return (
     <div>
       <svg
         aria-hidden="true"
-        className={`w-8 h-8 text-transparent animate-spin  ${color}`}
+        className={`w-${size} h-${size} text-transparent animate-spin  ${color}`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
