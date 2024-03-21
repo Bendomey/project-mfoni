@@ -14,7 +14,7 @@ export const SpringModal = ({
   setIsOpen,
   children,
   canClose = true,
-  className = 'relative w-full max-w-xl p-6 overflow-hidden text-gray-800 bg-white rounded-lg shadow-xl cursor-default',
+  className = 'relative w-full max-w-xl p-6 overflow-hidden overflow-y-auto text-gray-800 bg-white rounded-lg shadow-xl cursor-default max-h-[95dvh] md:max-h-[90dvh] lg:max-h-[100vh]',
 }: Props) => {
   return (
     <AnimatePresence>

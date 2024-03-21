@@ -3,6 +3,7 @@ import {useCallback, useMemo} from 'react'
 
 interface Props extends React.HTMLAttributes<HTMLButtonElement> {
   isLink?: boolean
+  isHref?: boolean
   href?: string
   variant?: 'outline' | 'solid' | 'ghost' | 'unstyled'
   color?:
@@ -26,6 +27,7 @@ export const Button = ({
   color: propColor = 'primary',
   size: propSize = 'md',
   isLink,
+  isHref,
   type = 'button',
   externalClassName = '',
   ...props
@@ -86,7 +88,8 @@ export const Button = ({
   if (isLink) {
     return (
       <Link
-        to={props.href || '/'}
+        to={props.href ?? '/'}
+        reloadDocument={isHref}
         className={`${className} ${externalClassName}`}
       >
         {children}

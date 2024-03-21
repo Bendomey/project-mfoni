@@ -201,7 +201,7 @@ export default function WaitListForm({show, setShow, handleClose}: Props) {
               </div>
               <div className="relative mt-2">
                 <input
-                  type="text"
+                  type="tel"
                   {...register('phoneNumber')}
                   className={classNames(
                     'block w-full rounded-md border-0 py-2.5 lg:py-2 text-gray-900 shadow-nome ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  text-xs lg:text-sm sm:leading-6 ',

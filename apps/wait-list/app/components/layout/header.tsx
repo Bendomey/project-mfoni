@@ -19,7 +19,7 @@ export const Header = ({showWaitlist = false}: Props) => {
         className="mx-auto flex w-full max-w-8xl items-center justify-between py-4 px-4 lg:px-8"
         aria-label="Global"
       >
-        <Link to="/" className="-m-1.5 p-1.5">
+        <Link reloadDocument relative="path" to="/" className="-m-1.5 p-1.5">
           <div className="flex flex-row items-end">
             <span className="text-4xl text-blue-700 font-extrabold">
               {APP_NAME.slice(0, 1)}
@@ -51,7 +51,7 @@ export const Header = ({showWaitlist = false}: Props) => {
               </span>
             </Button>
           ) : (
-            <Button href="/learn-more" variant="outline" isLink>
+            <Button href="/learn-more" variant="outline" isHref isLink>
               Learn more{' '}
               <span className="pl-1" aria-hidden="true">
                 &rarr;
