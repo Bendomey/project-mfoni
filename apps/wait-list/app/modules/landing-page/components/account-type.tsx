@@ -13,13 +13,13 @@ const accountTypeList: AccountTypeOption[] = [
   {
     id: 1,
     title: 'Photographer/Creator',
-    description: 'Freelancers who want showcase your creativity.',
+    description: 'Freelancer showcasing creativity.',
     value: 'CREATOR',
   },
   {
     id: 2,
     title: 'Client',
-    description: 'Users who want to access your event memories.',
+    description: 'As a user who wants to access event memories.',
     value: 'CLIENT',
   },
 ]
@@ -38,7 +38,7 @@ export default function AccountType({
   return (
     <RadioGroup value={selectedAccountType} onChange={setSelectedAccountType}>
       <RadioGroup.Label className="block text-sm font-medium leading-6 text-gray-900 mt-3">
-        How do you want to use mfoni?
+        How do you plan to use Mfoni?
       </RadioGroup.Label>
 
       <div className="mt-2 grid grid-cols-1 gap-y-4 lg:gap-y-6 sm:grid-cols-2 sm:gap-x-4">
