@@ -13,7 +13,7 @@ const accountTypeList: AccountTypeOption[] = [
   {
     id: 1,
     title: 'Photographer/Creator',
-    description: 'Freelancer showcasing creativity.',
+    description: 'As a freelancer showcasing creativity.',
     value: 'CREATOR',
   },
   {

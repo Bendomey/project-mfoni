@@ -7,6 +7,7 @@ import {Fragment} from 'react'
 import {Content} from '@/components/Content/index.tsx'
 import {MobileTabComponent} from './components/tabs/mobile.tsx'
 import {imageUrls} from '../landing-page/index.tsx'
+import {Footer} from '@/components/footer/index.tsx'
 
 export const ExploreModule = () => {
   const {ref: heroRef, inView} = useInView({
@@ -42,6 +43,7 @@ export const ExploreModule = () => {
           </FadeInStagger>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }
