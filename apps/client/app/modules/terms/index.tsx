@@ -1,10 +1,11 @@
+import {Footer} from '@/components/footer/index.tsx'
 import {Header} from '@/components/layout/index.ts'
 
 export const TermsModule = () => {
   return (
     <>
       <Header isHeroSearchInVisible={false} shouldHeaderBlur={false} />
-      <div className="bg-white  py-24 lg:py-32 ">
+      <div className="bg-white  pt-24 pb-8 lg:pb-10 lg:pt-32 ">
         <div className="mx-auto max-w-3xl px-6 lg:px-8 text-base leading-7 text-gray-700">
           <h1 className="pb-24 sm:pb-40 text-4xl font-bold text-center tracking-tight text-gray-900 sm:text-5xl">
             Terms of Service
@@ -170,6 +171,7 @@ export const TermsModule = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   )
 }

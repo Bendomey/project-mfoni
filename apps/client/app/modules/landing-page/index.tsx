@@ -5,6 +5,7 @@ import {Content} from '@/components/Content/index.tsx'
 import {FadeIn, FadeInStagger} from '@/components/animation/FadeIn.tsx'
 import {Fragment} from 'react'
 import {Pricing} from './components/pricing/index.tsx'
+import {Footer} from '@/components/footer/index.tsx'
 
 export const imageUrls = [
   'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image.jpg',
@@ -46,6 +47,7 @@ export const LandingPageModule = () => {
         </FadeInStagger>
         <Pricing />
       </div>
+      <Footer />
     </div>
   )
 }
