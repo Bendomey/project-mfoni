@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using main.Domains;
 using main.DTOs;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace main.Controllers;
 
@@ -44,11 +45,17 @@ public class TagsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<OutputResponse<List<Models.Tag>>> GetAll()
+    public async Task<OutputResponse<List<Models.Tag>>> GetAll([FromBody] SearchByTagInput? input)
     {
         _logger.LogInformation("Getting all tags");
-        var tags = await _searchTagsService.GetAll();
 
+        var filterTagsBy = string.Empty;
+        if (input is not null)
+        {
+            filterTagsBy = input.tagFilterInput;
+        }
+
+        var tags = await _searchTagsService.GetAll(filterTagsBy);
         return new GetEntityResponse<List<Models.Tag>>(tags, null).Result();
     }
 

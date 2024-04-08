@@ -2,6 +2,7 @@ using main.Configuratons;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using Microsoft.IdentityModel.Tokens;
 
 namespace main.Domains;
 
@@ -33,11 +34,16 @@ public class SearchTag
         return tag;
     }
 
-    public async Task<List<Models.Tag>> GetAll()
+    public async Task<List<Models.Tag>> GetAll(string filterTagsBy)
     {
-        // TODO: Add pagination
-        var tags = await _tagsCollection.Find(tag => true).Skip(0).Limit(10).ToListAsync();
-        return tags ?? [];
+        if (filterTagsBy.IsNullOrEmpty())
+        {
+            var tags = await _tagsCollection.Find(tag => true).Skip(0).Limit(50).ToListAsync();
+            return tags ?? [];
+        }
+
+        var tagsBasedOnQuery = await GetTagsBasedOnQuery(filterTagsBy);
+        return tagsBasedOnQuery.ToList();
     }
 
     public async Task<List<Models.Tag>> GetTagsBasedOnQuery(string query)
