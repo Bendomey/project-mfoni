@@ -10,4 +10,22 @@ public class CreateWaitlistInput
 
     [RegularExpression("^(CLIENT|CREATOR)$")]
     public required string UserType { get; set; }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not CreateWaitlistInput){
+            return false;
+        }
+        var objectAsWaitlistObject = (CreateWaitlistInput)obj;
+
+        return this.Name == objectAsWaitlistObject.Name && 
+        this.PhoneNumber == objectAsWaitlistObject.PhoneNumber &&
+        this.Email == objectAsWaitlistObject.Email &&
+        this.UserType == objectAsWaitlistObject.UserType;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
 }
