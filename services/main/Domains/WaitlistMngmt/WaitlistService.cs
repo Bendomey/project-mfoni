@@ -5,8 +5,9 @@ using main.Models;
 using main.DTOs;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using main.Domains.WaitlistMngmt;
 
-public class WaitlistService
+public class WaitlistService : IWaitlistService
 {
     private readonly ILogger<WaitlistService> _logger;
     private readonly IMongoCollection<Waitlist> _waitlistCollection;

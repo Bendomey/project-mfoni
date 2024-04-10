@@ -2,6 +2,7 @@ namespace Tests.L0
 {
 
     using main.Controllers;
+    using main.Domains.WaitlistMngmt;
     using main.DTOs;
     using main.Models;
     using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,12 @@ namespace Tests.L0
     {
         private readonly MockRepository mockRepository;
         private readonly WaitlistController waitlistController;
-        private readonly Mock<WaitlistService> waitlistServiceMock;
+        private readonly Mock<IWaitlistService> waitlistServiceMock;
 
         public WaitlistControllerTests()
         {
             this.mockRepository = new MockRepository(MockBehavior.Strict);
-            this.waitlistServiceMock = this.mockRepository.Create<WaitlistService>();
+            this.waitlistServiceMock = this.mockRepository.Create<IWaitlistService>();
             this.waitlistController = new WaitlistController(NullLogger<WaitlistController>.Instance, this.waitlistServiceMock.Object);
         }
 
