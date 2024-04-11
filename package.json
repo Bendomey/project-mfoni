@@ -8,6 +8,6 @@
     "format": "run-s format:*",
     "format:frontend-client": "cd apps/client && yarn format",
     "format:frontend-waitlist": "cd apps/wait-list && yarn format",
-    "format:services-main": "cd services/main && make lint"
+    "format:services-main": "cd services && make lint-main"
   }
 }

@@ -1,4 +1,5 @@
 
+using main.Domains.WaitlistMngmt;
 using main.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +10,9 @@ namespace main.Controllers;
 public class WaitlistController : ControllerBase
 {
     private readonly ILogger<WaitlistController> logger;
-    private readonly WaitlistService waitlistService;
+    private readonly IWaitlistService waitlistService;
 
-    public WaitlistController(ILogger<WaitlistController> logger, WaitlistService waitlistService)
+    public WaitlistController(ILogger<WaitlistController> logger, IWaitlistService waitlistService)
     {
         this.logger = logger;
         this.waitlistService = waitlistService;
