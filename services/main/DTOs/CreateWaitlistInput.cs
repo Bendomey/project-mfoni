@@ -13,12 +13,13 @@ public class CreateWaitlistInput
 
     public override bool Equals(object? obj)
     {
-        if (obj is not CreateWaitlistInput){
+        if (obj is not CreateWaitlistInput)
+        {
             return false;
         }
         var objectAsWaitlistObject = (CreateWaitlistInput)obj;
 
-        return this.Name == objectAsWaitlistObject.Name && 
+        return this.Name == objectAsWaitlistObject.Name &&
         this.PhoneNumber == objectAsWaitlistObject.PhoneNumber &&
         this.Email == objectAsWaitlistObject.Email &&
         this.UserType == objectAsWaitlistObject.UserType;
