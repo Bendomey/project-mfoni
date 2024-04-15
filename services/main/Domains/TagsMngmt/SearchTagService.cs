@@ -36,14 +36,24 @@ public class SearchTag
 
     public async Task<List<Models.Tag>> GetAll(string filterTagsBy)
     {
+        int pageSize = 50;
+        int pageNumber = 1;
+
+        int skip = (pageNumber - 1) * pageSize;
+        var args = { };
+        var result = await _tagsCollection.Find(args)
+            .Skip(skip)
+            .Take(pageSize)
+            .ToListAsync();
+
         if (filterTagsBy.IsNullOrEmpty())
         {
-            var tags = await _tagsCollection.Find(tag => true).Skip(0).Limit(50).ToListAsync();
-            return tags ?? [];
+            return result ?? [];
         }
 
         var tagsBasedOnQuery = await GetTagsBasedOnQuery(filterTagsBy);
-        return tagsBasedOnQuery.ToList();
+        args = tagsBasedOnQuery.ToList();
+        return result ?? [];
     }
 
     public async Task<List<Models.Tag>> GetTagsBasedOnQuery(string query)

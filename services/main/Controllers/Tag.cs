@@ -45,14 +45,14 @@ public class TagsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<OutputResponse<List<Models.Tag>>> GetAll([FromBody] SearchByTagInput? input)
+    public async Task<OutputResponse<List<Models.Tag>>> GetAll([FromQuery] string tagsFilter)
     {
         _logger.LogInformation("Getting all tags");
 
         var filterTagsBy = string.Empty;
         if (input is not null)
         {
-            filterTagsBy = input.tagFilterInput;
+            filterTagsBy = tagsFilter;
         }
 
         var tags = await _searchTagsService.GetAll(filterTagsBy);
