@@ -1,8 +1,11 @@
-import {Fragment} from 'react'
+import {Fragment, useMemo} from 'react'
 import {Transition, Dialog} from '@headlessui/react'
 import {Button} from '@/components/button/index.tsx'
 import {XCircleIcon} from '@heroicons/react/20/solid'
 import {useSubmitErrors} from './use-submit-errors.ts'
+import {toast} from 'react-hot-toast'
+import {Loader} from '@/components/loader/index.tsx'
+import {useContentUpload} from '../context.tsx'
 
 interface Props {
   isOpen: boolean
@@ -10,10 +13,20 @@ interface Props {
 }
 export const SubmitModal = ({isOpen, onToggle}: Props) => {
   const {errorMessages, isSubmittable} = useSubmitErrors()
+  const {isSubmitting} = useContentUpload()
+
+  const handleSubmit = () => {
+    toast.success('Success', {id: 'success-content-upload'})
+  }
+
+  const isSubmitButtonDisabled = useMemo(
+    () => !isSubmittable || isSubmitting,
+    [isSubmittable, isSubmitting],
+  )
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onToggle}>
+      <Dialog as="div" className="relative z-50" onClose={() => {}}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -42,16 +55,6 @@ export const SubmitModal = ({isOpen, onToggle}: Props) => {
                   isSubmittable ? 'max-w-md' : 'max-w-lg'
                 } transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all`}
               >
-                {/* <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
-                                    <button
-                                        type="button"
-                                        className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                        // onClick={() => setOpen(false)}
-                                    >
-                                        <span className="sr-only">Close</span>
-                                        <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                                    </button>
-                                </div> */}
                 <Dialog.Title
                   as="h1"
                   className="text-xl font-bold leading-6 text-gray-900"
@@ -95,11 +98,21 @@ export const SubmitModal = ({isOpen, onToggle}: Props) => {
                 )}
 
                 <div className="flex justify-end gap-3 mt-5">
-                  <Button onClick={onToggle} size="lg" variant="outline">
-                    Close
-                  </Button>
-                  <Button disabled={!isSubmittable} size="lg">
-                    Submit
+                  {isSubmitting ? null : (
+                    <Button onClick={onToggle} size="lg" variant="outline">
+                      Close
+                    </Button>
+                  )}
+                  <Button
+                    disabled={isSubmitButtonDisabled}
+                    onClick={handleSubmit}
+                    size="lg"
+                  >
+                    {isSubmitting ? (
+                      <Loader color="fill-white" size="5" />
+                    ) : (
+                      'Submit'
+                    )}
                   </Button>
                 </div>
               </Dialog.Panel>

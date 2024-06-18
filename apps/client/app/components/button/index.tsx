@@ -81,11 +81,11 @@ export const Button = ({
         }`
       } else if (propVariant === 'solid') {
         return `rounded-md bg-${color}-600 ${size} text-sm font-semibold text-white hover:bg-${color}-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-${color}-600 ${
-          disabled ? 'cursor-not-allowed' : ''
+          disabled ? `cursor-not-allowed bg-${color}-300` : ''
         }`
       } else if (propVariant === 'ghost') {
         return `rounded-md bg-white/10 ${size} text-sm font-semibold text-white hover:bg-white/20 ${
-          disabled ? 'cursor-not-allowed' : ''
+          disabled ? 'cursor-not-allowed bg-gray-200' : ''
         }`
       }
 
@@ -115,6 +115,7 @@ export const Button = ({
     <button
       {...props}
       type={type}
+      disabled={disabled}
       className={`${className} ${externalClassName}`}
     >
       {children}

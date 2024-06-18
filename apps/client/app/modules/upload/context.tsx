@@ -31,12 +31,14 @@ export interface ContentUploadContext {
     }>
   >
   openFileSelector: VoidFunction
+  isSubmitting: boolean
 }
 
 const ContentUploadContext = createContext<ContentUploadContext>({
   contents: {},
   setContents: () => {},
   openFileSelector: () => {},
+  isSubmitting: false,
 })
 
 export const ContentUploadProvider = () => {
@@ -99,7 +101,7 @@ export const ContentUploadProvider = () => {
 
   return (
     <ContentUploadContext.Provider
-      value={{contents, setContents, openFileSelector}}
+      value={{contents, setContents, openFileSelector, isSubmitting: false}}
     >
       <div {...getRootProps()} className="relative">
         <Header isHeroSearchInVisible={false} />
