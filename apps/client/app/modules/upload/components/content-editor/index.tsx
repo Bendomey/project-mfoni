@@ -1,63 +1,11 @@
-import {useContentUpload} from '../context.tsx'
+import {useContentUpload} from '../../context.tsx'
 import {Button} from '@/components/button/index.tsx'
 import {TrashIcon} from '@heroicons/react/24/solid'
-import {useEffect, useMemo, useState} from 'react'
-import {RadioGroup} from '@headlessui/react'
-import {classNames} from '@/lib/classNames.ts'
+import {useEffect, useMemo} from 'react'
 import {Loader} from '@/components/loader/index.tsx'
 import useImageUpload from '@/hooks/use-image-upload.ts'
-
-const memoryOptions = [
-  {name: 'PUBLIC', inStock: true},
-  {name: 'PRIVATE', inStock: true},
-]
-
-function VisibilitySetter() {
-  const [mem, setMem] = useState(memoryOptions[0])
-
-  return (
-    <div>
-      <div className="">
-        <label
-          htmlFor="email"
-          className="block font-semibold text-lg leading-6 text-gray-500"
-        >
-          Visibility
-        </label>
-        <small>
-          Users will still find it by visual search if it&apos;s private.
-        </small>
-      </div>
-
-      <RadioGroup value={mem} onChange={setMem} className="mt-2">
-        <RadioGroup.Label className="sr-only">
-          Choose a memory option
-        </RadioGroup.Label>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 ">
-          {memoryOptions.map(option => (
-            <RadioGroup.Option
-              key={option.name}
-              value={option}
-              className={({active, checked}) =>
-                classNames(
-                  'cursor-pointer focus:outline-none',
-                  active ? 'ring-2 ring-blue-600 ring-offset-2' : '',
-                  checked
-                    ? 'bg-blue-600 text-white hover:bg-blue-500'
-                    : 'ring-1 ring-inset ring-gray-300 bg-white text-gray-900 hover:bg-gray-50',
-                  'flex items-center justify-center rounded-md py-3 px-3 text-sm font-bold uppercase sm:flex-1',
-                )
-              }
-              disabled={!option.inStock}
-            >
-              <RadioGroup.Label as="span">{option.name}</RadioGroup.Label>
-            </RadioGroup.Option>
-          ))}
-        </div>
-      </RadioGroup>
-    </div>
-  )
-}
+import {VisibilityPicker} from './visibility-picker.tsx'
+import {TagsPicker} from './tags-picker.tsx'
 
 export const ContentEditor = ({contentId}: {contentId: string}) => {
   const {contents, setContents} = useContentUpload()
@@ -171,16 +119,17 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
                 <div className="flex flex-col gap-5">
                   <div>
                     <label
-                      htmlFor="email"
+                      htmlFor="title"
                       className="block font-semibold text-lg leading-6 text-gray-500"
                     >
                       Title <span className="text-gray-300">(optional)</span>
                     </label>
                     <div className="mt-2">
                       <input
-                        type="email"
-                        name="email"
-                        id="email"
+                        type="text"
+                        name="title"
+                        id="title"
+                        autoComplete="off"
                         className="block w-full rounded-md border-0 py-3 placeholder:font-medium font-bold text-lg text-gray-900  ring-0 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:leading-6"
                         placeholder="Enter title"
                       />
@@ -188,19 +137,13 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
                   </div>
                   <div>
                     <label
-                      htmlFor="email"
+                      htmlFor="tags"
                       className="block font-semibold text-lg leading-6 text-gray-500"
                     >
                       Tags <span className="text-gray-300">(optional)</span>
                     </label>
                     <div className="mt-2">
-                      <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        className="block w-full rounded-md border-0 py-3 placeholder:font-medium  font-bold text-lg text-gray-900  ring-0 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:leading-6"
-                        placeholder="Enter Tags"
-                      />
+                      <TagsPicker />
                     </div>
                   </div>
 
@@ -225,7 +168,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
                   </div>
 
                   <div>
-                    <VisibilitySetter />
+                    <VisibilityPicker />
                   </div>
                 </div>
               )}

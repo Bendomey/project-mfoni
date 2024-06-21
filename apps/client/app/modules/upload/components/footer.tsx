@@ -52,7 +52,7 @@ export const Footer = ({contents}: {contents: Array<Content>}) => {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 w-full z-10 bg-blue-50 flex justify-center">
+      <div className="fixed bottom-0 left-0 w-full z-10 bg-blue-50 flex justify-center border-t border-gray-200">
         <div className="grid grid-cols-3 gap-4 mx-6 md:mx-12 py-5 md:py-10 w-full">
           <div>
             <div className="flex flex-row gap-3">

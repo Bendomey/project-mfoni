@@ -3,3 +3,5 @@ interface ApiResponse<T> {
   errorMessage: Nullable<string>
   status: boolean
 }
+
+type NullableString = string | null

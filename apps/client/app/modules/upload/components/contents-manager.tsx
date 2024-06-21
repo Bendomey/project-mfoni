@@ -5,7 +5,7 @@ import {useContentUpload} from '../context.tsx'
 import {AddNewContentButton} from './add-new-content.tsx'
 import {ContentSideViewer} from './content-side-viewer.tsx'
 import {Footer} from './footer.tsx'
-import {ContentEditor} from './content-editor.tsx'
+import {ContentEditor} from './content-editor/index.tsx'
 
 const HeaderDetails = () => {
   return (
