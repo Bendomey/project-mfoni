@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using main.Middlewares;
 using System.Security.Claims;
+using Microsoft.OpenApi.Any;
 
 namespace main.Controllers;
 
@@ -85,13 +86,17 @@ public class TagsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] int? page, [FromQuery] int? pageSize, [FromQuery] string? sort, [FromQuery] string sortBy = "created_at")
     {
         try
         {
             _logger.LogInformation("Getting all tags");
-            var tags = await _searchTagsService.GetAll();
-            return new ObjectResult(new GetEntityResponse<List<Models.Tag>>(tags, null).Result()) { StatusCode = StatusCodes.Status200OK };
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.Tag>(page, pageSize, sort, sortBy);
+            var tags = await _searchTagsService.GetAll(queryFilter, search);
+            var tagsCount = await _searchTagsService.Count(search);
+
+            var response = HttpLib.GeneratePagination(tags, tagsCount, queryFilter);
+            return new ObjectResult(new GetEntityResponse<EntityWithPagination<Models.Tag>>(response, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
         catch (HttpRequestException e)
         {
@@ -101,7 +106,7 @@ public class TagsController : ControllerBase
                 statusCode = (HttpStatusCode)e.StatusCode;
             }
 
-            return new ObjectResult(new GetEntityResponse<List<Models.Tag>>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {

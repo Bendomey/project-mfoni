@@ -20,3 +20,14 @@ public class GetEntityResponse<T>
         return response;
     }
 }
+
+public class EntityWithPagination<T>
+{
+    public required List<T> Data { get; set; }
+    public required long DataLength { get; set; }
+    public required long DataPerPage { get; set; }
+    public required long CurrentPage { get; set; }
+    public long? NextPage { get; set; }
+    public long? PrevPage { get; set; }
+    public required long TotalPages { get; set; }
+}
