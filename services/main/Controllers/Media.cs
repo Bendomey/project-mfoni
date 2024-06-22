@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using main.Middlewares;
 using System.Security.Claims;
 using MongoDB.Driver;
+using System.Net;
 
 namespace main.Controllers;
 
@@ -25,19 +26,14 @@ public class MediaController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    public OutputResponse<List<OutputContent>> Save(SaveMedia[] mediaInput)
+    public IActionResult Save(SaveMedia[] mediaInput)
     {
-
-        _logger.LogInformation("Saving media");
-        var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
-        if (currentUser == null)
-        {
-            throw new Exception("UserNotFound");
-        }
-
         try
         {
-            var contents = _indexContentService.Save(mediaInput, currentUser.Id);
+            _logger.LogInformation("Saving media");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+
+            var contents = _indexContentService.Save(mediaInput, currentUser);
 
             var res = contents.Select(content =>
             {
@@ -45,12 +41,22 @@ public class MediaController : ControllerBase
                 return outputContent.Result();
             }).ToList();
 
-            return new GetEntityResponse<List<OutputContent>>(res, null).Result();
+            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(res, null).Result()) { StatusCode = StatusCodes.Status201Created };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {
-            _logger.LogError($"{e.Message}");
-            return new GetEntityResponse<List<OutputContent>>(null, e.Message).Result();
+            this._logger.LogError($"Failed to save media. Exception: {e}");
+            return new StatusCodeResult(500);
         }
 
     }
@@ -63,40 +69,77 @@ public class MediaController : ControllerBase
     }
 
     [HttpGet("search/visual")]
-    public async Task<OutputResponse<List<OutputContent>>> VisualSearch([FromForm] IFormFile media)
+    public async Task<IActionResult> VisualSearch([FromForm] IFormFile media)
     {
-        _logger.LogInformation("Getting contents by visual search");
-
-        byte[] imageBytes;
-        using (var memoryStream = new MemoryStream())
+        try
         {
-            await media.CopyToAsync(memoryStream);
-            imageBytes = memoryStream.ToArray();
+            _logger.LogInformation("Getting contents by visual search");
+
+            byte[] imageBytes;
+            using (var memoryStream = new MemoryStream())
+            {
+                await media.CopyToAsync(memoryStream);
+                imageBytes = memoryStream.ToArray();
+            }
+            var contents = await _searchContentService.VisualSearch(imageBytes);
+
+            var res = contents.Select(content =>
+            {
+                var outputContent = new GetOutputContent(content);
+                return outputContent.Result();
+            }).ToList();
+
+            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(res, null).Result()) { StatusCode = StatusCodes.Status200OK };
+
         }
-        var contents = await _searchContentService.VisualSearch(imageBytes);
-
-        var res = contents.Select(content =>
+        catch (HttpRequestException e)
         {
-            var outputContent = new GetOutputContent(content);
-            return outputContent.Result();
-        }).ToList();
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
 
-        return new GetEntityResponse<List<OutputContent>>(res, null).Result();
+            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get contents. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
     }
 
     [HttpGet("search/textual")]
-    public async Task<OutputResponse<List<OutputContent>>> TextualSearch([FromBody] TextualSearchBody body)
+    public async Task<IActionResult> TextualSearch([FromBody] TextualSearchBody body)
     {
-        _logger.LogInformation("Getting contents by textual search");
-
-        var contents = await _searchContentService.TextualSearch(body.Query);
-
-        var res = contents.Select(content =>
+        try
         {
-            var outputContent = new GetOutputContent(content);
-            return outputContent.Result();
-        }).ToList();
+            _logger.LogInformation("Getting contents by textual search");
 
-        return new GetEntityResponse<List<OutputContent>>(res, null).Result();
+            var contents = await _searchContentService.TextualSearch(body.Query);
+
+            var res = contents.Select(content =>
+            {
+                var outputContent = new GetOutputContent(content);
+                return outputContent.Result();
+            }).ToList();
+
+            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(res, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get contents. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
     }
 }

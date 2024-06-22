@@ -32,7 +32,7 @@ public class Auth
         _logger.LogDebug("AuthService initialized");
     }
 
-    public AuthenticateResponse? Authenticate(AuthenticateInput input)
+    public AuthenticateResponse Authenticate(AuthenticateInput input)
     {
         // check if user exists by verifying oauthId
         var __user = _usersCollection.Find<Models.User>(user => user.OAuthId == input.Uid).FirstOrDefault();
@@ -47,7 +47,7 @@ public class Auth
 
                 if (__user is not null)
                 {
-                    throw new Exception("UserAlreadyExistsWithAnotherProvider");
+                    throw new HttpRequestException("UserAlreadyExistsWithAnotherProvider");
                 }
             }
 
@@ -74,7 +74,7 @@ public class Auth
             };
         }
 
-        return null;
+        throw new HttpRequestException("UserNotFound");
     }
 
     public bool SetupAccount(SetupAccountInput accountInput, CurrentUserOutput userInput)
@@ -83,14 +83,14 @@ public class Auth
 
         if (user is null)
         {
-            throw new Exception("UserNotFound");
+            throw new HttpRequestException("UserNotFound");
         }
 
         var checkIfUsernameExists = _usersCollection.Find<Models.User>(user => user.Username == accountInput.Username).FirstOrDefault();
 
         if (checkIfUsernameExists is not null)
         {
-            throw new Exception("UsernameAlreadyTaken");
+            throw new HttpRequestException("UsernameAlreadyTaken");
         }
 
         user.Name = accountInput.Name;
@@ -143,7 +143,7 @@ public class Auth
 
         if (user is null)
         {
-            throw new Exception("UserNotFound");
+            throw new HttpRequestException("UserNotFound");
         }
 
         if (user.CreatorApplicationId is not null)

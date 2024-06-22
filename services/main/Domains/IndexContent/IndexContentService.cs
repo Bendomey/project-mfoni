@@ -42,18 +42,18 @@ public class IndexContent
         _logger.LogDebug("IndexContentService initialized");
     }
 
-    public List<Content> Save(SaveMedia[] mediaInput, string userId)
+    public List<Content> Save(SaveMedia[] mediaInput, CurrentUserOutput userInput)
     {
-        var user = _userCollection.Find(user => user.Id == userId).FirstOrDefault();
+        var user = _userCollection.Find(user => user.Id == userInput.Id).FirstOrDefault();
         if (user is null)
         {
-            throw new Exception("UserNotFound");
+            throw new HttpRequestException("UserNotFound");
         }
 
         // check if user is a creator
         if (user.Role != UserRole.CREATOR)
         {
-            throw new Exception("NotEnoughPermission");
+            throw new HttpRequestException("NotEnoughPermission");
         }
 
         // resolve upload collection
@@ -67,7 +67,7 @@ public class IndexContent
 
         if (collection is null)
         {
-            throw new Exception("CollectionNotFound");
+            throw new HttpRequestException("CollectionNotFound");
         }
 
         List<Content> contents = [];
@@ -75,7 +75,7 @@ public class IndexContent
         mediaInput.ToList().ForEach(media =>
         {
             var tags = new List<string>();
-            var dbTags = _saveTagsService.ResolveTags(media.Tags ?? []);
+            var dbTags = _saveTagsService.ResolveTags(media.Tags ?? [], userInput);
 
             var content = new Content
             {

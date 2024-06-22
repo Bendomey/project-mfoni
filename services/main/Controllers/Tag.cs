@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using main.Domains;
 using main.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using System.Net;
+using main.Middlewares;
+using System.Security.Claims;
 
 namespace main.Controllers;
 
@@ -19,37 +23,91 @@ public class TagsController : ControllerBase
         _searchTagsService = searchTagService;
     }
 
+    [Authorize]
     [HttpPost]
-    public OutputResponse<Models.Tag> Create([FromBody] CreateTagInput input)
+    public IActionResult Create([FromBody] CreateTagInput input)
     {
-        _logger.LogInformation("Saving tag: " + input);
-        var tag = _saveTagsService.Create(input);
+        try
+        {
+            _logger.LogInformation("Saving tag: " + input);
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var tag = _saveTagsService.Create(input, currentUser);
 
-        return new GetEntityResponse<Models.Tag>(tag, null).Result();
+            return new ObjectResult(new GetEntityResponse<Models.Tag>(tag, null).Result()) { StatusCode = StatusCodes.Status201Created };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<Models.Tag>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to save tag. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
     }
 
     [HttpGet("{id}")]
-    public async Task<OutputResponse<Models.Tag>> Get(string id)
+    public async Task<IActionResult> Get(string id)
     {
-        _logger.LogInformation("Getting tag: " + id);
-        var tag = await _searchTagsService.Get(id);
-
-        if (tag == null)
+        try
         {
-            _logger.LogInformation("Tag not found: " + id);
-            return new GetEntityResponse<Models.Tag>(null, "TagNotFound").Result();
-        }
+            _logger.LogInformation("Getting tag: " + id);
+            var tag = await _searchTagsService.Get(id);
 
-        return new GetEntityResponse<Models.Tag>(tag, null).Result();
+            if (tag == null)
+            {
+                throw new HttpRequestException("TagNotFound");
+            }
+
+            return new ObjectResult(new GetEntityResponse<Models.Tag>(tag, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<Models.Tag>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get tag. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
     }
 
     [HttpGet]
-    public async Task<OutputResponse<List<Models.Tag>>> GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        _logger.LogInformation("Getting all tags");
-        var tags = await _searchTagsService.GetAll();
+        try
+        {
+            _logger.LogInformation("Getting all tags");
+            var tags = await _searchTagsService.GetAll();
+            return new ObjectResult(new GetEntityResponse<List<Models.Tag>>(tags, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
 
-        return new GetEntityResponse<List<Models.Tag>>(tags, null).Result();
+            return new ObjectResult(new GetEntityResponse<List<Models.Tag>>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get tags. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
     }
 
 }
