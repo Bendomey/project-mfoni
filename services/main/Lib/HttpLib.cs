@@ -35,10 +35,10 @@ public class HttpLib
 
         var response = new EntityWithPagination<T>
         {
-            Data = data,
-            DataLength = dataLength,
-            DataPerPage = queryFilter.Limit,
-            CurrentPage = queryFilter.Skip,
+            Rows = data,
+            Total = dataLength,
+            PageSize = queryFilter.Limit,
+            Page = queryFilter.Skip,
             NextPage = queryFilter.Skip >= totalPages - 1 ? null : queryFilter.Skip + 1,
             PrevPage = queryFilter.Skip <= 0 ? null : queryFilter.Skip > totalPages ? totalPages : queryFilter.Skip - 1,
             TotalPages = totalPages,

@@ -1,30 +1,34 @@
+import {QUERY_KEYS} from '@/constants/index.ts'
+import {getQueryParams} from '@/lib/get-param.ts'
 import {fetchClient} from '@/lib/transport/index.ts'
 import {useQuery} from '@tanstack/react-query'
 
-const getTags = async () => {
+const getTags = async (props: FetchMultipleDataInputParams<FetchTagFilter>) => {
   try {
-    const response = await fetchClient<ApiResponse<Array<Tag>>>('/v1/tags')
-
-    if (!response.parsedBody.status && response.parsedBody.errorMessage) {
-      throw new Error(response.parsedBody.errorMessage)
-    }
+    const removeAllNullableValues = getQueryParams<FetchTagFilter>(props)
+    const params = new URLSearchParams(removeAllNullableValues)
+    const response = await fetchClient<
+      ApiResponse<FetchMultipleDataResponse<Tag>>
+    >(`/v1/tags?${params.toString()}`)
 
     return response.parsedBody.data
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      throw error
-    }
-
     // Error from server.
     if (error instanceof Response) {
       const response = await error.json()
       throw new Error(response.errorMessage)
     }
+
+    if (error instanceof Error) {
+      throw error
+    }
   }
 }
 
-export const useGetTags = () =>
+export const useGetTags = (
+  query: FetchMultipleDataInputParams<FetchTagFilter>,
+) =>
   useQuery({
-    queryKey: ['tags'],
-    queryFn: getTags,
+    queryKey: [QUERY_KEYS.TAGS, query],
+    queryFn: () => getTags(query),
   })

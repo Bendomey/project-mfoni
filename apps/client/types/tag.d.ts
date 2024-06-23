@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 interface Tag {
   id: string
   name: string
@@ -5,3 +6,5 @@ interface Tag {
   createdAt: Date
   updatedAt: Date
 }
+
+interface FetchTagFilter {}

@@ -7,31 +7,46 @@ import {useGetTags} from '@/api/tags/index.ts'
 import {Loader} from '@/components/loader/index.tsx'
 import {InformationCircleIcon} from '@heroicons/react/24/outline'
 import {getMatchingStrings} from '@/lib/strings.ts'
+import {useDebouncedState} from '@/hooks/use-debounce.ts'
 
 export function TagsPicker() {
-  const {data, isPending} = useGetTags()
   const [openPopover, setOpenPopover] = useState(false)
   const [selectedTags, setSelectedTags] = useState<Array<string>>([])
-  const [query, setQuery] = useState('')
+  const [query, setQuery, debouncedQuery] = useDebouncedState<string>('', {
+    delay: 500,
+  })
 
-  const selectTag = useCallback((tag: string) => {
-    setSelectedTags(prev => {
-      const matchingStrings = getMatchingStrings(tag, prev)
+  const {data, isPending} = useGetTags({
+    pagination: {
+      per: 10,
+      page: 0,
+    },
+    search: {
+      query: debouncedQuery,
+    },
+  })
 
-      if (matchingStrings.length) {
-        return prev
-      }
-      return [...prev, tag]
-    })
-    setQuery('')
-  }, [])
+  const selectTag = useCallback(
+    (tag: string) => {
+      setSelectedTags(prev => {
+        const matchingStrings = getMatchingStrings(tag, prev)
+
+        if (matchingStrings.length) {
+          return prev
+        }
+        return [...prev, tag]
+      })
+      setQuery('')
+    },
+    [setQuery],
+  )
 
   const unselectedData = useMemo(() => {
     if (!data) {
       return []
     }
 
-    return data.filter(tag => {
+    return data.rows.filter(tag => {
       const matchingStrings = getMatchingStrings(tag.name, selectedTags)
       return !matchingStrings.length
     })
