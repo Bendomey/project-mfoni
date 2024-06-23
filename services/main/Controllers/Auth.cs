@@ -4,6 +4,7 @@ using main.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using main.Middlewares;
+using System.Net;
 
 namespace main.Controllers;
 
@@ -21,76 +22,86 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("auth")]
-    public OutputResponse<AuthenticateResponse> Authenticate([FromBody] AuthenticateInput input)
+    public IActionResult Authenticate([FromBody] AuthenticateInput input)
     {
         try
         {
             _logger.LogInformation("Authenticate user input: " + input);
             var res = _authService.Authenticate(input);
+            return new ObjectResult(new GetEntityResponse<AuthenticateResponse>(res, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
 
-            if (res is not null)
-            {
-                return new GetEntityResponse<AuthenticateResponse>(res, null).Result();
-            }
-            else
-            {
-                // This should never happen.
-                return new GetEntityResponse<AuthenticateResponse>(null, "UserNotFound").Result();
-            }
+            return new ObjectResult(new GetEntityResponse<AuthenticateResponse>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error authenticating user");
-            return new GetEntityResponse<AuthenticateResponse>(null, e.Message).Result();
+            this._logger.LogError($"Failed to authenticate. Exception: {e}");
+            return new StatusCodeResult(500);
         }
     }
 
     [Authorize]
     [HttpPost("auth/setup")]
-    public OutputResponse<bool?> SetupAccount([FromBody] SetupAccountInput input)
+    public IActionResult SetupAccount([FromBody] SetupAccountInput input)
     {
-        _logger.LogInformation("Setting up account." + input);
-        var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
-        if (currentUser is not null)
+        try
         {
-            try
-            {
-                var res = _authService.SetupAccount(input, currentUser);
+            _logger.LogInformation("Setting up account." + input);
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var res = _authService.SetupAccount(input, currentUser);
 
-                return new GetEntityResponse<bool?>(true, null).Result();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error setting up account");
-                return new GetEntityResponse<bool?>(null, e.Message).Result();
-            }
-
+            return new ObjectResult(new GetEntityResponse<bool?>(true, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
 
-        return new GetEntityResponse<bool?>(null, "UserNotFound").Result();
+            return new ObjectResult(new GetEntityResponse<bool?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to setup account. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
     }
 
     [Authorize]
     [HttpGet("auth/me")]
-    public OutputResponse<Models.User> Me()
+    public IActionResult Me()
     {
-        var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
-        if (currentUser is not null)
+        try
         {
-            try
-            {
-                var res = _authService.Me(currentUser);
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var res = _authService.Me(currentUser);
 
-                return new GetEntityResponse<Models.User>(res, null).Result();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error fetching current user");
-                return new GetEntityResponse<Models.User>(null, e.Message).Result();
-            }
+            return new ObjectResult(new GetEntityResponse<Models.User>(res, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
 
-        return new GetEntityResponse<Models.User>(null, "UserNotFound").Result();
+            return new ObjectResult(new GetEntityResponse<Models.User>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get me. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
     }
 
 }

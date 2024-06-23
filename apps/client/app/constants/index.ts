@@ -10,4 +10,5 @@ export const USER_CIPHER = '@mfoni-account'
 
 export const QUERY_KEYS = {
   CURRENT_USER: 'current-user',
+  TAGS: 'tags',
 } as const

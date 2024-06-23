@@ -33,11 +33,38 @@ public class SearchTag
         return tag;
     }
 
-    public async Task<List<Models.Tag>> GetAll()
+    public async Task<List<Models.Tag>> GetAll(FilterQuery<Models.Tag> queryFilter, string? query)
     {
-        // TODO: Add pagination
-        var tags = await _tagsCollection.Find(tag => true).Skip(0).Limit(10).ToListAsync();
+        FilterDefinitionBuilder<Models.Tag> builder = Builders<Models.Tag>.Filter;
+        var filter = Builders<Models.Tag>.Filter.Empty;
+
+        if (query != null)
+        {
+            filter = builder.Regex("name", new BsonRegularExpression(query, "i"));
+        }
+
+        var tags = await _tagsCollection
+            .Find(filter)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
         return tags ?? [];
+    }
+
+    public async Task<long> Count(string? query)
+    {
+        FilterDefinitionBuilder<Models.Tag> builder = Builders<Models.Tag>.Filter;
+        var filter = builder.Empty;
+        if (query != null)
+        {
+            filter = builder.Regex("name", new BsonRegularExpression(query, "i"));
+        }
+
+        var tagsCount = await _tagsCollection.CountDocumentsAsync(filter);
+
+        return tagsCount;
     }
 
     public async Task<List<Models.Tag>> GetTagsBasedOnQuery(string query)
@@ -55,9 +82,7 @@ public class SearchTag
 
         tagsForSearch.ToList().ForEach(tag =>
         {
-            var nameFilter = builder.Regex("name", new BsonRegularExpression(tag, "i"));
-            // @FIXME: filter not working. Find out why
-            filter |= nameFilter;
+            filter = builder.Regex("name", new BsonRegularExpression(tag, "i"));
         });
 
         var tags = await _tagsCollection.Find(filter).Skip(0).Limit(10).ToListAsync();

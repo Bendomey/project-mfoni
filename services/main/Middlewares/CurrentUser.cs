@@ -1,3 +1,4 @@
+using System.Net;
 using System.Security.Claims;
 using main.DTOs;
 
@@ -5,7 +6,7 @@ namespace main.Middlewares;
 
 public class CurrentUser
 {
-    public static CurrentUserOutput? GetCurrentUser(ClaimsIdentity? identity)
+    public static CurrentUserOutput GetCurrentUser(ClaimsIdentity? identity)
     {
         if (identity is not null)
         {
@@ -24,7 +25,7 @@ public class CurrentUser
             }
         }
 
-        return null;
+        throw new HttpRequestException("UserNotFound", null, HttpStatusCode.Unauthorized);
     }
 
 }

@@ -74,15 +74,9 @@ public class CollectionService
 
     public bool UpdateCollectionContentsCount(string collectionId, int count)
     {
-        var collection = GetCollection(collectionId);
-        if (collection is null)
-        {
-            throw new Exception("CollectionNotFound");
-        }
-
         var filter = Builders<Models.Collection>.Filter.Eq(r => r.Id, collectionId);
         var updates = Builders<Models.Collection>.Update
-            .Set(r => r.ContentsCount, collection.ContentsCount + count);
+            .Inc(r => r.ContentsCount, count);
 
         _collectionCollection.UpdateOne(filter, updates);
 

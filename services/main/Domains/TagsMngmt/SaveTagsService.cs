@@ -1,7 +1,6 @@
 using main.Configuratons;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using MongoDB.Bson;
 using main.DTOs;
 
 namespace main.Domains;
@@ -25,19 +24,26 @@ public class SaveTags
         _logger.LogDebug("SaveTagsService initialized");
     }
 
-    public Models.Tag Create(CreateTagInput tag)
+    public Models.Tag Create(CreateTagInput tag, CurrentUserOutput userInput)
     {
+        var existingTag = _searchTagService.GetByName(tag.Name);
+        if (existingTag != null)
+        {
+            return existingTag;
+        }
+
         var tagToSave = new Models.Tag
         {
             Name = tag.Name,
-            Description = tag.Description
+            Description = tag.Description,
+            CreatedByUserId = userInput.Id,
         };
         _tagsCollection.InsertOne(tagToSave);
 
         return tagToSave;
     }
 
-    public List<Models.Tag> ResolveTags(string[] inputTags)
+    public List<Models.Tag> ResolveTags(string[] inputTags, CurrentUserOutput userInput)
     {
         var tags = new List<Models.Tag>();
 
@@ -46,7 +52,7 @@ public class SaveTags
             var existingTag = _searchTagService.GetByName(tag);
             if (existingTag == null)
             {
-                var newTag = Create(new CreateTagInput { Name = tag });
+                var newTag = Create(new CreateTagInput { Name = tag }, userInput);
                 tags.Add(newTag);
             }
             else
