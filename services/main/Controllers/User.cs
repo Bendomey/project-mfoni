@@ -4,6 +4,7 @@ using main.DTOs;
 using main.Domains;
 using main.Middlewares;
 using System.Security.Claims;
+using System.Net;
 
 namespace main.Controllers;
 
@@ -24,84 +25,85 @@ public class UserController : ControllerBase
 
     [Authorize]
     [HttpPatch("phone")]
-    public async Task<OutputResponse<bool?>> SavePhoneNumber([FromBody] PhoneNumberInput userPhoneNumber)
+    public async Task<IActionResult> SavePhoneNumber([FromBody] PhoneNumberInput userPhoneNumber)
     {
-        logger.LogInformation($"saving user phone number {userPhoneNumber}");
-
         try
         {
+            logger.LogInformation($"saving user phone number {userPhoneNumber}");
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
-            if (currentUser == null)
-            {
-                throw new HttpRequestException("UserNotFound");
-            }
-
             var savedPhoneNumber = await userService.SavePhoneNumber(userPhoneNumber.phoneNumber, currentUser.Id);
-            return new GetEntityResponse<bool?>(savedPhoneNumber, null).Result();
+            return new ObjectResult(new GetEntityResponse<bool?>(savedPhoneNumber, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
         catch (HttpRequestException e)
         {
-            return new GetEntityResponse<bool?>(null, e.Message).Result();
-        }
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
 
+            return new ObjectResult(new GetEntityResponse<bool?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
         catch (Exception e)
         {
-            logger.LogError($"{e.Message}");
-            return new GetEntityResponse<bool?>(null, e.Message).Result();
+            logger.LogError($"Save phone number exception: {e.Message}");
+            return new StatusCodeResult(500);
         }
     }
 
     [Authorize]
     [HttpPatch("phone/verify")]
-    public async Task<OutputResponse<bool?>> VerifyPhoneNumber([FromBody] VerificationCodeInput code)
+    public async Task<IActionResult> VerifyPhoneNumber([FromBody] VerificationCodeInput code)
     {
-        logger.LogInformation("verifying user phone number");
-
-
         try
         {
+            logger.LogInformation("verifying user phone number");
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
-            if (currentUser == null)
-            {
-                throw new HttpRequestException("UserNotFound");
-            }
-
             var verifyPhoneNumber = await userService.VerifyPhoneNumber(code.verificationCode, currentUser.Id);
-            return new GetEntityResponse<bool?>(verifyPhoneNumber, null).Result();
+            return new ObjectResult(new GetEntityResponse<bool?>(verifyPhoneNumber, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
         catch (HttpRequestException e)
         {
-            return new GetEntityResponse<bool?>(null, e.Message).Result();
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<bool?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {
-            logger.LogError($"{e.Message}");
-            return new GetEntityResponse<bool?>(null, e.Message).Result();
+            logger.LogError($" Verify phone number exception: {e}");
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpPost("identity/verify")]
-    public async Task<OutputResponse<bool?>> VerifyIdentity([FromBody] IdentityVerificationInput input)
+    public async Task<IActionResult> VerifyIdentity([FromBody] IdentityVerificationInput input)
     {
-        logger.LogInformation($"verify user identity {input}");
         try
         {
+            logger.LogInformation($"verify user identity {input}");
             await userService.VerifyIdentity(input);
-            return new GetEntityResponse<bool?>(true, null).Result();
+            return new ObjectResult(new GetEntityResponse<bool?>(true, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
-
         catch (HttpRequestException e)
         {
-            // sentry error
-            logger.LogError($"{e.Message}");
-            return new GetEntityResponse<bool?>(null, e.Message).Result();
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<bool?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
 
         catch (Exception e)
         {
             // sentry error
-            logger.LogError($"{e.Message}");
-            return new GetEntityResponse<bool?>(null, e.Message).Result();
+            logger.LogError($"Verify Identity exception: {e}");
+            return new StatusCodeResult(500);
         }
     }
 

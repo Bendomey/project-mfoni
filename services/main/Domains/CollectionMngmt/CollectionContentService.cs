@@ -36,7 +36,7 @@ public class CollectionContentService
 
         if (oldCollection is not null)
         {
-            throw new Exception("CollectionContentAlreadyExists");
+            throw new HttpRequestException("CollectionContentAlreadyExists");
         }
 
         var collection = new Models.CollectionContent
@@ -56,7 +56,7 @@ public class CollectionContentService
         var collectionContent = _collectionContentCollection.Find(collection => collection.Id == collectionId).FirstOrDefault();
         if (collectionContent is null)
         {
-            throw new Exception("CollectionContentNotFound");
+            throw new HttpRequestException("CollectionContentNotFound");
         }
 
         return collectionContent;

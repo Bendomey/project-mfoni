@@ -1,4 +1,5 @@
 
+using System.Net;
 using main.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,12 +24,18 @@ public class WaitlistController : ControllerBase
         try
         {
             var waitlist = await waitlistService.SaveWaitlistDetails(waitlistEntry);
-            return Ok(new GetEntityResponse<Models.Waitlist>(waitlist, null).Result());
+            return new ObjectResult(new GetEntityResponse<Models.Waitlist>(waitlist, null).Result()) { StatusCode = StatusCodes.Status201Created };
 
         }
         catch (HttpRequestException e)
         {
-            return BadRequest(new GetEntityResponse<Models.Waitlist>(null, e.Message).Result());
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<Models.Waitlist>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {

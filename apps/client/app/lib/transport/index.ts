@@ -5,6 +5,7 @@ declare global {
   interface Window {
     ENV: {
       API_ADDRESS: string
+      BUCKET: string
     }
   }
 }
