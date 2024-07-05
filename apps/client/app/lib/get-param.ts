@@ -6,7 +6,7 @@ export const getQueryParams = <FilterT>(
   const filters: ObjectT = props.filters ?? {}
   const query = cleanParams(filters)
 
-  const updatedFilter: Record<string, NullableString> = {...query}
+  const updatedFilter: Record<string, Nullable<string>> = {...query}
 
   return cleanParams({
     pageSize: props.pagination ? props.pagination.per : undefined,

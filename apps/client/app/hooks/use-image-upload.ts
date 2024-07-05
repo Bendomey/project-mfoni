@@ -1,7 +1,13 @@
 import {useSignS3UploadUrl} from '@/api/contents/index.ts'
 import {useState} from 'react'
 
+interface UploadResults {
+  fileLink: string
+  eTag?: string | null
+}
+
 const useImageUpload = () => {
+  const [results, setResults] = useState<UploadResults>()
   const [isUploading, setIsUploading] = useState(false)
   // const [progress, setProgress] = useState<number | null>(null); // TODO: support later!
   const {mutateAsync: generateSignedUrl, isPending} = useSignS3UploadUrl()
@@ -11,7 +17,7 @@ const useImageUpload = () => {
 
   const isLoading = isUploading || isPending
 
-  const upload = async (file: File): Promise<string> => {
+  const upload = async (file: File): Promise<UploadResults> => {
     try {
       setIsUploading(true)
       const filename = `${new Date().toISOString()}_${file.name}`
@@ -23,19 +29,29 @@ const useImageUpload = () => {
       })
 
       // Actual upload
-      await fetch(signedUrl.signedUrl, {
+      const res = await fetch(signedUrl.signedUrl, {
         method: 'PUT',
         body: file,
         signal: abortController.signal,
       })
 
-      return signedUrl.fileLink
+      const result: UploadResults = {
+        fileLink: signedUrl.fileLink,
+      }
+
+      if (res.ok) {
+        const eTag = res.headers.get('ETag')
+        result.eTag = eTag ? JSON.parse(eTag) : null
+      }
+
+      setResults(result)
+      return result
     } finally {
       setIsUploading(false)
     }
   }
 
-  return {upload, isLoading, abortController}
+  return {upload, isLoading, abortController, results}
 }
 
 export default useImageUpload

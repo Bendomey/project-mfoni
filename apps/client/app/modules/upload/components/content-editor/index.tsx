@@ -8,10 +8,15 @@ import {VisibilityPicker} from './visibility-picker.tsx'
 import {TagsPicker} from './tags-picker.tsx'
 
 export const ContentEditor = ({contentId}: {contentId: string}) => {
-  const {contents, setContents} = useContentUpload()
-  const content = contents[contentId]
-  const {upload, isLoading, abortController} = useImageUpload()
+  const {contents, updateContent, deleteContent} = useContentUpload()
+  const {
+    upload,
+    isLoading,
+    abortController,
+    results: uploadResults,
+  } = useImageUpload()
 
+  const content = useMemo(() => contents[contentId], [contentId, contents])
   const imageUrl = useMemo(
     () => (content ? URL.createObjectURL(content.file) : ''),
     [content],
@@ -19,6 +24,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
   const isRejected = useMemo(() => content?.status === 'rejected', [content])
 
   useEffect(() => {
+    // initialize upload
     void (async () => {
       if (
         !isRejected &&
@@ -26,39 +32,28 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
         !['uploading', 'completed'].includes(content.uploadStatus ?? '')
       ) {
         // send updates to central store
-        setContents(prev => {
-          return {
-            ...prev,
-            [contentId]: {
-              ...content,
-              uploadStatus: 'uploading',
-            },
-          }
-        })
-        const filUploadedUrl = await upload(content.file)
-
-        setContents(prev => {
-          return {
-            ...prev,
-            [contentId]: {
-              ...content,
-              uploadStatus: 'completed',
-              filUploadedUrl,
-            },
-          }
-        })
+        updateContent(contentId, {uploadStatus: 'uploading'})
+        await upload(content.file)
       }
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content])
+  }, [isRejected, content, updateContent, contentId, upload])
+
+  // save upload results
+  useEffect(() => {
+    if (uploadResults && content?.uploadStatus === 'uploading') {
+      // send updates to central store
+      updateContent(contentId, {
+        ...content,
+        uploadStatus: 'completed',
+        filUploadedUrl: uploadResults.fileLink,
+        eTag: uploadResults.eTag,
+      })
+    }
+  }, [content, contentId, updateContent, uploadResults])
 
   const handleDelete = () => {
     abortController.abort()
-    setContents(prev => {
-      return Object.fromEntries(
-        Object.entries(prev).filter(([key]) => key !== contentId),
-      )
-    })
+    deleteContent(contentId)
   }
 
   return (
@@ -129,6 +124,10 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
                         type="text"
                         name="title"
                         id="title"
+                        value={content?.title}
+                        onChange={e =>
+                          updateContent(contentId, {title: e.target.value})
+                        }
                         autoComplete="off"
                         className="block w-full rounded-md border-0 py-3 placeholder:font-medium font-bold text-lg text-gray-900  ring-0 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:leading-6"
                         placeholder="Enter title"
@@ -143,7 +142,10 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
                       Tags <span className="text-gray-300">(optional)</span>
                     </label>
                     <div className="mt-2">
-                      <TagsPicker />
+                      <TagsPicker
+                        tags={content?.tags ?? []}
+                        setTags={tags => updateContent(contentId, {tags})}
+                      />
                     </div>
                   </div>
 
@@ -161,6 +163,10 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
                         id="amount"
                         step={0.01}
                         min={0}
+                        value={content?.amount}
+                        onChange={e =>
+                          updateContent(contentId, {amount: e.target.value})
+                        }
                         className="block w-full rounded-md border-0 py-3 placeholder:font-medium  font-bold text-lg text-gray-900  ring-0 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-0 focus:ring-inset focus:ring-indigo-600 sm:leading-6"
                         placeholder="Free"
                       />
@@ -168,7 +174,12 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
                   </div>
 
                   <div>
-                    <VisibilityPicker />
+                    <VisibilityPicker
+                      visibility={content?.visibility}
+                      setVisibility={visibility =>
+                        updateContent(contentId, {visibility})
+                      }
+                    />
                   </div>
                 </div>
               )}

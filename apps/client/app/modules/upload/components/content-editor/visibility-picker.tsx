@@ -1,15 +1,17 @@
-import {useState} from 'react'
 import {RadioGroup} from '@headlessui/react'
 import {classNames} from '@/lib/classNames.ts'
 
-const memoryOptions = [
-  {name: 'PUBLIC', inStock: true},
-  {name: 'PRIVATE', inStock: true},
-]
+const visibilityOptions = ['PUBLIC', 'PRIVATE']
 
-export function VisibilityPicker() {
-  const [mem, setMem] = useState(memoryOptions[0])
+interface Props {
+  visibility?: IContentVisibility
+  setVisibility: (visibility: IContentVisibility) => void
+}
 
+export function VisibilityPicker({
+  visibility = 'PUBLIC',
+  setVisibility,
+}: Props) {
   return (
     <div>
       <div className="">
@@ -24,14 +26,14 @@ export function VisibilityPicker() {
         </small>
       </div>
 
-      <RadioGroup value={mem} onChange={setMem} className="mt-2">
+      <RadioGroup value={visibility} onChange={setVisibility} className="mt-2">
         <RadioGroup.Label className="sr-only">
-          Choose a memory option
+          Choose a visibility option
         </RadioGroup.Label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 ">
-          {memoryOptions.map(option => (
+          {visibilityOptions.map(option => (
             <RadioGroup.Option
-              key={option.name}
+              key={option}
               value={option}
               className={({active, checked}) =>
                 classNames(
@@ -43,9 +45,8 @@ export function VisibilityPicker() {
                   'flex items-center justify-center rounded-md py-3 px-3 text-sm font-bold uppercase sm:flex-1',
                 )
               }
-              disabled={!option.inStock}
             >
-              <RadioGroup.Label as="span">{option.name}</RadioGroup.Label>
+              <RadioGroup.Label as="span">{option}</RadioGroup.Label>
             </RadioGroup.Option>
           ))}
         </div>

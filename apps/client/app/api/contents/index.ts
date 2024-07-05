@@ -1,3 +1,4 @@
+import {fetchClient} from '@/lib/transport/index.ts'
 import {useMutation} from '@tanstack/react-query'
 
 interface IGenerateSignedUrlInput {
@@ -30,4 +31,47 @@ export const generateSignedUrl = async (props: IGenerateSignedUrlInput) => {
 export const useSignS3UploadUrl = () =>
   useMutation({
     mutationFn: generateSignedUrl,
+  })
+
+export type CreateContentInput = Array<{
+  title?: string
+  content: {
+    location: string
+    eTag: string
+    key: string
+    serverSideEncryption: string
+    bucket: string
+  }
+  tags?: string[]
+  visibility: IContentVisibility
+  amount?: number
+}>
+
+const createContent = async (props: CreateContentInput) => {
+  try {
+    const response = await fetchClient<ApiResponse<Array<Content>>>(
+      `/v1/contents`,
+      {
+        method: 'POST',
+        body: JSON.stringify(props),
+      },
+    )
+
+    return response.parsedBody.data
+  } catch (error: unknown) {
+    // Error from server.
+    if (error instanceof Response) {
+      const response = await error.json()
+      throw new Error(response.errorMessage)
+    }
+
+    if (error instanceof Error) {
+      throw error
+    }
+  }
+}
+
+export const useCreateContent = () =>
+  useMutation({
+    mutationFn: createContent,
   })

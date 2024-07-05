@@ -51,10 +51,11 @@ public class IndexContent
         }
 
         // check if user is a creator
-        if (user.Role != UserRole.CREATOR)
-        {
-            throw new HttpRequestException("NotEnoughPermission");
-        }
+        // TODO: work on enforcing in my next EPIC
+        // if (user.Role != UserRole.CREATOR)
+        // {
+        //     throw new HttpRequestException("NotEnoughPermission");
+        // }
 
         // resolve upload collection
         var collection = _collectionService.ResolveCollection(new SaveCollection

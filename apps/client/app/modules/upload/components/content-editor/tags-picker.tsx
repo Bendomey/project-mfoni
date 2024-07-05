@@ -9,9 +9,16 @@ import {InformationCircleIcon} from '@heroicons/react/24/outline'
 import {getMatchingStrings} from '@/lib/strings.ts'
 import {useDebouncedState} from '@/hooks/use-debounce.ts'
 
-export function TagsPicker() {
+interface Props {
+  tags: StringList
+  setTags: (tags: StringList) => void
+}
+
+export function TagsPicker({
+  tags: selectedTags,
+  setTags: setSelectedTags,
+}: Props) {
   const [openPopover, setOpenPopover] = useState(false)
-  const [selectedTags, setSelectedTags] = useState<Array<string>>([])
   const [query, setQuery, debouncedQuery] = useDebouncedState<string>('', {
     delay: 500,
   })
@@ -28,17 +35,16 @@ export function TagsPicker() {
 
   const selectTag = useCallback(
     (tag: string) => {
-      setSelectedTags(prev => {
-        const matchingStrings = getMatchingStrings(tag, prev)
+      const matchingStrings = getMatchingStrings(tag, selectedTags)
 
-        if (matchingStrings.length) {
-          return prev
-        }
-        return [...prev, tag]
-      })
+      if (matchingStrings.length) {
+        return selectedTags
+      }
+
+      setSelectedTags([...selectedTags, tag])
       setQuery('')
     },
-    [setQuery],
+    [selectedTags, setQuery, setSelectedTags],
   )
 
   const unselectedData = useMemo(() => {
@@ -68,7 +74,7 @@ export function TagsPicker() {
               {tag}
               <button
                 onClick={() =>
-                  setSelectedTags(prev => prev.filter(t => t !== tag))
+                  setSelectedTags(selectedTags.filter(t => t !== tag))
                 }
                 type="button"
                 className="group relative -mr-1 ml-1 h-3.5 w-3.5 rounded-sm hover:bg-gray-500/20"

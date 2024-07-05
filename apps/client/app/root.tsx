@@ -50,6 +50,7 @@ export async function loader() {
   return json({
     ENV: {
       API_ADDRESS: `${process.env.API_ADDRESS}/api`,
+      BUCKET: process.env.S3_BUCKET,
     },
   })
 }

@@ -3,7 +3,6 @@ import {Transition, Dialog} from '@headlessui/react'
 import {Button} from '@/components/button/index.tsx'
 import {XCircleIcon} from '@heroicons/react/20/solid'
 import {useSubmitErrors} from './use-submit-errors.ts'
-import {toast} from 'react-hot-toast'
 import {Loader} from '@/components/loader/index.tsx'
 import {useContentUpload} from '../context.tsx'
 
@@ -13,11 +12,7 @@ interface Props {
 }
 export const SubmitModal = ({isOpen, onToggle}: Props) => {
   const {errorMessages, isSubmittable} = useSubmitErrors()
-  const {isSubmitting} = useContentUpload()
-
-  const handleSubmit = () => {
-    toast.success('Success', {id: 'success-content-upload'})
-  }
+  const {isSubmitting, submit} = useContentUpload()
 
   const isSubmitButtonDisabled = useMemo(
     () => !isSubmittable || isSubmitting,
@@ -105,7 +100,7 @@ export const SubmitModal = ({isOpen, onToggle}: Props) => {
                   )}
                   <Button
                     disabled={isSubmitButtonDisabled}
-                    onClick={handleSubmit}
+                    onClick={submit}
                     size="lg"
                   >
                     {isSubmitting ? (

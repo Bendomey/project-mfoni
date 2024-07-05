@@ -2,7 +2,7 @@
 interface Tag {
   id: string
   name: string
-  description: NullableString
+  description: Nullable<String>
   createdAt: Date
   updatedAt: Date
 }
