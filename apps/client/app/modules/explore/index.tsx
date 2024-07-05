@@ -35,7 +35,7 @@ export const ExploreModule = () => {
               {imageUrls.map((url, index) => (
                 <Fragment key={index}>
                   <FadeIn>
-                    <Content content={{url}} showFlyout />
+                    <Content content={{media: url} as any} showFlyout />
                   </FadeIn>
                 </Fragment>
               ))}
