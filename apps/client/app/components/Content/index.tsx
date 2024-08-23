@@ -37,7 +37,7 @@ export const Content = ({content, showFlyout = false}: Props) => {
               </Button>
             </div>
           </div>
-          <div className="group-hover:flex hidden flex-row items-center justify-between">
+          <div className="group-hover:flex hidden flex-row items-center justify-between gap-2.5">
             {showFlyout ? (
               <FlyoutContainer
                 intendedPosition="y"
