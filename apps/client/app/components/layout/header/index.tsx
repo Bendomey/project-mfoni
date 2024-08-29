@@ -24,6 +24,7 @@ interface Props {
   shouldHeaderBlur?: boolean
 }
 
+
 export const Header = ({
   isHeroSearchInVisible,
   shouldHeaderBlur = true,

@@ -3,6 +3,9 @@ import {LockClosedIcon, HeartIcon} from '@heroicons/react/24/outline'
 import {useAsyncImage} from '@/hooks/use-async-image.ts'
 import {PhotographerCreatorCard} from '../creator-card/index.tsx'
 import {FlyoutContainer} from '../flyout/flyout-container.tsx'
+import { LoginModal } from '../login-modal/index.tsx'
+import { useState } from 'react'
+import { useAuth } from '@/providers/auth/index.tsx'
 
 interface Props {
   content: Content
@@ -11,6 +14,8 @@ interface Props {
 
 export const Content = ({content, showFlyout = false}: Props) => {
   const {pending} = useAsyncImage(content.media)
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const { isLoggedIn } = useAuth()
 
   return (
     <div className="cursor-zoom-in mb-5 relative ">
@@ -32,9 +37,15 @@ export const Content = ({content, showFlyout = false}: Props) => {
               </div>
             </div>
             <div className="group-hover:block hidden">
-              <Button variant="outline" size="sm" externalClassName="">
+              <Button variant="outline" size="sm" externalClassName="" onClick={() => !isLoggedIn && setShowModal(true)}>
                 <HeartIcon className="h-6 w-6 text-zinc-700" />
               </Button>
+              {/* Login Modal */}
+              {isLoggedIn ? (
+                <p className="text-green-500">Download is initiated</p>
+              ) : (
+                showModal && <LoginModal showModal={showModal} setShowModal={setShowModal} />
+              )}
             </div>
           </div>
           <div className="group-hover:flex hidden flex-row items-center justify-between">
