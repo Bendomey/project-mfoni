@@ -36,7 +36,7 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
                 X
               </button>
 
-            
+              <LoginComponent />
               {/* <LoginAuthProvider>
                 <LoginComponent />
               </LoginAuthProvider> */}
