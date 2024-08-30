@@ -8,7 +8,7 @@ import { type JSX } from 'react/jsx-runtime'
 import { Link } from '@remix-run/react'
 
 const insideNavigation = [
-  { name: 'Pricing', href: '/#pricing', routeType: 'href' },
+  { name: 'Pricing', href: '/#pricing', routeType: 'link' },
   { name: 'Terms Of Use', href: '/terms', routeType: 'link' },
 ]
 
@@ -104,23 +104,12 @@ export const Footer = () => {
               insideNavigation.map((item, index) => {
                 return (
                   <Fragment key={index}>
-                    {item.routeType === 'link' ? (
                       <Link
                         to={item.href}
                         className="text-sm font-semibold leading-6 text-gray-400 hover:text-gray-500"
                       >
                         {item.name}
                       </Link>
-                    ) :
-                      item.routeType === 'href' ? (
-                        <a
-                          href={item.href}
-                          className="text-sm font-semibold leading-6 text-gray-400 hover:text-gray-500"
-                        >
-                          {item.name}
-                        </a>
-                      ) : null
-                    }
                   </Fragment>
                 )
               })
