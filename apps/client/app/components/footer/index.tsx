@@ -8,8 +8,8 @@ import { type JSX } from 'react/jsx-runtime'
 import { Link } from '@remix-run/react'
 
 const insideNavigation = [
-  { name: 'Pricing', href: '/#pricing', routeType: 'link' },
-  { name: 'Terms Of Use', href: '/terms', routeType: 'link' },
+  { name: 'Pricing', href: '/#pricing'},
+  { name: 'Terms Of Use', href: '/terms'},
 ]
 
 const navigation = [
