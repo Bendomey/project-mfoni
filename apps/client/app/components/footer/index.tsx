@@ -104,7 +104,7 @@ export const Footer = () => {
               insideNavigation.map((item, index) => {
                 return (
                   <Fragment key={index}>
-                    {item && item.routeType === 'link' ? (
+                    {item.routeType === 'link' ? (
                       <Link
                         to={item.href}
                         className="text-sm font-semibold leading-6 text-gray-400 hover:text-gray-500"
@@ -112,7 +112,7 @@ export const Footer = () => {
                         {item.name}
                       </Link>
                     ) :
-                      item && item.routeType === 'href' ? (
+                      item.routeType === 'href' ? (
                         <a
                           href={item.href}
                           className="text-sm font-semibold leading-6 text-gray-400 hover:text-gray-500"
