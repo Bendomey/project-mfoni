@@ -14,6 +14,7 @@ import {
 } from '@/api/contents/index.ts'
 import {useNavigate} from '@remix-run/react'
 import {safeString} from '@/lib/strings.ts'
+import { useEnvContext } from '@/providers/env/index.tsx'
 
 // 30 MB
 const MAX_SIZE = 30
@@ -69,6 +70,7 @@ export const ContentUploadProvider = () => {
   const navigate = useNavigate()
   const [contents, setContents] = useState<ContentUploadContext['contents']>({})
   const {mutate, isPending} = useCreateContent()
+  const env = useEnvContext()
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -162,7 +164,7 @@ export const ContentUploadProvider = () => {
           content: {
             key: fileKey,
             location: safeString(content.filUploadedUrl),
-            bucket: window.ENV.BUCKET,
+            bucket: env.BUCKET,
             eTag: safeString(content.eTag),
             serverSideEncryption: 'AES256',
           },

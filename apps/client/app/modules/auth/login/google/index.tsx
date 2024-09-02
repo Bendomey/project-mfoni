@@ -1,15 +1,15 @@
-import { useAuthenticate } from '@/api/auth/index.ts'
-import { useBreakpoint } from '@/hooks/tailwind.ts'
-import { isBrowser } from '@/lib/is-browser.ts'
-import { useNavigate } from '@remix-run/react'
-import { useCallback, useEffect, useRef } from 'react'
-import { useLoginAuth } from '../context/index.tsx'
-import { errorMessagesWrapper } from '@/constants/error-messages.ts'
-import { toast } from 'react-hot-toast'
-import { useAuth } from '@/providers/auth/index.tsx'
-import { useQueryClient } from '@tanstack/react-query'
-import { QUERY_KEYS } from '@/constants/index.ts'
-import { useEnvContext } from '@/providers/env/index.tsx'
+import {useAuthenticate} from '@/api/auth/index.ts'
+import {useBreakpoint} from '@/hooks/tailwind.ts'
+import {isBrowser} from '@/lib/is-browser.ts'
+import {useNavigate} from '@remix-run/react'
+import {useCallback, useEffect, useRef} from 'react'
+import {useLoginAuth} from '../context/index.tsx'
+import {errorMessagesWrapper} from '@/constants/error-messages.ts'
+import {toast} from 'react-hot-toast'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {useQueryClient} from '@tanstack/react-query'
+import {QUERY_KEYS} from '@/constants/index.ts'
+import {useEnvContext} from '@/providers/env/index.tsx'
 
 declare global {
   interface Window {
@@ -19,9 +19,9 @@ declare global {
 }
 
 export const GoogleButton = () => {
-  const { mutate } = useAuthenticate()
-  const { setIsLoading, setErrorMessage } = useLoginAuth()
-  const { onSignin } = useAuth()
+  const {mutate} = useAuthenticate()
+  const {setIsLoading, setErrorMessage} = useLoginAuth()
+  const {onSignin} = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const env = useEnvContext()
