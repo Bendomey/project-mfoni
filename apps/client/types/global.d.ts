@@ -21,7 +21,12 @@ declare global {
     ENV: {
       API_ADDRESS: string
       BUCKET: string
+      FACEBOOK_APP_ID: string
+      MFONI_GOOGLE_AUTH_CLIENT_ID: string
     }
+    fbAsyncInit: any
+    FB: any
+    google: any
   }
 }
 

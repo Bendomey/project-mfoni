@@ -1,14 +1,15 @@
 /* eslint-disable func-names */
-import {useAuthenticate} from '@/api/auth/index.ts'
-import {Button} from '@/components/button/index.tsx'
-import {useLoaderData, useNavigate} from '@remix-run/react'
-import {useEffect} from 'react'
-import {useLoginAuth} from '../context/index.tsx'
-import {errorMessagesWrapper} from '@/constants/error-messages.ts'
-import {toast} from 'react-hot-toast'
-import {useAuth} from '@/providers/auth/index.tsx'
-import {useQueryClient} from '@tanstack/react-query'
-import {QUERY_KEYS} from '@/constants/index.ts'
+import { useAuthenticate } from '@/api/auth/index.ts'
+import { Button } from '@/components/button/index.tsx'
+import { useNavigate } from '@remix-run/react'
+import { useEffect } from 'react'
+import { useLoginAuth } from '../context/index.tsx'
+import { errorMessagesWrapper } from '@/constants/error-messages.ts'
+import { toast } from 'react-hot-toast'
+import { useAuth } from '@/providers/auth/index.tsx'
+import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS } from '@/constants/index.ts'
+import { useEnvContext } from '@/providers/env/index.tsx'
 
 declare global {
   interface Window {
@@ -19,33 +20,33 @@ declare global {
 }
 
 export const FacebookButton = () => {
-  const data = useLoaderData<{FACEBOOK_APP_ID: string}>()
 
-  const {mutate} = useAuthenticate()
-  const {setIsLoading, setErrorMessage} = useLoginAuth()
-  const {onSignin} = useAuth()
+  const { mutate } = useAuthenticate()
+  const { setIsLoading, setErrorMessage } = useLoginAuth()
+  const { onSignin } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const env = useEnvContext()
 
   useEffect(() => {
     window.fbAsyncInit = function () {
       window.FB.init({
-        appId: data.FACEBOOK_APP_ID,
+        appId: env.FACEBOOK_APP_ID,
         autoLogAppEvents: true,
         xfbml: true,
         version: 'v10.0',
       })
     }
-    ;(function (d, s, id) {
-      let js: any = d.getElementsByTagName(s)[0]
-      const fjs: any = d.getElementsByTagName(s)[0]
-      if (d.getElementById(id)) return
-      js = d.createElement(s)
-      js.id = id
-      js.src = 'https://connect.facebook.net/en_US/sdk.js'
-      fjs.parentNode.insertBefore(js, fjs)
-    })(document, 'script', 'facebook-jssdk')
-  }, [data.FACEBOOK_APP_ID])
+      ; (function (d, s, id) {
+        let js: any = d.getElementsByTagName(s)[0]
+        const fjs: any = d.getElementsByTagName(s)[0]
+        if (d.getElementById(id)) return
+        js = d.createElement(s)
+        js.id = id
+        js.src = 'https://connect.facebook.net/en_US/sdk.js'
+        fjs.parentNode.insertBefore(js, fjs)
+      })(document, 'script', 'facebook-jssdk')
+  }, [])
 
   const handleLogin = (res: any) => {
     setIsLoading(true)
@@ -94,7 +95,7 @@ export const FacebookButton = () => {
             (loginResponse: any) => {
               handleLogin(loginResponse)
             },
-            {scope: 'public_profile,email'},
+            { scope: 'public_profile,email' },
           )
         }
       })

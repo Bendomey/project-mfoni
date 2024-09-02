@@ -1,6 +1,6 @@
-import {cssBundleHref} from '@remix-run/css-bundle'
-import {type PropsWithChildren} from 'react'
-import {json, type LinksFunction} from '@remix-run/node'
+import { cssBundleHref } from '@remix-run/css-bundle'
+import { type PropsWithChildren } from 'react'
+import { json, type LinksFunction } from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -12,12 +12,13 @@ import {
   isRouteErrorResponse,
   useLoaderData,
 } from '@remix-run/react'
-import {NODE_ENV} from './constants/index.ts'
+import { NODE_ENV } from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
 import globalStyles from '@/styles/global.css'
-import {Toaster} from 'react-hot-toast'
-import {Providers} from './providers/index.tsx'
-import {RouteLoader} from './components/loader/route-loader.tsx'
+import { Toaster } from 'react-hot-toast'
+import { Providers } from './providers/index.tsx'
+import { RouteLoader } from './components/loader/route-loader.tsx'
+import { EnvContext } from './providers/env/index.tsx'
 
 export const links: LinksFunction = () => {
   return [
@@ -39,10 +40,10 @@ export const links: LinksFunction = () => {
     //   sizes: '16x16',
     //   href: '/favicons/favicon-16x16.png',
     // },
-    {rel: 'icon', href: '/favicon.ico'},
-    {rel: 'stylesheet', href: tailwindStyles},
-    {rel: 'stylesheet', href: globalStyles},
-    ...(cssBundleHref ? [{rel: 'stylesheet', href: cssBundleHref}] : []),
+    { rel: 'icon', href: '/favicon.ico' },
+    { rel: 'stylesheet', href: tailwindStyles },
+    { rel: 'stylesheet', href: globalStyles },
+    ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
   ]
 }
 
@@ -51,6 +52,8 @@ export async function loader() {
     ENV: {
       API_ADDRESS: `${process.env.API_ADDRESS}/api`,
       BUCKET: process.env.S3_BUCKET,
+      MFONI_GOOGLE_AUTH_CLIENT_ID: process.env.MFONI_GOOGLE_AUTH_CLIENT_ID,
+      FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID,
     },
   })
 }
@@ -66,7 +69,7 @@ export default function App() {
   )
 }
 
-function Document({children}: PropsWithChildren) {
+function Document({ children }: PropsWithChildren) {
   const data = useLoaderData<typeof loader>()
 
   return (
@@ -79,23 +82,31 @@ function Document({children}: PropsWithChildren) {
         <Links />
       </head>
       <body>
-        {children}
-        <Toaster position="bottom-center" />
-        <ScrollRestoration />
-        <script
-          src="https://accounts.google.com/gsi/client"
-          async
-          defer
-          data-nscript="afterInteractive"
-        />
-        <script type="text/javascript" src="https://sdk.dev.metric.africa/v1" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(data.ENV)}`,
-          }}
-        />
-        <Scripts />
-        {NODE_ENV === 'development' ? <LiveReload /> : null}
+        <EnvContext.Provider value={{
+          BUCKET: data.ENV.BUCKET!,
+          MFONI_GOOGLE_AUTH_CLIENT_ID: data.ENV.MFONI_GOOGLE_AUTH_CLIENT_ID!,
+          FACEBOOK_APP_ID: data.ENV.FACEBOOK_APP_ID!,
+        }}>
+          {children}
+          <Toaster position="bottom-center" />
+          <ScrollRestoration />
+          <script
+            src="https://accounts.google.com/gsi/client"
+            async
+            defer
+            data-nscript="afterInteractive"
+          />
+          <script type="text/javascript" src="https://sdk.dev.metric.africa/v1" />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.ENV = ${JSON.stringify({
+                'API_ADDRESS': data.ENV.API_ADDRESS,
+              })}`,
+            }}
+          />
+          <Scripts />
+          {NODE_ENV === 'development' ? <LiveReload /> : null}
+        </EnvContext.Provider>
       </body>
     </html>
   )
