@@ -40,7 +40,6 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
               </button>
                 <h2>Login</h2>
                 <LoginModule />
-              
             </div>
           </dialog>
         </>
