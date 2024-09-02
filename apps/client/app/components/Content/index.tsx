@@ -4,8 +4,9 @@ import {useAsyncImage} from '@/hooks/use-async-image.ts'
 import {PhotographerCreatorCard} from '../creator-card/index.tsx'
 import {FlyoutContainer} from '../flyout/flyout-container.tsx'
 import { LoginModal } from '../login-modal/index.tsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/providers/auth/index.tsx'
+import { Alert } from '../alert/index.tsx'
 
 interface Props {
   content: Content
@@ -15,7 +16,22 @@ interface Props {
 export const Content = ({content, showFlyout = false}: Props) => {
   const {pending} = useAsyncImage(content.media)
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+    
   const { isLoggedIn } = useAuth()
+
+  const handleCloseAlert = () => {
+    setShowAlert(false);
+  };
+
+  useEffect(() => {
+    if (showAlert) {
+      const timer = setTimeout(() => {
+        setShowAlert(false);
+      }, 5000); 
+      return () => clearTimeout(timer);
+    }
+  }, [showAlert]);
 
   return (
     <div className="cursor-zoom-in mb-5 relative ">
@@ -40,10 +56,13 @@ export const Content = ({content, showFlyout = false}: Props) => {
               <Button variant="outline" size="sm" externalClassName="" onClick={() => !isLoggedIn && setShowModal(true)}>
                 <HeartIcon className="h-6 w-6 text-zinc-700" />
               </Button>
-              {/* Login Modal */}
               {isLoggedIn ? (
-                <p className="text-green-500">Download is initiated</p>
+                showAlert && (
+                  // alert
+                  <Alert message="Download is initiated" onClose={handleCloseAlert} />
+                )
               ) : (
+              /* Login Modal */
                 showModal && <LoginModal showModal={showModal} setShowModal={setShowModal} />
               )}
             </div>

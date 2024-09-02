@@ -1,5 +1,5 @@
 import { LoginAuthProvider } from '@/modules/auth/login/context/index.tsx';
-import { LoginComponent } from '@/modules/auth/login/index.tsx';
+import { LoginComponent, LoginModule } from '@/modules/auth/login/index.tsx';
 import React, { useRef } from 'react'
 
 interface Props {
@@ -35,11 +35,9 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
               >
                 X
               </button>
-
-              <LoginComponent />
-              {/* <LoginAuthProvider>
-                <LoginComponent />
-              </LoginAuthProvider> */}
+                <h2>Login</h2>
+                <LoginModule />
+              
             </div>
           </div>
         </>
