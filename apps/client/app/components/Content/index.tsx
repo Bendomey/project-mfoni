@@ -53,7 +53,7 @@ export const Content = ({content, showFlyout = false}: Props) => {
               </div>
             </div>
             <div className="group-hover:block hidden">
-              <Button variant="outline" size="sm" externalClassName="" onClick={() => !isLoggedIn && setShowModal(true)}>
+              <Button variant="outline" size="sm" onClick={() => !isLoggedIn && setShowModal(true)}>
                 <HeartIcon className="h-6 w-6 text-zinc-700" />
               </Button>
               {isLoggedIn ? (
