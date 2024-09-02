@@ -18,6 +18,7 @@ import globalStyles from '@/styles/global.css'
 import {Toaster} from 'react-hot-toast'
 import {Providers} from './providers/index.tsx'
 import {RouteLoader} from './components/loader/route-loader.tsx'
+import {EnvContext} from './providers/env/index.tsx'
 
 export const links: LinksFunction = () => {
   return [
@@ -51,6 +52,8 @@ export async function loader() {
     ENV: {
       API_ADDRESS: `${process.env.API_ADDRESS}/api`,
       BUCKET: process.env.S3_BUCKET,
+      MFONI_GOOGLE_AUTH_CLIENT_ID: process.env.MFONI_GOOGLE_AUTH_CLIENT_ID,
+      FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID,
     },
   })
 }
@@ -79,23 +82,36 @@ function Document({children}: PropsWithChildren) {
         <Links />
       </head>
       <body>
-        {children}
-        <Toaster position="bottom-center" />
-        <ScrollRestoration />
-        <script
-          src="https://accounts.google.com/gsi/client"
-          async
-          defer
-          data-nscript="afterInteractive"
-        />
-        <script type="text/javascript" src="https://sdk.dev.metric.africa/v1" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(data.ENV)}`,
+        <EnvContext.Provider
+          value={{
+            BUCKET: data.ENV.BUCKET!,
+            MFONI_GOOGLE_AUTH_CLIENT_ID: data.ENV.MFONI_GOOGLE_AUTH_CLIENT_ID!,
+            FACEBOOK_APP_ID: data.ENV.FACEBOOK_APP_ID!,
           }}
-        />
-        <Scripts />
-        {NODE_ENV === 'development' ? <LiveReload /> : null}
+        >
+          {children}
+          <Toaster position="bottom-center" />
+          <ScrollRestoration />
+          <script
+            src="https://accounts.google.com/gsi/client"
+            async
+            defer
+            data-nscript="afterInteractive"
+          />
+          <script
+            type="text/javascript"
+            src="https://sdk.dev.metric.africa/v1"
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.ENV = ${JSON.stringify({
+                API_ADDRESS: data.ENV.API_ADDRESS,
+              })}`,
+            }}
+          />
+          <Scripts />
+          {NODE_ENV === 'development' ? <LiveReload /> : null}
+        </EnvContext.Provider>
       </body>
     </html>
   )

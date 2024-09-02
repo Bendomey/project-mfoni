@@ -1,7 +1,7 @@
 import {useAuthenticate} from '@/api/auth/index.ts'
 import {useBreakpoint} from '@/hooks/tailwind.ts'
 import {isBrowser} from '@/lib/is-browser.ts'
-import {useLoaderData, useNavigate} from '@remix-run/react'
+import {useNavigate} from '@remix-run/react'
 import {useCallback, useEffect, useRef} from 'react'
 import {useLoginAuth} from '../context/index.tsx'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
@@ -9,6 +9,7 @@ import {toast} from 'react-hot-toast'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useQueryClient} from '@tanstack/react-query'
 import {QUERY_KEYS} from '@/constants/index.ts'
+import {useEnvContext} from '@/providers/env/index.tsx'
 
 declare global {
   interface Window {
@@ -23,9 +24,9 @@ export const GoogleButton = () => {
   const {onSignin} = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const env = useEnvContext()
 
   const signInRef = useRef(null)
-  const data = useLoaderData<{MFONI_GOOGLE_AUTH_CLIENT_ID: string}>()
   const isMobileBreakPoint = useBreakpoint('sm')
 
   const onLoginWithGoogle = useCallback(
@@ -75,7 +76,7 @@ export const GoogleButton = () => {
   const init = useCallback(() => {
     if (window.google) {
       window.google.accounts.id.initialize({
-        client_id: data.MFONI_GOOGLE_AUTH_CLIENT_ID,
+        client_id: env.MFONI_GOOGLE_AUTH_CLIENT_ID,
         callback: onLoginWithGoogle,
       })
 
@@ -89,7 +90,7 @@ export const GoogleButton = () => {
         width: isMobileBreakPoint ? '355' : '385',
       })
     }
-  }, [data.MFONI_GOOGLE_AUTH_CLIENT_ID, isMobileBreakPoint, onLoginWithGoogle])
+  }, [env.MFONI_GOOGLE_AUTH_CLIENT_ID, isMobileBreakPoint, onLoginWithGoogle])
 
   useEffect(() => {
     if (isBrowser) {
