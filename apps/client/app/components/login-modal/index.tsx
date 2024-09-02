@@ -1,5 +1,4 @@
-import { LoginAuthProvider } from '@/modules/auth/login/context/index.tsx';
-import { LoginComponent, LoginModule } from '@/modules/auth/login/index.tsx';
+import { LoginModule } from '@/modules/auth/login/index.tsx';
 import React, { useRef } from 'react'
 
 interface Props {
