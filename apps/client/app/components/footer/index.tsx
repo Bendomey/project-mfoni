@@ -1,10 +1,16 @@
-import * as React from 'react'
+import { Fragment } from 'react'
 import {
   GITHUB_REPO_URL,
   MYLES_PUDO_URL,
   TWITTER_ACCOUNT_URL,
 } from '@/constants/index.ts'
-import {type JSX} from 'react/jsx-runtime'
+import { type JSX } from 'react/jsx-runtime'
+import { Link } from '@remix-run/react'
+
+const insideNavigation = [
+  { name: 'Pricing', href: '/#pricing'},
+  { name: 'Terms Of Use', href: '/terms'},
+]
 
 const navigation = [
   {
@@ -75,7 +81,8 @@ export const Footer = () => {
             </a>
           ))}
         </div>
-        <div className="mt-8 md:order-1 md:mt-0">
+
+        <div className="mt-8 md:order-1 md:mt-0 md:flex-row flex flex-col items-center gap-y-1 md:gap-10">
           <div className="flex flex-row items-center space-x-2">
             {/* @TODO: we need our logo here */}
             <p className="text-center text-sm leading-5 text-gray-500">
@@ -90,6 +97,23 @@ export const Footer = () => {
               </a>{' '}
               and an amazing group of contributors
             </p>
+          </div>
+
+          <div className="flex gap-3 items-center">
+            {
+              insideNavigation.map((item, index) => {
+                return (
+                  <Fragment key={index}>
+                      <Link
+                        to={item.href}
+                        className="text-sm font-semibold leading-6 text-gray-400 hover:text-gray-500"
+                      >
+                        {item.name}
+                      </Link>
+                  </Fragment>
+                )
+              })
+            }
           </div>
         </div>
       </div>
