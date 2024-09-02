@@ -1,5 +1,4 @@
-import { LoginAuthProvider } from '@/modules/auth/login/context/index.tsx';
-import { LoginComponent, LoginModule } from '@/modules/auth/login/index.tsx';
+import { LoginModule } from '@/modules/auth/login/index.tsx';
 import React, { useRef } from 'react'
 
 interface Props {
@@ -20,12 +19,16 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
     <>
       {showModal ? (
         <>
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          role="dialog"
+          <dialog  className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
           aria-modal="true"
           onClick={handleBackdropClick}>
             <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 relative"
             ref={modalRef}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+              }
+            }}
             onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -39,7 +42,7 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
                 <LoginModule />
               
             </div>
-          </div>
+          </dialog>
         </>
       ) : null}
     </>
