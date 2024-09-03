@@ -9,7 +9,6 @@ import { MobileTabComponent } from './components/tabs/mobile.tsx'
 import { imageUrls } from '../landing-page/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { EmptyState } from './components/empty-state/index.tsx'
-import { truncate } from 'node:fs'
 
 export const ExploreModule = () => {
   const { ref: heroRef, inView } = useInView({
@@ -19,12 +18,16 @@ export const ExploreModule = () => {
   const [empty, setEmpty] = useState(false)
 
   useEffect(() => {
-    categories.map((category) => {
-      if (category.name === "Detty December" && category.count.length <= 0) {
-        setEmpty(true)        
-      }
-    })
-  }, [])
+    const dettyDecemberCategory = categories.find(
+      (category) => category.name === "Detty December"
+    );
+
+    if (dettyDecemberCategory && dettyDecemberCategory.count.length <= 0) {
+      setEmpty(true);
+    } else {
+      setEmpty(false);
+    }
+  }, [categories])
 
   const exploreOther = () => {
     setEmpty(false)
@@ -48,7 +51,7 @@ export const ExploreModule = () => {
         {
           empty ?
             (
-              <EmptyState ftn={exploreOther}/>
+              <EmptyState ftn={exploreOther} />
             ) :
             (
               <div className="col-span-1 lg:col-span-3">
