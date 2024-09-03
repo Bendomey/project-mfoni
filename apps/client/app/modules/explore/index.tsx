@@ -1,17 +1,17 @@
-import { Header } from '@/components/layout/index.ts'
-import { useInView } from 'react-intersection-observer'
-import { ExploreHeroSection } from './components/hero/index.tsx'
-import { categories, WebTabComponent } from './components/tabs/web.tsx'
-import { FadeIn, FadeInStagger } from '@/components/animation/FadeIn.tsx'
-import { Fragment, useEffect, useState } from 'react'
-import { Content } from '@/components/Content/index.tsx'
-import { MobileTabComponent } from './components/tabs/mobile.tsx'
-import { imageUrls } from '../landing-page/index.tsx'
-import { Footer } from '@/components/footer/index.tsx'
-import { EmptyState } from './components/empty-state/index.tsx'
+import {Header} from '@/components/layout/index.ts'
+import {useInView} from 'react-intersection-observer'
+import {ExploreHeroSection} from './components/hero/index.tsx'
+import {categories, WebTabComponent} from './components/tabs/web.tsx'
+import {FadeIn, FadeInStagger} from '@/components/animation/FadeIn.tsx'
+import {Fragment, useEffect, useState} from 'react'
+import {Content} from '@/components/Content/index.tsx'
+import {MobileTabComponent} from './components/tabs/mobile.tsx'
+import {imageUrls} from '../landing-page/index.tsx'
+import {Footer} from '@/components/footer/index.tsx'
+import {EmptyState} from './components/empty-state/index.tsx'
 
 export const ExploreModule = () => {
-  const { ref: heroRef, inView } = useInView({
+  const {ref: heroRef, inView} = useInView({
     threshold: 0,
   })
 
@@ -19,13 +19,13 @@ export const ExploreModule = () => {
 
   useEffect(() => {
     const dettyDecemberCategory = categories.find(
-      (category) => category.name === "Detty December"
-    );
+      category => category.name === 'Detty December',
+    )
 
     if (dettyDecemberCategory && dettyDecemberCategory.count.length <= 0) {
-      setEmpty(true);
+      setEmpty(true)
     } else {
-      setEmpty(false);
+      setEmpty(false)
     }
   }, [categories])
 
@@ -48,27 +48,23 @@ export const ExploreModule = () => {
         <div className="col-span-1 lg:hidden">
           <MobileTabComponent />
         </div>
-        {
-          empty ?
-            (
-              <EmptyState ftn={exploreOther} />
-            ) :
-            (
-              <div className="col-span-1 lg:col-span-3">
-                <FadeInStagger faster>
-                  <div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8 ">
-                    {imageUrls.map((url, index) => (
-                      <Fragment key={index}>
-                        <FadeIn>
-                          <Content content={{ media: url } as any} showFlyout />
-                        </FadeIn>
-                      </Fragment>
-                    ))}
-                  </div>
-                </FadeInStagger>
+        {empty ? (
+          <EmptyState ftn={exploreOther} />
+        ) : (
+          <div className="col-span-1 lg:col-span-3">
+            <FadeInStagger faster>
+              <div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8 ">
+                {imageUrls.map((url, index) => (
+                  <Fragment key={index}>
+                    <FadeIn>
+                      <Content content={{media: url} as any} showFlyout />
+                    </FadeIn>
+                  </Fragment>
+                ))}
               </div>
-            )
-        }
+            </FadeInStagger>
+          </div>
+        )}
       </div>
       <Footer />
     </div>
