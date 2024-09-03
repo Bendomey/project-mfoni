@@ -1,15 +1,15 @@
-import { Fragment } from 'react'
+import {Fragment} from 'react'
 import {
   GITHUB_REPO_URL,
   MYLES_PUDO_URL,
   TWITTER_ACCOUNT_URL,
 } from '@/constants/index.ts'
-import { type JSX } from 'react/jsx-runtime'
-import { Link } from '@remix-run/react'
+import {type JSX} from 'react/jsx-runtime'
+import {Link} from '@remix-run/react'
 
 const insideNavigation = [
-  { name: 'Pricing', href: '/#pricing', routeType: 'href' },
-  { name: 'Terms Of Use', href: '/terms', routeType: 'link' },
+  {name: 'Pricing', href: '/#pricing'},
+  {name: 'Terms Of Use', href: '/terms'},
 ]
 
 const navigation = [
@@ -100,37 +100,20 @@ export const Footer = () => {
           </div>
 
           <div className="flex gap-3 items-center">
-            {
-              insideNavigation.map((item, index) => {
-                return (
-                  <Fragment key={index}>
-                    {item && item.routeType === 'link' ? (
-                      <Link
-                        to={item.href}
-                        className="text-sm font-semibold leading-6 text-gray-400 hover:text-gray-500"
-                      >
-                        {item.name}
-                      </Link>
-                    ) :
-                      item && item.routeType === 'href' ? (
-                        <a
-                          href={item.href}
-                          className="text-sm font-semibold leading-6 text-gray-400 hover:text-gray-500"
-                        >
-                          {item.name}
-                        </a>
-                      ) : null
-                    }
-                  </Fragment>
-                )
-              })
-            }
-
+            {insideNavigation.map((item, index) => {
+              return (
+                <Fragment key={index}>
+                  <Link
+                    to={item.href}
+                    className="text-sm font-semibold leading-6 text-gray-400 hover:text-gray-500"
+                  >
+                    {item.name}
+                  </Link>
+                </Fragment>
+              )
+            })}
           </div>
-
         </div>
-
-
       </div>
     </footer>
   )
