@@ -1,4 +1,6 @@
-﻿namespace main.Configurations;
+﻿using Newtonsoft.Json;
+
+namespace main.Configurations;
 
 public class SendSmsInput
 {
@@ -12,14 +14,18 @@ public class SmsConfiguration
 {
     public static async Task SendSms(SendSmsInput input)
     {
+        var jsonBody = new
+        {
+            from = "Mfoni",
+            to = input.PhoneNumber,
+            type = "1",
+            message = input.Message,
+            app_id = input.AppId,
+            app_secret = input.AppSecret,
+        };
 
-        string jsonBody = "{\n    \"from\": \"Mfoni\",\n    \"to\": \"{phoneNumber}\",\n    \"type\": \"1\",\n    \"message\": \"{message}\",\n    \"app_id\":  \"{app_id}\",\n    \"app_secret\": \"{app_secret}\"\n}"
-            .Replace("{phoneNumber}", input.PhoneNumber)
-            .Replace("{message}", input.Message)
-            .Replace("{app_id}", input.AppId)
-            .Replace("{app_secret}", input.AppSecret);
-
-        await Send(jsonBody);
+        var jsonContent = JsonConvert.SerializeObject(jsonBody);
+        await Send(jsonContent);
     }
 
     public static async Task Send(string jsonBody)

@@ -10,11 +10,13 @@ public class WaitlistService
 {
     private readonly ILogger<WaitlistService> _logger;
     private readonly IMongoCollection<Waitlist> _waitlistCollection;
+    private readonly AppConstants _appConstantsConfiguration;
 
     public WaitlistService(ILogger<WaitlistService> logger, DatabaseSettings databaseSettings, IOptions<AppConstants> appConstants)
     {
         this._logger = logger;
         this._waitlistCollection = databaseSettings.Database.GetCollection<Waitlist>(appConstants.Value.WaitlistCollection);
+        this._appConstantsConfiguration = appConstants.Value;
     }
 
     public async Task<Waitlist> SaveWaitlistDetails(CreateWaitlistInput entry)
@@ -39,6 +41,19 @@ public class WaitlistService
         };
 
         await _waitlistCollection.InsertOneAsync(__waitlist);
+
+        if (entry.Email is not null)
+        {
+            var _ = EmailConfiguration.Send(new SendEmailInput
+            {
+                From = _appConstantsConfiguration.EmailFrom,
+                Email = entry.Email,
+                Subject = EmailTemplates.WaitlistSubject,
+                Message = EmailTemplates.WaitlistBody,
+                ApiKey = _appConstantsConfiguration.ResendApiKey
+            });
+        }
+        
         return __waitlist;
     }
 }
