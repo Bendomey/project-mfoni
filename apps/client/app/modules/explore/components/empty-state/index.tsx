@@ -1,13 +1,13 @@
-export const EmptyState = (props: {ftn: () => void}) => {
+export const EmptyState = (props: { ftn: () => void }) => {
   return (
     <div
-      className="bg-white-100 h-max w-full mx-auto md:w-96 border-t-4 border-white-500 rounded-b text-gray-900 px-4 py-3 shadow-md"
+      className="bg-white-100 h-max w-full md:w-[650px] md:mx-28 mx-auto border-t-4 border-white-500 rounded-b text-gray-900 px-4 py-3 shadow-md"
       role="alert"
     >
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center gap-3 md:gap-4">
         <div className="py-1">
           <svg
-            className="fill-current h-6 w-6 text-white-500 mr-4"
+            className="fill-current h-5 w-5 md:h-6 md:w-6 text-white-500 mr-4"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
           >
@@ -15,13 +15,13 @@ export const EmptyState = (props: {ftn: () => void}) => {
           </svg>
         </div>
         <div>
-          <p className="font-bold">
+          <p className="font-bold text-sm">
             It seems like there are no items in the "Detty December" category
             right now.
           </p>
           <span>
             <button
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 hover:text-gray-700 text-sm" 
               onClick={props.ftn}
             >
               explore categories

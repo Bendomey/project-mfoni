@@ -21,7 +21,7 @@ export const categories = [
     name: 'Detty December',
     href: '#',
     icon: RocketLaunchIcon,
-    count: '1,250',
+    count: '',
   },
   {
     name: 'Outmostphere',
