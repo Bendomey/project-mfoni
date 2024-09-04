@@ -3,7 +3,7 @@ import {useInView} from 'react-intersection-observer'
 import {ExploreHeroSection} from './components/hero/index.tsx'
 import {WebTabComponent} from './components/tabs/web.tsx'
 import {FadeIn, FadeInStagger} from '@/components/animation/FadeIn.tsx'
-import {Fragment, useEffect, useState} from 'react'
+import {Fragment, useState} from 'react'
 import {Content} from '@/components/Content/index.tsx'
 import {MobileTabComponent} from './components/tabs/mobile.tsx'
 import {imageUrls} from '../landing-page/index.tsx'
@@ -15,7 +15,7 @@ export const ExploreModule = () => {
     threshold: 0,
   })
 
-  const [empty, setEmpty] = useState(false)
+  const [empty] = useState(false)
 
 
   return (
