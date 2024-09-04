@@ -29,9 +29,6 @@ export const ExploreModule = () => {
     }
   }, [categories])
 
-  const exploreOther = () => {
-    setEmpty(false)
-  }
 
   return (
     <div className="relative">
@@ -49,7 +46,7 @@ export const ExploreModule = () => {
           <MobileTabComponent />
         </div>
         {empty ? (
-          <EmptyState ftn={exploreOther} />
+          <EmptyState />
         ) : (
           <div className="col-span-1 lg:col-span-3">
             <FadeInStagger faster>

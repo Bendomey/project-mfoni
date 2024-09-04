@@ -1,4 +1,5 @@
-export const EmptyState = (props: { ftn: () => void }) => {
+
+export const EmptyState = () => {
   return (
     <div
       className="bg-white-100 h-max w-full md:w-[650px] md:mx-28 mx-auto border-t-4 border-white-500 rounded-b text-gray-900 px-4 py-3 shadow-md"
@@ -16,16 +17,15 @@ export const EmptyState = (props: { ftn: () => void }) => {
         </div>
         <div>
           <p className="font-bold text-sm">
-            It seems like there are no items in the "Detty December" category
+            It seems like there are no items in the Detty December category
             right now.
           </p>
           <span>
-            <button
-              className="text-gray-500 hover:text-gray-700 text-sm" 
-              onClick={props.ftn}
+            <a href="/categories"
+              className="text-gray-500 hover:text-gray-700 text-sm"
             >
               explore categories
-            </button>
+            </a>
           </span>
         </div>
       </div>
