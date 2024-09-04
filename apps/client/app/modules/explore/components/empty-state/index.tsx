@@ -1,5 +1,5 @@
 
-export const EmptyState = () => {
+export const EmptyState = (props: {title: string, message: string}) => {
   return (
     <div
       className="bg-white-100 h-max w-full md:w-[650px] md:mx-28 mx-auto border-t-4 border-white-500 rounded-b text-gray-900 px-4 py-3 shadow-md"
@@ -17,8 +17,7 @@ export const EmptyState = () => {
         </div>
         <div>
           <p className="font-bold text-sm">
-            It seems like there are no items in the Detty December category
-            right now.
+            {props.message} {props.title}
           </p>
           <span>
             <a href="/categories"

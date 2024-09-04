@@ -15,19 +15,7 @@ export const ExploreModule = () => {
     threshold: 0,
   })
 
-  const [empty, setEmpty] = useState(false)
-
-  useEffect(() => {
-    const dettyDecemberCategory = categories.find(
-      category => category.name === 'Detty December',
-    )
-
-    if (dettyDecemberCategory && dettyDecemberCategory.count.length <= 0) {
-      setEmpty(true)
-    } else {
-      setEmpty(false)
-    }
-  }, [categories])
+  const [empty, setEmpty] = useState(true)
 
 
   return (
@@ -46,7 +34,7 @@ export const ExploreModule = () => {
           <MobileTabComponent />
         </div>
         {empty ? (
-          <EmptyState />
+          <EmptyState message={"It seems like the category currently has no items for."} title={"Detty December"} />
         ) : (
           <div className="col-span-1 lg:col-span-3">
             <FadeInStagger faster>
