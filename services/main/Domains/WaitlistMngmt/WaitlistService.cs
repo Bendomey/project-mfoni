@@ -53,7 +53,7 @@ public class WaitlistService
                 ApiKey = _appConstantsConfiguration.ResendApiKey
             });
         }
-        
+
         return __waitlist;
     }
 }
