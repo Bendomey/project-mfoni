@@ -2,6 +2,7 @@ using main.Configuratons;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using main.Lib;
 
 namespace main.Domains;
 

@@ -1,10 +1,11 @@
 using Microsoft.OpenApi.Models;
 using main.Domains;
+using main.Transformations;
 using main.HostedServices;
 using main.Configuratons;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,19 +16,12 @@ builder.Services.Configure<RabbitMQConnection>(
 builder.Services.Configure<AppConstants>(
     builder.Configuration.GetSection("AppConstants"));
 
-var userSecretKey = builder.Configuration.GetSection("AppConstants:UserJwtSecret").Get<string>();
-
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetSection("AppConstants:RedisConnectionString").Get<string>();
 });
 
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    }).AddJwtBearer(options =>
+builder.Services.AddAuthentication().AddJwtBearer("USER", options =>
      {
          options.TokenValidationParameters = new TokenValidationParameters
          {
@@ -39,17 +33,44 @@ builder.Services.AddAuthentication(options =>
              ValidateLifetime = false,
              ValidateIssuerSigningKey = true
          };
+     }).AddJwtBearer("ADMIN", options =>
+     {
+         options.TokenValidationParameters = new TokenValidationParameters
+         {
+             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppConstants:AdminJwtSecret"]!)),
+             ValidIssuer = builder.Configuration["AppConstants:JwtIssuer"],
+             ValidAudience = builder.Configuration["AppConstants:JwtIssuer"],
+             ValidateIssuer = true,
+             ValidateAudience = true,
+             ValidateLifetime = true,
+             ValidateIssuerSigningKey = true
+         };
      });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.DefaultPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .AddAuthenticationSchemes("USER")
+            .Build();
+
+    options.AddPolicy("Admin", new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .AddAuthenticationSchemes("ADMIN")
+                .Build());
+});
 
 // configurations
 builder.Services.AddSingleton<DatabaseSettings>();
 builder.Services.AddSingleton<RabbitMQConnection>();
 builder.Services.AddSingleton<CacheProvider>();
 
-// auth services
-builder.Services.AddSingleton<Auth>();
+// admin services
+builder.Services.AddSingleton<AdminAuthService>();
+builder.Services.AddSingleton<AdminService>();
+
+// user services
+builder.Services.AddSingleton<UserAuth>();
 builder.Services.AddSingleton<UserService>();
 
 // search services
@@ -65,7 +86,11 @@ builder.Services.AddSingleton<CollectionContentService>();
 builder.Services.AddSingleton<IndexContent>();
 builder.Services.AddSingleton<ProcessIndexContent>();
 
-builder.Services.AddScoped<WaitlistService>();
+builder.Services.AddSingleton<WaitlistService>();
+
+// inject transformers
+builder.Services.AddSingleton<AdminTransformer>();
+
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();
 

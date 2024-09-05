@@ -15,13 +15,14 @@ public class Admin
     [BsonElement("email")]
     public required string Email { get; set; }
 
+    [BsonElement("password")]
     public required string Password { get; set; }
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [BsonElement("created_by_id")]
-    public ObjectId? CreatedById { get; set; }
+    public string? CreatedById { get; set; }
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

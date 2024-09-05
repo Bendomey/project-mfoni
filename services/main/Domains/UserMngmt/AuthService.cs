@@ -10,14 +10,14 @@ using main.Models;
 
 namespace main.Domains;
 
-public class Auth
+public class UserAuth
 {
-    private readonly ILogger<SaveTags> _logger;
+    private readonly ILogger<UserAuth> _logger;
     private readonly IMongoCollection<Models.User> _usersCollection;
     private readonly IMongoCollection<Models.CreatorApplication> _creatorsCollection;
     private readonly AppConstants _appConstantsConfiguration;
 
-    public Auth(ILogger<SaveTags> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
+    public UserAuth(ILogger<UserAuth> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
     {
         _logger = logger;
 
@@ -61,7 +61,6 @@ public class Auth
                 Photo = input.UserPhoto
             };
 
-            _logger.LogInformation("Creating new user: " + __user);
             _usersCollection.InsertOne(__user);
         }
 
@@ -164,7 +163,7 @@ public class Auth
             Subject = new ClaimsIdentity(new Claim[]
             {
                 new Claim("id", user.Id.ToString()),
-                new Claim(ClaimTypes.Role, "USER"), // Either a USER or ADMIN
+                new Claim(ClaimTypes.Role, "USER"),
             }),
             Issuer = _appConstantsConfiguration.JwtIssuer,
             Audience = _appConstantsConfiguration.JwtIssuer,

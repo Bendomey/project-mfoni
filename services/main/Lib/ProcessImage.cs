@@ -8,6 +8,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using main.Models;
 using Amazon.S3.Model;
 
+namespace main.Lib;
 
 public class IUploadToS3Input
 {

@@ -7,6 +7,7 @@ using RabbitMQ.Client.Events;
 using Amazon.Rekognition;
 using Amazon.Rekognition.Model;
 using Amazon.Runtime;
+using main.Lib;
 
 namespace main.Domains;
 
