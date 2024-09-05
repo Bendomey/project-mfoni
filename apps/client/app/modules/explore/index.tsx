@@ -3,16 +3,20 @@ import {useInView} from 'react-intersection-observer'
 import {ExploreHeroSection} from './components/hero/index.tsx'
 import {WebTabComponent} from './components/tabs/web.tsx'
 import {FadeIn, FadeInStagger} from '@/components/animation/FadeIn.tsx'
-import {Fragment} from 'react'
+import {Fragment, useState} from 'react'
 import {Content} from '@/components/Content/index.tsx'
 import {MobileTabComponent} from './components/tabs/mobile.tsx'
 import {imageUrls} from '../landing-page/index.tsx'
 import {Footer} from '@/components/footer/index.tsx'
+import {EmptyState} from './components/empty-state/index.tsx'
 
 export const ExploreModule = () => {
   const {ref: heroRef, inView} = useInView({
     threshold: 0,
   })
+
+  const [empty] = useState(false)
+
 
   return (
     <div className="relative">
@@ -29,19 +33,23 @@ export const ExploreModule = () => {
         <div className="col-span-1 lg:hidden">
           <MobileTabComponent />
         </div>
-        <div className="col-span-1 lg:col-span-3">
-          <FadeInStagger faster>
-            <div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8 ">
-              {imageUrls.map((url, index) => (
-                <Fragment key={index}>
-                  <FadeIn>
-                    <Content content={{media: url} as any} showFlyout />
-                  </FadeIn>
-                </Fragment>
-              ))}
-            </div>
-          </FadeInStagger>
-        </div>
+        {empty ? (
+          <EmptyState message={"It seems like the category currently has no items for."} title={"Detty December"} />
+        ) : (
+          <div className="col-span-1 lg:col-span-3">
+            <FadeInStagger faster>
+              <div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8 ">
+                {imageUrls.map((url, index) => (
+                  <Fragment key={index}>
+                    <FadeIn>
+                      <Content content={{media: url} as any} showFlyout />
+                    </FadeIn>
+                  </Fragment>
+                ))}
+              </div>
+            </FadeInStagger>
+          </div>
+        )}
       </div>
       <Footer />
     </div>
