@@ -1,5 +1,6 @@
+import { Button } from "@/components/button/index.tsx"
 
-export const EmptyState = (props: {title: string, message: string}) => {
+export const EmptyState = (props: { title: string, message: string }) => {
   return (
     <div
       className="bg-white-100 h-max w-full md:w-[650px] md:mx-28 mx-auto border-t-4 border-white-500 rounded-b text-gray-900 px-4 py-3 shadow-md"
@@ -20,11 +21,11 @@ export const EmptyState = (props: {title: string, message: string}) => {
             {props.message} {props.title}
           </p>
           <span>
-            <a href="/categories"
-              className="text-gray-500 hover:text-gray-700 text-sm"
-            >
-              explore categories
-            </a>
+            <Button isLink={true} href="/category" type="button" variant="ghost">
+              <span className="text-gray-500 hover:text-gray-700 text-sm">
+                explore categories
+              </span>
+            </Button>
           </span>
         </div>
       </div>
