@@ -24,5 +24,7 @@ public class AppConstants
     public string AWSSecretKey { get; set; } = null!;
     public string SmsAppId { get; set; } = null!;
     public string SmsAppSecret { get; set; } = null!;
+    public string ResendApiKey { get; set; } = null!;
+    public string EmailFrom { get; set; } = "Mfoni Notifications <noreply@notifications.mfoni.app>";
 
 }
