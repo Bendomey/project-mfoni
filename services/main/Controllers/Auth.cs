@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using main.Middlewares;
 using System.Net;
+using main.Transformations;
 
 namespace main.Controllers;
 
@@ -13,9 +14,9 @@ namespace main.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly ILogger<MediaController> _logger;
-    private readonly Auth _authService;
+    private readonly UserAuth _authService;
 
-    public AuthController(ILogger<MediaController> logger, Auth authService)
+    public AuthController(ILogger<MediaController> logger, UserAuth authService)
     {
         _logger = logger;
         _authService = authService;

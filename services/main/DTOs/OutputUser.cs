@@ -1,6 +1,4 @@
 
-using main.Models;
-
 namespace main.DTOs;
 
 public class OutputUser

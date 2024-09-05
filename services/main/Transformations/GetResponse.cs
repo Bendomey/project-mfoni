@@ -1,5 +1,6 @@
 using main.DTOs;
 
+namespace main.Transformations;
 
 public class GetEntityResponse<T>
 {

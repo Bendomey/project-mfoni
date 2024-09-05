@@ -1,5 +1,5 @@
 
-
+namespace main.Lib;
 
 public class EmailTemplates
 {
@@ -27,5 +27,17 @@ P.S. Let's hang out on socials:
 Twitter(https://twitter.com/mfoniapp)
 
 #mfoniComingSoon #GhanaPhotography #SnapShareDiscover
+    ";
+
+    public static string NewAdminSubject = "Welcome to the mfoni crew 📸";
+
+    public static string NewAdminBody = @"
+Hey {name},
+
+You can access the admin portal with these credentials:
+Email: {email}
+Password: {password}
+
+The mfoni Team
     ";
 }

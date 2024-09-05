@@ -6,14 +6,14 @@ public class AppConstants
     public string DatabaseName { get; set; } = null!;
     public string RedisConnectionString { get; set; } = null!;
     public string RabbitMQConnectionString { get; set; } = null!;
-    public string AdminCollection { get; set; } = null!;
-    public string UserCollection { get; set; } = null!;
-    public string CollectionCollection { get; set; } = null!;
-    public string CollectionContentCollection { get; set; } = null!;
-    public string ContentCollection { get; set; } = null!;
-    public string CreatorApplicatonCollection { get; set; } = null!;
-    public string TagCollection { get; set; } = null!;
-    public string WaitlistCollection { get; set; } = "waitlists";
+    public string AdminCollection { get; init; } = "admins";
+    public string UserCollection { get; init; } = "users";
+    public string CollectionCollection { get; init; } = "collections";
+    public string CollectionContentCollection { get; init; } = "collection_contents";
+    public string ContentCollection { get; init; } = "contents";
+    public string CreatorApplicatonCollection { get; init; } = "creator_applications";
+    public string TagCollection { get; init; } = "tags";
+    public string WaitlistCollection { get; init; } = "waitlists";
     public string BucketName { get; set; } = null!;
     public string AWSRekognitionCollection { get; set; } = null!;
     public string ProcessImageQueueName { get; set; } = null!;
@@ -25,6 +25,6 @@ public class AppConstants
     public string SmsAppId { get; set; } = null!;
     public string SmsAppSecret { get; set; } = null!;
     public string ResendApiKey { get; set; } = null!;
-    public string EmailFrom { get; set; } = "Mfoni Notifications <noreply@notifications.mfoni.app>";
+    public string EmailFrom { get; init; } = "Mfoni Notifications <noreply@notifications.mfoni.app>";
 
 }

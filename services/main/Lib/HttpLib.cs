@@ -1,5 +1,8 @@
 
+using main.Transformations;
 using MongoDB.Driver;
+
+namespace main.Lib;
 
 public class FilterQuery<T>
 {
