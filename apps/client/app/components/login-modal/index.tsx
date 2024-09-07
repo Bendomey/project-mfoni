@@ -23,6 +23,15 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
       setShowModal(false);
     }
   };
+
+  // Handle key events to simulate clicks
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.stopPropagation();
+      setShowModal(false); // Simulate the button click
+    }
+  };
+  
   return (
     <>
       {showModal ? (
@@ -31,12 +40,12 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
           ref={dialogRef}    
           aria-modal="true"     
           onClick={handleBackdropClick}
-          tabIndex={0}         
+                  
           >
             <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 relative"
-            onClick={(e) => e.stopPropagation()} 
-            role="html"     
-            tabIndex={-1}   
+            onClick={(e) => e.stopPropagation()}     
+            tabIndex={0}   
+            onKeyDown={handleKeyDown}
             >
               <button
                 className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
