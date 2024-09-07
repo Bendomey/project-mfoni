@@ -18,11 +18,11 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
   }, [showModal]);
 
   // Handle click outside the modal to close it
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
-    if (dialogRef.current && !dialogRef.current.contains(e.target as Node)) {
-      setShowModal(false);
-    }
-  };
+  // const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
+  //   if (dialogRef.current && !dialogRef.current.contains(e.target as Node)) {
+  //     setShowModal(false);
+  //   }
+  // };
 
   // Handle key events to simulate clicks
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
