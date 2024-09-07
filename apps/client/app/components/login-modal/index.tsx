@@ -31,7 +31,7 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
       setShowModal(false); // Simulate the button click
     }
   };
-  
+
   return (
     <>
       {showModal ? (
@@ -39,11 +39,11 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
           <dialog  className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
           ref={dialogRef}    
           aria-modal="true"     
-          onClick={handleBackdropClick}
+          // onClick={handleBackdropClick}
                   
           >
             <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 relative"
-            onClick={(e) => e.stopPropagation()}     
+            // onClick={(e) => e.stopPropagation()}     
             tabIndex={0}   
             onKeyDown={handleKeyDown}
             >
