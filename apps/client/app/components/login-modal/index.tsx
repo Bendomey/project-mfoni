@@ -7,29 +7,29 @@ interface Props {
 }
 
 export const LoginModal = ({showModal, setShowModal}: Props) => {
-    const modalRef = useRef<HTMLDivElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Handle click outside the modal to close it
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      setShowModal(false)
+      setShowModal(false);
     }
-  }
+  };
   return (
     <>
       {showModal ? (
         <>
-          <dialog  className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          aria-modal="true"
-          onClick={handleBackdropClick}>
+          <div  className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          role="dialog"        // Added role to indicate this is a dialog
+          aria-modal="true"     // Indicate that the modal is active
+          onClick={handleBackdropClick}
+          tabIndex={0}          // Make the element focusable
+          >
             <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 relative"
             ref={modalRef}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.stopPropagation();
-              }
-            }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()} // Prevent click propagation to backdrop
+            role="document"     // Indicate that this is the content of the dialog
+            tabIndex={-1}   
             >
               <button
                 className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
@@ -41,7 +41,7 @@ export const LoginModal = ({showModal, setShowModal}: Props) => {
                 <h2>Login</h2>
                 <LoginModule />
             </div>
-          </dialog>
+          </div>
         </>
       ) : null}
     </>
