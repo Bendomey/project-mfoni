@@ -22,6 +22,10 @@ public class GetEntityResponse<T>
     }
 }
 
+public record ApiEntityResponse<T>(T? Result, string? ErrorMessage = null);
+
+public record ApiErrorResponse(string? ErrorMessage, object? Result = null);
+
 public class EntityWithPagination<T>
 {
     public required List<T> Rows { get; set; }
