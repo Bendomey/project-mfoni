@@ -14,7 +14,7 @@ import {
 } from '@/api/contents/index.ts'
 import {useNavigate} from '@remix-run/react'
 import {safeString} from '@/lib/strings.ts'
-import { useEnvContext } from '@/providers/env/index.tsx'
+import {useEnvContext} from '@/providers/env/index.tsx'
 
 // 30 MB
 const MAX_SIZE = 30
