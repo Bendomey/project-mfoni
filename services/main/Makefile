@@ -6,8 +6,8 @@ trust-https:
 
 # Run application.
 run-dev:
-	dotnet run --launch-profile Development
-
+	ASPNETCORE_ENVIRONMENT=Development dotnet watch run
+	
 run-staging:
 	dotnet run --launch-profile Staging
 

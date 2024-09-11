@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Security.Claims;
 using main.Domains;
 using main.DTOs;
-using Microsoft.AspNetCore.Authorization;
 using main.Middlewares;
-using System.Security.Claims;
-using MongoDB.Driver;
-using System.Net;
 using main.Transformations;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 
 namespace main.Controllers;
 
@@ -18,7 +18,11 @@ public class MediaController : ControllerBase
     private readonly IndexContent _indexContentService;
     private readonly SearchContent _searchContentService;
 
-    public MediaController(ILogger<MediaController> logger, IndexContent indexContentService, SearchContent searchContentService)
+    public MediaController(
+        ILogger<MediaController> logger,
+        IndexContent indexContentService,
+        SearchContent searchContentService
+    )
     {
         _logger = logger;
         _indexContentService = indexContentService;
@@ -32,17 +36,24 @@ public class MediaController : ControllerBase
         try
         {
             _logger.LogInformation("Saving media");
-            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var currentUser = CurrentUser.GetCurrentUser(
+                HttpContext.User.Identity as ClaimsIdentity
+            );
 
             var contents = _indexContentService.Save(mediaInput, currentUser);
 
-            var res = contents.Select(content =>
-            {
-                var outputContent = new GetOutputContent(content);
-                return outputContent.Result();
-            }).ToList();
+            var res = contents
+                .Select(content =>
+                {
+                    var outputContent = new GetOutputContent(content);
+                    return outputContent.Result();
+                })
+                .ToList();
 
-            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(res, null).Result()) { StatusCode = StatusCodes.Status201Created };
+            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(res, null).Result())
+            {
+                StatusCode = StatusCodes.Status201Created
+            };
         }
         catch (HttpRequestException e)
         {
@@ -52,14 +63,18 @@ public class MediaController : ControllerBase
                 statusCode = (HttpStatusCode)e.StatusCode;
             }
 
-            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+            return new ObjectResult(
+                new GetEntityResponse<List<OutputContent>>(null, e.Message).Result()
+            )
+            {
+                StatusCode = (int)statusCode
+            };
         }
         catch (Exception e)
         {
             this._logger.LogError($"Failed to save media. Exception: {e}");
             return new StatusCodeResult(500);
         }
-
     }
 
     [HttpGet]
@@ -84,14 +99,18 @@ public class MediaController : ControllerBase
             }
             var contents = await _searchContentService.VisualSearch(imageBytes);
 
-            var res = contents.Select(content =>
+            var res = contents
+                .Select(content =>
+                {
+                    var outputContent = new GetOutputContent(content);
+                    return outputContent.Result();
+                })
+                .ToList();
+
+            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(res, null).Result())
             {
-                var outputContent = new GetOutputContent(content);
-                return outputContent.Result();
-            }).ToList();
-
-            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(res, null).Result()) { StatusCode = StatusCodes.Status200OK };
-
+                StatusCode = StatusCodes.Status200OK
+            };
         }
         catch (HttpRequestException e)
         {
@@ -101,7 +120,12 @@ public class MediaController : ControllerBase
                 statusCode = (HttpStatusCode)e.StatusCode;
             }
 
-            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+            return new ObjectResult(
+                new GetEntityResponse<List<OutputContent>>(null, e.Message).Result()
+            )
+            {
+                StatusCode = (int)statusCode
+            };
         }
         catch (Exception e)
         {
@@ -119,13 +143,18 @@ public class MediaController : ControllerBase
 
             var contents = await _searchContentService.TextualSearch(body.Query);
 
-            var res = contents.Select(content =>
-            {
-                var outputContent = new GetOutputContent(content);
-                return outputContent.Result();
-            }).ToList();
+            var res = contents
+                .Select(content =>
+                {
+                    var outputContent = new GetOutputContent(content);
+                    return outputContent.Result();
+                })
+                .ToList();
 
-            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(res, null).Result()) { StatusCode = StatusCodes.Status200OK };
+            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(res, null).Result())
+            {
+                StatusCode = StatusCodes.Status200OK
+            };
         }
         catch (HttpRequestException e)
         {
@@ -135,7 +164,12 @@ public class MediaController : ControllerBase
                 statusCode = (HttpStatusCode)e.StatusCode;
             }
 
-            return new ObjectResult(new GetEntityResponse<List<OutputContent>>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+            return new ObjectResult(
+                new GetEntityResponse<List<OutputContent>>(null, e.Message).Result()
+            )
+            {
+                StatusCode = (int)statusCode
+            };
         }
         catch (Exception e)
         {

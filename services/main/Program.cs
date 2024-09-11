@@ -1,63 +1,82 @@
-using Microsoft.OpenApi.Models;
-using main.Domains;
-using main.Transformations;
-using main.HostedServices;
-using main.Configuratons;
-using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Text;
+using main.Configuratons;
+using main.Domains;
+using main.HostedServices;
+using main.Transformations;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<RabbitMQConnection>(
-    builder.Configuration.GetSection("RabbitMQConnection"));
+    builder.Configuration.GetSection("RabbitMQConnection")
+);
 
-builder.Services.Configure<AppConstants>(
-    builder.Configuration.GetSection("AppConstants"));
+builder.Services.Configure<AppConstants>(builder.Configuration.GetSection("AppConstants"));
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = builder.Configuration.GetSection("AppConstants:RedisConnectionString").Get<string>();
+    options.Configuration = builder
+        .Configuration.GetSection("AppConstants:RedisConnectionString")
+        .Get<string>();
 });
 
-builder.Services.AddAuthentication().AddJwtBearer("USER", options =>
-     {
-         options.TokenValidationParameters = new TokenValidationParameters
-         {
-             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppConstants:UserJwtSecret"]!)),
-             ValidIssuer = builder.Configuration["AppConstants:JwtIssuer"],
-             ValidAudience = builder.Configuration["AppConstants:JwtIssuer"],
-             ValidateIssuer = true,
-             ValidateAudience = true,
-             ValidateLifetime = false,
-             ValidateIssuerSigningKey = true
-         };
-     }).AddJwtBearer("ADMIN", options =>
-     {
-         options.TokenValidationParameters = new TokenValidationParameters
-         {
-             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppConstants:AdminJwtSecret"]!)),
-             ValidIssuer = builder.Configuration["AppConstants:JwtIssuer"],
-             ValidAudience = builder.Configuration["AppConstants:JwtIssuer"],
-             ValidateIssuer = true,
-             ValidateAudience = true,
-             ValidateLifetime = true,
-             ValidateIssuerSigningKey = true
-         };
-     });
+builder
+    .Services.AddAuthentication()
+    .AddJwtBearer(
+        "USER",
+        options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(builder.Configuration["AppConstants:UserJwtSecret"]!)
+                ),
+                ValidIssuer = builder.Configuration["AppConstants:JwtIssuer"],
+                ValidAudience = builder.Configuration["AppConstants:JwtIssuer"],
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = false,
+                ValidateIssuerSigningKey = true
+            };
+        }
+    )
+    .AddJwtBearer(
+        "ADMIN",
+        options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(builder.Configuration["AppConstants:AdminJwtSecret"]!)
+                ),
+                ValidIssuer = builder.Configuration["AppConstants:JwtIssuer"],
+                ValidAudience = builder.Configuration["AppConstants:JwtIssuer"],
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true
+            };
+        }
+    );
 
 builder.Services.AddAuthorization(options =>
 {
     options.DefaultPolicy = new AuthorizationPolicyBuilder()
-            .RequireAuthenticatedUser()
-            .AddAuthenticationSchemes("USER")
-            .Build();
+        .RequireAuthenticatedUser()
+        .AddAuthenticationSchemes("USER")
+        .Build();
 
-    options.AddPolicy("Admin", new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .AddAuthenticationSchemes("ADMIN")
-                .Build());
+    options.AddPolicy(
+        "Admin",
+        new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .AddAuthenticationSchemes("ADMIN")
+            .Build()
+    );
 });
 
 // configurations
@@ -95,15 +114,43 @@ builder.Services.AddSingleton<AdminTransformer>();
 builder.Services.AddHostedService<ConsumerHostedService>();
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Mfoni API",
-        Version = "v1"
-    });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Mfoni API", Version = "v1" });
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+    options.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Please enter a valid token",
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+            Scheme = "Bearer"
+        }
+    );
+    options.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                new string[] { }
+            }
+        }
+    );
 });
 
 var app = builder.Build();
@@ -118,10 +165,7 @@ if (!app.Environment.IsProduction())
 // app.UseHttpsRedirection();
 
 // @TODO: secure based on our frontend setup.
-app.UseCors(builder => builder
-    .AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader());
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.UseAuthentication();
 app.UseAuthorization();
