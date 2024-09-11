@@ -73,7 +73,7 @@ public class AdminService
             throw new HttpRequestException(
                 "Admin not found",
                 inner: default,
-                statusCode: HttpStatusCode.BadRequest
+                statusCode: HttpStatusCode.NotFound
             );
         }
 

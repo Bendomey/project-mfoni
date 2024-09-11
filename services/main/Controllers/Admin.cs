@@ -126,7 +126,7 @@ public class AdminController : ControllerBase
     /// <response code="500">An unknown error occured</response>
     [Authorize(Policy = "Admin")]
     [HttpPatch]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiEntityResponse<OutputAdmin>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiEntityResponse<bool>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiErrorResponse))]
     [ProducesResponseType(
@@ -144,7 +144,7 @@ public class AdminController : ControllerBase
             var admin = await _adminService.UpdatePassword(currentAdmin.Id, input);
             var transformed = _adminTransformer.Transform(admin);
 
-            return new ObjectResult(new GetEntityResponse<OutputAdmin>(transformed, null).Result())
+            return new ObjectResult(new GetEntityResponse<bool>(true, null).Result())
             {
                 StatusCode = StatusCodes.Status200OK
             };
