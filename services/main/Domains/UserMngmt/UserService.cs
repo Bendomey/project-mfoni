@@ -35,8 +35,37 @@ public class UserService
         logger.LogDebug("User service initialized");
     }
 
+    public bool SetupAccount(SetupAccountInput accountInput, CurrentUserOutput userInput)
+    {
+        var user = _userCollection.Find<Models.User>(user => user.Id == userInput.Id).FirstOrDefault();
+
+        if (user is null)
+        {
+            throw new HttpRequestException("UserNotFound");
+        }
+
+        user.Role = accountInput.Role;
+        user.Name = accountInput.Name;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        if (accountInput.Role == UserRole.CREATOR)
+        {
+            var __newCreatorApplication = new Models.CreatorApplication
+            {
+                UserId = user.Id,
+                IntendedPricingPackage = accountInput.IntendedPricingPackage,
+            };
+            _creatorApplicationCollection.InsertOne(__newCreatorApplication);
+        }
+
+        _userCollection.ReplaceOne(user => user.Id == userInput.Id, user);
+        return true;
+    }
+
     public async Task<bool> SavePhoneNumber(string phoneNumber, string userId)
     {
+        var normalizedPhoneNumber = StringLib.NormalizePhoneNumber(phoneNumber);
+
         var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
         if (user is null)
         {
@@ -44,7 +73,7 @@ public class UserService
         }
 
         // verify if phone number has been taken already
-        var userExistsWithPhoneNumber = await _userCollection.Find(user => user.PhoneNumber == phoneNumber).FirstOrDefaultAsync();
+        var userExistsWithPhoneNumber = await _userCollection.Find(user => user.PhoneNumber == normalizedPhoneNumber).FirstOrDefaultAsync();
         if (userExistsWithPhoneNumber != null && userExistsWithPhoneNumber.Id != userId)
         {
             throw new HttpRequestException("PhoneNumberAlreadyExists");
@@ -52,11 +81,11 @@ public class UserService
 
         var filter = Builders<Models.User>.Filter.Eq(u => u.Id, userId);
         var updates = Builders<Models.User>.Update
-            .Set(r => r.PhoneNumber, phoneNumber);
+            .Set(r => r.PhoneNumber, normalizedPhoneNumber);
 
-        if (phoneNumber != user.PhoneNumber)
+        if (normalizedPhoneNumber != user.PhoneNumber)
         {
-            updates = updates.Set(r => r.VerifiedPhoneNumberAt, null);
+            updates = updates.Set(r => r.PhoneNumberVerifiedAt, null);
         }
 
         await _userCollection.UpdateOneAsync(filter, updates);
@@ -71,8 +100,8 @@ public class UserService
 
         await SmsConfiguration.SendSms(new SendSmsInput
         {
-            PhoneNumber = phoneNumber,
-            Message = $"Hello {user.Name},\\n\\nYour OTP is {code}. Please use this code to complete your action.\\n\\nThank you.",
+            PhoneNumber = normalizedPhoneNumber,
+            Message = EmailTemplates.VerifyPhoneNumberBody.Replace("{code}", code).Replace("{name}", user.Name),
             AppId = _appConstantsConfiguration.SmsAppId,
             AppSecret = _appConstantsConfiguration.SmsAppSecret
         });
@@ -88,7 +117,7 @@ public class UserService
             throw new HttpRequestException("UserNotFound");
         }
 
-        if (user.VerifiedPhoneNumberAt is not null)
+        if (user.PhoneNumberVerifiedAt is not null)
         {
             throw new HttpRequestException("PhoneNumberAlreadyVerified");
         }
@@ -101,91 +130,46 @@ public class UserService
         }
 
         var filter = Builders<Models.User>.Filter.Eq(r => r.Id, user.Id);
-        var updates = Builders<Models.User>.Update.Set(v => v.VerifiedPhoneNumberAt, DateTime.Now);
+        var updates = Builders<Models.User>.Update.Set(v => v.PhoneNumberVerifiedAt, DateTime.Now);
         await _userCollection.UpdateOneAsync(filter, updates);
 
         // await _cacheProvider.ClearCache($"verify-{user.Id}");
         return true;
     }
 
-    public async Task VerifyIdentity(IdentityVerificationInput input)
+    public async Task<CreatorApplication> SubmitCreatorApplication(SubmitCreatorApplicationInput input, string userId)
     {
-        // verify reference id
-        var normalizedPhoneNumber = StringLib.NormalizePhoneNumber(input.ReferenceId);
-        var user = await _userCollection.Find(user => user.PhoneNumber == normalizedPhoneNumber).FirstOrDefaultAsync();
+        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
         if (user is null)
         {
             throw new HttpRequestException("UserNotFound");
         }
 
-        var creatorApplication = await _creatorApplicationCollection.Find(creatorApplication => creatorApplication.Id == user.CreatorApplicationId).FirstOrDefaultAsync();
+        var filterByUserId = Builders<CreatorApplication>.Filter.Eq(creatorApplication => creatorApplication.UserId, userId);
+        var filterByStatus = Builders<CreatorApplication>.Filter.Eq(creatorApplication => creatorApplication.Status, CreatorApplicationStatus.PENDING);
+
+        // Combine filters using AND
+        var combinedFilter = Builders<CreatorApplication>.Filter.And(filterByUserId, filterByStatus);
+
+        var creatorApplication = await _creatorApplicationCollection.Find(combinedFilter).FirstOrDefaultAsync();
         if (creatorApplication is null)
         {
             throw new HttpRequestException("CreatorApplicationNotFound");
         }
 
-        if (creatorApplication.Status != CreatorApplicationStatus.PENDING)
-        {
-            throw new HttpRequestException("CreatorApplicationNotPending");
-        }
+        var idFilter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
+        var userUpdates = Builders<CreatorApplication>.Update
+            .Set(r => r.IdType, input.IdType)
+            .Set(r => r.IdNumber, input.IdNumber)
+            .Set(r => r.IdFrontImage, input.IdFrontImage)
+            .Set(r => r.IdBackImage, input.IdBackImage)
+            .Set(r => r.Status, CreatorApplicationStatus.SUBMITTED)
+            .Set(r => r.SubmittedAt, DateTime.UtcNow)
+            .Set(r => r.UpdatedAt, DateTime.UtcNow);
 
-        // check the status of the identity response
-        if (input.Status == IdentityVerificationInputStatus.FAILED)
-        {
-            // once its a failed status, we create a new creatorApplication for the applicant and reject it. We need to create records for all failed transactions.
-            var __newCreatorApplication = new CreatorApplication
-            {
-                ApplicantId = user.Id,
-                Status = CreatorApplicationStatus.REJECTED,
-                IdentityProviderResponse = new IdentityProviderResponse
-                {
-                    TransactionNumber = input.TransactionNumber,
-                    PictureMatchScore = input.PictureMatchScore,
-                    LivenessVerificationScore = input.LivenessVerificationScore,
-                    DateOfBirthMatchScore = input.DateOfBirthMatchScore,
-                    NameMatchScore = input.NameMatchScore,
-                    Image = input.Image,
-                    OverAllComparismScore = input.OverAllComparismScore,
-                    Status = input.Status,
-                    ReferenceId = input.ReferenceId,
-                    IdNumber = input.IdNumber,
-                    VerificationResult = input.VerificationResult
-                }
-            };
+        await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
 
-            _creatorApplicationCollection.InsertOne(__newCreatorApplication);
-        }
-        else if (input.Status == IdentityVerificationInputStatus.SUCCESSFUL)
-        {
-            // if its successful, we update the creatorApplication status to approved
-            var filter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
-            var updates = Builders<CreatorApplication>.Update
-                .Set(r => r.Status, CreatorApplicationStatus.APPROVED)
-                .Set(r => r.ApprovedAt, DateTime.UtcNow)
-                .Set(r => r.UpdatedAt, DateTime.UtcNow)
-                .Set(r => r.IdentityProviderResponse, new IdentityProviderResponse
-                {
-                    TransactionNumber = input.TransactionNumber,
-                    PictureMatchScore = input.PictureMatchScore,
-                    LivenessVerificationScore = input.LivenessVerificationScore,
-                    DateOfBirthMatchScore = input.DateOfBirthMatchScore,
-                    NameMatchScore = input.NameMatchScore,
-                    Image = input.Image,
-                    OverAllComparismScore = input.OverAllComparismScore,
-                    Status = input.Status,
-                    ReferenceId = input.ReferenceId,
-                    IdNumber = input.IdNumber,
-                    VerificationResult = input.VerificationResult
-                });
-            await _creatorApplicationCollection.UpdateOneAsync(filter, updates);
-
-            // update the user role to creator
-            var userFilter = Builders<Models.User>.Filter.Eq(r => r.Id, user.Id);
-            var userUpdates = Builders<Models.User>.Update
-                .Set(r => r.UpdatedAt, DateTime.UtcNow)
-                .Set(r => r.Role, UserRole.CREATOR);
-            await _userCollection.UpdateOneAsync(userFilter, userUpdates);
-        }
+        return creatorApplication;
     }
 }
 

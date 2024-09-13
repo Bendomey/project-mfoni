@@ -23,7 +23,7 @@ public class AdminTransformer
             var createdBy = _adminService.GetAdminById(admin.CreatedById);
             if (createdBy is not null)
             {
-                outputCreatedByAdmin = Transform(createdBy); ;
+                outputCreatedByAdmin = Transform(createdBy);
             }
         }
 

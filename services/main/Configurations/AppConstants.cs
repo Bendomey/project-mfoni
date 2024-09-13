@@ -12,6 +12,7 @@ public class AppConstants
     public string CollectionContentCollection { get; init; } = "collection_contents";
     public string ContentCollection { get; init; } = "contents";
     public string CreatorApplicatonCollection { get; init; } = "creator_applications";
+    public string CreatorCollection { get; init; } = "creators";
     public string TagCollection { get; init; } = "tags";
     public string WaitlistCollection { get; init; } = "waitlists";
     public string BucketName { get; set; } = null!;
