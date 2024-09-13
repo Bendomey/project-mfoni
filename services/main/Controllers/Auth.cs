@@ -6,6 +6,7 @@ using System.Security.Claims;
 using main.Middlewares;
 using System.Net;
 using main.Transformations;
+using Microsoft.OpenApi.Any;
 
 namespace main.Controllers;
 
@@ -15,21 +16,33 @@ public class AuthController : ControllerBase
 {
     private readonly ILogger<MediaController> _logger;
     private readonly UserAuth _authService;
+    private readonly UserService _userService;
+    private readonly UserTransformer _userTransformer;
 
-    public AuthController(ILogger<MediaController> logger, UserAuth authService)
+    public AuthController(ILogger<MediaController> logger, UserAuth authService, UserService userService, UserTransformer userTransformer)
     {
         _logger = logger;
         _authService = authService;
+        _userService = userService;
+        _userTransformer = userTransformer;
     }
 
     [HttpPost("auth")]
+    [ProducesResponseType(typeof(OutputResponse<DTOs.AuthenticateResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     public IActionResult Authenticate([FromBody] AuthenticateInput input)
     {
         try
         {
             _logger.LogInformation("Authenticate user input: " + input);
             var res = _authService.Authenticate(input);
-            return new ObjectResult(new GetEntityResponse<AuthenticateResponse>(res, null).Result()) { StatusCode = StatusCodes.Status200OK };
+
+            var output = new DTOs.AuthenticateResponse
+            {
+                Token = res.Token,
+                User = _userTransformer.Transform(res.User)
+            };
+            return new ObjectResult(new GetEntityResponse<DTOs.AuthenticateResponse>(output, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
         catch (HttpRequestException e)
         {
@@ -39,7 +52,7 @@ public class AuthController : ControllerBase
                 statusCode = (HttpStatusCode)e.StatusCode;
             }
 
-            return new ObjectResult(new GetEntityResponse<AuthenticateResponse>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+            return new ObjectResult(new GetEntityResponse<DTOs.AuthenticateResponse>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {
@@ -50,13 +63,15 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpPost("auth/setup")]
+    [ProducesResponseType(typeof(OutputResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     public IActionResult SetupAccount([FromBody] SetupAccountInput input)
     {
         try
         {
             _logger.LogInformation("Setting up account." + input);
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
-            var res = _authService.SetupAccount(input, currentUser);
+            var res = _userService.SetupAccount(input, currentUser);
 
             return new ObjectResult(new GetEntityResponse<bool?>(true, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
@@ -79,6 +94,8 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("auth/me")]
+    [ProducesResponseType(typeof(OutputResponse<OutputUser>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     public IActionResult Me()
     {
         try
@@ -86,7 +103,8 @@ public class AuthController : ControllerBase
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var res = _authService.Me(currentUser);
 
-            return new ObjectResult(new GetEntityResponse<Models.User>(res, null).Result()) { StatusCode = StatusCodes.Status200OK };
+
+            return new ObjectResult(new GetEntityResponse<OutputUser>(_userTransformer.Transform(res!), null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
         catch (HttpRequestException e)
         {
@@ -96,7 +114,7 @@ public class AuthController : ControllerBase
                 statusCode = (HttpStatusCode)e.StatusCode;
             }
 
-            return new ObjectResult(new GetEntityResponse<Models.User>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+            return new ObjectResult(new GetEntityResponse<OutputUser>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {

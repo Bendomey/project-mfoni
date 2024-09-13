@@ -40,6 +40,9 @@ public class AdminController : ControllerBase
 
     [Authorize(Policy = "Admin")]
     [HttpPost]
+    [ProducesResponseType(typeof(OutputResponse<OutputAdmin>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult> AddAdmin([FromBody] DTOs.CreateAdminInput input)
     {
         try
@@ -87,6 +90,8 @@ public class AdminController : ControllerBase
     }
 
     [HttpPost("login")]
+    [ProducesResponseType(typeof(OutputResponse<DTOs.AdminAuthenticateResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     public ActionResult Login([FromBody] LoginAdminInput input)
     {
         try

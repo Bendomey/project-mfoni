@@ -92,6 +92,7 @@ builder.Services.AddSingleton<SearchAdmin>();
 // user services
 builder.Services.AddSingleton<UserAuth>();
 builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<CreatorApplicationService>();
 
 // search services
 builder.Services.AddSingleton<SearchTag>();
@@ -110,6 +111,9 @@ builder.Services.AddSingleton<WaitlistService>();
 
 // inject transformers
 builder.Services.AddSingleton<AdminTransformer>();
+builder.Services.AddSingleton<UserTransformer>();
+builder.Services.AddSingleton<CreatorApplicationTransformer>();
+builder.Services.AddSingleton<CreatorTransformer>();
 
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();

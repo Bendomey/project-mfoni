@@ -12,10 +12,10 @@ public class GetOutputUser
     {
         _user = new OutputUser
         {
+            Status = user.Status,
             Id = user.Id,
             Role = user.Role,
             Name = user.Name,
-            Username = user.Username,
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,
             Photo = user.Photo,

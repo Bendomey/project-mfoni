@@ -23,6 +23,7 @@ public class Admin
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [BsonElement("created_by_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
     public string? CreatedById { get; set; }
 
     [BsonElement("updated_at")]
