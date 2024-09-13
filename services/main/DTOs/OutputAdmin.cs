@@ -1,4 +1,3 @@
-
 namespace main.DTOs;
 
 public class OutputAdmin

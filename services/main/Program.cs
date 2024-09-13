@@ -87,6 +87,7 @@ builder.Services.AddSingleton<CacheProvider>();
 // admin services
 builder.Services.AddSingleton<AdminAuthService>();
 builder.Services.AddSingleton<AdminService>();
+builder.Services.AddSingleton<SearchAdmin>();
 
 // user services
 builder.Services.AddSingleton<UserAuth>();
