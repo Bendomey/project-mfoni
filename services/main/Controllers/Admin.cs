@@ -2,10 +2,13 @@ using System.Net;
 using System.Security.Claims;
 using main.Domains;
 using main.DTOs;
+using main.Lib;
 using main.Middlewares;
+using main.Models;
 using main.Transformations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Any;
 
 namespace main.Controllers;
 
@@ -16,18 +19,22 @@ public class AdminController : ControllerBase
     private readonly ILogger<WaitlistController> logger;
     private readonly AdminAuthService _adminAuthService;
     private readonly AdminService _adminService;
+
+    private readonly SearchAdmin _searchAdminService;
     private readonly AdminTransformer _adminTransformer;
 
     public AdminController(
         ILogger<WaitlistController> logger,
         AdminAuthService adminAuthService,
         AdminService adminService,
+        SearchAdmin searchAdminService,
         AdminTransformer adminTransformer
     )
     {
         this.logger = logger;
         this._adminAuthService = adminAuthService;
         this._adminService = adminService;
+        this._searchAdminService = searchAdminService;
         this._adminTransformer = adminTransformer;
     }
 
@@ -162,6 +169,62 @@ public class AdminController : ControllerBase
         {
             this.logger.LogError($"Failed to update admin password. Exception: {e}");
             return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpGet]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<EntityWithPagination<Admin>>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? search,
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] string? sort,
+        [FromQuery] string sortBy = "created_at"
+    )
+    {
+        try
+        {
+            logger.LogInformation("Getting all admins");
+            var queryFilter = HttpLib.GenerateFilterQuery<Admin>(page, pageSize, sort, sortBy);
+            var admins = await _searchAdminService.GetAdmins(queryFilter, search);
+            var adminsCount = await _searchAdminService.Count(search);
+
+            var outAdmin = admins.ConvertAll<OutputAdmin>(
+                new Converter<Admin, OutputAdmin>(admin => _adminTransformer.Transform(admin))
+            );
+            var response = HttpLib.GeneratePagination<OutputAdmin, Admin>(
+                outAdmin,
+                adminsCount,
+                queryFilter
+            );
+            return new ObjectResult(
+                new GetEntityResponse<EntityWithPagination<OutputAdmin>>(response, null).Result()
+            )
+            {
+                StatusCode = StatusCodes.Status200OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = e.StatusCode ?? HttpStatusCode.BadRequest;
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result())
+            {
+                StatusCode = (int)statusCode
+            };
+        }
+        catch (Exception e)
+        {
+            logger.LogError($"Failed to get admins. Exception: {e}");
+            return new StatusCodeResult(500);
         }
     }
 }
