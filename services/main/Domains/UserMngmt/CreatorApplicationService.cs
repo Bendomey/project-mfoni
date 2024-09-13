@@ -49,7 +49,7 @@ public class CreatorApplicationService
 
         if (creatorApplication.Status != CreatorApplicationStatus.PENDING)
         {
-            throw new HttpRequestException("CreatorApplicationAlready"+creatorApplication.Status.ToString());
+            throw new HttpRequestException("CreatorApplicationAlready" + creatorApplication.Status.ToString());
         }
 
         var idFilter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
