@@ -1,6 +1,5 @@
 using System.Net;
 using main.Configuratons;
-using main.DTOs;
 using main.Lib;
 using main.Transformations;
 using Microsoft.Extensions.Options;
@@ -49,7 +48,7 @@ public class SearchAdmin
         var filter = Builders<Models.Admin>.Filter.Empty;
         if (query is not null)
         {
-            filter = builder.Regex("", new BsonRegularExpression(query, "i"));
+            filter = builder.Regex("name", new BsonRegularExpression(query, "i"));
         }
 
         var admins = await _adminsCollection
@@ -69,7 +68,7 @@ public class SearchAdmin
 
         if (query is not null)
         {
-            filter = builder.Regex("", new BsonRegularExpression(query, "i"));
+            filter = builder.Regex("name", new BsonRegularExpression(query, "i"));
         }
         var adminsCount = await _adminsCollection.CountDocumentsAsync(filter);
         return adminsCount;

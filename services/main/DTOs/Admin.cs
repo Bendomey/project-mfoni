@@ -1,17 +1,38 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace main.DTOs;
 
 public class CreateAdminInput
 {
+    /// <summary>
+    /// Name of the admin
+    /// </summary>
+    /// <example>John Doe</example>
+    [Required]
     public required string Name { get; set; }
+
+    /// <summary>
+    /// Some email used for sign up
+    /// </summary>
+    /// <example>email@example.com</example>
+    [Required]
     public required string Email { get; set; }
 }
 
 public class LoginAdminInput
 {
+    /// <summary>
+    /// Some email used for sign up
+    /// </summary>
+    /// <example>email@example.com</example>
+    [Required]
     public required string Email { get; set; }
+
+    /// <summary>
+    /// Password retrieved from email
+    /// </summary>
+    /// <example>SomePassword</example>
+    [Required]
     public required string Password { get; set; }
 }
 
