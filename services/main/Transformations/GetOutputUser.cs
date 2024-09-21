@@ -1,5 +1,3 @@
-
-
 using main.DTOs;
 using main.Models;
 
@@ -8,13 +6,14 @@ namespace main.Transformations;
 public class GetOutputUser
 {
     private OutputUser _user;
+
     public GetOutputUser(User user)
     {
         _user = new OutputUser
         {
             Status = user.Status,
             Id = user.Id,
-            Role = user.Role,
+            Role = user.Role!,
             Name = user.Name,
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,
