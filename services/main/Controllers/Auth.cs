@@ -39,7 +39,7 @@ public class AuthController : ControllerBase
         StatusCodes.Status200OK
     )]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
-    public IActionResult Authenticate([FromBody] [Required] AuthenticateInput input)
+    public IActionResult Authenticate([FromBody][Required] AuthenticateInput input)
     {
         try
         {
@@ -84,7 +84,7 @@ public class AuthController : ControllerBase
     [HttpPost("auth/setup")]
     [ProducesResponseType(typeof(OutputResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
-    public IActionResult SetupAccount([FromBody] [Required] SetupAccountInput input)
+    public IActionResult SetupAccount([FromBody][Required] SetupAccountInput input)
     {
         try
         {
