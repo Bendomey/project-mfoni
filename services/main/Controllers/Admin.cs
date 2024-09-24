@@ -57,7 +57,7 @@ public class AdminController : ControllerBase
     [ProducesResponseType(typeof(OutputResponse<OutputAdmin>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult> AddAdmin([FromBody] [Required] DTOs.CreateAdminInput input)
+    public async Task<ActionResult> AddAdmin([FromBody][Required] DTOs.CreateAdminInput input)
     {
         try
         {
@@ -113,7 +113,7 @@ public class AdminController : ControllerBase
         StatusCodes.Status200OK
     )]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
-    public ActionResult Login([FromBody] [Required] LoginAdminInput input)
+    public ActionResult Login([FromBody][Required] LoginAdminInput input)
     {
         try
         {
@@ -166,7 +166,7 @@ public class AdminController : ControllerBase
         StatusCodes.Status500InternalServerError,
         Type = typeof(StatusCodeResult)
     )]
-    public async Task<IActionResult> UpdatePassword([FromBody] [Required] UpdatePasswordInput input)
+    public async Task<IActionResult> UpdatePassword([FromBody][Required] UpdatePasswordInput input)
     {
         try
         {

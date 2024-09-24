@@ -9,7 +9,7 @@ public class GetOutputUser
 
     public GetOutputUser(User user)
     {
-        //TODO:: @Bendomey - Investigate this warning
+        //TODO: @Bendomey - Investigate this warning
         _user = new OutputUser
         {
             Status = user.Status,
