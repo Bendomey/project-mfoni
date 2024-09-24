@@ -5,6 +5,7 @@ using main.Lib;
 using main.Models;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using NanoidDotNet;
 
@@ -282,5 +283,61 @@ public class CreatorApplicationService
         }
 
         return creatorApplication;
+    }
+
+    public async Task<List<CreatorApplication>> GetCreatorApplications(
+        FilterQuery<CreatorApplication> queryFilter,
+        string? status
+    )
+    {
+        FilterDefinitionBuilder<CreatorApplication> builder = Builders<CreatorApplication>.Filter;
+        var filter = builder.Empty;
+
+        List<string> filters = ["status"];
+        List<string> filterValues = [status];
+
+        var regexFilters = filters
+            .Select(
+                (field, index) =>
+                    filterValues[index] != null
+                        ? builder.Regex(field, new BsonRegularExpression(filterValues[index], "i"))
+                        : builder.Empty
+            )
+            .ToList();
+
+        filter = builder.And(regexFilters);
+        var creatorApplications = await _creatorApplicationCollection
+            .Find(filter)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return creatorApplications ?? [];
+    }
+
+    public async Task<long> CountCreatorApplications(string? status)
+    {
+        FilterDefinitionBuilder<CreatorApplication> builder = Builders<CreatorApplication>.Filter;
+        var filter = builder.Empty;
+
+        List<string> filters = ["status"];
+        List<string> filterValues = [status];
+
+        var regexFilters = filters
+            .Select(
+                (field, index) =>
+                    filterValues[index] != null
+                        ? builder.Regex(field, new BsonRegularExpression(filterValues[index], "i"))
+                        : builder.Empty
+            )
+            .ToList();
+
+        filter = builder.And(regexFilters);
+
+        long creatorApplicationsCount = await _creatorApplicationCollection.CountDocumentsAsync(
+            filter
+        );
+        return creatorApplicationsCount;
     }
 }

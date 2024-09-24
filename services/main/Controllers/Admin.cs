@@ -23,6 +23,8 @@ public class AdminController : ControllerBase
     private readonly AdminService _adminService;
 
     private readonly SearchAdmin _searchAdminService;
+    private readonly CreatorApplicationService _creatorApplicationService;
+    private readonly UserService _userService;
     private readonly AdminTransformer _adminTransformer;
     private readonly UserTransformer _userTransformer;
     private readonly CreatorApplicationTransformer _creatorApplicationTransformer;
@@ -32,6 +34,8 @@ public class AdminController : ControllerBase
         AdminAuthService adminAuthService,
         AdminService adminService,
         SearchAdmin searchAdminService,
+        CreatorApplicationService creatorApplicationService,
+        UserService userService,
         AdminTransformer adminTransformer,
         UserTransformer userTransformer,
         CreatorApplicationTransformer creatorApplicationTransformer
@@ -41,6 +45,8 @@ public class AdminController : ControllerBase
         this._adminAuthService = adminAuthService;
         this._adminService = adminService;
         this._searchAdminService = searchAdminService;
+        this._creatorApplicationService = creatorApplicationService;
+        this._userService = userService;
         this._adminTransformer = adminTransformer;
         this._userTransformer = userTransformer;
         this._creatorApplicationTransformer = creatorApplicationTransformer;
@@ -51,7 +57,7 @@ public class AdminController : ControllerBase
     [ProducesResponseType(typeof(OutputResponse<OutputAdmin>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult> AddAdmin([FromBody][Required] DTOs.CreateAdminInput input)
+    public async Task<ActionResult> AddAdmin([FromBody] [Required] DTOs.CreateAdminInput input)
     {
         try
         {
@@ -59,7 +65,12 @@ public class AdminController : ControllerBase
                 HttpContext.User.Identity as ClaimsIdentity
             );
             var admin = await _adminService.Create(
-                new Domains.CreateAdminInput { Name = input.Name, Email = input.Email, }
+                new Domains.CreateAdminInput
+                {
+                    Name = input.Name,
+                    Email = input.Email,
+                    CreatedBy = currentAdmin.Id,
+                }
             );
 
             return new ObjectResult(
@@ -102,7 +113,7 @@ public class AdminController : ControllerBase
         StatusCodes.Status200OK
     )]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
-    public ActionResult Login([FromBody][Required] LoginAdminInput input)
+    public ActionResult Login([FromBody] [Required] LoginAdminInput input)
     {
         try
         {
@@ -155,7 +166,7 @@ public class AdminController : ControllerBase
         StatusCodes.Status500InternalServerError,
         Type = typeof(StatusCodeResult)
     )]
-    public async Task<IActionResult> UpdatePassword([FromBody][Required] UpdatePasswordInput input)
+    public async Task<IActionResult> UpdatePassword([FromBody] [Required] UpdatePasswordInput input)
     {
         try
         {
@@ -221,7 +232,7 @@ public class AdminController : ControllerBase
             var queryFilter = HttpLib.GenerateFilterQuery<Admin>(page, pageSize, sort, sortBy);
             var admins = await _searchAdminService.GetAdmins(queryFilter, search);
 
-            long count = await _searchAdminService.CountAdmins(queryFilter, search);
+            long count = await _searchAdminService.CountAdmins(search);
 
             var outAdmin = admins.ConvertAll<OutputAdmin>(
                 new Converter<Admin, OutputAdmin>(admin => _adminTransformer.Transform(admin))
@@ -250,7 +261,7 @@ public class AdminController : ControllerBase
         catch (Exception e)
         {
             logger.LogError($"Failed to get admins. Exception: {e}");
-            return new StatusCodeResult(500);
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -292,20 +303,15 @@ public class AdminController : ControllerBase
         {
             logger.LogInformation("Getting all users by admins");
             var queryFilter = HttpLib.GenerateFilterQuery<User>(page, pageSize, sort, sortBy);
-            var users = await _searchAdminService.GetUsers(
-                queryFilter,
-                status,
-                role,
-                provider,
-                search
-            );
-            long count = await _searchAdminService.CountUsers(
-                queryFilter,
-                status,
-                role,
-                provider,
-                search
-            );
+            var input = new GetUsersInput
+            {
+                Role = role,
+                Status = status,
+                Provider = provider,
+                Search = search
+            };
+            var users = await _userService.GetUsers(queryFilter, input);
+            long count = await _userService.CountUsers(input);
 
             var outUser = users.ConvertAll<OutputUser>(
                 new Converter<User, OutputUser>(user => _userTransformer.Transform(user))
@@ -334,7 +340,7 @@ public class AdminController : ControllerBase
         catch (Exception e)
         {
             logger.LogError($"An error occured {e}");
-            return new StatusCodeResult(500);
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -375,9 +381,12 @@ public class AdminController : ControllerBase
                 sort,
                 sortBy
             );
-            var creatorApplications = await _searchAdminService.GetCreators(queryFilter, status);
+            var creatorApplications = await _creatorApplicationService.GetCreatorApplications(
+                queryFilter,
+                status
+            );
 
-            long count = await _searchAdminService.CountCreators(queryFilter, status);
+            long count = await _creatorApplicationService.CountCreatorApplications(status);
 
             var outCreatorApplications = creatorApplications.ConvertAll<OutputCreatorApplication>(
                 new Converter<CreatorApplication, OutputCreatorApplication>(creatorApplication =>
@@ -410,7 +419,7 @@ public class AdminController : ControllerBase
         catch (Exception e)
         {
             logger.LogError($"An error occured {e}");
-            return new StatusCodeResult(500);
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 }

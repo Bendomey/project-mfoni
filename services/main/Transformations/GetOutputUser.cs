@@ -9,11 +9,12 @@ public class GetOutputUser
 
     public GetOutputUser(User user)
     {
+        //TODO:: @Bendomey - Investigate this warning
         _user = new OutputUser
         {
             Status = user.Status,
             Id = user.Id,
-            Role = user.Role!,
+            Role = user.Role,
             Name = user.Name,
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,

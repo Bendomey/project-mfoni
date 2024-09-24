@@ -197,4 +197,59 @@ public class UserService
 
         return creatorApplication;
     }
+
+    public async Task<List<Models.User>> GetUsers(
+        FilterQuery<Models.User> queryFilter,
+        GetUsersInput input
+    )
+    {
+        FilterDefinitionBuilder<Models.User> builder = Builders<Models.User>.Filter;
+        var filter = builder.Empty;
+        List<string> filters = ["status", "role", "provider", "name"];
+
+        List<string> filterValues = [input.Status, input.Role, input.Provider, input.Search];
+
+        var regexFilters = filters
+            .Select(
+                (field, index) =>
+                    filterValues[index] != null
+                        ? builder.Regex(field, new BsonRegularExpression(filterValues[index], "i"))
+                        : builder.Empty
+            )
+            .ToList();
+
+        filter = builder.And(regexFilters);
+
+        var users = await _userCollection
+            .Find(filter)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return users ?? [];
+    }
+
+    public async Task<long> CountUsers(GetUsersInput input)
+    {
+        FilterDefinitionBuilder<Models.User> builder = Builders<Models.User>.Filter;
+        var filter = builder.Empty;
+        List<string> filters = ["status", "role", "provider", "name"];
+
+        List<string> filterValues = [input.Status, input.Role, input.Provider, input.Search];
+
+        var regexFilters = filters
+            .Select(
+                (field, index) =>
+                    filterValues[index] != null
+                        ? builder.Regex(field, new BsonRegularExpression(filterValues[index], "i"))
+                        : builder.Empty
+            )
+            .ToList();
+
+        filter = builder.And(regexFilters);
+
+        long usersCount = await _userCollection.CountDocumentsAsync(filter);
+        return usersCount;
+    }
 }

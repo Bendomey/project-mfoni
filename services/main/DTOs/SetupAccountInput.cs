@@ -19,6 +19,5 @@ public class SetupAccountInput
     /// <summary>
     /// Can be `FREE` or `BASIC` or `ADVANCED`
     /// </summary>
-    [Required]
     public string? IntendedPricingPackage { get; set; } // FREE | BASIC | ADVANCED
 }
