@@ -12,11 +12,3 @@ public class AdminAuthenticateResponse
     public required Models.Admin Admin { get; set; }
     public required string Token { get; set; }
 }
-
-public class GetUsersInput
-{
-    public string? Status { get; set; }
-    public string? Role { get; set; }
-    public string? Provider { get; set; }
-    public string? Search { get; set; }
-}

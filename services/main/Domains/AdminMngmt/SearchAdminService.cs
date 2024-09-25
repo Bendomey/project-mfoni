@@ -53,8 +53,6 @@ public class SearchAdmin
             .Sort(queryFilter.Sort)
             .ToListAsync();
 
-        long adminsCount = await _adminsCollection.CountDocumentsAsync(filter);
-
         return admins ?? [];
     }
 
