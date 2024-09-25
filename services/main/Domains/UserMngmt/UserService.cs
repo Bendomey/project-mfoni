@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+﻿using main.Configurations;
 using main.Configuratons;
-using NanoidDotNet;
-using main.Configurations;
-using Microsoft.Extensions.Caching.Distributed;
 using main.DTOs;
-using main.Models;
 using main.Lib;
+using main.Models;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using NanoidDotNet;
 
 namespace main.Domains;
 
@@ -18,7 +19,6 @@ public class UserService
     private readonly CacheProvider _cacheProvider;
     private readonly AppConstants _appConstantsConfiguration;
 
-
     public UserService(
         ILogger<UserService> logger,
         DatabaseSettings databaseConfig,
@@ -27,8 +27,13 @@ public class UserService
     )
     {
         _logger = logger;
-        _userCollection = databaseConfig.Database.GetCollection<Models.User>(appConstants.Value.UserCollection);
-        _creatorApplicationCollection = databaseConfig.Database.GetCollection<Models.CreatorApplication>(appConstants.Value.CreatorApplicatonCollection);
+        _userCollection = databaseConfig.Database.GetCollection<Models.User>(
+            appConstants.Value.UserCollection
+        );
+        _creatorApplicationCollection =
+            databaseConfig.Database.GetCollection<Models.CreatorApplication>(
+                appConstants.Value.CreatorApplicatonCollection
+            );
         _cacheProvider = cacheProvider;
         _appConstantsConfiguration = appConstants.Value;
 
@@ -37,7 +42,9 @@ public class UserService
 
     public bool SetupAccount(SetupAccountInput accountInput, CurrentUserOutput userInput)
     {
-        var user = _userCollection.Find<Models.User>(user => user.Id == userInput.Id).FirstOrDefault();
+        var user = _userCollection
+            .Find<Models.User>(user => user.Id == userInput.Id)
+            .FirstOrDefault();
 
         if (user is null)
         {
@@ -73,15 +80,16 @@ public class UserService
         }
 
         // verify if phone number has been taken already
-        var userExistsWithPhoneNumber = await _userCollection.Find(user => user.PhoneNumber == normalizedPhoneNumber).FirstOrDefaultAsync();
+        var userExistsWithPhoneNumber = await _userCollection
+            .Find(user => user.PhoneNumber == normalizedPhoneNumber)
+            .FirstOrDefaultAsync();
         if (userExistsWithPhoneNumber != null && userExistsWithPhoneNumber.Id != userId)
         {
             throw new HttpRequestException("PhoneNumberAlreadyExists");
         }
 
         var filter = Builders<Models.User>.Filter.Eq(u => u.Id, userId);
-        var updates = Builders<Models.User>.Update
-            .Set(r => r.PhoneNumber, normalizedPhoneNumber);
+        var updates = Builders<Models.User>.Update.Set(r => r.PhoneNumber, normalizedPhoneNumber);
 
         if (normalizedPhoneNumber != user.PhoneNumber)
         {
@@ -98,13 +106,17 @@ public class UserService
         //     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
         // });
 
-        await SmsConfiguration.SendSms(new SendSmsInput
-        {
-            PhoneNumber = normalizedPhoneNumber,
-            Message = EmailTemplates.VerifyPhoneNumberBody.Replace("{code}", code).Replace("{name}", user.Name),
-            AppId = _appConstantsConfiguration.SmsAppId,
-            AppSecret = _appConstantsConfiguration.SmsAppSecret
-        });
+        await SmsConfiguration.SendSms(
+            new SendSmsInput
+            {
+                PhoneNumber = normalizedPhoneNumber,
+                Message = EmailTemplates
+                    .VerifyPhoneNumberBody.Replace("{code}", code)
+                    .Replace("{name}", user.Name),
+                AppId = _appConstantsConfiguration.SmsAppId,
+                AppSecret = _appConstantsConfiguration.SmsAppSecret
+            }
+        );
 
         return true;
     }
@@ -137,7 +149,10 @@ public class UserService
         return true;
     }
 
-    public async Task<CreatorApplication> SubmitCreatorApplication(SubmitCreatorApplicationInput input, string userId)
+    public async Task<CreatorApplication> SubmitCreatorApplication(
+        SubmitCreatorApplicationInput input,
+        string userId
+    )
     {
         var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
         if (user is null)
@@ -145,21 +160,32 @@ public class UserService
             throw new HttpRequestException("UserNotFound");
         }
 
-        var filterByUserId = Builders<CreatorApplication>.Filter.Eq(creatorApplication => creatorApplication.UserId, userId);
-        var filterByStatus = Builders<CreatorApplication>.Filter.Eq(creatorApplication => creatorApplication.Status, CreatorApplicationStatus.PENDING);
+        var filterByUserId = Builders<CreatorApplication>.Filter.Eq(
+            creatorApplication => creatorApplication.UserId,
+            userId
+        );
+        var filterByStatus = Builders<CreatorApplication>.Filter.Eq(
+            creatorApplication => creatorApplication.Status,
+            CreatorApplicationStatus.PENDING
+        );
 
         // Combine filters using AND
-        var combinedFilter = Builders<CreatorApplication>.Filter.And(filterByUserId, filterByStatus);
+        var combinedFilter = Builders<CreatorApplication>.Filter.And(
+            filterByUserId,
+            filterByStatus
+        );
 
-        var creatorApplication = await _creatorApplicationCollection.Find(combinedFilter).FirstOrDefaultAsync();
+        var creatorApplication = await _creatorApplicationCollection
+            .Find(combinedFilter)
+            .FirstOrDefaultAsync();
         if (creatorApplication is null)
         {
             throw new HttpRequestException("CreatorApplicationNotFound");
         }
 
         var idFilter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
-        var userUpdates = Builders<CreatorApplication>.Update
-            .Set(r => r.IdType, input.IdType)
+        var userUpdates = Builders<CreatorApplication>
+            .Update.Set(r => r.IdType, input.IdType)
             .Set(r => r.IdNumber, input.IdNumber)
             .Set(r => r.IdFrontImage, input.IdFrontImage)
             .Set(r => r.IdBackImage, input.IdBackImage)
@@ -171,5 +197,59 @@ public class UserService
 
         return creatorApplication;
     }
-}
 
+    public async Task<List<Models.User>> GetUsers(
+        FilterQuery<Models.User> queryFilter,
+        GetUsersInput input
+    )
+    {
+        FilterDefinitionBuilder<Models.User> builder = Builders<Models.User>.Filter;
+        var filter = builder.Empty;
+        List<string> filters = ["status", "role", "provider", "name"];
+
+        List<string> filterValues = [input.Status, input.Role, input.Provider, input.Search];
+
+        var regexFilters = filters
+            .Select(
+                (field, index) =>
+                    filterValues[index] != null
+                        ? builder.Regex(field, new BsonRegularExpression(filterValues[index], "i"))
+                        : builder.Empty
+            )
+            .ToList();
+
+        filter = builder.And(regexFilters);
+
+        var users = await _userCollection
+            .Find(filter)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return users ?? [];
+    }
+
+    public async Task<long> CountUsers(GetUsersInput input)
+    {
+        FilterDefinitionBuilder<Models.User> builder = Builders<Models.User>.Filter;
+        var filter = builder.Empty;
+        List<string> filters = ["status", "role", "provider", "name"];
+
+        List<string> filterValues = [input.Status, input.Role, input.Provider, input.Search];
+
+        var regexFilters = filters
+            .Select(
+                (field, index) =>
+                    filterValues[index] != null
+                        ? builder.Regex(field, new BsonRegularExpression(filterValues[index], "i"))
+                        : builder.Empty
+            )
+            .ToList();
+
+        filter = builder.And(regexFilters);
+
+        long usersCount = await _userCollection.CountDocumentsAsync(filter);
+        return usersCount;
+    }
+}
