@@ -10,22 +10,19 @@ using main.Models;
 
 namespace main.Domains;
 
-public class Auth
+public class UserAuth
 {
-    private readonly ILogger<SaveTags> _logger;
+    private readonly ILogger<UserAuth> _logger;
     private readonly IMongoCollection<Models.User> _usersCollection;
-    private readonly IMongoCollection<Models.CreatorApplication> _creatorsCollection;
     private readonly AppConstants _appConstantsConfiguration;
 
-    public Auth(ILogger<SaveTags> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
+    public UserAuth(ILogger<UserAuth> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
     {
         _logger = logger;
 
         var database = databaseConfig.Database;
 
         _usersCollection = database.GetCollection<Models.User>(appConstants.Value.UserCollection);
-
-        _creatorsCollection = database.GetCollection<Models.CreatorApplication>(appConstants.Value.CreatorApplicatonCollection);
 
         _appConstantsConfiguration = appConstants.Value;
 
@@ -61,7 +58,6 @@ public class Auth
                 Photo = input.UserPhoto
             };
 
-            _logger.LogInformation("Creating new user: " + __user);
             _usersCollection.InsertOne(__user);
         }
 
@@ -77,79 +73,14 @@ public class Auth
         throw new HttpRequestException("UserNotFound");
     }
 
-    public bool SetupAccount(SetupAccountInput accountInput, CurrentUserOutput userInput)
-    {
-        var user = _usersCollection.Find<Models.User>(user => user.Id == userInput.Id).FirstOrDefault();
-
-        if (user is null)
-        {
-            throw new HttpRequestException("UserNotFound");
-        }
-
-        var checkIfUsernameExists = _usersCollection.Find<Models.User>(user => user.Username == accountInput.Username).FirstOrDefault();
-
-        if (checkIfUsernameExists is not null)
-        {
-            throw new HttpRequestException("UsernameAlreadyTaken");
-        }
-
-        user.Name = accountInput.Name;
-        user.Username = accountInput.Username;
-        user.AccountSetupAt = DateTime.UtcNow;
-        user.UpdatedAt = DateTime.UtcNow;
-
-
-        if (accountInput.Role == UserRole.CREATOR && user.CreatorApplication is null)
-        {
-            var __newCreatorApplication = new Models.CreatorApplication
-            {
-                ApplicantId = user.Id,
-            };
-            _creatorsCollection.InsertOne(__newCreatorApplication);
-
-            user.CreatorApplicationId = __newCreatorApplication.Id;
-        }
-
-        _usersCollection.ReplaceOne(user => user.Id == userInput.Id, user);
-        return true;
-    }
-
     public Models.User? Me(CurrentUserOutput userInput)
     {
-        // TODO: make aggregate query to get user with creator application
-        // var pipeline = _usersCollection
-        //     .Aggregate()
-        //     .Match(user => user.Id == userInput.Id)
-        //     .Lookup<Models.User, Models.CreatorApplication, Models.User>(
-        //         foreignCollection: _creatorsCollection,
-        //         localField: user => user.CreatorApplicationId,
-        //         foreignField: creator => creator.Id,
-        //         //  @as: (user, creatorApplications) => new Models.UserWithCreatorApplication
-        //         //  {
-        //         //      CreatorApplication = user,
-        //         //      User = creatorApplications.FirstOrDefault()
-        //         //  }
-        //     );
 
-        // var users = pipeline.ToList();
-
-        // if (users.Count == 0)
-        // {
-        //     throw new Exception("UserNotFound");
-        // }
-
-        // return users[0];
         var user = _usersCollection.Find<Models.User>(user => user.Id == userInput.Id).FirstOrDefault();
 
         if (user is null)
         {
             throw new HttpRequestException("UserNotFound");
-        }
-
-        if (user.CreatorApplicationId is not null)
-        {
-            var creatorApplication = _creatorsCollection.Find<Models.CreatorApplication>(creator => creator.Id == user.CreatorApplicationId).FirstOrDefault();
-            user.CreatorApplication = creatorApplication;
         }
 
         return user;
@@ -164,7 +95,7 @@ public class Auth
             Subject = new ClaimsIdentity(new Claim[]
             {
                 new Claim("id", user.Id.ToString()),
-                new Claim(ClaimTypes.Role, "USER"), // Either a USER or ADMIN
+                new Claim(ClaimTypes.Role, "USER"),
             }),
             Issuer = _appConstantsConfiguration.JwtIssuer,
             Audience = _appConstantsConfiguration.JwtIssuer,

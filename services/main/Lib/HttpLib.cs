@@ -1,5 +1,7 @@
-
+using main.Transformations;
 using MongoDB.Driver;
+
+namespace main.Lib;
 
 public class FilterQuery<T>
 {
@@ -10,8 +12,12 @@ public class FilterQuery<T>
 
 public class HttpLib
 {
-
-    public static FilterQuery<T> GenerateFilterQuery<T>(int? skip, int? limit, string? sortParam, string sortBy)
+    public static FilterQuery<T> GenerateFilterQuery<T>(
+        int? skip,
+        int? limit,
+        string? sortParam,
+        string sortBy
+    )
     {
         var sort = Builders<T>.Sort.Descending(sortBy);
         if (sortParam is "asc")
@@ -29,7 +35,11 @@ public class HttpLib
         return queryFilter;
     }
 
-    public static EntityWithPagination<T> GeneratePagination<T>(List<T> data, long dataLength, FilterQuery<T> queryFilter)
+    public static EntityWithPagination<T> GeneratePagination<T, Q>(
+        List<T> data,
+        long dataLength,
+        FilterQuery<Q> queryFilter
+    )
     {
         var totalPages = (int)Math.Ceiling((double)dataLength / queryFilter.Limit);
 
@@ -40,7 +50,12 @@ public class HttpLib
             PageSize = queryFilter.Limit,
             Page = queryFilter.Skip,
             NextPage = queryFilter.Skip >= totalPages - 1 ? null : queryFilter.Skip + 1,
-            PrevPage = queryFilter.Skip <= 0 ? null : queryFilter.Skip > totalPages ? totalPages : queryFilter.Skip - 1,
+            PrevPage =
+                queryFilter.Skip <= 0
+                    ? null
+                    : queryFilter.Skip > totalPages
+                        ? totalPages
+                        : queryFilter.Skip - 1,
             TotalPages = totalPages,
         };
 

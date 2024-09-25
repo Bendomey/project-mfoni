@@ -5,6 +5,7 @@ using main.Models;
 using main.DTOs;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using main.Lib;
 
 public class WaitlistService
 {
