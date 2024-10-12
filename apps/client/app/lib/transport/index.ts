@@ -15,7 +15,7 @@ declare global {
  *
  * @returns {Promise} - Returns promise.
  */
-function transport(input: RequestInfo, init?: RequestInit): Promise<Response> {
+export function transport(input: RequestInfo, init?: RequestInit): Promise<Response> {
   return new Promise(async (resolve, reject) => {
     try {
       const response = await fetch(input, init)
@@ -73,6 +73,7 @@ export function fetchClient<T>(
     try {
       if (!config?.isUnAuthorizedRequest) {
         const userToken: string | undefined = auth.getCipher(USER_CIPHER)
+        console.log({userToken})
         if (userToken) {
           headers.append('Authorization', `Bearer ${userToken}`)
         }

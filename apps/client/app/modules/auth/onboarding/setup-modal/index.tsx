@@ -11,21 +11,17 @@ import {yupResolver} from '@hookform/resolvers/yup'
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline'
 import {classNames} from '@/lib/classNames.ts'
 import {toast} from 'react-hot-toast'
-import {useNavigate} from '@remix-run/react'
-import {useQueryClient} from '@tanstack/react-query'
-import {QUERY_KEYS} from '@/constants/index.ts'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 
 interface Props {
   open: boolean
   onClose: () => void
-  selectedType?: User['role']
+  selectedType?: UserRole
 }
 
 interface FormValues {
-  role: User['role']
+  role: UserRole
   name: string
-  username?: string
 }
 
 const schema = Yup.object().shape({
@@ -34,14 +30,11 @@ const schema = Yup.object().shape({
     .default('CLIENT')
     .required('Role is required'),
   name: Yup.string().required('Name is required'),
-  username: Yup.string(),
 })
 
 export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
   const {isPending, mutate} = useSetupAccount()
   const {currentUser} = useAuth()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
   const {
     register,
@@ -59,37 +52,13 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
       if (selectedType) {
         setValue('role', selectedType)
       }
-
-      if (selectedType === 'CREATOR') {
-        if (currentUser.username) {
-          setValue('username', currentUser.username)
-        } else {
-          setValue('username', currentUser.name.split(' ').join(''))
-        }
-      }
     }
   }, [currentUser, selectedType, setValue])
 
   const onSubmit = (data: FormValues) => {
-    if (selectedType === 'CREATOR' && !data.username) {
-      return toast.error('Username is required', {id: 'username-required'})
-    }
-
     mutate(data, {
       onSuccess: async () => {
-        toast.success('Account setup successfully', {
-          id: 'account-setup-success',
-        })
-
-        if (selectedType === 'CREATOR') {
-          navigate('/account/verify')
-        } else {
-          navigate('/')
-        }
-
-        await queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.CURRENT_USER],
-        })
+        window.location.pathname = '/'
       },
       onError: error => {
         toast.error(errorMessagesWrapper(error.message), {
@@ -198,28 +167,6 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
                         ) : null}
                       </div>
                     </div>
-
-                    {selectedType === 'CREATOR' ? (
-                      <div className="mt-3">
-                        <div className="flex justify-between">
-                          <label
-                            htmlFor="email"
-                            className="block text-sm font-medium leading-6 text-gray-900"
-                          >
-                            Username
-                          </label>
-                        </div>
-                        <div className="mt-2">
-                          <input
-                            type="text"
-                            {...register('username')}
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                            placeholder="Username"
-                            aria-describedby="username-optional"
-                          />
-                        </div>
-                      </div>
-                    ) : null}
                   </div>
 
                   <div className="mt-4">

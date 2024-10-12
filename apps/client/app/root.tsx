@@ -1,6 +1,6 @@
-import {cssBundleHref} from '@remix-run/css-bundle'
-import {type PropsWithChildren} from 'react'
-import {json, type LinksFunction} from '@remix-run/node'
+import { cssBundleHref } from '@remix-run/css-bundle'
+import { type PropsWithChildren } from 'react'
+import { json, type LoaderFunctionArgs, type LinksFunction, redirect } from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -12,13 +12,15 @@ import {
   isRouteErrorResponse,
   useLoaderData,
 } from '@remix-run/react'
-import {NODE_ENV} from './constants/index.ts'
+import { NODE_ENV } from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
 import globalStyles from '@/styles/global.css'
-import {Toaster} from 'react-hot-toast'
-import {Providers} from './providers/index.tsx'
-import {RouteLoader} from './components/loader/route-loader.tsx'
-import {EnvContext} from './providers/env/index.tsx'
+import { Toaster } from 'react-hot-toast'
+import { Providers } from './providers/index.tsx'
+import { RouteLoader } from './components/loader/route-loader.tsx'
+import { EnvContext } from './providers/env/index.tsx'
+import { extractAuthCookie } from './lib/actions/extract-auth-cookie.ts'
+import { getCurrentUser } from './api/auth/index.ts'
 
 export const links: LinksFunction = () => {
   return [
@@ -40,14 +42,40 @@ export const links: LinksFunction = () => {
     //   sizes: '16x16',
     //   href: '/favicons/favicon-16x16.png',
     // },
-    {rel: 'icon', href: '/favicon.ico'},
-    {rel: 'stylesheet', href: tailwindStyles},
-    {rel: 'stylesheet', href: globalStyles},
-    ...(cssBundleHref ? [{rel: 'stylesheet', href: cssBundleHref}] : []),
+    { rel: 'icon', href: '/favicon.ico' },
+    { rel: 'stylesheet', href: tailwindStyles },
+    { rel: 'stylesheet', href: globalStyles },
+    ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
   ]
 }
 
-export async function loader() {
+export async function loader({ request }: LoaderFunctionArgs) {
+  let user: User | null = null;
+
+  const cookieString = request.headers.get('cookie')
+  if (cookieString) {
+
+    const token = await extractAuthCookie(cookieString);
+    if (token) {
+
+      try {
+        const res = await getCurrentUser(token);
+
+        if (res?.data) {
+          user = res?.data
+
+          // eslint-disable-next-line max-depth
+          if(!res?.data?.role && !request.url.includes('/auth/onboarding')) {
+            return redirect('/auth/onboarding')
+          }
+        }
+
+      } catch (e: unknown) { /* empty */ }
+
+    }
+  }
+
+
   return json({
     ENV: {
       API_ADDRESS: `${process.env.API_ADDRESS}/api`,
@@ -55,13 +83,23 @@ export async function loader() {
       MFONI_GOOGLE_AUTH_CLIENT_ID: process.env.MFONI_GOOGLE_AUTH_CLIENT_ID,
       FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID,
     },
+    authUser: user,
   })
 }
 
 export default function App() {
+  const data = useLoaderData<typeof loader>()
+
   return (
-    <Document>
-      <Providers>
+    <Document
+      ENV={{
+        BUCKET: data.ENV.BUCKET!,
+        FACEBOOK_APP_ID: data.ENV.FACEBOOK_APP_ID!,
+        MFONI_GOOGLE_AUTH_CLIENT_ID: data.ENV.MFONI_GOOGLE_AUTH_CLIENT_ID!,
+        API_ADDRESS: data.ENV.API_ADDRESS,
+      }}
+    >
+      <Providers authData={data.authUser as User | null}>
         <RouteLoader />
         <Outlet />
       </Providers>
@@ -69,8 +107,16 @@ export default function App() {
   )
 }
 
-function Document({children}: PropsWithChildren) {
-  const data = useLoaderData<typeof loader>()
+interface DocumentProps {
+  ENV: {
+    BUCKET: string
+    MFONI_GOOGLE_AUTH_CLIENT_ID: string
+    FACEBOOK_APP_ID: string
+    API_ADDRESS: string
+  }
+}
+
+function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
 
   return (
     <html lang="en">
@@ -84,9 +130,9 @@ function Document({children}: PropsWithChildren) {
       <body>
         <EnvContext.Provider
           value={{
-            BUCKET: data.ENV.BUCKET!,
-            MFONI_GOOGLE_AUTH_CLIENT_ID: data.ENV.MFONI_GOOGLE_AUTH_CLIENT_ID!,
-            FACEBOOK_APP_ID: data.ENV.FACEBOOK_APP_ID!,
+            BUCKET: ENV.BUCKET,
+            MFONI_GOOGLE_AUTH_CLIENT_ID: ENV.MFONI_GOOGLE_AUTH_CLIENT_ID,
+            FACEBOOK_APP_ID: ENV.FACEBOOK_APP_ID,
           }}
         >
           {children}
@@ -99,13 +145,9 @@ function Document({children}: PropsWithChildren) {
             data-nscript="afterInteractive"
           />
           <script
-            type="text/javascript"
-            src="https://sdk.dev.metric.africa/v1"
-          />
-          <script
             dangerouslySetInnerHTML={{
               __html: `window.ENV = ${JSON.stringify({
-                API_ADDRESS: data.ENV.API_ADDRESS,
+                API_ADDRESS: ENV.API_ADDRESS,
               })}`,
             }}
           />

@@ -1,15 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-import {useGetCurrentUser} from '@/api/auth/index.ts'
-import {QUERY_KEYS, USER_CIPHER} from '@/constants/index.ts'
+import {USER_CIPHER} from '@/constants/index.ts'
 import {auth} from '@/lib/cookies.config.ts'
-import {useQueryClient} from '@tanstack/react-query'
 import {type PropsWithChildren, createContext, useMemo, useContext} from 'react'
-import {toast} from 'react-hot-toast'
 
 interface AuthContextProps {
   isLoading: boolean
   isLoggedIn: boolean
-  currentUser?: User
+  currentUser: User | null
   getToken: () => Nullable<string>
   onSignin: (input: {user: User; token: string}) => void
   onSignout: () => void
@@ -21,15 +17,15 @@ export const AuthContext = createContext<AuthContextProps>({
   onSignin: () => {},
   onSignout: () => {},
   getToken: () => null,
+  currentUser: null,
 })
 
-export const AuthProvider = ({children}: PropsWithChildren) => {
-  const authCipher = auth.getCipher(USER_CIPHER)
-  const queryClient = useQueryClient()
+interface Props {
+  authData: User | null
+}
 
-  const {data: currentUser} = useGetCurrentUser({
-    enabled: Boolean(authCipher),
-  })
+export const AuthProvider = ({children, authData: currentUser}: PropsWithChildren<Props>) => {
+  const authCipher = auth.getCipher(USER_CIPHER)
 
   const authController = useMemo(
     () => ({
@@ -37,19 +33,14 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
         auth.setCipher(USER_CIPHER, token)
       },
       onSignout: async () => {
-        const token = auth.getCipher(USER_CIPHER)
-        if (token) {
-          auth.clearCipher(USER_CIPHER)
-          queryClient.setQueryData([QUERY_KEYS.CURRENT_USER], null)
-          toast.success('Logged out successfully', {id: 'logout-success'})
-        }
+        auth.clearCipher(USER_CIPHER)
       },
       getToken: () => {
         const token = auth.getCipher(USER_CIPHER)
         return token ?? null
       },
     }),
-    [queryClient],
+    [],
   )
 
   return (
@@ -69,6 +60,7 @@ export const AuthProvider = ({children}: PropsWithChildren) => {
 export const useAuth = () => {
   const context = useContext(AuthContext)
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!context) {
     throw new Error('useAuth must be used within AuthProvider')
   }

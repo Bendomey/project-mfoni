@@ -1,16 +1,14 @@
 import {Button} from '@/components/button/index.tsx'
 import {APP_NAME} from '@/constants/index.ts'
 import {ArrowRightIcon} from '@heroicons/react/24/solid'
-import {Link, useNavigate} from '@remix-run/react'
+import {Link} from '@remix-run/react'
 import creatorImage from '@/assets/creator.jpg'
 import userImage from '@/assets/user.jpeg'
-import {useCallback, useEffect, useState} from 'react'
-import {useAuth} from '@/providers/auth/index.tsx'
+import {useCallback, useState} from 'react'
 import {useDisclosure} from '@/hooks/use-disclosure.tsx'
 import {SetupAccountModal} from './setup-modal/index.tsx'
 import {ArrowLeftIcon} from '@heroicons/react/20/solid'
 import {TypewriterEffectSmooth} from '@/components/animation/TypeWriteEffect.tsx'
-import {toast} from 'react-hot-toast'
 
 const words = [
   {
@@ -31,20 +29,9 @@ const words = [
 ]
 
 export const OnboardingModule = () => {
-  const [selectedType, setSelected] = useState<'CLIENT' | 'CREATOR'>()
-  const navigate = useNavigate()
-  const {currentUser, getToken} = useAuth()
+  const [selectedType, setSelected] = useState<UserRole>()
   const {onToggle, isOpen} = useDisclosure()
 
-  useEffect(() => {
-    const token = getToken()
-    if (!token) {
-      navigate('/auth')
-      toast.error('Kindly login to access page', {id: 'login-to-access-page'})
-    } else if (currentUser?.accountSetupAt) {
-      navigate('/account')
-    }
-  }, [currentUser, getToken, navigate])
 
   const handleContinue = useCallback(() => {
     onToggle()

@@ -9,8 +9,6 @@ import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {toast} from 'react-hot-toast'
 import {useEffect} from 'react'
 import {useAuth} from '@/providers/auth/index.tsx'
-import {useQueryClient} from '@tanstack/react-query'
-import {QUERY_KEYS} from '@/constants/index.ts'
 import {Loader} from '@/components/loader/index.tsx'
 
 const schema = Yup.object().shape({
@@ -30,7 +28,6 @@ interface Props {
 
 export const SendOtp = ({setPage}: Props) => {
   const {currentUser} = useAuth()
-  const queryClient = useQueryClient()
   const {mutate, isPending: isLoading} = useUpdatePhone()
 
   const {
@@ -56,13 +53,6 @@ export const SendOtp = ({setPage}: Props) => {
       },
       {
         onSuccess: async () => {
-          await queryClient.setQueryData(
-            [QUERY_KEYS.CURRENT_USER],
-            (oldData: User) => ({
-              ...oldData,
-              phoneNumber: normalizedPhoneNumber,
-            }),
-          )
           setPage('VerifyOTP')
         },
         onError: error => {

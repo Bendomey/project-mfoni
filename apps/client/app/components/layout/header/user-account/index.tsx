@@ -11,7 +11,7 @@ const user = {
 }
 
 export const UserAccountNav = () => {
-  const {currentUser, onSignout} = useAuth()
+  const {currentUser} = useAuth()
 
   return (
     <Menu as="div" className="relative ml-3">
@@ -57,7 +57,9 @@ export const UserAccountNav = () => {
             {({active}) => (
               <button
                 type="button"
-                onClick={onSignout}
+                onClick={() => {
+                  window.location.href = '/auth'
+                }}
                 className={classNames(
                   active ? 'bg-gray-100' : '',
                   'flex px-4 py-2 w-full focus:outline-none text-sm items-start text-gray-700',
@@ -74,7 +76,7 @@ export const UserAccountNav = () => {
 }
 
 export const UserAccountMobileNav = () => {
-  const {currentUser, onSignout} = useAuth()
+  const {currentUser} = useAuth()
 
   return (
     <div className=" pb-3 pt-2">
@@ -101,7 +103,9 @@ export const UserAccountMobileNav = () => {
         </button>
         <button
           type="button"
-          onClick={onSignout}
+          onClick={() => {
+            window.location.href = '/auth'
+          }}
           className="flex focus:outline-none items-start w-full  py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
         >
           Logout

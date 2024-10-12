@@ -7,8 +7,6 @@ import {useLoginAuth} from '../context/index.tsx'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {toast} from 'react-hot-toast'
 import {useAuth} from '@/providers/auth/index.tsx'
-import {useQueryClient} from '@tanstack/react-query'
-import {QUERY_KEYS} from '@/constants/index.ts'
 import {useEnvContext} from '@/providers/env/index.tsx'
 
 declare global {
@@ -24,7 +22,6 @@ export const FacebookButton = () => {
   const {setIsLoading, setErrorMessage} = useLoginAuth()
   const {onSignin} = useAuth()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const env = useEnvContext()
 
   useEffect(() => {
@@ -66,9 +63,8 @@ export const FacebookButton = () => {
         onSuccess: successRes => {
           if (successRes) {
             onSignin(successRes)
-            queryClient.setQueryData([QUERY_KEYS.CURRENT_USER], successRes.user)
 
-            if (successRes.user.accountSetupAt) {
+            if (successRes.user.role) {
               navigate('/')
               toast.success(`Welcome ${successRes.user.name}`)
             } else {
