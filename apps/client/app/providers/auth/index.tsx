@@ -24,7 +24,10 @@ interface Props {
   authData: User | null
 }
 
-export const AuthProvider = ({children, authData: currentUser}: PropsWithChildren<Props>) => {
+export const AuthProvider = ({
+  children,
+  authData: currentUser,
+}: PropsWithChildren<Props>) => {
   const authCipher = auth.getCipher(USER_CIPHER)
 
   const authController = useMemo(

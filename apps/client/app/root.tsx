@@ -1,6 +1,11 @@
-import { cssBundleHref } from '@remix-run/css-bundle'
-import { type PropsWithChildren } from 'react'
-import { json, type LoaderFunctionArgs, type LinksFunction, redirect } from '@remix-run/node'
+import {cssBundleHref} from '@remix-run/css-bundle'
+import {type PropsWithChildren} from 'react'
+import {
+  json,
+  type LoaderFunctionArgs,
+  type LinksFunction,
+  redirect,
+} from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -12,15 +17,15 @@ import {
   isRouteErrorResponse,
   useLoaderData,
 } from '@remix-run/react'
-import { NODE_ENV } from './constants/index.ts'
+import {NODE_ENV} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
 import globalStyles from '@/styles/global.css'
-import { Toaster } from 'react-hot-toast'
-import { Providers } from './providers/index.tsx'
-import { RouteLoader } from './components/loader/route-loader.tsx'
-import { EnvContext } from './providers/env/index.tsx'
-import { extractAuthCookie } from './lib/actions/extract-auth-cookie.ts'
-import { getCurrentUser } from './api/auth/index.ts'
+import {Toaster} from 'react-hot-toast'
+import {Providers} from './providers/index.tsx'
+import {RouteLoader} from './components/loader/route-loader.tsx'
+import {EnvContext} from './providers/env/index.tsx'
+import {extractAuthCookie} from './lib/actions/extract-auth-cookie.ts'
+import {getCurrentUser} from './api/auth/index.ts'
 
 export const links: LinksFunction = () => {
   return [
@@ -42,39 +47,36 @@ export const links: LinksFunction = () => {
     //   sizes: '16x16',
     //   href: '/favicons/favicon-16x16.png',
     // },
-    { rel: 'icon', href: '/favicon.ico' },
-    { rel: 'stylesheet', href: tailwindStyles },
-    { rel: 'stylesheet', href: globalStyles },
-    ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
+    {rel: 'icon', href: '/favicon.ico'},
+    {rel: 'stylesheet', href: tailwindStyles},
+    {rel: 'stylesheet', href: globalStyles},
+    ...(cssBundleHref ? [{rel: 'stylesheet', href: cssBundleHref}] : []),
   ]
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  let user: User | null = null;
+export async function loader({request}: LoaderFunctionArgs) {
+  let user: User | null = null
 
   const cookieString = request.headers.get('cookie')
   if (cookieString) {
-
-    const token = await extractAuthCookie(cookieString);
+    const token = await extractAuthCookie(cookieString)
     if (token) {
-
       try {
-        const res = await getCurrentUser(token);
+        const res = await getCurrentUser(token)
 
         if (res?.data) {
           user = res?.data
 
           // eslint-disable-next-line max-depth
-          if(!res?.data?.role && !request.url.includes('/auth/onboarding')) {
+          if (!res?.data?.role && !request.url.includes('/auth/onboarding')) {
             return redirect('/auth/onboarding')
           }
         }
-
-      } catch (e: unknown) { /* empty */ }
-
+      } catch (e: unknown) {
+        /* empty */
+      }
     }
   }
-
 
   return json({
     ENV: {
@@ -116,8 +118,7 @@ interface DocumentProps {
   }
 }
 
-function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
-
+function Document({children, ENV}: PropsWithChildren<DocumentProps>) {
   return (
     <html lang="en">
       <head>

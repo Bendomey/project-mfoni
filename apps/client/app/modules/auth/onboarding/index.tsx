@@ -32,7 +32,6 @@ export const OnboardingModule = () => {
   const [selectedType, setSelected] = useState<UserRole>()
   const {onToggle, isOpen} = useDisclosure()
 
-
   const handleContinue = useCallback(() => {
     onToggle()
   }, [onToggle])

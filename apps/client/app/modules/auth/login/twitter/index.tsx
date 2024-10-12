@@ -62,7 +62,15 @@ export const TwitterButton = () => {
         },
       )
     }
-  }, [location, mutate, navigate, onSignin, params, setErrorMessage, setIsLoading])
+  }, [
+    location,
+    mutate,
+    navigate,
+    onSignin,
+    params,
+    setErrorMessage,
+    setIsLoading,
+  ])
 
   useEffect(() => {
     checkForTwitterResponse()
