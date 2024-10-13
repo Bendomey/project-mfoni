@@ -12,6 +12,7 @@ import {ExclamationCircleIcon} from '@heroicons/react/24/outline'
 import {classNames} from '@/lib/classNames.ts'
 import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
+import {useSearchParams} from '@remix-run/react'
 
 interface Props {
   open: boolean
@@ -35,6 +36,7 @@ const schema = Yup.object().shape({
 export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
   const {isPending, mutate} = useSetupAccount()
   const {currentUser} = useAuth()
+  const [searchParams] = useSearchParams()
 
   const {
     register,
@@ -58,7 +60,7 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
   const onSubmit = (data: FormValues) => {
     mutate(data, {
       onSuccess: async () => {
-        window.location.pathname = '/'
+        window.location.href = searchParams.get('return_to') ?? '/'
       },
       onError: error => {
         toast.error(errorMessagesWrapper(error.message), {

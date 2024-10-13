@@ -17,7 +17,7 @@ import {
   isRouteErrorResponse,
   useLoaderData,
 } from '@remix-run/react'
-import {NODE_ENV} from './constants/index.ts'
+import {NODE_ENV, PAGES} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
 import globalStyles from '@/styles/global.css'
 import {Toaster} from 'react-hot-toast'
@@ -26,6 +26,7 @@ import {RouteLoader} from './components/loader/route-loader.tsx'
 import {EnvContext} from './providers/env/index.tsx'
 import {extractAuthCookie} from './lib/actions/extract-auth-cookie.ts'
 import {getCurrentUser} from './api/auth/index.ts'
+import {getFullUrlPath} from './lib/url-helpers.ts'
 
 export const links: LinksFunction = () => {
   return [
@@ -54,10 +55,11 @@ export const links: LinksFunction = () => {
   ]
 }
 
-export async function loader({request}: LoaderFunctionArgs) {
+export async function loader(args: LoaderFunctionArgs) {
+  const url = new URL(args.request.url)
   let user: User | null = null
 
-  const cookieString = request.headers.get('cookie')
+  const cookieString = args.request.headers.get('cookie')
   if (cookieString) {
     const token = await extractAuthCookie(cookieString)
     if (token) {
@@ -68,12 +70,19 @@ export async function loader({request}: LoaderFunctionArgs) {
           user = res?.data
 
           // eslint-disable-next-line max-depth
-          if (!res?.data?.role && !request.url.includes('/auth/onboarding')) {
-            return redirect('/auth/onboarding')
+          if (
+            !res?.data.role &&
+            url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
+          ) {
+            return redirect(
+              `${
+                PAGES.AUTHENTICATED_PAGES.ONBOARDING
+              }?return_to=${getFullUrlPath(url)}`,
+            )
           }
         }
       } catch (e: unknown) {
-        /* empty */
+        return redirect(`${PAGES.LOGIN}?return_to=${getFullUrlPath(url)}`)
       }
     }
   }

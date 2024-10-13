@@ -11,3 +11,15 @@ export const USER_CIPHER = 'mfoni-account'
 export const QUERY_KEYS = {
   TAGS: 'tags',
 } as const
+
+export const PAGES = {
+  LOGIN: '/auth',
+  HOME: '/',
+  EXPLORE: '/explore',
+  PRIVACY_POLICY: '/privacy',
+  TERMS: '/terms',
+  AUTHENTICATED_PAGES: {
+    ONBOARDING: '/auth/onboarding',
+    UPLOAD: '/upload',
+  },
+}
