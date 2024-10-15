@@ -1,6 +1,8 @@
+type UserRole = 'CLIENT' | 'CREATOR'
+
 interface User {
   id: string
-  role: 'CLIENT' | 'CREATOR'
+  role: UserRole | null
   provider: 'GOOGLE' | 'TWITTER' | 'FACEBOOK'
   name: string
   oAuthId: string
@@ -11,7 +13,6 @@ interface User {
   photo: Nullable<string>
   creatorApplicationId: Nullable<string>
   creatorApplication: Nullable<CreatorApplication>
-  accountSetupAt: Nullable<Date>
   createdAt: Date
   updatedAt: Date
 }

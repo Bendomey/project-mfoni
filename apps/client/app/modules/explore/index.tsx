@@ -17,7 +17,6 @@ export const ExploreModule = () => {
 
   const [empty] = useState(false)
 
-
   return (
     <div className="relative">
       <div ref={heroRef}>
@@ -34,7 +33,10 @@ export const ExploreModule = () => {
           <MobileTabComponent />
         </div>
         {empty ? (
-          <EmptyState message={"It seems like the category currently has no items for."} title={"Detty December"} />
+          <EmptyState
+            message={'It seems like the category currently has no items for.'}
+            title={'Detty December'}
+          />
         ) : (
           <div className="col-span-1 lg:col-span-3">
             <FadeInStagger faster>

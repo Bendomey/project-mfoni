@@ -1,22 +1,21 @@
-import {initiateTwitterAuth, useAuthenticate} from '@/api/auth/index.ts'
-import {Button} from '@/components/button/index.tsx'
-import {QUERY_KEYS, TWITTER_BASE_URL} from '@/constants/index.ts'
-import {useSearchParams, useLocation, useNavigate} from '@remix-run/react'
-import {useCallback, useEffect} from 'react'
-import {toast} from 'react-hot-toast'
-import {errorMessagesWrapper} from '@/constants/error-messages.ts'
-import {useLoginAuth} from '../context/index.tsx'
-import {useAuth} from '@/providers/auth/index.tsx'
-import {useQueryClient} from '@tanstack/react-query'
+import { initiateTwitterAuth, useAuthenticate } from '@/api/auth/index.ts'
+import { Button } from '@/components/button/index.tsx'
+import { TWITTER_BASE_URL } from '@/constants/index.ts'
+import { useSearchParams, useLocation, useNavigate } from '@remix-run/react'
+import { useCallback, useEffect } from 'react'
+import { toast } from 'react-hot-toast'
+import { errorMessagesWrapper } from '@/constants/error-messages.ts'
+import { useLoginAuth } from '../context/index.tsx'
+import { useAuth } from '@/providers/auth/index.tsx'
+import { getFullUrlPath } from '@/lib/url-helpers.ts'
 
 export const TwitterButton = () => {
-  const {mutate} = useAuthenticate()
-  const {setErrorMessage, setIsLoading} = useLoginAuth()
-  const {onSignin} = useAuth()
+  const { mutate } = useAuthenticate()
+  const { setErrorMessage, setIsLoading } = useLoginAuth()
+  const { onSignin } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [params] = useSearchParams()
-  const queryClient = useQueryClient()
 
   const checkForTwitterResponse = useCallback(() => {
     const oAuthToken = params.get('oauth_token')
@@ -37,7 +36,7 @@ export const TwitterButton = () => {
       mutate(
         {
           provider: 'TWITTER',
-          twitter: {oAuthToken, oAuthVerifier},
+          twitter: { oAuthToken, oAuthVerifier },
         },
         {
           onError: error => {
@@ -48,16 +47,13 @@ export const TwitterButton = () => {
           onSuccess: successRes => {
             if (successRes) {
               onSignin(successRes)
-              queryClient.setQueryData(
-                [QUERY_KEYS.CURRENT_USER],
-                successRes.user,
-              )
 
-              if (successRes.user.accountSetupAt) {
-                navigate('/')
+              const returnTo = params.get('return_to')
+              if (successRes.user.role) {
+                navigate(returnTo ?? '/')
                 toast.success(`Welcome ${successRes.user.name}`)
               } else {
-                navigate('/auth/onboarding')
+                navigate(`/auth/onboarding${returnTo ? `?return_to=${getFullUrlPath(new URL(returnTo))}` : ''}`)
                 toast.success('Setup account')
               }
             }
@@ -74,7 +70,6 @@ export const TwitterButton = () => {
     navigate,
     onSignin,
     params,
-    queryClient,
     setErrorMessage,
     setIsLoading,
   ])

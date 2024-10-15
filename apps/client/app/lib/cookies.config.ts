@@ -6,7 +6,7 @@ class Auth {
     return token == undefined ? null : JSON.parse(token)
   }
 
-  setCipher<T>(key: string, data: T) {
+  setCipher(key: string, data: string) {
     Cookies.set(key, JSON.stringify(data))
   }
 

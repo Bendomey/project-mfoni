@@ -1,15 +1,14 @@
 /* eslint-disable func-names */
 import {useAuthenticate} from '@/api/auth/index.ts'
 import {Button} from '@/components/button/index.tsx'
-import {useNavigate} from '@remix-run/react'
+import {useNavigate, useSearchParams} from '@remix-run/react'
 import {useEffect} from 'react'
 import {useLoginAuth} from '../context/index.tsx'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {toast} from 'react-hot-toast'
 import {useAuth} from '@/providers/auth/index.tsx'
-import {useQueryClient} from '@tanstack/react-query'
-import {QUERY_KEYS} from '@/constants/index.ts'
 import {useEnvContext} from '@/providers/env/index.tsx'
+import { getFullUrlPath } from '@/lib/url-helpers.ts'
 
 declare global {
   interface Window {
@@ -24,8 +23,8 @@ export const FacebookButton = () => {
   const {setIsLoading, setErrorMessage} = useLoginAuth()
   const {onSignin} = useAuth()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const env = useEnvContext()
+  const [params] = useSearchParams()
 
   useEffect(() => {
     window.fbAsyncInit = function () {
@@ -66,13 +65,13 @@ export const FacebookButton = () => {
         onSuccess: successRes => {
           if (successRes) {
             onSignin(successRes)
-            queryClient.setQueryData([QUERY_KEYS.CURRENT_USER], successRes.user)
 
-            if (successRes.user.accountSetupAt) {
-              navigate('/')
+            const returnTo = params.get('return_to')
+            if (successRes.user.role) {
+              navigate(returnTo ?? '/')
               toast.success(`Welcome ${successRes.user.name}`)
             } else {
-              navigate('/auth/onboarding')
+              navigate(`/auth/onboarding${returnTo ? `?return_to=${getFullUrlPath(new URL(returnTo))}` : ''}`)
               toast.success('Setup account')
             }
           }

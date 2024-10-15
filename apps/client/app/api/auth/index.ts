@@ -1,11 +1,5 @@
-import {
-  useMutation,
-  useQuery,
-  type UndefinedInitialDataOptions,
-  type QueryKey,
-} from '@tanstack/react-query'
-import {fetchClient} from '@/lib/transport/index.ts'
-import {QUERY_KEYS} from '@/constants/index.ts'
+import {useMutation} from '@tanstack/react-query'
+import {fetchClient, transport} from '@/lib/transport/index.ts'
 
 export const initiateTwitterAuth = async () => {
   const res = await fetch('/api/auth/twitter', {
@@ -64,7 +58,7 @@ export const useAuthenticate = () =>
 interface SetupAccountInputProps {
   role: 'CLIENT' | 'CREATOR'
   name: string
-  username?: string
+  intendedPricingPackage?: string
 }
 
 export const setupAccount = async (input: SetupAccountInputProps) => {
@@ -96,15 +90,18 @@ export const useSetupAccount = () =>
     mutationFn: setupAccount,
   })
 
-const getCurrentUser = async () => {
+export const getCurrentUser = async (token: string) => {
   try {
-    const response = await fetchClient<ApiResponse<User>>('/v1/auth/me')
+    const res = await transport(`${process.env.API_ADDRESS}/api/v1/auth/me`, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
 
-    if (!response.parsedBody.status && response.parsedBody.errorMessage) {
-      throw new Error(response.parsedBody.errorMessage)
-    }
-
-    return response.parsedBody.data
+    const response = await res.json()
+    return response
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw error
@@ -117,19 +114,3 @@ const getCurrentUser = async () => {
     }
   }
 }
-export const useGetCurrentUser = (
-  opts?: Omit<
-    UndefinedInitialDataOptions<
-      User | undefined,
-      Error,
-      User | undefined,
-      QueryKey
-    >,
-    'queryKey'
-  >,
-) =>
-  useQuery({
-    queryFn: getCurrentUser,
-    queryKey: [QUERY_KEYS.CURRENT_USER],
-    ...opts,
-  })
