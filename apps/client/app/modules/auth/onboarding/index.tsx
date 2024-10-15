@@ -1,15 +1,15 @@
-import {Button} from '@/components/button/index.tsx'
-import {APP_NAME} from '@/constants/index.ts'
-import {ArrowRightIcon} from '@heroicons/react/24/solid'
-import {Link, useNavigate} from '@remix-run/react'
+import { Button } from '@/components/button/index.tsx'
+import { APP_NAME } from '@/constants/index.ts'
+import { ArrowRightIcon } from '@heroicons/react/24/solid'
+import { useNavigate } from '@remix-run/react'
 import creatorImage from '@/assets/creator.jpg'
 import userImage from '@/assets/user.jpeg'
-import {useCallback, useEffect, useState} from 'react'
-import {useDisclosure} from '@/hooks/use-disclosure.tsx'
-import {SetupAccountModal} from './setup-modal/index.tsx'
-import {ArrowLeftIcon} from '@heroicons/react/20/solid'
-import {TypewriterEffectSmooth} from '@/components/animation/TypeWriteEffect.tsx'
-import {useAuth} from '@/providers/auth/index.tsx'
+import { useCallback, useEffect, useState } from 'react'
+import { useDisclosure } from '@/hooks/use-disclosure.tsx'
+import { SetupAccountModal } from './setup-modal/index.tsx'
+import { ArrowLeftIcon } from '@heroicons/react/20/solid'
+import { TypewriterEffectSmooth } from '@/components/animation/TypeWriteEffect.tsx'
+import { useAuth } from '@/providers/auth/index.tsx'
 
 const words = [
   {
@@ -31,8 +31,8 @@ const words = [
 
 export const OnboardingModule = () => {
   const [selectedType, setSelected] = useState<UserRole>()
-  const {onToggle, isOpen} = useDisclosure()
-  const {currentUser, getToken} = useAuth()
+  const { onToggle, isOpen } = useDisclosure()
+  const { currentUser, getToken, onSignout } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -49,7 +49,10 @@ export const OnboardingModule = () => {
     <>
       <div className="h-screen w-full flex flex-col relative">
         <div className="border-b border-zinc-200 px-5 md:px-10 py-5 flex flex-row items-center justify-between">
-          <Link to="/auth" className="ml-2 flex flex-row items-center">
+          <button onClick={() => {
+            onSignout()
+            navigate('/auth')
+          }} className="ml-2 flex flex-row items-center">
             <ArrowLeftIcon className="h-7 w-7 text-zinc-600" />
             <div className="flex flex-row items-end ml-2">
               <span className="text-4xl text-blue-700 font-extrabold">
@@ -59,7 +62,7 @@ export const OnboardingModule = () => {
                 {APP_NAME.slice(1)}
               </span>
             </div>
-          </Link>
+          </button>
           <div>
             {selectedType ? (
               <Button
@@ -84,11 +87,10 @@ export const OnboardingModule = () => {
               <Button
                 onClick={() => setSelected('CLIENT')}
                 variant="unstyled"
-                externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${
-                  selectedType === 'CLIENT'
+                externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${selectedType === 'CLIENT'
                     ? 'border-zinc-600'
                     : 'border-dashed border-zinc-300'
-                } p-5 rounded-lg`}
+                  } p-5 rounded-lg`}
               >
                 <img
                   className="hidden md:block rounded-lg max-w-full h-auto"
@@ -105,11 +107,10 @@ export const OnboardingModule = () => {
               <Button
                 onClick={() => setSelected('CREATOR')}
                 variant="unstyled"
-                externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${
-                  selectedType === 'CREATOR'
+                externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${selectedType === 'CREATOR'
                     ? 'border-zinc-600'
                     : 'border-dashed border-zinc-300'
-                } p-5 rounded-lg cursor-pointer`}
+                  } p-5 rounded-lg cursor-pointer`}
               >
                 <img
                   className="hidden md:block rounded-lg max-w-full h-auto"

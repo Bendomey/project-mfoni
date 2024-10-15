@@ -1,21 +1,21 @@
-import {USER_CIPHER} from '@/constants/index.ts'
-import {auth} from '@/lib/cookies.config.ts'
-import {type PropsWithChildren, createContext, useMemo, useContext} from 'react'
+import { USER_CIPHER } from '@/constants/index.ts'
+import { auth } from '@/lib/cookies.config.ts'
+import { type PropsWithChildren, createContext, useMemo, useContext, useState } from 'react'
 
 interface AuthContextProps {
   isLoading: boolean
   isLoggedIn: boolean
   currentUser: User | null
   getToken: () => Nullable<string>
-  onSignin: (input: {user: User; token: string}) => void
+  onSignin: (input: { user: User; token: string }) => void
   onSignout: () => void
 }
 
 export const AuthContext = createContext<AuthContextProps>({
   isLoading: false,
   isLoggedIn: false,
-  onSignin: () => {},
-  onSignout: () => {},
+  onSignin: () => { },
+  onSignout: () => { },
   getToken: () => null,
   currentUser: null,
 })
@@ -26,13 +26,15 @@ interface Props {
 
 export const AuthProvider = ({
   children,
-  authData: currentUser,
+  authData,
 }: PropsWithChildren<Props>) => {
   const authCipher = auth.getCipher(USER_CIPHER)
+  const [currentUser, setCurrentUser] = useState<User | null>(() => authData)
 
   const authController = useMemo(
     () => ({
-      onSignin: ({token}: {user: User; token: string}) => {
+      onSignin: ({ user, token }: { user: User; token: string }) => {
+        setCurrentUser(user)
         auth.setCipher(USER_CIPHER, token)
       },
       onSignout: async () => {

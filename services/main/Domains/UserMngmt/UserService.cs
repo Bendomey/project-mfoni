@@ -44,7 +44,7 @@ public class UserService
             throw new HttpRequestException("UserNotFound");
         }
 
-        user.Role = accountInput.Role;
+        user.Role = UserRole.CLIENT;
         user.Name = accountInput.Name;
         user.UpdatedAt = DateTime.UtcNow;
 
