@@ -10,6 +10,7 @@ export const USER_CIPHER = 'mfoni-account'
 
 export const QUERY_KEYS = {
   TAGS: 'tags',
+  CREATOR_APPLICATIONS: 'creatorApplications',
 } as const
 
 export const PAGES = {

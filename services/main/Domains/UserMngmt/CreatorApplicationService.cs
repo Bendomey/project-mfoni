@@ -215,5 +215,14 @@ public class CreatorApplicationService
 
         return creatorApplication;
     }
+
+    public async Task<CreatorApplication> GetUserActiveCreatorApplication(string userId){
+        var creatorApplication = await _creatorApplicationCollection.Find(application => application.UserId == userId)
+            .SortByDescending(application => application.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        return creatorApplication;
+    }
+    
 }
 

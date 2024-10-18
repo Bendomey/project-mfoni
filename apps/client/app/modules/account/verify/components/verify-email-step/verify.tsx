@@ -2,7 +2,7 @@ import {PinField} from 'react-pin-field'
 import {useEffect, useState} from 'react'
 import {Button} from '@/components/button/index.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
-import {useUpdatePhone, useVerifyPhone} from '@/api/users/index.ts'
+import {useUpdateEmail, useVerifyEmail} from '@/api/users/index.ts'
 import {Loader} from '@/components/loader/index.tsx'
 import {useVerifyCreator} from '../../context.tsx'
 import {toast} from 'react-hot-toast'
@@ -17,11 +17,11 @@ export const VerifyOtp = ({setPage}: Props) => {
   const [countDown, setCountdown] = useState(59)
   const [code, setCode] = useState('')
   const {currentUser, onUpdateUser} = useAuth()
-  const {mutate: verifyPhone, isPending: isVerifying} = useVerifyPhone()
-  const {mutate: resendCode, isPending: isResending} = useUpdatePhone()
+  const {mutate: verifyEmail, isPending: isVerifying} = useVerifyEmail()
+  const {mutate: resendCode, isPending: isResending} = useUpdateEmail()
 
   const verifyCode = () => {
-    verifyPhone(
+    verifyEmail(
       {
         verificationCode: code,
       },
@@ -30,18 +30,18 @@ export const VerifyOtp = ({setPage}: Props) => {
           if(currentUser){
             onUpdateUser({
               ...currentUser,
-              phoneNumberVerifiedAt: new Date(),
+              emailVerifiedAt: new Date(),
             })
           }
-          toast.success('Phone number verified successfully', {
-            id: 'phone-verified',
+          toast.success('Email Address verified successfully', {
+            id: 'email-verified',
           })
           setActiveStep('id')
         },
         onError(error) {
           if (error.message) {
             toast.error(errorMessagesWrapper(error.message), {
-              id: 'phone-verify-error',
+              id: 'email-verify-error',
             })
           }
         },
@@ -50,22 +50,22 @@ export const VerifyOtp = ({setPage}: Props) => {
   }
 
   const resendCodeHandler = () => {
-    if (currentUser?.phoneNumber) {
+    if (currentUser?.email) {
       resendCode(
         {
-          phoneNumber: currentUser.phoneNumber,
+          emailAddress: currentUser.email,
         },
         {
           onSuccess() {
             setCountdown(59)
             toast.success('Verification code sent successfully', {
-              id: 'phone-resend-successful',
+              id: 'email-resend-successful',
             })
           },
           onError(error) {
             if (error.message) {
               toast.error(errorMessagesWrapper(error.message), {
-                id: 'phone-resend-error',
+                id: 'email-resend-error',
               })
             }
           },
@@ -87,7 +87,7 @@ export const VerifyOtp = ({setPage}: Props) => {
       <div className="mt-4 flex flex-row items-end">
         <p className=" text-zinc-600">
           We sent a code to{' '}
-          <span className="font-bold">{currentUser?.phoneNumber ?? 'N/A'}</span>
+          <span className="font-bold">{currentUser?.email ?? 'N/A'}</span>
         </p>
         <button
           type="button"

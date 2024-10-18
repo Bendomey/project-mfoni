@@ -1,23 +1,42 @@
 /* eslint-disable no-negated-condition */
-import {classNames} from '@/lib/classNames.ts'
+import { classNames } from '@/lib/classNames.ts'
+import { useAuth } from '@/providers/auth/index.tsx'
 import {
   CheckIcon,
   EnvelopeIcon,
+  PhoneIcon,
   RocketLaunchIcon,
 } from '@heroicons/react/24/outline'
-import {useCallback, useMemo} from 'react'
+import { useCallback, useMemo } from 'react'
 
-export type Step = 'phone' | 'id' | 'welcome'
+export type Step = 'phone' | 'email' | 'id' | 'welcome'
 
 interface Props {
   activeStep: Step
 }
 
-export function Steps({activeStep}: Props) {
+export function Steps({ activeStep }: Props) {
+  const { currentUser } = useAuth()
   const getStepStatus = useCallback(
-    (step: Step) => (step === activeStep ? 'active' : 'inactive'),
-    [activeStep],
+    (step: Step) => {
+      if (step === 'phone') {
+        if (currentUser?.phoneNumberVerifiedAt) {
+          return 'active'
+        }
+      }
+
+      if (step === 'email') {
+        if (currentUser?.emailVerifiedAt) {
+          return 'active'
+        }
+      }
+
+      return step === activeStep ? 'active' : 'inactive'
+
+    },
+    [activeStep, currentUser],
   )
+
 
   const steps = useMemo(() => {
     return [
@@ -32,8 +51,15 @@ export function Steps({activeStep}: Props) {
         name: 'Verify your phone',
         description: 'Enter your verification code',
         status: getStepStatus('phone'),
-        icon: EnvelopeIcon,
+        icon: PhoneIcon,
         id: 'phone',
+      },
+      {
+        name: 'Verify your email',
+        description: 'Enter your verification code',
+        status: getStepStatus('email'),
+        icon: EnvelopeIcon,
+        id: 'email',
       },
       {
         name: 'Verfiy ID',

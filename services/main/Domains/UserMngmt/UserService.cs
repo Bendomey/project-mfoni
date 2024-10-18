@@ -137,6 +137,84 @@ public class UserService
         return true;
     }
 
+    public async Task<bool> SaveEmailAddress(string emailAddress, string userId)
+    {
+        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            throw new HttpRequestException("UserNotFound");
+        }
+
+        // verify if phone number has been taken already
+        var userExistsWithEmailAddress = await _userCollection.Find(user => user.Email == emailAddress).FirstOrDefaultAsync();
+        if (userExistsWithEmailAddress != null && userExistsWithEmailAddress.Id != userId)
+        {
+            throw new HttpRequestException("EmailAlreadyExists");
+        }
+
+        var filter = Builders<Models.User>.Filter.Eq(u => u.Id, userId);
+        var updates = Builders<Models.User>.Update
+            .Set(r => r.Email, emailAddress);
+
+        if (emailAddress != user.Email)
+        {
+            updates = updates.Set(r => r.EmailVerifiedAt, null);
+        }
+
+        await _userCollection.UpdateOneAsync(filter, updates);
+
+        var code = "12345";
+        // TODO: look into redis problem in staging.
+        // var code = Nanoid.Generate("1234567890", 5);
+        // await _cacheProvider.SetCache($"verify-{user.Id}", code, new DistributedCacheEntryOptions
+        // {
+        //     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+        // });
+
+        var _ = EmailConfiguration.Send(
+            new SendEmailInput
+            {
+                From = _appConstantsConfiguration.EmailFrom,
+                Email = emailAddress,
+                Subject = EmailTemplates.VerifyAccountSubject,
+                Message = EmailTemplates.VerifyPhoneNumberBody.Replace("{code}", code).Replace("{name}", user.Name),
+                ApiKey = _appConstantsConfiguration.ResendApiKey
+            }
+        );
+
+        return true;
+    }
+
+    public async Task<bool> VerifyEmailAddress(string code, string userId)
+    {
+        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            throw new HttpRequestException("UserNotFound");
+        }
+
+        if (user.EmailVerifiedAt is not null)
+        {
+            throw new HttpRequestException("EmailAddressAlreadyVerified");
+        }
+
+        // var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
+        // if (code != verificationCode)
+        if (code != "12345")
+        {
+            throw new HttpRequestException("CodeIsIncorrectOrHasExpired");
+        }
+
+        var filter = Builders<Models.User>.Filter.Eq(r => r.Id, user.Id);
+        var updates = Builders<Models.User>.Update.Set(v => v.EmailVerifiedAt, DateTime.Now);
+        await _userCollection.UpdateOneAsync(filter, updates);
+
+        // await _cacheProvider.ClearCache($"verify-{user.Id}");
+        return true;
+    }
+
+
+
     public async Task<CreatorApplication> SubmitCreatorApplication(SubmitCreatorApplicationInput input, string userId)
     {
         var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();

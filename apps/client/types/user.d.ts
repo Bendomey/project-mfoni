@@ -7,8 +7,9 @@ interface User {
   name: string
   oAuthId: string
   email: Nullable<string>
+  emailVerifiedAt: Nullable<Date>
   phoneNumber: Nullable<string>
-  verifiedPhoneNumberAt: Nullable<Date>
+  phoneNumberVerifiedAt: Nullable<Date>
   username: Nullable<string>
   photo: Nullable<string>
   creatorApplicationId: Nullable<string>

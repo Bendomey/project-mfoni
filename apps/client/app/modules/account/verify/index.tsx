@@ -8,9 +8,11 @@ import {VerifyIdStep} from './components/verify-id-step/index.tsx'
 import {classNames} from '@/lib/classNames.ts'
 import {WelcomeStep} from './components/welcome-step/index.tsx'
 import {VerifyCreatorProvider, useVerifyCreator} from './context.tsx'
+import { VerifyEmailStep } from './components/verify-email-step/index.tsx'
 
 const StepComponents: Record<Step, () => JSX.Element> = {
   phone: VerifyPhoneStep,
+  email: VerifyEmailStep,
   id: VerifyIdStep,
   welcome: WelcomeStep,
 }
@@ -76,7 +78,7 @@ const VerifyAccount = () => {
           <Step />
         </div>
         <div className="flex items-center justify-center">
-          <div className="grid grid-cols-3 gap-2 w-[50vw] md:w-[17vw]">
+          <div className="grid grid-cols-4 gap-2 w-[50vw] md:w-[17vw]">
             {steps.map((step, i) => (
               <div
                 className={classNames(

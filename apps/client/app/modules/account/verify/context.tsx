@@ -9,7 +9,6 @@ import {
 } from 'react'
 import {type Step} from './components/steps.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
-import {toast} from 'react-hot-toast'
 import {useNavigate} from '@remix-run/react'
 import {Loader} from '@/components/loader/index.tsx'
 
@@ -30,13 +29,6 @@ export const VerifyCreatorProvider = ({children}: PropsWithChildren) => {
   const {getToken, currentUser, isLoading} = useAuth()
 
   useEffect(() => {
-    const token = getToken()
-    if (!token) {
-      navigate(`/auth?return_to=${window.location}`)
-      toast.error('Kindly login to access page', {id: 'login-to-access-page'})
-      return
-    }
-
     // const isAppliedToBeACreator = currentUser && currentUser.role === "CLIENT" && Boolean(currentUser.creatorApplicationId)
 
     // if (!isAppliedToBeACreator) {
@@ -50,8 +42,12 @@ export const VerifyCreatorProvider = ({children}: PropsWithChildren) => {
 
     if (isCreatorApplicationApproved) {
       setActiveStep('welcome')
-    } else if (currentUser?.verifiedPhoneNumberAt) {
+    } else if (currentUser?.emailVerifiedAt && currentUser.phoneNumberVerifiedAt) {
       setActiveStep('id')
+    } else if (currentUser?.emailVerifiedAt && !currentUser.phoneNumberVerifiedAt) {
+      setActiveStep('phone')
+    }  else if (!currentUser?.emailVerifiedAt && currentUser?.phoneNumberVerifiedAt) {
+      setActiveStep('email')
     }
   }, [currentUser, getToken, navigate])
 

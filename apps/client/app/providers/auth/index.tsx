@@ -7,6 +7,7 @@ interface AuthContextProps {
   isLoggedIn: boolean
   currentUser: User | null
   getToken: () => Nullable<string>
+  onUpdateUser: (user: User) => void
   onSignin: (input: { user: User; token: string }) => void
   onSignout: () => void
 }
@@ -18,6 +19,7 @@ export const AuthContext = createContext<AuthContextProps>({
   onSignout: () => { },
   getToken: () => null,
   currentUser: null,
+  onUpdateUser: () => {},
 })
 
 interface Props {
@@ -39,6 +41,9 @@ export const AuthProvider = ({
       },
       onSignout: async () => {
         auth.clearCipher(USER_CIPHER)
+      },
+      onUpdateUser: async (user: User) => {
+        setCurrentUser(user)
       },
       getToken: () => {
         const token = auth.getCipher(USER_CIPHER)

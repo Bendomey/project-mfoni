@@ -4,6 +4,8 @@ namespace main.Lib;
 public class EmailTemplates
 {
 
+    public static string VerifyAccountSubject = @"Verify Account";
+
     public static string VerifyPhoneNumberBody = @"Hello {name},
 Your OTP is {code}. Please use this code to complete your action.
 
