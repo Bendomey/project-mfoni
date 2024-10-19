@@ -29,21 +29,8 @@ export const VerifyCreatorProvider = ({children}: PropsWithChildren) => {
   const {getToken, currentUser, isLoading} = useAuth()
 
   useEffect(() => {
-    // const isAppliedToBeACreator = currentUser && currentUser.role === "CLIENT" && Boolean(currentUser.creatorApplicationId)
-
-    // if (!isAppliedToBeACreator) {
-    //   navigate('/')
-    //   return
-    // }
-
-    const isCreatorApplicationApproved =
-      currentUser?.creatorApplication &&
-      currentUser.creatorApplication.status === 'APPROVED'
-
-    if (isCreatorApplicationApproved) {
+    if (currentUser?.emailVerifiedAt && currentUser.phoneNumberVerifiedAt) {
       setActiveStep('welcome')
-    } else if (currentUser?.emailVerifiedAt && currentUser.phoneNumberVerifiedAt) {
-      setActiveStep('id')
     } else if (currentUser?.emailVerifiedAt && !currentUser.phoneNumberVerifiedAt) {
       setActiveStep('phone')
     }  else if (!currentUser?.emailVerifiedAt && currentUser?.phoneNumberVerifiedAt) {

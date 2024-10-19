@@ -1,49 +1,30 @@
-import {Header} from '@/components/layout/index.ts'
-import {AccountCover} from './components/cover.tsx'
-import {ProfileAbout, ProfileMuse, ProfileVideos} from './tabs/index.ts'
-import {ProfileTabList, type ProfileTab} from './components/profile-tab.tsx'
-import {APP_NAME} from '@/constants/index.ts'
-import {useSessionStorage} from '@/hooks/use-session-storage.ts'
-import {useCallback, useMemo} from 'react'
-
-const PROFILE_TAB_CACHE = `@${APP_NAME}-profile-tab`
-
-const profileTabViews: Record<ProfileTab, () => JSX.Element> = {
-  about: ProfileAbout,
-  muse: ProfileMuse,
-  videos: ProfileVideos,
-}
+import { Header } from '@/components/layout/index.ts'
+import { AccountCover } from './components/cover.tsx'
+import { Footer } from '@/components/footer/index.tsx'
+import { CreatorAnalytics } from './components/creator-analytics.tsx'
+import { UserTimeline } from './components/timeline.tsx'
+import { OtherCreators } from './components/other-creators.tsx'
+import { Contents } from './components/content.tsx'
+import { QuickActions } from './components/quick-actions.tsx'
 
 export const AccountModule = () => {
-  const [activeTab, setActiveTab] = useSessionStorage<ProfileTab>(
-    PROFILE_TAB_CACHE,
-    'about',
-  )
-
-  const ProfileTabView = useMemo(() => profileTabViews[activeTab], [activeTab])
-
-  const handleSetActiveTab = useCallback(
-    (tab: ProfileTab) => {
-      setActiveTab(tab)
-    },
-    [setActiveTab],
-  )
 
   return (
     <>
       <Header isHeroSearchInVisible={false} />
-      <article>
-        {/* Profile header */}
-        <AccountCover />
-        {/* Tabs */}
-        <ProfileTabList
-          selectedTab={activeTab}
-          handleSetTab={handleSetActiveTab}
-        />
-        <div className="mx-auto mt-6 max-w-7xl px-4 sm:px-6 lg:px-8">
-          <ProfileTabView />
+      <div className='grid grid-cols-8 gap-3 px-4 lg:px-8 bg-gray-50 pt-4 pb-16'>
+        <div className='col-span-8 lg:col-span-6 flex flex-col gap-y-8'>
+          <AccountCover />
+          <CreatorAnalytics />
+          <Contents />
         </div>
-      </article>
+        <div className='col-span-2 flex flex-col gap-y-10'>
+          <QuickActions />
+          <UserTimeline />
+          <OtherCreators />
+        </div>
+      </div>
+      <Footer />
     </>
   )
 }

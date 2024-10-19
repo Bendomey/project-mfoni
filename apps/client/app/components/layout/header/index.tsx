@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Dialog } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link } from '@remix-run/react'
@@ -9,7 +9,7 @@ import { SearchPhotosForMobile } from './search-for-mobile/index.tsx'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { UserAccountMobileNav, UserAccountNav } from './user-account/index.tsx'
 import useScroll from '@/hooks/use-scroll.ts'
-import { useGetActiveCreatorApplication } from '@/api/users/index.ts'
+import { NoticeBanner } from './notice-banner/index.tsx'
 
 const navigation = (isLoggedIn: boolean) => [
   { name: 'Explore', href: '/explore', routeType: 'link' },
@@ -27,38 +27,9 @@ export const Header = ({
   isHeroSearchInVisible,
   shouldHeaderBlur = true,
 }: Props) => {
-  const { isLoggedIn, currentUser } = useAuth()
+  const { isLoggedIn } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const scrolled = useScroll(50)
-
-
-  const { data: activeCreatorApplcation } = useGetActiveCreatorApplication({
-    enabled: isLoggedIn,
-  });
-
-  const { showHeader, continueCreatorApplication, verifyAccount } = useMemo(() => {
-    if (currentUser) {
-      if (!currentUser.phoneNumberVerifiedAt || !currentUser.emailVerifiedAt) {
-        return {
-          showHeader: true,
-          verifyAccount: true
-        }
-      }
-    }
-
-    if (activeCreatorApplcation) {
-      if (activeCreatorApplcation.status === 'PENDING') {
-        return {
-          showHeader: true,
-          continueCreatorApplication: true
-        }
-      }
-    }
-
-    return {
-      showHeader: false
-    }
-  }, [activeCreatorApplcation, currentUser]);
 
 
   const headerBlurred = shouldHeaderBlur
@@ -73,21 +44,7 @@ export const Header = ({
           : `${scrolled ? headerBlurred : 'sticky top-0 z-50 bg-white '}`
       }
     >
-      {
-        showHeader ? (
-          <div className='bg-blue-600 text-white text-sm flex justify-center py-2'>
-            {verifyAccount ? (
-              <Link to='/account/verify' className='hover:underline'>
-                Verify your mfoni account
-              </Link>
-            ) : continueCreatorApplication ? (
-              <Link to='/account' className='hover:underline'>
-                Complete your creator application
-              </Link>
-            ) : null}
-          </div>
-        ) : null
-      }
+      <NoticeBanner />
       <nav
         className="mx-auto flex max-w-8xl items-center justify-between py-4 px-4 lg:px-8"
         aria-label="Global"

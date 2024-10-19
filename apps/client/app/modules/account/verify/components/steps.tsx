@@ -2,14 +2,13 @@
 import { classNames } from '@/lib/classNames.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 import {
-  CheckIcon,
   EnvelopeIcon,
   PhoneIcon,
   RocketLaunchIcon,
 } from '@heroicons/react/24/outline'
 import { useCallback, useMemo } from 'react'
 
-export type Step = 'phone' | 'email' | 'id' | 'welcome'
+export type Step = 'phone' | 'email' | 'welcome'
 
 interface Props {
   activeStep: Step
@@ -61,13 +60,13 @@ export function Steps({ activeStep }: Props) {
         icon: EnvelopeIcon,
         id: 'email',
       },
-      {
-        name: 'Verfiy ID',
-        description: 'Verif your card information',
-        status: getStepStatus('id'),
-        icon: CheckIcon,
-        id: 'id',
-      },
+      // {
+      //   name: 'Verfiy ID',
+      //   description: 'Verif your card information',
+      //   status: getStepStatus('id'),
+      //   icon: CheckIcon,
+      //   id: 'id',
+      // },
       {
         name: 'Welcome to mfoni',
         description: 'Get up and running in a minute',
