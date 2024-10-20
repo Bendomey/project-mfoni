@@ -76,7 +76,6 @@ export function fetchClient<T>(
     try {
       if (!config?.isUnAuthorizedRequest) {
         const userToken: string | undefined = auth.getCipher(USER_CIPHER)
-        console.log({userToken})
         if (userToken) {
           headers.append('Authorization', `Bearer ${userToken}`)
         }

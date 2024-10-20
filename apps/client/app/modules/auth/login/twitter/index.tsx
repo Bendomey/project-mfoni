@@ -99,8 +99,7 @@ export const TwitterButton = () => {
   return (
     <Button
       onClick={initiateLogin}
-      variant="unstyled"
-      externalClassName="flex w-full items-center justify-center gap-3 rounded-md bg-[#1D9BF0] px-3 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
+      className="justify-center bg-[#1D9BF0] hover:bg-[#1D9BF0]/80 px-3 py-2 "
     >
       <svg
         className="h-5 w-5"

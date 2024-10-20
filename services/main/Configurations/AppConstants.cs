@@ -15,6 +15,7 @@ public class AppConstants
     public string CreatorCollection { get; init; } = "creators";
     public string TagCollection { get; init; } = "tags";
     public string WaitlistCollection { get; init; } = "waitlists";
+    public string CreatorPackageCollection { get; init; } = "creator_packages";
     public string BucketName { get; set; } = null!;
     public string AWSRekognitionCollection { get; set; } = null!;
     public string ProcessImageQueueName { get; set; } = null!;

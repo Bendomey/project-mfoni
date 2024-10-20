@@ -69,7 +69,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
         <div className="flex md:hidden justify-center mb-5">
           <Button
             onClick={handleDelete}
-            externalClassName={`${
+            className={`${
               isRejected ? 'bg-red-600 text-white' : 'bg-zinc-200 text-zinc-600'
             }  font-bold mt-5`}
             size="xl"
@@ -104,7 +104,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
                   </p>
                   <Button
                     onClick={handleDelete}
-                    externalClassName="bg-red-600 hover:bg-red-700 mt-5"
+                    className="bg-red-600 hover:bg-red-700 mt-5"
                     size="xl"
                   >
                     Remove
@@ -191,7 +191,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
         <Button
           onClick={handleDelete}
           variant="unstyled"
-          externalClassName="bg-zinc-100 rounded-full p-5 "
+          className="bg-zinc-100 rounded-full p-5 "
         >
           <TrashIcon className="h-10 w-auto text-zinc-300 hover:text-zinc-600" />
         </Button>

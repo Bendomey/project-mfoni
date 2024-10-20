@@ -31,7 +31,7 @@ const words = [
 
 export const OnboardingModule = () => {
   const [selectedType, setSelected] = useState<UserRole>()
-  const { onToggle, isOpen } = useDisclosure()
+  const { onToggle, isOpened } = useDisclosure()
   const { currentUser, getToken, onSignout } = useAuth()
   const navigate = useNavigate()
 
@@ -68,8 +68,8 @@ export const OnboardingModule = () => {
               <Button
                 onClick={handleContinue}
                 size="lg"
-                variant="outline"
-                externalClassName="hidden md:flex flex-row items-center"
+                variant="outlined"
+                className="hidden md:flex"
               >
                 Continue{' '}
                 <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
@@ -84,10 +84,10 @@ export const OnboardingModule = () => {
           <TypewriterEffectSmooth words={words} />
           <div className="my-10 w-3/3 sm:w-3/3 md:w-2/3 px-5 md:px-0">
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
-              <Button
+              <button
                 onClick={() => setSelected('CLIENT')}
-                variant="unstyled"
-                externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${selectedType === 'CLIENT'
+                type="button"
+                className={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${selectedType === 'CLIENT'
                     ? 'border-zinc-600'
                     : 'border-dashed border-zinc-300'
                   } p-5 rounded-lg`}
@@ -103,11 +103,11 @@ export const OnboardingModule = () => {
                     I&apos;m here to download photos and videos.
                   </h3>
                 </div>
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={() => setSelected('CREATOR')}
-                variant="unstyled"
-                externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${selectedType === 'CREATOR'
+                type="button"
+                className={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${selectedType === 'CREATOR'
                     ? 'border-zinc-600'
                     : 'border-dashed border-zinc-300'
                   } p-5 rounded-lg cursor-pointer`}
@@ -123,14 +123,14 @@ export const OnboardingModule = () => {
                     I&apos;m here to share my photos and videos with the world.
                   </h3>
                 </div>
-              </Button>
+              </button>
             </div>
             {selectedType ? (
               <Button
                 size="lg"
                 onClick={handleContinue}
-                variant="outline"
-                externalClassName="flex md:hidden flex-row items-center justify-center mt-10 w-full"
+                variant="outlined"
+                className="flex md:hidden justify-center mt-10 w-full"
               >
                 Continue{' '}
                 <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
@@ -147,7 +147,7 @@ export const OnboardingModule = () => {
         </div>
       </div>
       <SetupAccountModal
-        open={isOpen}
+        open={isOpened}
         onClose={onToggle}
         selectedType={selectedType}
       />

@@ -6,8 +6,11 @@ import { UserTimeline } from './components/timeline.tsx'
 import { OtherCreators } from './components/other-creators.tsx'
 import { Contents } from './components/content.tsx'
 import { QuickActions } from './components/quick-actions.tsx'
+import { AccountProvider, useAccountContext } from './context/index.tsx'
+import { CreatorApplicationModal } from './components/creator-application-modal/index.tsx'
 
-export const AccountModule = () => {
+const AccountModuleComponent = () => {
+  const { isCreatorApplicationModalOpened } = useAccountContext()
 
   return (
     <>
@@ -25,6 +28,15 @@ export const AccountModule = () => {
         </div>
       </div>
       <Footer />
+      <CreatorApplicationModal isOpened={isCreatorApplicationModalOpened}/>
     </>
+  )
+}
+
+export const AccountModule = () => {
+  return (
+    <AccountProvider>
+      <AccountModuleComponent />
+    </AccountProvider>
   )
 }

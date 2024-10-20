@@ -1,6 +1,6 @@
 import { useGetActiveCreatorApplication } from '@/api/users/index.ts';
+import { Button } from '@/components/button/index.tsx';
 import { useAuth } from '@/providers/auth/index.tsx';
-import { Link } from '@remix-run/react';
 import { useMemo } from 'react';
 
 export function NoticeBanner() {
@@ -47,12 +47,13 @@ export function NoticeBanner() {
                     </svg>
                     Verifying your account will help us secure your account.
                 </p>
-                <Link
-                    to="/account/verify"
+                <Button
+                    isLink={true}
+                    href="/account/verify"
                     className="flex-none rounded-full bg-gray-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
                 >
                     Continue <span aria-hidden="true">&rarr;</span>
-                </Link>
+                </Button>
             </>
         )
     } else if (continueCreatorApplication) {
@@ -65,12 +66,15 @@ export function NoticeBanner() {
                     </svg>
                     You have a creator application in progress.
                 </p>
-                <Link
-                    to="/account"
-                    className="flex-none rounded-full bg-gray-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
+                <Button
+                    isLink={true}
+                    href="/account?complete-creator-application=true"
+                    color='black'
+                    size='sm'
+                    className='rounded-full'
                 >
                     Continue <span aria-hidden="true">&rarr;</span>
-                </Link>
+                </Button>
             </>
         )
     }

@@ -116,7 +116,7 @@ export const SendOtp = ({setPage}: Props) => {
             <Loader color="fill-blue-600" />
           </div>
         ) : (
-          <Button type="submit" externalClassName="w-full mt-5" size="lg">
+          <Button type="submit" className="w-full justify-center mt-5" size="lg">
             Send OTP
           </Button>
         )}

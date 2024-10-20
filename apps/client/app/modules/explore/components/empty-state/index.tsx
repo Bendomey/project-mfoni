@@ -25,7 +25,8 @@ export const EmptyState = (props: {title: string; message: string}) => {
               isLink={true}
               href="/category"
               type="button"
-              variant="ghost"
+              variant="solid"
+              color='secondaryGhost'
             >
               <span className="text-gray-500 hover:text-gray-700 text-sm">
                 explore categories

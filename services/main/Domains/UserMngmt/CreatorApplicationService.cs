@@ -17,6 +17,7 @@ public class CreatorApplicationService
     private readonly IMongoCollection<Models.Admin> _adminCollection;
     private readonly IMongoCollection<Models.CreatorApplication> _creatorApplicationCollection;
     private readonly IMongoCollection<Models.Creator> _creatorCollection;
+    private readonly IMongoCollection<Models.CreatorPackage> _creatorPackageCollection;
     private readonly AppConstants _appConstantsConfiguration;
 
     public CreatorApplicationService(
@@ -30,6 +31,7 @@ public class CreatorApplicationService
         _adminCollection = databaseConfig.Database.GetCollection<Models.Admin>(appConstants.Value.AdminCollection);
         _creatorApplicationCollection = databaseConfig.Database.GetCollection<Models.CreatorApplication>(appConstants.Value.CreatorApplicatonCollection);
         _creatorCollection = databaseConfig.Database.GetCollection<Models.Creator>(appConstants.Value.CreatorCollection);
+        _creatorPackageCollection = databaseConfig.Database.GetCollection<Models.CreatorPackage>(appConstants.Value.CreatorPackageCollection);
         _appConstantsConfiguration = appConstants.Value;
 
         logger.LogDebug("User service initialized");
@@ -61,6 +63,17 @@ public class CreatorApplicationService
             .Set(r => r.Status, CreatorApplicationStatus.SUBMITTED)
             .Set(r => r.SubmittedAt, DateTime.UtcNow)
             .Set(r => r.UpdatedAt, DateTime.UtcNow);
+
+        if (input.CreatorPackageType is not null)
+        {
+            userUpdates = userUpdates.Set(r => r.IntendedPricingPackage, input.CreatorPackageType);
+        }
+
+        // make sure there's a creator package set
+        if (creatorApplication.IntendedPricingPackage is null)
+        {
+            throw new HttpRequestException("PackageTypeNotSet");
+        }
 
         await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
 
@@ -126,6 +139,22 @@ public class CreatorApplicationService
         };
 
         await _creatorCollection.InsertOneAsync(creator);
+
+        if (creatorApplication.IntendedPricingPackage is not null)
+        {
+            var creatorPackage = new CreatorPackage
+            {
+                CreatorId = creator.Id,
+                PackageType = creatorApplication.IntendedPricingPackage,
+                Status = CreatorPackageStatus.ACTIVE,
+            };
+
+            await _creatorPackageCollection.InsertOneAsync(creatorPackage);
+        } else {
+            // this shouldn't happen. but just in case
+            throw new HttpRequestException("PackageTypeNotSet");
+        }
+
 
         var user = await _userCollection.Find(user => user.Id == creatorApplication.UserId).FirstOrDefaultAsync();
         if (user is null)
@@ -216,13 +245,14 @@ public class CreatorApplicationService
         return creatorApplication;
     }
 
-    public async Task<CreatorApplication> GetUserActiveCreatorApplication(string userId){
+    public async Task<CreatorApplication> GetUserActiveCreatorApplication(string userId)
+    {
         var creatorApplication = await _creatorApplicationCollection.Find(application => application.UserId == userId)
             .SortByDescending(application => application.CreatedAt)
             .FirstOrDefaultAsync();
 
         return creatorApplication;
     }
-    
+
 }
 

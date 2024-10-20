@@ -13,6 +13,7 @@ import {classNames} from '@/lib/classNames.ts'
 import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useSearchParams} from '@remix-run/react'
+import { useValidateImage } from '@/hooks/use-validate-image.tsx'
 
 interface Props {
   open: boolean
@@ -37,6 +38,7 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
   const {isPending, mutate} = useSetupAccount()
   const {currentUser} = useAuth()
   const [searchParams] = useSearchParams()
+  const isProfilePhotoValid = useValidateImage(currentUser?.photo ?? '')
 
   const {
     register,
@@ -58,7 +60,10 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
   }, [currentUser, selectedType, setValue])
 
   const onSubmit = (data: FormValues) => {
-    mutate(data, {
+    mutate({
+      ...data,
+      intendedPricingPackage: searchParams.get('pricing_package') ?? undefined,
+    }, {
       onSuccess: async () => {
         window.location.href = searchParams.get('return_to') ?? '/'
       },
@@ -99,7 +104,7 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
               <Dialog.Panel className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="flex justify-center mb-3">
-                    {currentUser?.photo ? (
+                    {isProfilePhotoValid && currentUser?.photo ? (
                       <img
                         className="inline-block h-14 w-14 rounded-full"
                         src={currentUser.photo}
@@ -173,16 +178,16 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
 
                   <div className="mt-4">
                     <Button
-                      variant="unstyled"
+                      variant="solid"
+                      color='primaryGhost'
                       type="submit"
-                      externalClassName="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     >
                       Save Changes!
                     </Button>
                     <Button
-                      variant="outline"
+                      variant="outlined"
                       type="button"
-                      externalClassName=" ml-2 "
+                      className="ml-2"
                       onClick={onClose}
                     >
                       Close

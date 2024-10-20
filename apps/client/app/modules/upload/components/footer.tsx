@@ -37,7 +37,7 @@ const CircularProgress = ({progress}: {progress: number}) => {
 }
 
 export const Footer = ({contents}: {contents: Array<Content>}) => {
-  const {isOpen: isOpenSubmitModal, onToggle: onToggleSubmitModal} =
+  const {isOpened: isOpenSubmitModal, onToggle: onToggleSubmitModal} =
     useDisclosure()
   const rejectedContentLength = useMemo(
     () => contents.filter(content => content.status === 'rejected').length,
@@ -102,7 +102,7 @@ export const Footer = ({contents}: {contents: Array<Content>}) => {
             <Button
               onClick={onToggleSubmitModal}
               size="xl"
-              externalClassName="flex flex-row items-center"
+              className="flex flex-row items-center"
             >
               Submit{' '}
               <span className="hidden md:block ml-1.5">your content</span>

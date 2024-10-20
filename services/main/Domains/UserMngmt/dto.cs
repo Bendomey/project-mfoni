@@ -8,6 +8,7 @@ public class AuthenticateResponse
 
 public class SubmitCreatorApplicationInput
 {
+    public string? CreatorPackageType { get; set; }
     public required string IdType { get; set; }
     public required string IdNumber { get; set; }
     public required string IdFrontImage { get; set; }

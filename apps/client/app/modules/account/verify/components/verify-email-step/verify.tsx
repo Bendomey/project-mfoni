@@ -36,7 +36,7 @@ export const VerifyOtp = ({setPage}: Props) => {
           toast.success('Email Address verified successfully', {
             id: 'email-verified',
           })
-          setActiveStep('id')
+          setActiveStep('welcome')
         },
         onError(error) {
           if (error.message) {
@@ -117,7 +117,7 @@ export const VerifyOtp = ({setPage}: Props) => {
         <>
           <Button
             onClick={verifyCode}
-            externalClassName="w-full lg:w-1/3 mt-10"
+            className="w-full lg:w-1/3 justify-center mt-10"
             size="lg"
           >
             Verify

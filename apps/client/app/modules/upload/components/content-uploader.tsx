@@ -27,7 +27,7 @@ export const ContentUploader = () => {
             <Button
               onClick={openFileSelector}
               size="lg"
-              externalClassName="mt-7"
+              className="mt-7"
             >
               Browse
             </Button>

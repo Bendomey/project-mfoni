@@ -103,8 +103,7 @@ export const FacebookButton = () => {
   return (
     <Button
       onClick={handleLoginInitiation}
-      variant="unstyled"
-      externalClassName="flex w-full items-center justify-center gap-3 rounded-md bg-blue-600 px-3 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
+      className='justify-center'
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

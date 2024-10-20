@@ -27,28 +27,28 @@ const SearchModal = ({onClose}: Props) => {
         <div />
         <div>
           <div className="flex flex-row items-center rounded-lg bg-zinc-100">
-            <Button
+            <button
               onClick={() => setActiveMenu(MENUS.TEXT_SEARCH)}
-              variant="unstyled"
-              externalClassName={`p-4 ${
+              type="button"
+              className={`p-4 ${
                 activeMenu === MENUS.TEXT_SEARCH
                   ? 'bg-zinc-300 rounded-l-lg'
                   : ''
               } `}
             >
               <MagnifyingGlassIcon className="h-5 w-5" />
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={() => setActiveMenu(MENUS.VISUAL_SEARCH)}
-              variant="unstyled"
-              externalClassName={`p-4 ${
+              type="button"
+              className={`p-4 ${
                 activeMenu === MENUS.VISUAL_SEARCH
                   ? 'bg-zinc-300 rounded-r-lg'
                   : ''
               } `}
             >
               <ViewfinderCircleIcon className="h-5 w-5" />
-            </Button>
+            </button>
           </div>
         </div>
         <Button onClick={onClose} variant="unstyled">
@@ -85,7 +85,7 @@ export const SearchPhotosForMobile = () => {
         <Button
           variant="unstyled"
           onClick={() => setIsSearchFocused(true)}
-          externalClassName="block w-full rounded-full text-base flex flex-start items-center font-medium py-2 px-5 text-gray-400 bg-white border border-zinc-400"
+          className="block w-full rounded-full text-base flex flex-start items-center font-medium py-2 px-5 text-gray-400 bg-white border border-zinc-400"
         >
           <MagnifyingGlassIcon className="h-5 w-5 mr-3 text-zinc-400" />
           Search for photos

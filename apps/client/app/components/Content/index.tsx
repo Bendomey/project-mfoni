@@ -32,7 +32,7 @@ export const Content = ({content, showFlyout = false}: Props) => {
               </div>
             </div>
             <div className="group-hover:block hidden">
-              <Button variant="outline" size="sm" externalClassName="">
+              <Button variant="outlined" size="sm">
                 <HeartIcon className="h-6 w-6 text-zinc-700" />
               </Button>
             </div>
@@ -59,8 +59,7 @@ export const Content = ({content, showFlyout = false}: Props) => {
             )}
             <div>
               <Button
-                variant="outline"
-                externalClassName="flex flex-row items-center"
+                variant="outlined"
               >
                 <LockClosedIcon className="h-4 w-4 mr-2" />
                 Download

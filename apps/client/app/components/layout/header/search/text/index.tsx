@@ -12,7 +12,7 @@ export const TextSearch = () => {
         <h1 className="font-bold text-xl md:text-lg">Recent Searches</h1>
         <Button
           variant="unstyled"
-          externalClassName="text-sm text-zinc-400 hover:underline"
+          className="text-sm text-zinc-400 hover:underline"
         >
           Clear
         </Button>
@@ -28,7 +28,7 @@ export const TextSearch = () => {
           'Current Events',
           'Business & Work',
         ].map((item, index) => (
-          <Button size="sm" key={index} variant="outline">
+          <Button size="sm" key={index} variant="outlined">
             <div className="flex flex-row items-center text-gray-600 font-base">
               {' '}
               <MagnifyingGlassIcon className="h-3 w-3 mr-2" /> {item}
@@ -53,7 +53,7 @@ export const TextSearch = () => {
           'Current Events',
           'Business & Work',
         ].map((item, index) => (
-          <Button size="sm" key={index} variant="outline">
+          <Button size="sm" key={index} variant="outlined">
             <div className="flex flex-row items-center">
               {' '}
               <ArrowTrendingUpIcon className="h-5 w-5 mr-2" /> {item}
@@ -76,7 +76,7 @@ export const TextSearch = () => {
           'Current Events',
           'Business & Work',
         ].map((item, index) => (
-          <Button key={index} variant="outline">
+          <Button key={index} variant="outlined">
             <div className="flex flex-row items-center">
               <RectangleGroupIcon className="h-5 w-5 mr-2" /> {item}
             </div>
