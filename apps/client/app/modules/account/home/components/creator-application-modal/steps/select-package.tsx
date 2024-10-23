@@ -24,6 +24,7 @@ export function SelectPackage({ mfoniPackage, setMfoniPackage }: Props) {
                         <option value='BASIC'>Pro Lens (Basic Premium Tier)</option>
                         <option value='ADVANCED'>Master Shot (Advanced Premium Tier)</option>
                     </select>
+                <p className="text-xs text-gray-600 mt-1"><span className="font-bold">Note:</span> You can always change your package and make your payments after we&apos;ve approved your application.</p>
                 </div>
             </div>
         </div>

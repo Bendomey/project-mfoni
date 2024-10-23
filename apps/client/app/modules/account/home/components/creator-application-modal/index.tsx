@@ -4,7 +4,7 @@ import { ArrowRightIcon, CheckIcon, ChevronLeftIcon } from "@heroicons/react/24/
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { useSearchParams } from "@remix-run/react";
 import { SelectPackage } from "./steps/select-package.tsx";
-import { UploadDocuments } from "./steps/upload-documents.tsx";
+import { UploadDocuments } from "./steps/upload-documents/index.tsx";
 import { useMemo, useState } from "react";
 
 interface Props {
@@ -16,6 +16,11 @@ const steps = {
     document: UploadDocuments
 }
 
+export interface IImageType {
+    url: string;
+    name: string;
+}
+
 export function CreatorApplicationModal({
     isOpened,
 }: Props) {
@@ -23,8 +28,8 @@ export function CreatorApplicationModal({
     const [searchParams, setSearchParams] = useSearchParams()
     const [mfoniPackage, setMfoniPackage] = useState<string>('')
     const [idType, setIdType] = useState<string>('')
-    const [frontId, setFrontId] = useState<string>('')
-    const [backId, setBackId] = useState<string>('')
+    const [frontId, setFrontId] = useState<IImageType>()
+    const [backId, setBackId] = useState<IImageType>()
 
     const onClose = () => {
         searchParams.delete('complete-creator-application')
@@ -34,7 +39,7 @@ export function CreatorApplicationModal({
     }
 
     const isNextButtonDisabled = useMemo(() => !mfoniPackage, [mfoniPackage])
-    const isCompleteButtonDisabled = useMemo(() => !idType || !frontId || !backId, [backId, frontId, idType])
+    const isCompleteButtonDisabled = useMemo(() => !mfoniPackage || !idType || !frontId || !backId, [backId, frontId, idType, mfoniPackage])
 
     return (
         <Modal className='w-full md:w-4/6 lg:w-3/6 p-0' onClose={onClose} isOpened={isOpened} canBeClosedWithBackdrop={false}>
