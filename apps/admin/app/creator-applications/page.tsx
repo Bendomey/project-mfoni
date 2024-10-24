@@ -1,4 +1,6 @@
+
 import { Header } from "@/components/header";
+import { Application } from "@/modules";
 import ComingSoon from "@/modules/coming-soon";
 
 import { Metadata } from "next";
@@ -12,8 +14,8 @@ export default function CreatorApplications() {
         <>
             <Header />
 
-            <div className="mt-20">
-                <ComingSoon />
+            <div className="mt-12">
+                <Application />
             </div>
         </>
     )
