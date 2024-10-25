@@ -35,6 +35,7 @@ import {
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { LoadingContainer } from "../LoadingContainer";
 import { ScrollArea } from "@/components/ui/scroll-area"
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
