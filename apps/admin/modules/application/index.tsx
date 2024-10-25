@@ -2,7 +2,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { DataTable } from "@/components/table";
-import { ArrowUpDown, ChevronsUpDownIcon, CreditCardIcon, User, UserIcon } from "lucide-react";
+import { ArrowUpDown, ChevronsUpDownIcon, CreditCardIcon, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {

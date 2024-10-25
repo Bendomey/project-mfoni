@@ -34,7 +34,7 @@ import {
 } from "@radix-ui/react-icons";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { LoadingContainer } from "../LoadingContainer";
-
+import { ScrollArea } from "@/components/ui/scroll-area"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -47,7 +47,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  boxHeight = 410,
+  boxHeight = 65,
   isDataLoading = false,
   error,
   refetch,
@@ -72,17 +72,14 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  if (isDataLoading) {
-    return <LoadingContainer />;
-  }
-
   return (
     <>
+     <ScrollArea className="w-full flex flex-col items-center justify-center" style={{height: `${boxHeight - 5}vh`}}>
       {isDataLoading ? (
         <LoadingContainer />
       ) : error ? (
         <div
-          className={`flex flex-col justify-center items-center h-[${boxHeight}px]`}
+          className={`flex flex-col justify-center items-center border rounded h-full`}
         >
           <p>An error occurred: {error.message}</p>
           {refetch && (
@@ -93,7 +90,7 @@ export function DataTable<TData, TValue>({
         </div>
       ) : data && !data.length ? (
         <div
-          className={`flex flex-col items-center justify-center h-[${boxHeight}px]`}
+        className={`flex flex-col justify-center items-center border rounded h-full`}
         >
           <h2 className="mt-5 text-xl font-semibold">No data found</h2>
 
@@ -250,6 +247,7 @@ export function DataTable<TData, TValue>({
           </div>
         </>
       )}
+      </ScrollArea>
     </>
   );
 }
