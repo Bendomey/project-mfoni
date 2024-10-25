@@ -2,7 +2,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { DataTable } from "@/components/table";
-import { ArrowUpDown, ChevronsUpDownIcon } from "lucide-react";
+import { ArrowUpDown, ChevronsUpDownIcon, CreditCardIcon, User, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -111,15 +111,10 @@ export const Application = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(payment.id)}
-                >
-                  Copy payment ID
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>View customer</DropdownMenuItem>
-                <DropdownMenuItem>View payment details</DropdownMenuItem>
+                <DropdownMenuLabel>Options</DropdownMenuLabel>
+                <DropdownMenuItem><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
+                <DropdownMenuItem><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
+                <DropdownMenuItem><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )
