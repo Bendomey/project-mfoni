@@ -106,7 +106,7 @@ export const Pricing = () => {
               id={tier.id}
               className={classNames(
                 tier.featured ? 'text-blue-400' : 'text-blue-600',
-                'leading-7 font-shantell text-3xl font-medium',
+                'leading-7 font-shantell text-3xl font-semibold',
               )}
             >
               {tier.name}
