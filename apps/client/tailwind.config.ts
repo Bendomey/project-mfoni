@@ -6,6 +6,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'sans-serif'],
+        shantell: ['Shantell Sans', 'sans-serif'],
       },
     },
   },

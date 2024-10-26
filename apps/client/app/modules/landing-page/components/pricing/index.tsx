@@ -86,19 +86,19 @@ export const Pricing = () => {
         Qui iusto aut est earum eos quae. Eligendi est at nam aliquid ad quo
         reprehenderit in aliquid fugiat dolorum voluptatibus.
       </p>
-      <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-none 2xl:max-w-7xl lg:grid-cols-3">
+      <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-flex-start gap-x-5 gap-y-6 sm:mt-20 sm:gap-y-7 lg:max-w-none 2xl:max-w-7xl lg:grid-cols-3">
         {tiers.map((tier, tierIdx) => (
           <div
             key={tierIdx}
             className={classNames(
               tier.featured
-                ? 'relative bg-black shadow-2xl'
+                ? 'relative bg-black shadow-2xl '
                 : 'bg-white/60 sm:mx-8 lg:mx-0',
               tier.featured
                 ? ''
                 : tierIdx === 0
-                  ? 'rounded-t-3xl sm:rounded-b-none lg:rounded-tr-none lg:rounded-bl-3xl'
-                  : 'sm:rounded-t-none lg:rounded-tr-3xl lg:rounded-bl-none',
+                  ? 'rounded-t-3xl lg:rounded-bl-3xl'
+                  : 'lg:rounded-tr-3xl ',
               'rounded-3xl p-8 ring-1 ring-black/10 sm:p-10',
             )}
           >
@@ -106,7 +106,7 @@ export const Pricing = () => {
               id={tier.id}
               className={classNames(
                 tier.featured ? 'text-blue-400' : 'text-blue-600',
-                'text-base font-semibold leading-7',
+                'leading-7 font-shantell text-3xl font-medium',
               )}
             >
               {tier.name}
@@ -115,7 +115,7 @@ export const Pricing = () => {
               <span
                 className={classNames(
                   tier.featured ? 'text-white' : 'text-black',
-                  'text-5xl font-bold tracking-tight',
+                  'text-3xl font-bold tracking-tight',
                 )}
               >
                 {tier.priceMonthly}
@@ -137,6 +137,20 @@ export const Pricing = () => {
             >
               {tier.description}
             </p>
+
+            <a
+              href={tier.href}
+              aria-describedby={tier.id}
+              className={classNames(
+                tier.featured
+                  ? 'bg-blue-500 text-white shadow-sm hover:bg-blue-400 focus-visible:outline-blue-500'
+                  : 'text-blue-600 ring-1 ring-inset ring-blue-200 hover:ring-blue-300 focus-visible:outline-blue-600',
+                'mt-8 block rounded-md py-2.5 px-3.5 text-center text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
+              )}
+            >
+              Get started today
+            </a>
+            
             <ul
               className={classNames(
                 tier.featured ? 'text-gray-300' : 'text-gray-600',
@@ -156,18 +170,7 @@ export const Pricing = () => {
                 </li>
               ))}
             </ul>
-            <a
-              href={tier.href}
-              aria-describedby={tier.id}
-              className={classNames(
-                tier.featured
-                  ? 'bg-blue-500 text-white shadow-sm hover:bg-blue-400 focus-visible:outline-blue-500'
-                  : 'text-blue-600 ring-1 ring-inset ring-blue-200 hover:ring-blue-300 focus-visible:outline-blue-600',
-                'mt-8 block rounded-md py-2.5 px-3.5 text-center text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
-              )}
-            >
-              Get started today
-            </a>
+           
           </div>
         ))}
       </div>
