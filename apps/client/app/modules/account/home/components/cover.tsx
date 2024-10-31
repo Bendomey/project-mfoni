@@ -9,6 +9,8 @@ import { Button } from '@/components/button/index.tsx'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { useValidateImage } from '@/hooks/use-validate-image.tsx'
 import { useAccountContext } from '../context/index.tsx'
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import {classNames} from "@/lib/classNames.ts";
 
 export const profile = {
   name: 'Ricardo Cooper',
@@ -32,6 +34,40 @@ export const profile = {
   },
 }
 const getNameInitials = (name: string) => name.split(' ').map((n) => n[0]).join('')
+
+interface Props {
+  application: CreatorApplication
+}
+
+function CreatorApplicationBanner({application}: Props) {
+
+  const color = application.status === 'SUBMITTED' ? 'yellow' : 'red'
+  return (
+      <div className={classNames(`rounded-md bg-${color}-50 p-4`)}>
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <ExclamationTriangleIcon aria-hidden="true" className={classNames(`h-5 w-5 text-${color}-400`)} />
+          </div>
+          <div className="ml-3">
+            <h3 className={classNames(`text-sm font-medium text-${color}-800`)}>Creator Application Updates</h3>
+            <div className={classNames(`mt-2 text-sm text-${color}-700`)}>
+                {
+                  application.status == 'SUBMITTED' ? (
+                      <p>Your application is in review. Support will reach back with updates soon. Hang tight!</p>
+                  ) : application.status === 'REJECTED' ? (
+                      <>
+                          <p>Your application was rejected unfortunately. Click on the &apos;Become a Creator&apos; button below to re-apply.</p>
+                        {application.rejectedReason ? <b>Reason: {application.rejectedReason}</b> : null}
+                      </>
+                  ) : null
+                }
+            </div>
+          </div>
+        </div>
+      </div>
+  )
+}
+
 
 export const AccountCover = () => {
   const { currentUser } = useAuth()
@@ -97,6 +133,14 @@ export const AccountCover = () => {
                 East Legon, Accra - Ghana
               </div>
             </div>
+            {
+              activeCreatorApplication && ['SUBMITTED', 'REJECTED'].includes(activeCreatorApplication.status) ? (
+                  <div className='my-5'>
+                    <CreatorApplicationBanner application={{...activeCreatorApplication, status: 'SUBMITTED'}} />
+                  </div>
+              ) : null
+            }
+
             <div className='mt-4 flex flex-col md:flex-row items-center gap-x-2 gap-y-4'>
               <Button className='w-full md:w-auto'>
                 <UserIcon
@@ -143,7 +187,7 @@ export const AccountCover = () => {
                         color='secondaryGhost'
                         className="w-full md:w-auto bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:opacity-80"
                     >
-                      Become A Creator
+                      Become a Creator
                     </Button>
                 ) : null
               }

@@ -13,8 +13,6 @@ import {
 import {useAccountContext} from "@/modules/account/home/context/index.tsx";
 import {toast} from "react-hot-toast";
 import {errorMessagesWrapper} from "@/constants/error-messages.ts";
-import {useQueryClient} from "@tanstack/react-query";
-import {QUERY_KEYS} from "@/constants/index.ts";
 import {Loader} from "@/components/loader/index.tsx";
 
 interface Props {
@@ -35,7 +33,6 @@ export function CreatorApplicationModal({
                                             isOpened,
                                         }: Props) {
     const {activeCreatorApplication} = useAccountContext()
-    const queryClient = useQueryClient()
     const {mutateAsync: creatorCreatorApplication, isPending: isCreatingApplication} = useCreateCreatorApplication()
     const {mutateAsync: updateCreatorApplication, isPending: isUpdatingApplication} = useUpdateCreatorApplication()
     const {mutateAsync: submitCreatorApplication, isPending: isSubmitingApplication} = useSubmitCreatorApplication()
@@ -48,11 +45,22 @@ export function CreatorApplicationModal({
     const [backId, setBackId] = useState<IImageType>()
 
     useEffect(() => {
-        if (activeCreatorApplication?.intendedPricingPackage) {
-            setMfoniPackage(activeCreatorApplication.intendedPricingPackage)
-            setStep('document')
+        if (activeCreatorApplication) {
+            if(activeCreatorApplication.intendedPricingPackage){
+                setMfoniPackage(activeCreatorApplication.intendedPricingPackage)
+                setStep('document')
+            }
+            setIdType(activeCreatorApplication.idType ?? '')
+            setFrontId(activeCreatorApplication.idFrontImage ? {
+                url: activeCreatorApplication.idFrontImage,
+                name: 'front image',
+            } : undefined)
+            setBackId(activeCreatorApplication.idBackImage ? {
+                url: activeCreatorApplication.idBackImage,
+                name: 'back image',
+            } : undefined)
         }
-    }, [])
+    }, [activeCreatorApplication])
 
     const onClose = useCallback(() => {
         searchParams.delete('complete-creator-application')
@@ -103,10 +111,9 @@ export function CreatorApplicationModal({
             }
 
             await submitCreatorApplication(creatorApplicationId);
-            void queryClient.invalidateQueries({queryKey: [QUERY_KEYS.CREATOR_APPLICATIONS, 'user:active']})
-            onClose();
-
             toast.success('Creator Application submitted.')
+
+            window.location.href = '/account'
         } catch (error) {
             if (error instanceof Error) {
                 toast.error(errorMessagesWrapper(error.message), {
@@ -114,8 +121,7 @@ export function CreatorApplicationModal({
                 })
             }
         }
-    }, [activeCreatorApplication, backId, creatorCreatorApplication, frontId, idType, mfoniPackage, onClose, queryClient, submitCreatorApplication, updateCreatorApplication])
-
+    }, [activeCreatorApplication, backId, creatorCreatorApplication, frontId, idType, mfoniPackage, submitCreatorApplication, updateCreatorApplication])
 
     return (
         <Modal className='w-full md:w-4/6 lg:w-3/6 p-0 relative' onClose={onClose} isOpened={isOpened}
