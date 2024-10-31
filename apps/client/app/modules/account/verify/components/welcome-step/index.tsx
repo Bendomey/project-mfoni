@@ -8,11 +8,11 @@ export const WelcomeStep = () => {
       <Confetti className="h-full w-full" />
       <div className="text-7xl mb-16">🚀</div>
       <h1 className="text-2xl font-extrabold mb-2">
-        You&apos;re now a creator!
+        You&apos;re now a verified user!
       </h1>
       <p>
-        You&apos;ve successfully verified your account. You can now start
-        uploading content.
+        Your account is secured more than ever. You can now explore the app and
+        enjoy the full experience.
       </p>
 
       <div className="mt-5">

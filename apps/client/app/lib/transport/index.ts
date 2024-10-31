@@ -15,7 +15,10 @@ declare global {
  *
  * @returns {Promise} - Returns promise.
  */
-function transport(input: RequestInfo, init?: RequestInit): Promise<Response> {
+export function transport(
+  input: RequestInfo,
+  init?: RequestInit,
+): Promise<Response> {
   return new Promise(async (resolve, reject) => {
     try {
       const response = await fetch(input, init)

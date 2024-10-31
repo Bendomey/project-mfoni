@@ -6,12 +6,12 @@ public class AuthenticateResponse
     public required string Token { get; set; }
 }
 
-public class SubmitCreatorApplicationInput
+public class UpdateCreatorApplicationInput
 {
-    public required string IdType { get; set; }
-    public required string IdNumber { get; set; }
-    public required string IdFrontImage { get; set; }
-    public required string IdBackImage { get; set; }
+    public string? CreatorPackageType { get; set; }
+    public string? IdType { get; set; }
+    public string? IdFrontImage { get; set; }
+    public string? IdBackImage { get; set; }
 }
 
 public class ApproveCreatorApplicationInput

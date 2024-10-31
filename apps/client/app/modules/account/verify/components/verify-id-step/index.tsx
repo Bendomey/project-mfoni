@@ -212,7 +212,7 @@ export const VerifyIdStep = () => {
           </div>
         ) : null}
 
-        <Button type="submit" externalClassName="w-full mt-5" size="lg">
+        <Button type="submit" className="w-full justify-center mt-5" size="lg">
           Initiate Verification
         </Button>
       </form>

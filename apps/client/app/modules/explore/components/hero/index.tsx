@@ -44,7 +44,7 @@ export const ExploreHeroSection = () => {
         backgroundSize: 'cover',
         backgroundPosition: 'left',
       }}
-      className="h-[42vh]  bg-gradient-to-r from-sky-500 to-indigo-500"
+      className="h-[50vh]  bg-gradient-to-r from-sky-500 to-indigo-500"
     >
       <Header isHeroSearchInVisible={true} />
       <FadeIn className="relative  px-6 pt-14 lg:px-8">

@@ -1,32 +1,35 @@
+type UserRole = 'CLIENT' | 'CREATOR'
+
 interface User {
   id: string
-  role: 'CLIENT' | 'CREATOR'
+  role: UserRole | null
   provider: 'GOOGLE' | 'TWITTER' | 'FACEBOOK'
   name: string
   oAuthId: string
   email: Nullable<string>
+  emailVerifiedAt: Nullable<Date>
   phoneNumber: Nullable<string>
-  verifiedPhoneNumberAt: Nullable<Date>
+  phoneNumberVerifiedAt: Nullable<Date>
   username: Nullable<string>
   photo: Nullable<string>
   creatorApplicationId: Nullable<string>
   creatorApplication: Nullable<CreatorApplication>
-  accountSetupAt: Nullable<Date>
   createdAt: Date
   updatedAt: Date
 }
 
 interface CreatorApplication {
   id: string
+  userId: string
   status: 'PENDING' | 'SUBMITTED' | 'APPROVED' | 'REJECTED'
   submittedAt: Nullable<Date>
   approvedAt: Nullable<Date>
-  approvedBy: Nullable<string>
   rejectedAt: Nullable<Date>
-  rejectedBy: Nullable<string>
-  platformAggrementForm: Nullable<string>
-  ghanaCardFront: Nullable<string>
-  ghanaCardBack: Nullable<string>
+  rejectedReason: Nullable<string>
+  intendedPricingPackage: Nullable<'FREE' | 'BASIC' | 'ADVANCED'>
+  idType: Nullable<'DRIVERS_LICENSE' | 'NATIONAL_ID' | 'VOTERS'>
+  idFrontImage: Nullable<string>
+  idBackImage: Nullable<string>
   createdAt: Date
   createdBy: string
   updatedAt: Date

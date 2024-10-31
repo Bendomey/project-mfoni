@@ -65,7 +65,7 @@ export const SearchPhotos = ({isSittingOnADarkBackground}: Props) => {
               variant="unstyled"
               type="button"
               onClick={() => setQuery('')}
-              externalClassName="border-r border-zinc-400 mr-4 pr-4"
+              className="border-r border-zinc-400 mr-4"
             >
               <XMarkIcon
                 className="h-5 w-5 text-gray-600 cursor-pointer"

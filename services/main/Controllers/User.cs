@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Net;
 using main.Transformations;
 using Microsoft.OpenApi.Any;
+using main.Models;
 
 namespace main.Controllers;
 
@@ -98,16 +99,187 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("creator-applications/{id}/submit")]
-    [ProducesResponseType(typeof(OutputResponse<OutputCreatorApplication>), StatusCodes.Status200OK)]
+    [HttpPatch("users/email")]
+    [ProducesResponseType(typeof(OutputResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> SubmitCreatorApplication([FromBody] SubmitCreatorApplicationInput input, string id)
+    public async Task<IActionResult> SaveEmailAddress([FromBody] EmailAddressInput userEmailAddress)
     {
         try
         {
-            logger.LogInformation($"verify user identity {input}");
-            var creatorApplication = await _creatorApplicationService.SubmitCreatorApplication(input, id);
+            logger.LogInformation($"saving user email address {userEmailAddress}");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var savedEmailAddress = await userService.SaveEmailAddress(userEmailAddress.emailAddress, currentUser.Id);
+            return new ObjectResult(new GetEntityResponse<bool?>(savedEmailAddress, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<bool?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            logger.LogError($"Save email address exception: {e.Message}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
+    [HttpPatch("users/email/verify")]
+    [ProducesResponseType(typeof(OutputResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> VerifyEmailAddress([FromBody] VerificationCodeInput code)
+    {
+        try
+        {
+            logger.LogInformation("verifying user email address");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var verifyEmailAddress = await userService.VerifyEmailAddress(code.verificationCode, currentUser.Id);
+            return new ObjectResult(new GetEntityResponse<bool?>(verifyEmailAddress, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<bool?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            logger.LogError($"Verify email address exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+
+    [Authorize]
+    [HttpGet("users/creator-applications/active")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorApplication>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ActiveUserCreatorApplication()
+    {
+        try
+        {
+            logger.LogInformation($"get user's active creator application");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var creatorApplication = await _creatorApplicationService.GetUserActiveCreatorApplication(currentUser.Id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorApplication>(_creatorApplicationTransformer.Transform(creatorApplication), null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorApplication>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"get user's active creator application exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
+    [HttpPost("creator-applications")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorApplication>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> CreateCreatorApplication([FromBody] DTOs.CreateCreatorApplicationInput input)
+    {
+        try
+        {
+            logger.LogInformation($"create creator application {input}");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var creatorApplication = await _creatorApplicationService.CreateCreatorApplication(input, currentUser.Id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorApplication>(_creatorApplicationTransformer.Transform(creatorApplication), null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorApplication>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"Create creator application exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
+    [HttpPatch("creator-applications/{id}")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorApplication>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateCreatorApplication([FromBody] UpdateCreatorApplicationInput input, string id)
+    {
+        try
+        {
+            logger.LogInformation($"Update creator application {input}");
+            var creatorApplication = await _creatorApplicationService.UpdateCreatorApplication(input, id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorApplication>(_creatorApplicationTransformer.Transform(creatorApplication), null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorApplication>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"Update creator application exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+
+    [Authorize]
+    [HttpPatch("creator-applications/{id}/submit")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorApplication>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> SubmitCreatorApplication(string id)
+    {
+        try
+        {
+            logger.LogInformation($"submit creator application {id}");
+            var creatorApplication = await _creatorApplicationService.SubmitCreatorApplication(id);
             return new ObjectResult(
             new GetEntityResponse<OutputCreatorApplication>(_creatorApplicationTransformer.Transform(creatorApplication), null).Result()
             )
@@ -133,11 +305,11 @@ public class UserController : ControllerBase
     }
 
     [Authorize(Policy = "Admin")]
-    [HttpPost("creator-applications/{id}/approve")]
+    [HttpPatch("creator-applications/{id}/approve")]
     [ProducesResponseType(typeof(OutputResponse<OutputCreator>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> SubmitCreatorApplication(string id)
+    public async Task<IActionResult> ApproveCreatorApplication(string id)
     {
         try
         {
@@ -172,7 +344,7 @@ public class UserController : ControllerBase
     }
 
     [Authorize(Policy = "Admin")]
-    [HttpPost("creator-applications/{id}/reject")]
+    [HttpPatch("creator-applications/{id}/reject")]
     [ProducesResponseType(typeof(OutputResponse<OutputCreatorApplication>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

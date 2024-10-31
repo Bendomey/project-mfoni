@@ -1,16 +1,15 @@
 import {Button} from '@/components/button/index.tsx'
 import {APP_NAME} from '@/constants/index.ts'
 import {ArrowRightIcon} from '@heroicons/react/24/solid'
-import {Link, useNavigate} from '@remix-run/react'
+import {useNavigate} from '@remix-run/react'
 import creatorImage from '@/assets/creator.jpg'
 import userImage from '@/assets/user.jpeg'
 import {useCallback, useEffect, useState} from 'react'
-import {useAuth} from '@/providers/auth/index.tsx'
 import {useDisclosure} from '@/hooks/use-disclosure.tsx'
 import {SetupAccountModal} from './setup-modal/index.tsx'
 import {ArrowLeftIcon} from '@heroicons/react/20/solid'
 import {TypewriterEffectSmooth} from '@/components/animation/TypeWriteEffect.tsx'
-import {toast} from 'react-hot-toast'
+import {useAuth} from '@/providers/auth/index.tsx'
 
 const words = [
   {
@@ -31,17 +30,13 @@ const words = [
 ]
 
 export const OnboardingModule = () => {
-  const [selectedType, setSelected] = useState<'CLIENT' | 'CREATOR'>()
+  const [selectedType, setSelected] = useState<UserRole>()
+  const {onToggle, isOpened} = useDisclosure()
+  const {currentUser, getToken, onSignout} = useAuth()
   const navigate = useNavigate()
-  const {currentUser, getToken} = useAuth()
-  const {onToggle, isOpen} = useDisclosure()
 
   useEffect(() => {
-    const token = getToken()
-    if (!token) {
-      navigate('/auth')
-      toast.error('Kindly login to access page', {id: 'login-to-access-page'})
-    } else if (currentUser?.accountSetupAt) {
+    if (currentUser?.role) {
       navigate('/account')
     }
   }, [currentUser, getToken, navigate])
@@ -54,7 +49,13 @@ export const OnboardingModule = () => {
     <>
       <div className="h-screen w-full flex flex-col relative">
         <div className="border-b border-zinc-200 px-5 md:px-10 py-5 flex flex-row items-center justify-between">
-          <Link to="/auth" className="ml-2 flex flex-row items-center">
+          <button
+            onClick={() => {
+              onSignout()
+              navigate('/auth')
+            }}
+            className="ml-2 flex flex-row items-center"
+          >
             <ArrowLeftIcon className="h-7 w-7 text-zinc-600" />
             <div className="flex flex-row items-end ml-2">
               <span className="text-4xl text-blue-700 font-extrabold">
@@ -64,14 +65,14 @@ export const OnboardingModule = () => {
                 {APP_NAME.slice(1)}
               </span>
             </div>
-          </Link>
+          </button>
           <div>
             {selectedType ? (
               <Button
                 onClick={handleContinue}
                 size="lg"
-                variant="outline"
-                externalClassName="hidden md:flex flex-row items-center"
+                variant="outlined"
+                className="hidden md:flex"
               >
                 Continue{' '}
                 <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
@@ -86,10 +87,10 @@ export const OnboardingModule = () => {
           <TypewriterEffectSmooth words={words} />
           <div className="my-10 w-3/3 sm:w-3/3 md:w-2/3 px-5 md:px-0">
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
-              <Button
+              <button
                 onClick={() => setSelected('CLIENT')}
-                variant="unstyled"
-                externalClassName={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${
+                type="button"
+                className={`flex flex-col flex-start border-2 hover:bg-zinc-100 ${
                   selectedType === 'CLIENT'
                     ? 'border-zinc-600'
                     : 'border-dashed border-zinc-300'
@@ -106,11 +107,11 @@ export const OnboardingModule = () => {
                     I&apos;m here to download photos and videos.
                   </h3>
                 </div>
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={() => setSelected('CREATOR')}
-                variant="unstyled"
-                externalClassName={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${
+                type="button"
+                className={`flex flex-col flex-start  hover:bg-zinc-100 border-2 ${
                   selectedType === 'CREATOR'
                     ? 'border-zinc-600'
                     : 'border-dashed border-zinc-300'
@@ -127,14 +128,14 @@ export const OnboardingModule = () => {
                     I&apos;m here to share my photos and videos with the world.
                   </h3>
                 </div>
-              </Button>
+              </button>
             </div>
             {selectedType ? (
               <Button
                 size="lg"
                 onClick={handleContinue}
-                variant="outline"
-                externalClassName="flex md:hidden flex-row items-center justify-center mt-10 w-full"
+                variant="outlined"
+                className="flex md:hidden justify-center mt-10 w-full"
               >
                 Continue{' '}
                 <ArrowRightIcon className="h-5 w-5 text-zinc-600 ml-2" />
@@ -151,7 +152,7 @@ export const OnboardingModule = () => {
         </div>
       </div>
       <SetupAccountModal
-        open={isOpen}
+        open={isOpened}
         onClose={onToggle}
         selectedType={selectedType}
       />

@@ -17,7 +17,9 @@ public class GetOutputUser
             Role = user.Role,
             Name = user.Name,
             Email = user.Email,
+            EmailVerifiedAt = user.EmailVerifiedAt,
             PhoneNumber = user.PhoneNumber,
+            PhoneNumberVerifiedAt = user.PhoneNumberVerifiedAt,
             Photo = user.Photo,
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt

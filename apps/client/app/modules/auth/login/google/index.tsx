@@ -1,15 +1,14 @@
 import {useAuthenticate} from '@/api/auth/index.ts'
 import {useBreakpoint} from '@/hooks/tailwind.ts'
 import {isBrowser} from '@/lib/is-browser.ts'
-import {useNavigate} from '@remix-run/react'
+import {useNavigate, useSearchParams} from '@remix-run/react'
 import {useCallback, useEffect, useRef} from 'react'
 import {useLoginAuth} from '../context/index.tsx'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {toast} from 'react-hot-toast'
 import {useAuth} from '@/providers/auth/index.tsx'
-import {useQueryClient} from '@tanstack/react-query'
-import {QUERY_KEYS} from '@/constants/index.ts'
 import {useEnvContext} from '@/providers/env/index.tsx'
+import {getFullUrlPath} from '@/lib/url-helpers.ts'
 
 declare global {
   interface Window {
@@ -23,8 +22,8 @@ export const GoogleButton = () => {
   const {setIsLoading, setErrorMessage} = useLoginAuth()
   const {onSignin} = useAuth()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const env = useEnvContext()
+  const [params] = useSearchParams()
 
   const signInRef = useRef(null)
   const isMobileBreakPoint = useBreakpoint('sm')
@@ -49,16 +48,19 @@ export const GoogleButton = () => {
             onSuccess: successRes => {
               if (successRes) {
                 onSignin(successRes)
-                queryClient.setQueryData(
-                  [QUERY_KEYS.CURRENT_USER],
-                  successRes.user,
-                )
 
-                if (successRes.user.accountSetupAt) {
-                  navigate('/')
+                const returnTo = params.get('return_to')
+                if (successRes.user.role) {
+                  navigate(returnTo ?? '/')
                   toast.success(`Welcome ${successRes.user.name}`)
                 } else {
-                  navigate('/auth/onboarding')
+                  navigate(
+                    `/auth/onboarding${
+                      returnTo
+                        ? `?return_to=${getFullUrlPath(new URL(returnTo))}`
+                        : ''
+                    }`,
+                  )
                   toast.success('Setup account')
                 }
               }
@@ -70,7 +72,7 @@ export const GoogleButton = () => {
         )
       }
     },
-    [mutate, navigate, onSignin, queryClient, setErrorMessage, setIsLoading],
+    [mutate, navigate, onSignin, params, setErrorMessage, setIsLoading],
   )
 
   const init = useCallback(() => {
