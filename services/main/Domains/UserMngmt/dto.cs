@@ -24,3 +24,11 @@ public class RejectCreatorApplicationInput
     public required string CreatorApplicationId { get; set; }
     public string? Reason { get; set; }
 }
+
+public class GetUsersInput
+{
+    public string? Status { get; set; }
+    public string? Role { get; set; }
+    public string? Provider { get; set; }
+    public string? Search { get; set; }
+}

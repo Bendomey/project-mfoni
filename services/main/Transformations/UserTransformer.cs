@@ -6,9 +6,7 @@ namespace main.Transformations;
 
 public class UserTransformer
 {
-    public UserTransformer()
-    {
-    }
+    public UserTransformer() { }
 
     public OutputUser Transform(User user)
     {
@@ -26,7 +24,7 @@ public class UserTransformer
         {
             Id = user.Id,
             Name = user.Name,
-            Role = user.Role,
+            Role = user.Role!,
             Status = user.Status,
             Email = user.Email,
             EmailVerifiedAt = user.EmailVerifiedAt,

@@ -1,6 +1,7 @@
 using System.Net;
 using main.Configuratons;
 using main.Lib;
+using main.Models;
 using main.Transformations;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -12,20 +13,14 @@ public class SearchAdmin
 {
     private readonly AppConstants _appConstantsConfiguration;
     private readonly IMongoCollection<Models.Admin> _adminsCollection;
-    private readonly AdminTransformer _adminTransformer;
 
-    public SearchAdmin(
-        DatabaseSettings databaseConfig,
-        IOptions<AppConstants> appConstants,
-        AdminTransformer adminTransformer
-    )
+    public SearchAdmin(DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
     {
         var database = databaseConfig.Database;
         _adminsCollection = database.GetCollection<Models.Admin>(
             appConstants.Value.AdminCollection
         );
         _appConstantsConfiguration = appConstants.Value;
-        _adminTransformer = adminTransformer;
     }
 
     public async Task<Models.Admin> Get(string id)
@@ -61,16 +56,17 @@ public class SearchAdmin
         return admins ?? [];
     }
 
-    public async Task<long> Count(string? query)
+    public async Task<long> CountAdmins(string? query)
     {
         FilterDefinitionBuilder<Models.Admin> builder = Builders<Models.Admin>.Filter;
-        var filter = builder.Empty;
-
+        var filter = Builders<Models.Admin>.Filter.Empty;
         if (query is not null)
         {
             filter = builder.Regex("name", new BsonRegularExpression(query, "i"));
         }
-        var adminsCount = await _adminsCollection.CountDocumentsAsync(filter);
+
+        long adminsCount = await _adminsCollection.CountDocumentsAsync(filter);
+
         return adminsCount;
     }
 }

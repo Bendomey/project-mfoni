@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+﻿using main.Configurations;
 using main.Configuratons;
-using NanoidDotNet;
-using main.Configurations;
-using Microsoft.Extensions.Caching.Distributed;
 using main.DTOs;
-using main.Models;
 using main.Lib;
+using main.Models;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using NanoidDotNet;
 
 namespace main.Domains;
 
@@ -27,10 +28,19 @@ public class CreatorApplicationService
     )
     {
         _logger = logger;
-        _userCollection = databaseConfig.Database.GetCollection<Models.User>(appConstants.Value.UserCollection);
-        _adminCollection = databaseConfig.Database.GetCollection<Models.Admin>(appConstants.Value.AdminCollection);
-        _creatorApplicationCollection = databaseConfig.Database.GetCollection<Models.CreatorApplication>(appConstants.Value.CreatorApplicatonCollection);
-        _creatorCollection = databaseConfig.Database.GetCollection<Models.Creator>(appConstants.Value.CreatorCollection);
+        _userCollection = databaseConfig.Database.GetCollection<Models.User>(
+            appConstants.Value.UserCollection
+        );
+        _adminCollection = databaseConfig.Database.GetCollection<Models.Admin>(
+            appConstants.Value.AdminCollection
+        );
+        _creatorApplicationCollection =
+            databaseConfig.Database.GetCollection<Models.CreatorApplication>(
+                appConstants.Value.CreatorApplicatonCollection
+            );
+        _creatorCollection = databaseConfig.Database.GetCollection<Models.Creator>(
+            appConstants.Value.CreatorCollection
+        );
         _creatorPackageCollection = databaseConfig.Database.GetCollection<Models.CreatorPackage>(appConstants.Value.CreatorPackageCollection);
         _appConstantsConfiguration = appConstants.Value;
 
@@ -66,13 +76,11 @@ public class CreatorApplicationService
         var filterByApplicationId = Builders<CreatorApplication>.Filter.Eq(creatorApplication => creatorApplication.Id, creatorApplicationId);
 
         var combinedFilter = Builders<CreatorApplication>.Filter.And(filterByApplicationId);
-
         var creatorApplication = await _creatorApplicationCollection.Find(combinedFilter).FirstOrDefaultAsync();
         if (creatorApplication is null)
         {
             throw new HttpRequestException("CreatorApplicationNotFound");
         }
-
         if (creatorApplication.Status != CreatorApplicationStatus.PENDING)
         {
             throw new HttpRequestException("CreatorApplicationAlready" + creatorApplication.Status.ToString());
@@ -80,6 +88,8 @@ public class CreatorApplicationService
 
         var idFilter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
         var userUpdates = Builders<CreatorApplication>.Update
+            .Set(r => r.IdFrontImage, input.IdFrontImage)
+            .Set(r => r.IdBackImage, input.IdBackImage)
             .Set(r => r.UpdatedAt, DateTime.UtcNow);
 
         if (input.CreatorPackageType is not null)
@@ -106,7 +116,6 @@ public class CreatorApplicationService
 
         return creatorApplication;
     }
-
 
     public async Task<CreatorApplication> SubmitCreatorApplication(string creatorApplicationId)
     {
@@ -160,7 +169,6 @@ public class CreatorApplicationService
         {
             throw new HttpRequestException("UserNotFound");
         }
-
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
         {
             var _ = SmsConfiguration.SendSms(new SendSmsInput
@@ -171,7 +179,6 @@ public class CreatorApplicationService
                 AppSecret = _appConstantsConfiguration.SmsAppSecret
             });
         }
-
         if (user.Email is not null && user.EmailVerifiedAt is not null)
         {
             var _ = EmailConfiguration.Send(new SendEmailInput
@@ -183,7 +190,6 @@ public class CreatorApplicationService
                 ApiKey = _appConstantsConfiguration.ResendApiKey
             });
         }
-
         return creatorApplication;
     }
 
@@ -194,22 +200,18 @@ public class CreatorApplicationService
         {
             throw new HttpRequestException("AdminNotFound");
         }
-
         var creatorApplication = await _creatorApplicationCollection.Find(application => application.Id == input.CreatorApplicationId).FirstOrDefaultAsync();
         if (creatorApplication is null)
         {
             throw new HttpRequestException("CreatorApplicationNotFound");
         }
-
         var idFilter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, input.CreatorApplicationId);
         var userUpdates = Builders<CreatorApplication>.Update
             .Set(r => r.Status, CreatorApplicationStatus.APPROVED)
             .Set(r => r.ApprovedAt, DateTime.UtcNow)
             .Set(r => r.ApprovedById, adminId)
             .Set(r => r.UpdatedAt, DateTime.UtcNow);
-
         await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
-
         var creator = new Creator
         {
             CreatorApplicationId = creatorApplication.Id,
@@ -242,7 +244,6 @@ public class CreatorApplicationService
         {
             throw new HttpRequestException("UserNotFound");
         }
-
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
         {
             var _ = SmsConfiguration.SendSms(new SendSmsInput
@@ -253,7 +254,6 @@ public class CreatorApplicationService
                 AppSecret = _appConstantsConfiguration.SmsAppSecret
             });
         }
-
         if (user.Email is not null && user.EmailVerifiedAt is not null)
         {
             var _ = EmailConfiguration.Send(new SendEmailInput
@@ -265,8 +265,6 @@ public class CreatorApplicationService
                 ApiKey = _appConstantsConfiguration.ResendApiKey
             });
         }
-
-
         return creator;
     }
 
@@ -277,13 +275,11 @@ public class CreatorApplicationService
         {
             throw new HttpRequestException("AdminNotFound");
         }
-
         var creatorApplication = await _creatorApplicationCollection.Find(application => application.Id == input.CreatorApplicationId).FirstOrDefaultAsync();
         if (creatorApplication is null)
         {
             throw new HttpRequestException("CreatorApplicationNotFound");
         }
-
         var idFilter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, input.CreatorApplicationId);
         var userUpdates = Builders<CreatorApplication>.Update
             .Set(r => r.Status, CreatorApplicationStatus.REJECTED)
@@ -291,15 +287,12 @@ public class CreatorApplicationService
             .Set(r => r.RejectedById, adminId)
             .Set(r => r.RejectedReason, input.Reason)
             .Set(r => r.UpdatedAt, DateTime.UtcNow);
-
         await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
-
         var user = await _userCollection.Find(user => user.Id == creatorApplication.UserId).FirstOrDefaultAsync();
         if (user is null)
         {
             throw new HttpRequestException("UserNotFound");
         }
-
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
         {
             var _ = SmsConfiguration.SendSms(new SendSmsInput
@@ -310,7 +303,6 @@ public class CreatorApplicationService
                 AppSecret = _appConstantsConfiguration.SmsAppSecret
             });
         }
-
         if (user.Email is not null && user.EmailVerifiedAt is not null)
         {
             var _ = EmailConfiguration.Send(new SendEmailInput
@@ -335,5 +327,59 @@ public class CreatorApplicationService
         return creatorApplication;
     }
 
-}
+    public async Task<List<CreatorApplication>> GetCreatorApplications(
+        FilterQuery<CreatorApplication> queryFilter,
+        string? status
+    )
+    {
+        FilterDefinitionBuilder<CreatorApplication> builder = Builders<CreatorApplication>.Filter;
+        var filter = builder.Empty;
 
+        List<string> filters = ["status"];
+        List<string> filterValues = [status];
+
+        var regexFilters = filters
+            .Select(
+                (field, index) =>
+                    filterValues[index] != null
+                        ? builder.Regex(field, new BsonRegularExpression(filterValues[index], "i"))
+                        : builder.Empty
+            )
+            .ToList();
+
+        filter = builder.And(regexFilters);
+        var creatorApplications = await _creatorApplicationCollection
+            .Find(filter)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return creatorApplications ?? [];
+    }
+
+    public async Task<long> CountCreatorApplications(string? status)
+    {
+        FilterDefinitionBuilder<CreatorApplication> builder = Builders<CreatorApplication>.Filter;
+        var filter = builder.Empty;
+
+        List<string> filters = ["status"];
+        List<string> filterValues = [status];
+
+        var regexFilters = filters
+            .Select(
+                (field, index) =>
+                    filterValues[index] != null
+                        ? builder.Regex(field, new BsonRegularExpression(filterValues[index], "i"))
+                        : builder.Empty
+            )
+            .ToList();
+
+        filter = builder.And(regexFilters);
+
+        long creatorApplicationsCount = await _creatorApplicationCollection.CountDocumentsAsync(
+            filter
+        );
+        return creatorApplicationsCount;
+    }
+}
