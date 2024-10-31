@@ -31,9 +31,15 @@ export const VerifyCreatorProvider = ({children}: PropsWithChildren) => {
   useEffect(() => {
     if (currentUser?.emailVerifiedAt && currentUser.phoneNumberVerifiedAt) {
       setActiveStep('welcome')
-    } else if (currentUser?.emailVerifiedAt && !currentUser.phoneNumberVerifiedAt) {
+    } else if (
+      currentUser?.emailVerifiedAt &&
+      !currentUser.phoneNumberVerifiedAt
+    ) {
       setActiveStep('phone')
-    }  else if (!currentUser?.emailVerifiedAt && currentUser?.phoneNumberVerifiedAt) {
+    } else if (
+      !currentUser?.emailVerifiedAt &&
+      currentUser?.phoneNumberVerifiedAt
+    ) {
       setActiveStep('email')
     }
   }, [currentUser, getToken, navigate])

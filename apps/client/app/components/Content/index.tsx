@@ -58,9 +58,7 @@ export const Content = ({content, showFlyout = false}: Props) => {
               <div />
             )}
             <div>
-              <Button
-                variant="outlined"
-              >
+              <Button variant="outlined">
                 <LockClosedIcon className="h-4 w-4 mr-2" />
                 Download
               </Button>

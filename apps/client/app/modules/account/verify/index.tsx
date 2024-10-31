@@ -7,7 +7,7 @@ import {VerifyPhoneStep} from './components/verify-phone-step/index.tsx'
 import {classNames} from '@/lib/classNames.ts'
 import {WelcomeStep} from './components/welcome-step/index.tsx'
 import {VerifyCreatorProvider, useVerifyCreator} from './context.tsx'
-import { VerifyEmailStep } from './components/verify-email-step/index.tsx'
+import {VerifyEmailStep} from './components/verify-email-step/index.tsx'
 
 const StepComponents: Record<Step, () => JSX.Element> = {
   phone: VerifyPhoneStep,
@@ -63,7 +63,12 @@ const VerifyAccount = () => {
       </div>
       <div className="relative flex flex-1 flex-col w-2/3 justify-between items-center px-4 py-7 md:py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div>
-          <Button isLink href='/' variant='unstyled' className="mb-10 block md:hidden">
+          <Button
+            isLink
+            href="/"
+            variant="unstyled"
+            className="mb-10 block md:hidden"
+          >
             <span className="text-3xl text-blue-700 font-extrabold">
               {APP_NAME.slice(0, 1)}
             </span>

@@ -50,7 +50,7 @@ export const VisualSearch = () => {
           )}
           {imgSrc ? (
             <Button
-              variant='solid'
+              variant="solid"
               type="button"
               onClick={handleRetake}
               className="absolute bottom-0 mt-2 z-30 "
@@ -59,7 +59,7 @@ export const VisualSearch = () => {
             </Button>
           ) : (
             <Button
-              variant='solid'
+              variant="solid"
               type="button"
               onClick={handleCapture}
               className="absolute bottom-0 mt-2 z-30"

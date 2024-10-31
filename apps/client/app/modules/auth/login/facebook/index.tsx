@@ -8,7 +8,7 @@ import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {toast} from 'react-hot-toast'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useEnvContext} from '@/providers/env/index.tsx'
-import { getFullUrlPath } from '@/lib/url-helpers.ts'
+import {getFullUrlPath} from '@/lib/url-helpers.ts'
 
 declare global {
   interface Window {
@@ -71,7 +71,13 @@ export const FacebookButton = () => {
               navigate(returnTo ?? '/')
               toast.success(`Welcome ${successRes.user.name}`)
             } else {
-              navigate(`/auth/onboarding${returnTo ? `?return_to=${getFullUrlPath(new URL(returnTo))}` : ''}`)
+              navigate(
+                `/auth/onboarding${
+                  returnTo
+                    ? `?return_to=${getFullUrlPath(new URL(returnTo))}`
+                    : ''
+                }`,
+              )
               toast.success('Setup account')
             }
           }
@@ -101,10 +107,7 @@ export const FacebookButton = () => {
   }
 
   return (
-    <Button
-      onClick={handleLoginInitiation}
-      className='justify-center'
-    >
+    <Button onClick={handleLoginInitiation} className="justify-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-6 w-6"

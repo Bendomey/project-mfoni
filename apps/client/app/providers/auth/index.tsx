@@ -1,6 +1,12 @@
-import { USER_CIPHER } from '@/constants/index.ts'
-import { auth } from '@/lib/cookies.config.ts'
-import { type PropsWithChildren, createContext, useMemo, useContext, useState } from 'react'
+import {USER_CIPHER} from '@/constants/index.ts'
+import {auth} from '@/lib/cookies.config.ts'
+import {
+  type PropsWithChildren,
+  createContext,
+  useMemo,
+  useContext,
+  useState,
+} from 'react'
 
 interface AuthContextProps {
   isLoading: boolean
@@ -8,15 +14,15 @@ interface AuthContextProps {
   currentUser: User | null
   getToken: () => Nullable<string>
   onUpdateUser: (user: User) => void
-  onSignin: (input: { user: User; token: string }) => void
+  onSignin: (input: {user: User; token: string}) => void
   onSignout: () => void
 }
 
 export const AuthContext = createContext<AuthContextProps>({
   isLoading: false,
   isLoggedIn: false,
-  onSignin: () => { },
-  onSignout: () => { },
+  onSignin: () => {},
+  onSignout: () => {},
   getToken: () => null,
   currentUser: null,
   onUpdateUser: () => {},
@@ -35,7 +41,7 @@ export const AuthProvider = ({
 
   const authController = useMemo(
     () => ({
-      onSignin: ({ user, token }: { user: User; token: string }) => {
+      onSignin: ({user, token}: {user: User; token: string}) => {
         setCurrentUser(user)
         auth.setCipher(USER_CIPHER, token)
       },

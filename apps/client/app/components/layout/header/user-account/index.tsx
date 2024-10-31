@@ -1,14 +1,18 @@
-import { useValidateImage } from '@/hooks/use-validate-image.tsx'
-import { classNames } from '@/lib/classNames.ts'
-import { useAuth } from '@/providers/auth/index.tsx'
-import { Menu, Transition } from '@headlessui/react'
-import { Link } from '@remix-run/react'
-import { Fragment } from 'react'
+import {useValidateImage} from '@/hooks/use-validate-image.tsx'
+import {classNames} from '@/lib/classNames.ts'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {Menu, Transition} from '@headlessui/react'
+import {Link} from '@remix-run/react'
+import {Fragment} from 'react'
 
-const getNameInitials = (name: string) => name.split(' ').map((n) => n[0]).join('')
+const getNameInitials = (name: string) =>
+  name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
 
 export const UserAccountNav = () => {
-  const { currentUser } = useAuth()
+  const {currentUser} = useAuth()
   const isProfilePhotoValid = useValidateImage(currentUser?.photo ?? '')
   const initials = getNameInitials(currentUser?.name ?? '')
 
@@ -18,19 +22,19 @@ export const UserAccountNav = () => {
         <Menu.Button className="relative flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
           <span className="absolute -inset-1.5" />
           <span className="sr-only">Open user menu</span>
-          {
-            isProfilePhotoValid && currentUser?.photo ? (
-              <img
-                className="h-8 w-8 rounded-full"
-                src={currentUser.photo}
-                alt={currentUser.name}
-              />
-            ) : (
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-600">
-                <span className="text-sm font-medium leading-none text-white">{initials}</span>
+          {isProfilePhotoValid && currentUser?.photo ? (
+            <img
+              className="h-8 w-8 rounded-full"
+              src={currentUser.photo}
+              alt={currentUser.name}
+            />
+          ) : (
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-600">
+              <span className="text-sm font-medium leading-none text-white">
+                {initials}
               </span>
-            )
-          }
+            </span>
+          )}
         </Menu.Button>
       </div>
       <Transition
@@ -49,7 +53,7 @@ export const UserAccountNav = () => {
             </div>
           </Menu.Item>
           <Menu.Item>
-            {({ active }) => (
+            {({active}) => (
               <button
                 className={classNames(
                   active ? 'bg-gray-100' : '',
@@ -61,7 +65,7 @@ export const UserAccountNav = () => {
             )}
           </Menu.Item>
           <Menu.Item>
-            {({ active }) => (
+            {({active}) => (
               <button
                 type="button"
                 onClick={() => {
@@ -83,28 +87,27 @@ export const UserAccountNav = () => {
 }
 
 export const UserAccountMobileNav = () => {
-  const { currentUser } = useAuth()
+  const {currentUser} = useAuth()
   const isProfilePhotoValid = useValidateImage(currentUser?.photo ?? '')
   const initials = getNameInitials(currentUser?.name ?? '')
-
 
   return (
     <div className=" pb-3 pt-2">
       <div className="flex items-center">
         <div className="flex-shrink-0">
-        {
-            isProfilePhotoValid && currentUser?.photo ? (
-              <img
-                className="h-8 w-8 rounded-full"
-                src={currentUser.photo}
-                alt={currentUser.name}
-              />
-            ) : (
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-600">
-                <span className="text-sm font-medium leading-none text-white">{initials}</span>
+          {isProfilePhotoValid && currentUser?.photo ? (
+            <img
+              className="h-8 w-8 rounded-full"
+              src={currentUser.photo}
+              alt={currentUser.name}
+            />
+          ) : (
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-600">
+              <span className="text-sm font-medium leading-none text-white">
+                {initials}
               </span>
-            )
-          }
+            </span>
+          )}
         </div>
         <div className="ml-3">
           <div className="text-base font-medium text-gray-800">

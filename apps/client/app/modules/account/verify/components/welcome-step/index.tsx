@@ -11,8 +11,8 @@ export const WelcomeStep = () => {
         You&apos;re now a verified user!
       </h1>
       <p>
-        Your account is secured more than ever. You can now explore the app and enjoy
-        the full experience.
+        Your account is secured more than ever. You can now explore the app and
+        enjoy the full experience.
       </p>
 
       <div className="mt-5">

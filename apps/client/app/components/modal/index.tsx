@@ -1,5 +1,5 @@
-import { useLockBodyScroll } from '@/hooks/use-lock-body-scroll.tsx'
-import { classNames } from '@/lib/classNames.ts'
+import {useLockBodyScroll} from '@/hooks/use-lock-body-scroll.tsx'
+import {classNames} from '@/lib/classNames.ts'
 import {Transition, Dialog} from '@headlessui/react'
 import {Fragment, type PropsWithChildren} from 'react'
 
@@ -10,13 +10,22 @@ interface Props {
   className?: string
 }
 
-
-export const Modal = ({onClose, isOpened, children, canBeClosedWithBackdrop = true, className}: PropsWithChildren<Props>) => {
+export const Modal = ({
+  onClose,
+  isOpened,
+  children,
+  canBeClosedWithBackdrop = true,
+  className,
+}: PropsWithChildren<Props>) => {
   useLockBodyScroll({enabled: isOpened})
-  
+
   return (
     <Transition appear show={isOpened} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={canBeClosedWithBackdrop ? onClose : () => {}}>
+      <Dialog
+        as="div"
+        className="relative z-50"
+        onClose={canBeClosedWithBackdrop ? onClose : () => {}}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -40,8 +49,13 @@ export const Modal = ({onClose, isOpened, children, canBeClosedWithBackdrop = tr
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className={classNames("relative w-full  transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all", className)}>
-                {children}               
+              <Dialog.Panel
+                className={classNames(
+                  'relative w-full  transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all',
+                  className,
+                )}
+              >
+                {children}
               </Dialog.Panel>
             </Transition.Child>
           </div>

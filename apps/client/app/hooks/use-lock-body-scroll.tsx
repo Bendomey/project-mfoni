@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import {useLayoutEffect} from 'react'
 
 /**
  * This hook locks the scrolling of the body element. Generally used in dialogs and modals.
@@ -19,12 +19,14 @@ import { useLayoutEffect } from 'react';
  * }
  * ```
  */
-export function useLockBodyScroll({ enabled = true }: { enabled?: boolean }): void {
+export function useLockBodyScroll({enabled = true}: {enabled?: boolean}): void {
   useLayoutEffect((): (() => void) => {
-    const originalStyle: string = window.getComputedStyle(document.body).overflow;
+    const originalStyle: string = window.getComputedStyle(
+      document.body,
+    ).overflow
     if (enabled) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     }
-    return () => (document.body.style.overflow = originalStyle);
-  }, [enabled]);
+    return () => (document.body.style.overflow = originalStyle)
+  }, [enabled])
 }

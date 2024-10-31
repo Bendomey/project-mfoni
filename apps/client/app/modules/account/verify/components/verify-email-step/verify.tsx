@@ -27,7 +27,7 @@ export const VerifyOtp = ({setPage}: Props) => {
       },
       {
         onSuccess() {
-          if(currentUser){
+          if (currentUser) {
             onUpdateUser({
               ...currentUser,
               emailVerifiedAt: new Date(),

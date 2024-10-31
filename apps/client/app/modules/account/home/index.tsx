@@ -1,34 +1,34 @@
-import { Header } from '@/components/layout/index.ts'
-import { AccountCover } from './components/cover.tsx'
-import { Footer } from '@/components/footer/index.tsx'
-import { CreatorAnalytics } from './components/creator-analytics.tsx'
-import { UserTimeline } from './components/timeline.tsx'
-import { OtherCreators } from './components/other-creators.tsx'
-import { Contents } from './components/content.tsx'
-import { QuickActions } from './components/quick-actions.tsx'
-import { AccountProvider, useAccountContext } from './context/index.tsx'
-import { CreatorApplicationModal } from './components/creator-application-modal/index.tsx'
+import {Header} from '@/components/layout/index.ts'
+import {AccountCover} from './components/cover.tsx'
+import {Footer} from '@/components/footer/index.tsx'
+import {CreatorAnalytics} from './components/creator-analytics.tsx'
+import {UserTimeline} from './components/timeline.tsx'
+import {OtherCreators} from './components/other-creators.tsx'
+import {Contents} from './components/content.tsx'
+import {QuickActions} from './components/quick-actions.tsx'
+import {AccountProvider, useAccountContext} from './context/index.tsx'
+import {CreatorApplicationModal} from './components/creator-application-modal/index.tsx'
 
 const AccountModuleComponent = () => {
-  const { isCreatorApplicationModalOpened } = useAccountContext()
+  const {isCreatorApplicationModalOpened} = useAccountContext()
 
   return (
     <>
       <Header isHeroSearchInVisible={false} />
-      <div className='grid grid-cols-8 gap-3 px-4 lg:px-8 bg-gray-50 pt-4 pb-16'>
-        <div className='col-span-8 lg:col-span-6 flex flex-col gap-y-8'>
+      <div className="grid grid-cols-8 gap-3 px-4 lg:px-8 bg-gray-50 pt-4 pb-16">
+        <div className="col-span-8 lg:col-span-6 flex flex-col gap-y-8">
           <AccountCover />
           <CreatorAnalytics />
           <Contents />
         </div>
-        <div className='col-span-2 flex flex-col gap-y-10'>
+        <div className="col-span-2 flex flex-col gap-y-10">
           <QuickActions />
           <UserTimeline />
           <OtherCreators />
         </div>
       </div>
       <Footer />
-      <CreatorApplicationModal isOpened={isCreatorApplicationModalOpened}/>
+      <CreatorApplicationModal isOpened={isCreatorApplicationModalOpened} />
     </>
   )
 }

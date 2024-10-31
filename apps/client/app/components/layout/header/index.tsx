@@ -1,20 +1,20 @@
-import { Fragment, useState } from 'react'
-import { Dialog } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Link } from '@remix-run/react'
-import { APP_NAME } from '@/constants/index.ts'
-import { Button } from '@/components/button/index.tsx'
-import { SearchPhotos } from './search/index.tsx'
-import { SearchPhotosForMobile } from './search-for-mobile/index.tsx'
-import { useAuth } from '@/providers/auth/index.tsx'
-import { UserAccountMobileNav, UserAccountNav } from './user-account/index.tsx'
+import {Fragment, useState} from 'react'
+import {Dialog} from '@headlessui/react'
+import {Bars3Icon, XMarkIcon} from '@heroicons/react/24/outline'
+import {Link} from '@remix-run/react'
+import {APP_NAME} from '@/constants/index.ts'
+import {Button} from '@/components/button/index.tsx'
+import {SearchPhotos} from './search/index.tsx'
+import {SearchPhotosForMobile} from './search-for-mobile/index.tsx'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {UserAccountMobileNav, UserAccountNav} from './user-account/index.tsx'
 import useScroll from '@/hooks/use-scroll.ts'
-import { NoticeBanner } from './notice-banner/index.tsx'
+import {NoticeBanner} from './notice-banner/index.tsx'
 
 const navigation = (isLoggedIn: boolean) => [
-  { name: 'Explore', href: '/explore', routeType: 'link' },
+  {name: 'Explore', href: '/explore', routeType: 'link'},
   isLoggedIn
-    ? { name: 'My Account', href: '/account', routeType: 'link' }
+    ? {name: 'My Account', href: '/account', routeType: 'link'}
     : undefined,
 ]
 
@@ -27,10 +27,9 @@ export const Header = ({
   isHeroSearchInVisible,
   shouldHeaderBlur = true,
 }: Props) => {
-  const { isLoggedIn } = useAuth()
+  const {isLoggedIn} = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const scrolled = useScroll(50)
-
 
   const headerBlurred = shouldHeaderBlur
     ? 'bg-white/95 backdrop-blur-xl sticky top-0 z-50'

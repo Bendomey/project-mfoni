@@ -26,7 +26,7 @@ export const EmptyState = (props: {title: string; message: string}) => {
               href="/category"
               type="button"
               variant="solid"
-              color='secondaryGhost'
+              color="secondaryGhost"
             >
               <span className="text-gray-500 hover:text-gray-700 text-sm">
                 explore categories

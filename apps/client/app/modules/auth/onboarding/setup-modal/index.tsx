@@ -13,7 +13,7 @@ import {classNames} from '@/lib/classNames.ts'
 import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useSearchParams} from '@remix-run/react'
-import { useValidateImage } from '@/hooks/use-validate-image.tsx'
+import {useValidateImage} from '@/hooks/use-validate-image.tsx'
 
 interface Props {
   open: boolean
@@ -60,19 +60,23 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
   }, [currentUser, selectedType, setValue])
 
   const onSubmit = (data: FormValues) => {
-    mutate({
-      ...data,
-      intendedPricingPackage: searchParams.get('pricing_package') ?? undefined,
-    }, {
-      onSuccess: async () => {
-        window.location.href = searchParams.get('return_to') ?? '/'
+    mutate(
+      {
+        ...data,
+        intendedPricingPackage:
+          searchParams.get('pricing_package') ?? undefined,
       },
-      onError: error => {
-        toast.error(errorMessagesWrapper(error.message), {
-          id: 'account-setup-error',
-        })
+      {
+        onSuccess: async () => {
+          window.location.href = searchParams.get('return_to') ?? '/'
+        },
+        onError: error => {
+          toast.error(errorMessagesWrapper(error.message), {
+            id: 'account-setup-error',
+          })
+        },
       },
-    })
+    )
   }
 
   return (
@@ -177,11 +181,7 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
                   </div>
 
                   <div className="mt-4">
-                    <Button
-                      variant="solid"
-                      color='primaryGhost'
-                      type="submit"
-                    >
+                    <Button variant="solid" color="primaryGhost" type="submit">
                       Save Changes!
                     </Button>
                     <Button

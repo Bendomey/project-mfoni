@@ -21,7 +21,7 @@ public class CreatorPackage
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
-    
+
     [BsonElement("creator_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public required string CreatorId { get; init; }

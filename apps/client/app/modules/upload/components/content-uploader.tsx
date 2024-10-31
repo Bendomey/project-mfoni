@@ -24,11 +24,7 @@ export const ContentUploader = () => {
             <h1 className="font-bold text-xl md:text-4xl w-3/3 md:w-72 text-center mt-5">
               Drag and drop to upload, or
             </h1>
-            <Button
-              onClick={openFileSelector}
-              size="lg"
-              className="mt-7"
-            >
+            <Button onClick={openFileSelector} size="lg" className="mt-7">
               Browse
             </Button>
             <div className="mt-5">

@@ -51,13 +51,13 @@ export const SendOtp = ({setPage}: Props) => {
       },
       {
         onSuccess: async () => {
-          if(currentUser){
+          if (currentUser) {
             onUpdateUser({
               ...currentUser,
               email: data.emailAddress,
             })
           }
-        
+
           setPage('VerifyOTP')
         },
         onError: error => {
@@ -101,7 +101,11 @@ export const SendOtp = ({setPage}: Props) => {
             <Loader color="fill-blue-600" />
           </div>
         ) : (
-          <Button type="submit" className="w-full justify-center mt-5" size="lg">
+          <Button
+            type="submit"
+            className="w-full justify-center mt-5"
+            size="lg"
+          >
             Send OTP
           </Button>
         )}

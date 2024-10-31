@@ -1,12 +1,12 @@
 /* eslint-disable no-negated-condition */
-import { classNames } from '@/lib/classNames.ts'
-import { useAuth } from '@/providers/auth/index.tsx'
+import {classNames} from '@/lib/classNames.ts'
+import {useAuth} from '@/providers/auth/index.tsx'
 import {
   EnvelopeIcon,
   PhoneIcon,
   RocketLaunchIcon,
 } from '@heroicons/react/24/outline'
-import { useCallback, useMemo } from 'react'
+import {useCallback, useMemo} from 'react'
 
 export type Step = 'phone' | 'email' | 'welcome'
 
@@ -14,8 +14,8 @@ interface Props {
   activeStep: Step
 }
 
-export function Steps({ activeStep }: Props) {
-  const { currentUser } = useAuth()
+export function Steps({activeStep}: Props) {
+  const {currentUser} = useAuth()
   const getStepStatus = useCallback(
     (step: Step) => {
       if (step === 'phone') {
@@ -31,11 +31,9 @@ export function Steps({ activeStep }: Props) {
       }
 
       return step === activeStep ? 'active' : 'inactive'
-
     },
     [activeStep, currentUser],
   )
-
 
   const steps = useMemo(() => {
     return [
