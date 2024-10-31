@@ -68,25 +68,11 @@ export const useApplicationQuery = () => {
   };
 
 
-  // export const useApproveApplication = (id?: string) => {
-  //   const isDataLoading = false; const error = null; 
-  // // Simulate a response for demonstration
-  // const res = id ? 200 : 400; // Returns 200 if id is provided, otherwise 400
-
-  //   return { isDataLoading, error, res };
-  // }
-
 export const useApproveApplication = () => {
 
 let status = 200
   const mutate = async (id: string) => {
-    try {
-      // Simulated API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       status =  200; // Mock response
-    } catch (err) {
-    } finally {
-    }
   };
 
   return { mutate, isDataLoading, status, error };
