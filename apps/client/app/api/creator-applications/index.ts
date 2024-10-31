@@ -1,18 +1,11 @@
+import {QUERY_KEYS} from '@/constants/index.ts'
 import {fetchClient} from '@/lib/transport/index.ts'
-import {useMutation} from '@tanstack/react-query'
+import {useMutation, useQuery} from '@tanstack/react-query'
 
-interface UpdatePhoneInputProps {
-    phoneNumber: string
-}
-
-const updatePhone = async (input: UpdatePhoneInputProps) => {
+const getActiveCreatorApplication = async () => {
     try {
-        const response = await fetchClient<ApiResponse<boolean>>(
-            '/v1/users/phone',
-            {
-                method: 'PATCH',
-                body: JSON.stringify(input),
-            },
+        const response = await fetchClient<ApiResponse<CreatorApplication>>(
+            '/v1/users/creator-applications/active',
         )
 
         if (!response.parsedBody.status && response.parsedBody.errorMessage) {
@@ -33,23 +26,28 @@ const updatePhone = async (input: UpdatePhoneInputProps) => {
     }
 }
 
-export const useUpdatePhone = () =>
-    useMutation({
-        mutationFn: updatePhone,
+export const useGetActiveCreatorApplication = ({enabled}: { enabled: boolean }) =>
+    useQuery({
+        queryKey: [QUERY_KEYS.CREATOR_APPLICATIONS, 'user:active'],
+        queryFn: getActiveCreatorApplication,
+        enabled,
     })
 
-interface VerifyPhoneInputProps {
-    verificationCode: string
+interface CreateCreatorApplicationInputProps {
+    creatorPackageType: string;
+    idType: string;
+    idFrontImage: string;
+    idBackImage: string;
 }
 
-const verifyPhone = async (input: VerifyPhoneInputProps) => {
+const createCreatorApplication = async (params: CreateCreatorApplicationInputProps) => {
     try {
-        const response = await fetchClient<ApiResponse<boolean>>(
-            '/v1/users/phone/verify',
+        const response = await fetchClient<ApiResponse<CreatorApplication>>(
+            '/v1/creator-applications',
             {
-                method: 'PATCH',
-                body: JSON.stringify(input),
-            },
+                method: 'POST',
+                body: JSON.stringify(params),
+            }
         )
 
         if (!response.parsedBody.status && response.parsedBody.errorMessage) {
@@ -70,23 +68,31 @@ const verifyPhone = async (input: VerifyPhoneInputProps) => {
     }
 }
 
-export const useVerifyPhone = () =>
+export const useCreateCreatorApplication = () =>
     useMutation({
-        mutationFn: verifyPhone,
+        mutationFn: createCreatorApplication,
     })
 
-interface UpdateEmailInputProps {
-    emailAddress: string
+
+interface UpdateCreatorApplicationInputProps {
+    id: string;
+    creatorPackageType?: string;
+    idType?: string;
+    idFrontImage?: string;
+    idBackImage?: string;
 }
 
-const updateEmail = async (input: UpdateEmailInputProps) => {
+const updateCreatorApplication = async (params: UpdateCreatorApplicationInputProps) => {
     try {
-        const response = await fetchClient<ApiResponse<boolean>>(
-            '/v1/users/email',
+        const response = await fetchClient<ApiResponse<CreatorApplication>>(
+            `/v1/creator-applications/${params.id}`,
             {
                 method: 'PATCH',
-                body: JSON.stringify(input),
-            },
+                body: JSON.stringify({
+                    ...params,
+                    id: undefined,
+                }),
+            }
         )
 
         if (!response.parsedBody.status && response.parsedBody.errorMessage) {
@@ -107,23 +113,19 @@ const updateEmail = async (input: UpdateEmailInputProps) => {
     }
 }
 
-export const useUpdateEmail = () =>
+export const useUpdateCreatorApplication = () =>
     useMutation({
-        mutationFn: updateEmail,
+        mutationFn: updateCreatorApplication,
     })
 
-interface VerifyEmailInputProps {
-    verificationCode: string
-}
 
-const verifyEmail = async (input: VerifyEmailInputProps) => {
+const submitCreatorApplication = async (creatorApplicationId: string) => {
     try {
-        const response = await fetchClient<ApiResponse<boolean>>(
-            '/v1/users/email/verify',
+        const response = await fetchClient<ApiResponse<CreatorApplication>>(
+            `/v1/creator-applications/${creatorApplicationId}/submit`,
             {
-                method: 'PATCH',
-                body: JSON.stringify(input),
-            },
+                method: 'PATCH'
+            }
         )
 
         if (!response.parsedBody.status && response.parsedBody.errorMessage) {
@@ -144,7 +146,8 @@ const verifyEmail = async (input: VerifyEmailInputProps) => {
     }
 }
 
-export const useVerifyEmail = () =>
+export const useSubmitCreatorApplication = () =>
     useMutation({
-        mutationFn: verifyEmail,
+        mutationFn: submitCreatorApplication,
     })
+

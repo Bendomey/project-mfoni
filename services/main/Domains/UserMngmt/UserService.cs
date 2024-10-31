@@ -214,40 +214,5 @@ public class UserService
     }
 
 
-
-    public async Task<CreatorApplication> SubmitCreatorApplication(SubmitCreatorApplicationInput input, string userId)
-    {
-        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
-        if (user is null)
-        {
-            throw new HttpRequestException("UserNotFound");
-        }
-
-        var filterByUserId = Builders<CreatorApplication>.Filter.Eq(creatorApplication => creatorApplication.UserId, userId);
-        var filterByStatus = Builders<CreatorApplication>.Filter.Eq(creatorApplication => creatorApplication.Status, CreatorApplicationStatus.PENDING);
-
-        // Combine filters using AND
-        var combinedFilter = Builders<CreatorApplication>.Filter.And(filterByUserId, filterByStatus);
-
-        var creatorApplication = await _creatorApplicationCollection.Find(combinedFilter).FirstOrDefaultAsync();
-        if (creatorApplication is null)
-        {
-            throw new HttpRequestException("CreatorApplicationNotFound");
-        }
-
-        var idFilter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
-        var userUpdates = Builders<CreatorApplication>.Update
-            .Set(r => r.IdType, input.IdType)
-            .Set(r => r.IdNumber, input.IdNumber)
-            .Set(r => r.IdFrontImage, input.IdFrontImage)
-            .Set(r => r.IdBackImage, input.IdBackImage)
-            .Set(r => r.Status, CreatorApplicationStatus.SUBMITTED)
-            .Set(r => r.SubmittedAt, DateTime.UtcNow)
-            .Set(r => r.UpdatedAt, DateTime.UtcNow);
-
-        await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
-
-        return creatorApplication;
-    }
 }
 

@@ -124,7 +124,7 @@ export const AccountCover = () => {
                     <CheckIcon className="h-5 w-auto mr-2" /> Verify
                     Account
                   </Button>
-                ) : Boolean(activeCreatorApplication) ? (
+                ) : activeCreatorApplication && Boolean(activeCreatorApplication.status === "PENDING") ? (
                   <Button
                     isLink
                     href="/account?complete-creator-application=true"
@@ -134,21 +134,19 @@ export const AccountCover = () => {
                   >
                     <CheckIcon className="h-5 w-auto mr-2" /> Complete Creator Application
                   </Button>
-                ) : (
-                  <Button
-                    isLink
-                    href="/account?complete-creator-application=true"
-                    variant="solid"
-                    color='secondaryGhost'
-                    className="w-full md:w-auto bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:opacity-80"
-                  >
-                    Become A Creator
-                  </Button>
-                )
+                    // eslint-disable-next-line no-negated-condition
+                ) : !activeCreatorApplication ? (
+                    <Button
+                        isLink
+                        href="/account?complete-creator-application=true"
+                        variant="solid"
+                        color='secondaryGhost'
+                        className="w-full md:w-auto bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:opacity-80"
+                    >
+                      Become A Creator
+                    </Button>
+                ) : null
               }
-
-
-
             </div>
           </div>
         </div>

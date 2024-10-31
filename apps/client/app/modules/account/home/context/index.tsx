@@ -1,4 +1,4 @@
-import { useGetActiveCreatorApplication } from "@/api/users/index.ts";
+import { useGetActiveCreatorApplication } from "@/api/creator-applications/index.ts";
 import { useDisclosure } from "@/hooks/use-disclosure.tsx";
 import { useAuth } from "@/providers/auth/index.tsx";
 import { useSearchParams } from "@remix-run/react";

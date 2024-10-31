@@ -13,7 +13,7 @@ public static class CreatorApplicationStatus
 
 public static class IdType
 {
-    public static readonly string PASSPORT = "PASSPORT";
+    public static readonly string DRIVERS_LICENSE = "DRIVERS_LICENSE";
     public static readonly string NATIONAL_ID = "NATIONAL_ID";
     public static readonly string VOTERS = "VOTERS";
 }

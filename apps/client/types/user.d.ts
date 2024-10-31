@@ -20,15 +20,16 @@ interface User {
 
 interface CreatorApplication {
   id: string
+  userId: string
   status: 'PENDING' | 'SUBMITTED' | 'APPROVED' | 'REJECTED'
   submittedAt: Nullable<Date>
   approvedAt: Nullable<Date>
-  approvedBy: Nullable<string>
   rejectedAt: Nullable<Date>
-  rejectedBy: Nullable<string>
-  platformAggrementForm: Nullable<string>
-  ghanaCardFront: Nullable<string>
-  ghanaCardBack: Nullable<string>
+  rejectedReason: Nullable<string>
+  intendedPricingPackage: Nullable<'FREE' | 'BASIC' | 'ADVANCED'>
+  idType: Nullable<'DRIVERS_LICENSE' | 'NATIONAL_ID' | 'VOTERS'>
+  idFrontImage: Nullable<string>
+  idBackImage: Nullable<string>
   createdAt: Date
   createdBy: string
   updatedAt: Date

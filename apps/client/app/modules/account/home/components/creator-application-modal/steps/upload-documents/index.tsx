@@ -1,8 +1,8 @@
-import { useDisclosure } from "@/hooks/use-disclosure.tsx"
-import { Button } from "@/components/button/index.tsx"
-import { PhotoIcon } from "@heroicons/react/24/outline"
-import { UploadDialog } from "@/components/upload-dialog/index.tsx"
-import { type IImageType } from "../../index.tsx"
+import {useDisclosure} from "@/hooks/use-disclosure.tsx"
+import {Button} from "@/components/button/index.tsx"
+import {PhotoIcon} from "@heroicons/react/24/outline"
+import {UploadDialog} from "@/components/upload-dialog/index.tsx"
+import {type IImageType} from "../../index.tsx"
 
 interface Props {
     idType: string
@@ -14,18 +14,19 @@ interface Props {
 }
 
 export function UploadDocuments({
-    idType,
-    setIdType,
-    frontId,
-    setFrontId,
-    backId,
-    setBackId,
-}: Props) {
+                                    idType,
+                                    setIdType,
+                                    frontId,
+                                    setFrontId,
+                                    backId,
+                                    setBackId,
+                                }: Props) {
     return (
         <div>
             <h1 className="font-bold text-xl">2. Upload Your ID Card</h1>
             <div className="ml-5">
-                <p className="text-sm text-gray-600 mt-1">Any type of Ghanaian ID Card is acceptable. Please make sure the images are not blurry. Your application might get rejected because of that</p>
+                <p className="text-sm text-gray-600 mt-1">Any type of Ghanaian ID Card is acceptable. Please make sure
+                    the images are not blurry. Your application might get rejected because of that</p>
 
                 <div className="mt-5">
                     <label htmlFor="type" className="block text-sm font-medium leading-6 text-gray-900">
@@ -40,26 +41,32 @@ export function UploadDocuments({
                             className="block w-full rounded-md border-0 py-3 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
                         >
                             <option value=''>Please Select</option>
-                            <option value="GHANA_CARD">Ghana Card</option>
-                            <option value="VOTER">Voter&apos;s ID</option>
+                            <option value="NATIONAL_ID">Ghana Card</option>
+                            <option value="VOTERS">Voter&apos;s ID</option>
                             <option value="DRIVERS_LICENSE">Driver&apos;s License</option>
                         </select>
                     </div>
                 </div>
-                <div className="mt-3">
-                    <label htmlFor="type" className="block text-sm font-medium leading-6 text-gray-900">
-                        Front Side
-                    </label>
-                    <UploadItem image={frontId} setImage={setFrontId} />
+                {
+                    idType ? (
+                        <>
+                            <div className="mt-3">
+                                <label htmlFor="type" className="block text-sm font-medium leading-6 text-gray-900">
+                                    Front Side
+                                </label>
+                                <UploadItem image={frontId} setImage={setFrontId}/>
 
-                </div>
+                            </div>
 
-                <div className="mt-3">
-                    <label htmlFor="type" className="block text-sm font-medium leading-6 text-gray-900">
-                        Back Side
-                    </label>
-                    <UploadItem image={backId} setImage={setBackId} />
-                </div>
+                            <div className="mt-3">
+                                <label htmlFor="type" className="block text-sm font-medium leading-6 text-gray-900">
+                                    Back Side
+                                </label>
+                                <UploadItem image={backId} setImage={setBackId}/>
+                            </div>
+                        </>
+                    ) : null
+                }
             </div>
         </div>
     )
@@ -71,9 +78,9 @@ interface UploadItemProps {
 }
 
 function UploadItem({
-    image, setImage
-}: UploadItemProps) {
-    const { isOpened: isUploadDialogOpened, onClose: onCloseUploadDialog, onOpen: onOpenUploadDialog } = useDisclosure()
+                        image, setImage
+                    }: UploadItemProps) {
+    const {isOpened: isUploadDialogOpened, onClose: onCloseUploadDialog, onOpen: onOpenUploadDialog} = useDisclosure()
 
     return (
         <>
@@ -83,27 +90,28 @@ function UploadItem({
                         {
                             image ? (
                                 <>
-                                    <img src={image.url} alt={image.name} className="h-10 w-auto rounded-md" />
+                                    <img src={image.url} alt={image.name} className="h-10 w-auto rounded-md"/>
                                     <span className="text-xs text-gray-600">{image.name}</span>
                                 </>
 
                             ) : (
                                 <>
-                                    <PhotoIcon className="h-10 w-auto text-gray-400" />
+                                    <PhotoIcon className="h-10 w-auto text-gray-400"/>
                                     <span className="text-xs text-gray-400">Nothing Selected.</span>
                                 </>
                             )
                         }
                     </div>
                     <div>
-                        <Button size='sm' variant='outlined' onClick={onOpenUploadDialog}>{image ? "Update" : "Upload"}</Button>
+                        <Button size='sm' variant='outlined'
+                                onClick={onOpenUploadDialog}>{image ? "Update" : "Upload"}</Button>
                     </div>
                 </div>
             </div>
             <UploadDialog isOpened={isUploadDialogOpened} onClose={onCloseUploadDialog} onSave={(res) => {
                 setImage(res)
                 onCloseUploadDialog()
-            }} />
+            }}/>
         </>
 
     )

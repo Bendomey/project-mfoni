@@ -1,11 +1,21 @@
-import { Button } from "@/components/button/index.tsx";
-import { Modal } from "@/components/modal/index.tsx";
-import { ArrowRightIcon, CheckIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
-import { XMarkIcon } from "@heroicons/react/24/solid";
-import { useSearchParams } from "@remix-run/react";
-import { SelectPackage } from "./steps/select-package.tsx";
-import { UploadDocuments } from "./steps/upload-documents/index.tsx";
-import { useMemo, useState } from "react";
+import {Button} from "@/components/button/index.tsx";
+import {Modal} from "@/components/modal/index.tsx";
+import {ArrowRightIcon, CheckIcon, ChevronLeftIcon} from "@heroicons/react/24/outline";
+import {useSearchParams} from "@remix-run/react";
+import {SelectPackage} from "./steps/select-package.tsx";
+import {UploadDocuments} from "./steps/upload-documents/index.tsx";
+import {useCallback, useEffect, useMemo, useState} from "react";
+import {
+    useCreateCreatorApplication,
+    useSubmitCreatorApplication,
+    useUpdateCreatorApplication
+} from "@/api/creator-applications/index.ts";
+import {useAccountContext} from "@/modules/account/home/context/index.tsx";
+import {toast} from "react-hot-toast";
+import {errorMessagesWrapper} from "@/constants/error-messages.ts";
+import {useQueryClient} from "@tanstack/react-query";
+import {QUERY_KEYS} from "@/constants/index.ts";
+import {Loader} from "@/components/loader/index.tsx";
 
 interface Props {
     isOpened: boolean;
@@ -22,8 +32,14 @@ export interface IImageType {
 }
 
 export function CreatorApplicationModal({
-    isOpened,
-}: Props) {
+                                            isOpened,
+                                        }: Props) {
+    const {activeCreatorApplication} = useAccountContext()
+    const queryClient = useQueryClient()
+    const {mutateAsync: creatorCreatorApplication, isPending: isCreatingApplication} = useCreateCreatorApplication()
+    const {mutateAsync: updateCreatorApplication, isPending: isUpdatingApplication} = useUpdateCreatorApplication()
+    const {mutateAsync: submitCreatorApplication, isPending: isSubmitingApplication} = useSubmitCreatorApplication()
+
     const [step, setStep] = useState<keyof typeof steps>('package')
     const [searchParams, setSearchParams] = useSearchParams()
     const [mfoniPackage, setMfoniPackage] = useState<string>('')
@@ -31,33 +47,92 @@ export function CreatorApplicationModal({
     const [frontId, setFrontId] = useState<IImageType>()
     const [backId, setBackId] = useState<IImageType>()
 
-    const onClose = () => {
+    useEffect(() => {
+        if (activeCreatorApplication?.intendedPricingPackage) {
+            setMfoniPackage(activeCreatorApplication.intendedPricingPackage)
+            setStep('document')
+        }
+    }, [])
+
+    const onClose = useCallback(() => {
         searchParams.delete('complete-creator-application')
         setSearchParams(searchParams, {
             preventScrollReset: true,
         });
-    }
+    }, [searchParams, setSearchParams])
+
+    const isLoading = useMemo(() => isCreatingApplication || isUpdatingApplication || isSubmitingApplication, [isCreatingApplication, isSubmitingApplication, isUpdatingApplication])
+
 
     const isNextButtonDisabled = useMemo(() => !mfoniPackage, [mfoniPackage])
-    const isCompleteButtonDisabled = useMemo(() => !mfoniPackage || !idType || !frontId || !backId, [backId, frontId, idType, mfoniPackage])
+    const isCompleteButtonDisabled = useMemo(() =>
+            !mfoniPackage || !idType || !frontId || !backId || isLoading,
+        [backId, frontId, idType, isLoading, mfoniPackage])
+
+
+    const handleSubmit = useCallback(async () => {
+        try {
+            if (!backId || !frontId) {
+                return
+            }
+            let creatorApplicationId: string | undefined
+            if (activeCreatorApplication) {
+                creatorApplicationId = activeCreatorApplication.id
+                await updateCreatorApplication({
+                    id: creatorApplicationId,
+                    idType,
+                    creatorPackageType: mfoniPackage,
+                    idBackImage: backId.url,
+                    idFrontImage: frontId.url
+                });
+            } else {
+                const newCreatorApplication = await creatorCreatorApplication({
+                    idType,
+                    creatorPackageType: mfoniPackage,
+                    idBackImage: backId.url,
+                    idFrontImage: frontId.url
+                });
+
+                if (newCreatorApplication) {
+                    creatorApplicationId = newCreatorApplication.id
+                }
+            }
+
+            if (!creatorApplicationId) {
+                return toast.error('Creator Application is Required')
+            }
+
+            await submitCreatorApplication(creatorApplicationId);
+            void queryClient.invalidateQueries({queryKey: [QUERY_KEYS.CREATOR_APPLICATIONS, 'user:active']})
+            onClose();
+
+            toast.success('Creator Application submitted.')
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(errorMessagesWrapper(error.message), {
+                    id: 'submit-creator-application',
+                })
+            }
+        }
+    }, [activeCreatorApplication, backId, creatorCreatorApplication, frontId, idType, mfoniPackage, onClose, queryClient, submitCreatorApplication, updateCreatorApplication])
+
 
     return (
-        <Modal className='w-full md:w-4/6 lg:w-3/6 p-0' onClose={onClose} isOpened={isOpened} canBeClosedWithBackdrop={false}>
+        <Modal className='w-full md:w-4/6 lg:w-3/6 p-0 relative' onClose={onClose} isOpened={isOpened}
+               canBeClosedWithBackdrop={false}>
             <div className="flex flex-row items-center justify-between bg-gray-100 p-4 text-gray-600">
                 <h1 className="font-bold ">Creator Application</h1>
-                <Button variant='unstyled' onClick={onClose}>
-                    <XMarkIcon className="h-5 w-5" />
-                </Button>
             </div>
             <div className="m-4">
                 {
                     step === 'package' ? (
-                        <SelectPackage mfoniPackage={mfoniPackage} setMfoniPackage={setMfoniPackage} />
+                        <SelectPackage mfoniPackage={mfoniPackage} setMfoniPackage={setMfoniPackage}/>
                     ) : (
                         <>
                             <div className="flex flex-row items-center mb-2">
-                                <Button onClick={() => setStep('package')} variant='unstyled' className="font-bold text-sm">
-                                    <ChevronLeftIcon className="h-4 w-4 mr-1" /> Back
+                                <Button onClick={() => setStep('package')} variant='unstyled'
+                                        className="font-bold text-sm">
+                                    <ChevronLeftIcon className="h-4 w-4 mr-1"/> Back
                                 </Button>
                             </div>
                             <UploadDocuments
@@ -79,6 +154,7 @@ export function CreatorApplicationModal({
                     type="button"
                     color='secondaryGhost'
                     onClick={onClose}
+                    disabled={isLoading}
                 >
                     Cancel
                 </Button>
@@ -90,7 +166,7 @@ export function CreatorApplicationModal({
                             disabled={isNextButtonDisabled}
                             onClick={() => setStep('document')}
                         >
-                            Next <ArrowRightIcon className="ml-1 h-3 w-3" />
+                            Next <ArrowRightIcon className="ml-1 h-3 w-3"/>
                         </Button>
                     ) : (
                         <Button
@@ -98,13 +174,23 @@ export function CreatorApplicationModal({
                             type="button"
                             color='success'
                             disabled={isCompleteButtonDisabled}
-                            onClick={() => setStep('document')}
+
+                            onClick={handleSubmit}
                         >
-                            Complete <CheckIcon className="ml-1 h-3 w-3" />
+                            {
+                                isLoading ? (
+                                    <>
+                                        <Loader size='5' color="fill-white"/> <span className='ml-2'>Submitting</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        Complete < CheckIcon className="ml-1 h-3 w-3"/>
+                                    </>
+                                )
+                            }
                         </Button>
                     )
                 }
-
             </div>
         </Modal>
     );

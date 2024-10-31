@@ -1,4 +1,4 @@
-import { useGetActiveCreatorApplication } from '@/api/users/index.ts';
+import { useGetActiveCreatorApplication } from '@/api/creator-applications/index.ts';
 import { Button } from '@/components/button/index.tsx';
 import { useAuth } from '@/providers/auth/index.tsx';
 import { useMemo } from 'react';

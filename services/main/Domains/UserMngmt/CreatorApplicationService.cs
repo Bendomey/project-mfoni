@@ -37,7 +37,31 @@ public class CreatorApplicationService
         logger.LogDebug("User service initialized");
     }
 
-    public async Task<CreatorApplication> SubmitCreatorApplication(SubmitCreatorApplicationInput input, string creatorApplicationId)
+    public async Task<CreatorApplication> CreateCreatorApplication(CreateCreatorApplicationInput input, string userId)
+    {
+        // check if user already has an active creator application
+        var activeCreatorApplication = await _creatorApplicationCollection.Find(application => application.UserId == userId && application.Status != CreatorApplicationStatus.REJECTED)
+            .FirstOrDefaultAsync();
+
+        if (activeCreatorApplication is not null)
+        {
+            throw new HttpRequestException("CreatorApplicationAlreadyExists");
+        }
+
+        var __newCreatorApplication = new Models.CreatorApplication
+        {
+            UserId = userId,
+            IdType = input.IdType,
+            IdBackImage = input.IdBackImage,
+            IdFrontImage = input.IdFrontImage,
+            IntendedPricingPackage = input.CreatorPackageType,
+        };
+        _creatorApplicationCollection.InsertOne(__newCreatorApplication);
+
+        return __newCreatorApplication;
+    }
+
+    public async Task<CreatorApplication> UpdateCreatorApplication(UpdateCreatorApplicationInput input, string creatorApplicationId)
     {
         var filterByApplicationId = Builders<CreatorApplication>.Filter.Eq(creatorApplication => creatorApplication.Id, creatorApplicationId);
 
@@ -56,12 +80,6 @@ public class CreatorApplicationService
 
         var idFilter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
         var userUpdates = Builders<CreatorApplication>.Update
-            .Set(r => r.IdType, input.IdType)
-            .Set(r => r.IdNumber, input.IdNumber)
-            .Set(r => r.IdFrontImage, input.IdFrontImage)
-            .Set(r => r.IdBackImage, input.IdBackImage)
-            .Set(r => r.Status, CreatorApplicationStatus.SUBMITTED)
-            .Set(r => r.SubmittedAt, DateTime.UtcNow)
             .Set(r => r.UpdatedAt, DateTime.UtcNow);
 
         if (input.CreatorPackageType is not null)
@@ -69,11 +87,71 @@ public class CreatorApplicationService
             userUpdates = userUpdates.Set(r => r.IntendedPricingPackage, input.CreatorPackageType);
         }
 
-        // make sure there's a creator package set
+        if (input.IdType is not null)
+        {
+            userUpdates = userUpdates.Set(r => r.IdType, input.IdType);
+        }
+
+        if (input.IdFrontImage is not null)
+        {
+            userUpdates = userUpdates.Set(r => r.IdFrontImage, input.IdFrontImage);
+        }
+
+        if (input.IdBackImage is not null)
+        {
+            userUpdates = userUpdates.Set(r => r.IdBackImage, input.IdBackImage);
+        }
+
+        await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
+
+        return creatorApplication;
+    }
+
+
+    public async Task<CreatorApplication> SubmitCreatorApplication(string creatorApplicationId)
+    {
+        var filterByApplicationId = Builders<CreatorApplication>.Filter.Eq(creatorApplication => creatorApplication.Id, creatorApplicationId);
+
+        var combinedFilter = Builders<CreatorApplication>.Filter.And(filterByApplicationId);
+
+        var creatorApplication = await _creatorApplicationCollection.Find(combinedFilter).FirstOrDefaultAsync();
+        if (creatorApplication is null)
+        {
+            throw new HttpRequestException("CreatorApplicationNotFound");
+        }
+
+        if (creatorApplication.Status != CreatorApplicationStatus.PENDING)
+        {
+            throw new HttpRequestException("CreatorApplicationAlready" + creatorApplication.Status.ToString());
+        }
+
+        // make sure that all required fields are set
+        if (creatorApplication.IdType is null)
+        {
+            throw new HttpRequestException("IdTypeNotSet");
+        }
+
+        if (creatorApplication.IdFrontImage is null)
+        {
+            throw new HttpRequestException("IdFrontImageNotSet");
+        }
+
+        if (creatorApplication.IdBackImage is null)
+        {
+            throw new HttpRequestException("IdFrontImageNotSet");
+        }
+
         if (creatorApplication.IntendedPricingPackage is null)
         {
             throw new HttpRequestException("PackageTypeNotSet");
         }
+
+        var idFilter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
+        var userUpdates = Builders<CreatorApplication>.Update
+            .Set(r => r.Status, CreatorApplicationStatus.SUBMITTED)
+            .Set(r => r.SubmittedAt, DateTime.UtcNow)
+            .Set(r => r.UpdatedAt, DateTime.UtcNow);
+
 
         await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
 
@@ -142,6 +220,7 @@ public class CreatorApplicationService
 
         if (creatorApplication.IntendedPricingPackage is not null)
         {
+            // TODO: Come back and think through this bit.
             var creatorPackage = new CreatorPackage
             {
                 CreatorId = creator.Id,
@@ -150,7 +229,9 @@ public class CreatorApplicationService
             };
 
             await _creatorPackageCollection.InsertOneAsync(creatorPackage);
-        } else {
+        }
+        else
+        {
             // this shouldn't happen. but just in case
             throw new HttpRequestException("PackageTypeNotSet");
         }
