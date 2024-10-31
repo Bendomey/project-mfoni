@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog"
 import { useApproveApplication } from "@/TestData";
 import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast"
 
 
 interface AcceptApplicationModalProps {
@@ -29,22 +28,21 @@ const { mutate, status } = useApproveApplication();
 const handleSubmit = () => {
       mutate(data!.id)
                 if(status == 200){
-                  console.log('success')
                   setOpened(false)
                   toast({
-                    title: "Uh oh! Something went wrong.",
-                    description: "There was a problem with your request.",
-                    variant: "default"
+                    title: "Application approved",
+                    description: "application sucessfully approved",
+                    variant: "success",
+                    duration: 5000
                   })
                 }
                 else{
                   toast({
-                    title: "Uh oh! Something went wrong.",
+                    title: "Error approving application",
                     description: "There was a problem with your request.",
                     variant: "destructive",
-                    duration: 50000
+                    duration: 5000
                   })
-                  console.log('error----')
             }
         }     
   
