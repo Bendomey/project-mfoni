@@ -1,14 +1,12 @@
 /* eslint-disable func-names */
 import {useAuthenticate} from '@/api/auth/index.ts'
 import {Button} from '@/components/button/index.tsx'
-import {useNavigate} from '@remix-run/react'
+import {useNavigate, useSearchParams} from '@remix-run/react'
 import {useEffect} from 'react'
 import {useLoginAuth} from '../context/index.tsx'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {toast} from 'react-hot-toast'
 import {useAuth} from '@/providers/auth/index.tsx'
-import {useQueryClient} from '@tanstack/react-query'
-import {QUERY_KEYS} from '@/constants/index.ts'
 import {useEnvContext} from '@/providers/env/index.tsx'
 
 declare global {
@@ -24,8 +22,8 @@ export const FacebookButton = () => {
   const {setIsLoading, setErrorMessage} = useLoginAuth()
   const {onSignin} = useAuth()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const env = useEnvContext()
+  const [params] = useSearchParams()
 
   useEffect(() => {
     window.fbAsyncInit = function () {
@@ -66,13 +64,15 @@ export const FacebookButton = () => {
         onSuccess: successRes => {
           if (successRes) {
             onSignin(successRes)
-            queryClient.setQueryData([QUERY_KEYS.CURRENT_USER], successRes.user)
 
-            if (successRes.user.accountSetupAt) {
-              navigate('/')
+            const returnTo = params.get('return_to')
+            if (successRes.user.role) {
+              navigate(returnTo ?? '/')
               toast.success(`Welcome ${successRes.user.name}`)
             } else {
-              navigate('/auth/onboarding')
+              navigate(
+                `/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''}`,
+              )
               toast.success('Setup account')
             }
           }
@@ -102,11 +102,7 @@ export const FacebookButton = () => {
   }
 
   return (
-    <Button
-      onClick={handleLoginInitiation}
-      variant="unstyled"
-      externalClassName="flex w-full items-center justify-center gap-3 rounded-md bg-blue-600 px-3 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
-    >
+    <Button onClick={handleLoginInitiation} className="justify-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-6 w-6"

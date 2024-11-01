@@ -16,7 +16,7 @@ export const VerifyOtp = ({setPage}: Props) => {
   const {setActiveStep} = useVerifyCreator()
   const [countDown, setCountdown] = useState(59)
   const [code, setCode] = useState('')
-  const {currentUser} = useAuth()
+  const {currentUser, onUpdateUser} = useAuth()
   const {mutate: verifyPhone, isPending: isVerifying} = useVerifyPhone()
   const {mutate: resendCode, isPending: isResending} = useUpdatePhone()
 
@@ -27,10 +27,16 @@ export const VerifyOtp = ({setPage}: Props) => {
       },
       {
         onSuccess() {
+          if (currentUser) {
+            onUpdateUser({
+              ...currentUser,
+              phoneNumberVerifiedAt: new Date(),
+            })
+          }
           toast.success('Phone number verified successfully', {
             id: 'phone-verified',
           })
-          setActiveStep('id')
+          setActiveStep('email')
         },
         onError(error) {
           if (error.message) {
@@ -111,7 +117,7 @@ export const VerifyOtp = ({setPage}: Props) => {
         <>
           <Button
             onClick={verifyCode}
-            externalClassName="w-full lg:w-1/3 mt-10"
+            className="w-full lg:w-1/3 justify-center mt-10"
             size="lg"
           >
             Verify

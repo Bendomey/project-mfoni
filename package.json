@@ -6,6 +6,7 @@
     "format": "run-s format:*",
     "format:frontend-client": "cd apps/client && yarn format",
     "format:frontend-waitlist": "cd apps/wait-list && yarn format",
+    "format:frontend-admin": "cd apps/admin && yarn lint --fix",
     "format:services-main": "cd services/main && make lint"
   }
 }

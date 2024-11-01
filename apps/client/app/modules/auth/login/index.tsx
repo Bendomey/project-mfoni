@@ -87,7 +87,7 @@ export const LoginComponent = () => {
                 isLink
                 href="/"
                 variant="unstyled"
-                externalClassName="flex flex-wrap flex-row items-center hover:bg-zinc-100 p-2 rounded-lg"
+                className="flex flex-wrap flex-row items-center hover:bg-zinc-100 p-2 rounded-lg"
               >
                 <ArrowLeftIcon className="h-4 w-4 mr-3" />
                 <span className="font-bold">Go Back</span>

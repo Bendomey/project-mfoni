@@ -1,5 +1,6 @@
 using main.DTOs;
 
+namespace main.Transformations;
 
 public class GetEntityResponse<T>
 {
@@ -20,6 +21,10 @@ public class GetEntityResponse<T>
         return response;
     }
 }
+
+public record ApiEntityResponse<T>(T? Result, string? ErrorMessage = null);
+
+public record ApiErrorResponse(string? ErrorMessage, object? Result = null);
 
 public class EntityWithPagination<T>
 {

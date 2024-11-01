@@ -1,11 +1,13 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+﻿using main.Configurations;
 using main.Configuratons;
-using NanoidDotNet;
-using main.Configurations;
-using Microsoft.Extensions.Caching.Distributed;
 using main.DTOs;
+using main.Lib;
 using main.Models;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using NanoidDotNet;
 
 namespace main.Domains;
 
@@ -17,7 +19,6 @@ public class UserService
     private readonly CacheProvider _cacheProvider;
     private readonly AppConstants _appConstantsConfiguration;
 
-
     public UserService(
         ILogger<UserService> logger,
         DatabaseSettings databaseConfig,
@@ -26,16 +27,52 @@ public class UserService
     )
     {
         _logger = logger;
-        _userCollection = databaseConfig.Database.GetCollection<Models.User>(appConstants.Value.UserCollection);
-        _creatorApplicationCollection = databaseConfig.Database.GetCollection<Models.CreatorApplication>(appConstants.Value.CreatorApplicatonCollection);
+        _userCollection = databaseConfig.Database.GetCollection<Models.User>(
+            appConstants.Value.UserCollection
+        );
+        _creatorApplicationCollection =
+            databaseConfig.Database.GetCollection<Models.CreatorApplication>(
+                appConstants.Value.CreatorApplicatonCollection
+            );
         _cacheProvider = cacheProvider;
         _appConstantsConfiguration = appConstants.Value;
 
         logger.LogDebug("User service initialized");
     }
 
+    public bool SetupAccount(SetupAccountInput accountInput, CurrentUserOutput userInput)
+    {
+        var user = _userCollection
+            .Find<Models.User>(user => user.Id == userInput.Id)
+            .FirstOrDefault();
+
+        if (user is null)
+        {
+            throw new HttpRequestException("UserNotFound");
+        }
+
+        user.Role = UserRole.CLIENT;
+        user.Name = accountInput.Name;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        if (accountInput.Role == UserRole.CREATOR)
+        {
+            var __newCreatorApplication = new Models.CreatorApplication
+            {
+                UserId = user.Id,
+                IntendedPricingPackage = accountInput.IntendedPricingPackage,
+            };
+            _creatorApplicationCollection.InsertOne(__newCreatorApplication);
+        }
+
+        _userCollection.ReplaceOne(user => user.Id == userInput.Id, user);
+        return true;
+    }
+
     public async Task<bool> SavePhoneNumber(string phoneNumber, string userId)
     {
+        var normalizedPhoneNumber = StringLib.NormalizePhoneNumber(phoneNumber);
+
         var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
         if (user is null)
         {
@@ -43,19 +80,20 @@ public class UserService
         }
 
         // verify if phone number has been taken already
-        var userExistsWithPhoneNumber = await _userCollection.Find(user => user.PhoneNumber == phoneNumber).FirstOrDefaultAsync();
+        var userExistsWithPhoneNumber = await _userCollection
+            .Find(user => user.PhoneNumber == normalizedPhoneNumber)
+            .FirstOrDefaultAsync();
         if (userExistsWithPhoneNumber != null && userExistsWithPhoneNumber.Id != userId)
         {
             throw new HttpRequestException("PhoneNumberAlreadyExists");
         }
 
         var filter = Builders<Models.User>.Filter.Eq(u => u.Id, userId);
-        var updates = Builders<Models.User>.Update
-            .Set(r => r.PhoneNumber, phoneNumber);
+        var updates = Builders<Models.User>.Update.Set(r => r.PhoneNumber, normalizedPhoneNumber);
 
-        if (phoneNumber != user.PhoneNumber)
+        if (normalizedPhoneNumber != user.PhoneNumber)
         {
-            updates = updates.Set(r => r.VerifiedPhoneNumberAt, null);
+            updates = updates.Set(r => r.PhoneNumberVerifiedAt, null);
         }
 
         await _userCollection.UpdateOneAsync(filter, updates);
@@ -68,13 +106,17 @@ public class UserService
         //     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
         // });
 
-        await SmsConfiguration.SendSms(new SendSmsInput
-        {
-            PhoneNumber = phoneNumber,
-            Message = $"Hello {user.Name},\\n\\nYour OTP is {code}. Please use this code to complete your action.\\n\\nThank you.",
-            AppId = _appConstantsConfiguration.SmsAppId,
-            AppSecret = _appConstantsConfiguration.SmsAppSecret
-        });
+        await SmsConfiguration.SendSms(
+            new SendSmsInput
+            {
+                PhoneNumber = normalizedPhoneNumber,
+                Message = EmailTemplates
+                    .VerifyPhoneNumberBody.Replace("{code}", code)
+                    .Replace("{name}", user.Name),
+                AppId = _appConstantsConfiguration.SmsAppId,
+                AppSecret = _appConstantsConfiguration.SmsAppSecret
+            }
+        );
 
         return true;
     }
@@ -87,7 +129,7 @@ public class UserService
             throw new HttpRequestException("UserNotFound");
         }
 
-        if (user.VerifiedPhoneNumberAt is not null)
+        if (user.PhoneNumberVerifiedAt is not null)
         {
             throw new HttpRequestException("PhoneNumberAlreadyVerified");
         }
@@ -100,91 +142,142 @@ public class UserService
         }
 
         var filter = Builders<Models.User>.Filter.Eq(r => r.Id, user.Id);
-        var updates = Builders<Models.User>.Update.Set(v => v.VerifiedPhoneNumberAt, DateTime.Now);
+        var updates = Builders<Models.User>.Update.Set(v => v.PhoneNumberVerifiedAt, DateTime.Now);
         await _userCollection.UpdateOneAsync(filter, updates);
 
         // await _cacheProvider.ClearCache($"verify-{user.Id}");
         return true;
     }
 
-    public async Task VerifyIdentity(IdentityVerificationInput input)
+    public async Task<bool> SaveEmailAddress(string emailAddress, string userId)
     {
-        // verify reference id
-        var normalizedPhoneNumber = StringLib.NormalizePhoneNumber(input.ReferenceId);
-        var user = await _userCollection.Find(user => user.PhoneNumber == normalizedPhoneNumber).FirstOrDefaultAsync();
+        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
         if (user is null)
         {
             throw new HttpRequestException("UserNotFound");
         }
 
-        var creatorApplication = await _creatorApplicationCollection.Find(creatorApplication => creatorApplication.Id == user.CreatorApplicationId).FirstOrDefaultAsync();
-        if (creatorApplication is null)
+        // verify if phone number has been taken already
+        var userExistsWithEmailAddress = await _userCollection.Find(user => user.Email == emailAddress).FirstOrDefaultAsync();
+        if (userExistsWithEmailAddress != null && userExistsWithEmailAddress.Id != userId)
         {
-            throw new HttpRequestException("CreatorApplicationNotFound");
+            throw new HttpRequestException("EmailAlreadyExists");
         }
 
-        if (creatorApplication.Status != CreatorApplicationStatus.PENDING)
+        var filter = Builders<Models.User>.Filter.Eq(u => u.Id, userId);
+        var updates = Builders<Models.User>.Update
+            .Set(r => r.Email, emailAddress);
+
+        if (emailAddress != user.Email)
         {
-            throw new HttpRequestException("CreatorApplicationNotPending");
+            updates = updates.Set(r => r.EmailVerifiedAt, null);
         }
 
-        // check the status of the identity response
-        if (input.Status == IdentityVerificationInputStatus.FAILED)
-        {
-            // once its a failed status, we create a new creatorApplication for the applicant and reject it. We need to create records for all failed transactions.
-            var __newCreatorApplication = new CreatorApplication
+        await _userCollection.UpdateOneAsync(filter, updates);
+
+        var code = "12345";
+        // TODO: look into redis problem in staging.
+        // var code = Nanoid.Generate("1234567890", 5);
+        // await _cacheProvider.SetCache($"verify-{user.Id}", code, new DistributedCacheEntryOptions
+        // {
+        //     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+        // });
+
+        var _ = EmailConfiguration.Send(
+            new SendEmailInput
             {
-                ApplicantId = user.Id,
-                Status = CreatorApplicationStatus.REJECTED,
-                IdentityProviderResponse = new IdentityProviderResponse
-                {
-                    TransactionNumber = input.TransactionNumber,
-                    PictureMatchScore = input.PictureMatchScore,
-                    LivenessVerificationScore = input.LivenessVerificationScore,
-                    DateOfBirthMatchScore = input.DateOfBirthMatchScore,
-                    NameMatchScore = input.NameMatchScore,
-                    Image = input.Image,
-                    OverAllComparismScore = input.OverAllComparismScore,
-                    Status = input.Status,
-                    ReferenceId = input.ReferenceId,
-                    IdNumber = input.IdNumber,
-                    VerificationResult = input.VerificationResult
-                }
-            };
+                From = _appConstantsConfiguration.EmailFrom,
+                Email = emailAddress,
+                Subject = EmailTemplates.VerifyAccountSubject,
+                Message = EmailTemplates.VerifyPhoneNumberBody.Replace("{code}", code).Replace("{name}", user.Name),
+                ApiKey = _appConstantsConfiguration.ResendApiKey
+            }
+        );
 
-            _creatorApplicationCollection.InsertOne(__newCreatorApplication);
-        }
-        else if (input.Status == IdentityVerificationInputStatus.SUCCESSFUL)
+        return true;
+    }
+
+    public async Task<bool> VerifyEmailAddress(string code, string userId)
+    {
+        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+        if (user is null)
         {
-            // if its successful, we update the creatorApplication status to approved
-            var filter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
-            var updates = Builders<CreatorApplication>.Update
-                .Set(r => r.Status, CreatorApplicationStatus.APPROVED)
-                .Set(r => r.ApprovedAt, DateTime.UtcNow)
-                .Set(r => r.UpdatedAt, DateTime.UtcNow)
-                .Set(r => r.IdentityProviderResponse, new IdentityProviderResponse
-                {
-                    TransactionNumber = input.TransactionNumber,
-                    PictureMatchScore = input.PictureMatchScore,
-                    LivenessVerificationScore = input.LivenessVerificationScore,
-                    DateOfBirthMatchScore = input.DateOfBirthMatchScore,
-                    NameMatchScore = input.NameMatchScore,
-                    Image = input.Image,
-                    OverAllComparismScore = input.OverAllComparismScore,
-                    Status = input.Status,
-                    ReferenceId = input.ReferenceId,
-                    IdNumber = input.IdNumber,
-                    VerificationResult = input.VerificationResult
-                });
-            await _creatorApplicationCollection.UpdateOneAsync(filter, updates);
-
-            // update the user role to creator
-            var userFilter = Builders<Models.User>.Filter.Eq(r => r.Id, user.Id);
-            var userUpdates = Builders<Models.User>.Update
-                .Set(r => r.UpdatedAt, DateTime.UtcNow)
-                .Set(r => r.Role, UserRole.CREATOR);
-            await _userCollection.UpdateOneAsync(userFilter, userUpdates);
+            throw new HttpRequestException("UserNotFound");
         }
+
+        if (user.EmailVerifiedAt is not null)
+        {
+            throw new HttpRequestException("EmailAddressAlreadyVerified");
+        }
+
+        // var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
+        // if (code != verificationCode)
+        if (code != "12345")
+        {
+            throw new HttpRequestException("CodeIsIncorrectOrHasExpired");
+        }
+
+        var filter = Builders<Models.User>.Filter.Eq(r => r.Id, user.Id);
+        var updates = Builders<Models.User>.Update.Set(v => v.EmailVerifiedAt, DateTime.Now);
+        await _userCollection.UpdateOneAsync(filter, updates);
+
+        // await _cacheProvider.ClearCache($"verify-{user.Id}");
+        return true;
+    }
+
+
+    public async Task<List<Models.User>> GetUsers(
+        FilterQuery<Models.User> queryFilter,
+        GetUsersInput input
+    )
+    {
+        FilterDefinitionBuilder<Models.User> builder = Builders<Models.User>.Filter;
+        var filter = builder.Empty;
+        List<string> filters = ["status", "role", "provider", "name"];
+
+        List<string> filterValues = [input.Status, input.Role, input.Provider, input.Search];
+
+        var regexFilters = filters
+            .Select(
+                (field, index) =>
+                    filterValues[index] != null
+                        ? builder.Regex(field, new BsonRegularExpression(filterValues[index], "i"))
+                        : builder.Empty
+            )
+            .ToList();
+
+        filter = builder.And(regexFilters);
+
+        var users = await _userCollection
+            .Find(filter)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return users ?? [];
+    }
+
+    public async Task<long> CountUsers(GetUsersInput input)
+    {
+        FilterDefinitionBuilder<Models.User> builder = Builders<Models.User>.Filter;
+        var filter = builder.Empty;
+        List<string> filters = ["status", "role", "provider", "name"];
+
+        List<string> filterValues = [input.Status, input.Role, input.Provider, input.Search];
+
+        var regexFilters = filters
+            .Select(
+                (field, index) =>
+                    filterValues[index] != null
+                        ? builder.Regex(field, new BsonRegularExpression(filterValues[index], "i"))
+                        : builder.Empty
+            )
+            .ToList();
+
+        filter = builder.And(regexFilters);
+
+        long usersCount = await _userCollection.CountDocumentsAsync(filter);
+        return usersCount;
     }
 }
-

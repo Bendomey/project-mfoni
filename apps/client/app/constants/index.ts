@@ -6,9 +6,35 @@ export const TWITTER_ACCOUNT_URL = 'https://twitter.com/mfoniapp'
 export const GITHUB_REPO_URL = 'https://github.com/Bendomey/project-mfoni'
 export const MYLES_PUDO_URL = 'https://mylespudo.com'
 
-export const USER_CIPHER = '@mfoni-account'
+export const USER_CIPHER = 'mfoni-account'
 
 export const QUERY_KEYS = {
-  CURRENT_USER: 'current-user',
   TAGS: 'tags',
+  CREATOR_APPLICATIONS: 'creatorApplications',
 } as const
+
+export const MFONI_PACKAGES: Array<PackageType> = ['FREE', 'BASIC', 'ADVANCED']
+
+export const MFONI_PACKAGES_DETAILED: Record<PackageType, {name: string}> = {
+  FREE: {
+    name: 'Snap & Share (Free tier)',
+  },
+  BASIC: {
+    name: 'Pro Lens (Basic Premium Tier)',
+  },
+  ADVANCED: {
+    name: 'Master Shot (Premium Tier)',
+  },
+}
+
+export const PAGES = {
+  LOGIN: '/auth',
+  HOME: '/',
+  EXPLORE: '/explore',
+  PRIVACY_POLICY: '/privacy',
+  TERMS: '/terms',
+  AUTHENTICATED_PAGES: {
+    ONBOARDING: '/auth/onboarding',
+    UPLOAD: '/upload',
+  },
+}

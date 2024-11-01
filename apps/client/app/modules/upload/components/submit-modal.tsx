@@ -94,7 +94,7 @@ export const SubmitModal = ({isOpen, onToggle}: Props) => {
 
                 <div className="flex justify-end gap-3 mt-5">
                   {isSubmitting ? null : (
-                    <Button onClick={onToggle} size="lg" variant="outline">
+                    <Button onClick={onToggle} size="lg" variant="outlined">
                       Close
                     </Button>
                   )}

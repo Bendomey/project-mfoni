@@ -9,6 +9,7 @@ import {SearchPhotosForMobile} from './search-for-mobile/index.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {UserAccountMobileNav, UserAccountNav} from './user-account/index.tsx'
 import useScroll from '@/hooks/use-scroll.ts'
+import {NoticeBanner} from './notice-banner/index.tsx'
 
 const navigation = (isLoggedIn: boolean) => [
   {name: 'Explore', href: '/explore', routeType: 'link'},
@@ -42,6 +43,7 @@ export const Header = ({
           : `${scrolled ? headerBlurred : 'sticky top-0 z-50 bg-white '}`
       }
     >
+      <NoticeBanner />
       <nav
         className="mx-auto flex max-w-8xl items-center justify-between py-4 px-4 lg:px-8"
         aria-label="Global"
@@ -53,7 +55,7 @@ export const Header = ({
             </span>
             <span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
           </div>
-        </Link> 
+        </Link>
         <div className="flex-grow mx-8 hidden md:flex h-11">
           {isHeroSearchInVisible ? null : <SearchPhotos />}
         </div>
@@ -92,7 +94,7 @@ export const Header = ({
           {isLoggedIn ? (
             <UserAccountNav />
           ) : (
-            <Button href="/auth" variant="outline" isLink>
+            <Button href="/auth" variant="outlined" isLink>
               Sign In{' '}
               <span className="pl-1" aria-hidden="true">
                 &rarr;
@@ -165,7 +167,7 @@ export const Header = ({
                 {isLoggedIn ? (
                   <UserAccountMobileNav />
                 ) : (
-                  <Button href="/auth" variant="outline" size="lg" isLink>
+                  <Button href="/auth" variant="outlined" size="lg" isLink>
                     Sign In
                     <span className="pl-1" aria-hidden="true">
                       &rarr;

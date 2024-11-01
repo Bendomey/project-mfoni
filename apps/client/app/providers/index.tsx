@@ -2,10 +2,14 @@ import {type PropsWithChildren} from 'react'
 import {ReactQueryProvider} from './react-query/index.tsx'
 import {AuthProvider} from './auth/index.tsx'
 
-export const Providers = ({children}: PropsWithChildren) => {
+interface Props {
+  authData: User | null
+}
+
+export const Providers = ({children, authData}: PropsWithChildren<Props>) => {
   return (
     <ReactQueryProvider>
-      <AuthProvider>{children}</AuthProvider>
+      <AuthProvider authData={authData}>{children}</AuthProvider>
     </ReactQueryProvider>
   )
 }

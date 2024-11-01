@@ -1,12 +1,15 @@
 import {classNames} from '@/lib/classNames.ts'
 import {CheckIcon} from '@heroicons/react/24/outline'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {formatAmount} from '@/lib/format-amount.ts'
+import {useNavigate} from '@remix-run/react'
+import {Button} from '@/components/button/index.tsx'
 
 const tiers = [
   {
     name: 'Snap & Share',
-    id: 'tier-hobby',
-    href: '/auth?pricing_package=FREE',
-    priceMonthly: '$9.99',
+    id: 'FREE',
+    priceMonthly: 0,
     description:
       "The perfect plan if you're just getting started with our product.",
     features: [
@@ -20,9 +23,8 @@ const tiers = [
   },
   {
     name: 'Pro Lens',
-    id: 'tier-enterprise',
-    href: '/auth?pricing_package=BASIC',
-    priceMonthly: '$39.99',
+    id: 'BASIC',
+    priceMonthly: 50,
     description:
       'Grow your photography business with premium support and exclusive opportunities.',
     features: [
@@ -37,9 +39,8 @@ const tiers = [
   },
   {
     name: 'Master Shot',
-    id: 'tier-hobby',
-    href: '/auth?pricing_package=PREMIUM',
-    priceMonthly: '$19.99',
+    id: 'ADVANCED',
+    priceMonthly: 100,
     description:
       'Elevate your brand and streamline workflow with advanced features.',
     features: [
@@ -57,6 +58,8 @@ const tiers = [
 ]
 
 export const Pricing = () => {
+  const {currentUser} = useAuth()
+  const navigate = useNavigate()
   return (
     <div
       id="pricing"
@@ -82,10 +85,6 @@ export const Pricing = () => {
           The right price for you, whoever you are
         </p>
       </div>
-      <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
-        Qui iusto aut est earum eos quae. Eligendi est at nam aliquid ad quo
-        reprehenderit in aliquid fugiat dolorum voluptatibus.
-      </p>
       <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-flex-start gap-x-5 gap-y-6 sm:mt-20 sm:gap-y-7 lg:max-w-none 2xl:max-w-7xl lg:grid-cols-3">
         {tiers.map((tier, tierIdx) => (
           <div
@@ -118,7 +117,7 @@ export const Pricing = () => {
                   'text-3xl font-bold tracking-tight',
                 )}
               >
-                {tier.priceMonthly}
+                {formatAmount(tier.priceMonthly)}
               </span>
               <span
                 className={classNames(
@@ -138,19 +137,32 @@ export const Pricing = () => {
               {tier.description}
             </p>
 
-            <a
-              href={tier.href}
+            <Button
+              onClick={() => {
+                if (currentUser && currentUser.role == 'CREATOR') {
+                  // TODO: maybe change this to a page when working on change package feature.
+                  navigate(`/account?change-package=${tier.id}`)
+                  return
+                }
+
+                navigate(`/account?complete-creator-application=${tier.id}`)
+              }}
+              disabled={
+                currentUser?.creator?.creatorPackage?.packageType === tier.id
+              }
               aria-describedby={tier.id}
-              className={classNames(
-                tier.featured
-                  ? 'bg-blue-500 text-white shadow-sm hover:bg-blue-400 focus-visible:outline-blue-500'
-                  : 'text-blue-600 ring-1 ring-inset ring-blue-200 hover:ring-blue-300 focus-visible:outline-blue-600',
-                'mt-8 block rounded-md py-2.5 px-3.5 text-center text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
-              )}
+              className="w-full mt-8"
+              variant={tier.featured ? 'solid' : 'outlined'}
             >
-              Get started today
-            </a>
-            
+              {currentUser
+                ? currentUser.role === 'CLIENT'
+                  ? 'Apply'
+                  : currentUser.creator?.creatorPackage?.packageType === tier.id
+                    ? 'Selected'
+                    : 'Apply'
+                : 'Get started today'}
+            </Button>
+
             <ul
               className={classNames(
                 tier.featured ? 'text-gray-300' : 'text-gray-600',
@@ -170,7 +182,6 @@ export const Pricing = () => {
                 </li>
               ))}
             </ul>
-           
           </div>
         ))}
       </div>

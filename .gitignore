@@ -2,6 +2,9 @@
 .env
 
 yarn.lock
+!apps/admin/yarn.lock
 !apps/client/yarn.lock
 !apps/wait-list/yarn.lock
 node_modules
+
+.idea

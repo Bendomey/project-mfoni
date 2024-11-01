@@ -1,5 +1,7 @@
 using System.Net;
 
+namespace main.Lib;
+
 public class StringLib
 {
     public static string Base64Encode(string plainText)

@@ -24,7 +24,7 @@ export const VisualSearch = () => {
         </div>
         <Button
           variant="unstyled"
-          externalClassName="text-xs text-zinc-600 hover:underline"
+          className="text-xs text-zinc-600 hover:underline"
         >
           <span>Need Help?</span>
         </Button>
@@ -50,17 +50,19 @@ export const VisualSearch = () => {
           )}
           {imgSrc ? (
             <Button
+              variant="solid"
               type="button"
               onClick={handleRetake}
-              externalClassName="absolute bottom-0 mt-2 z-30 bg-gray-600 text-white"
+              className="absolute bottom-0 mt-2 z-30 "
             >
               Retake
             </Button>
           ) : (
             <Button
+              variant="solid"
               type="button"
               onClick={handleCapture}
-              externalClassName="absolute bottom-0 mt-2 z-30 bg-blue-600 text-white"
+              className="absolute bottom-0 mt-2 z-30"
             >
               Capture
             </Button>

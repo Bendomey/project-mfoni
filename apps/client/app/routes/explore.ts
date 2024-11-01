@@ -1,4 +1,4 @@
-import {ExploreModule} from '@/modules/explore/index.tsx'
+import {ExploreModule} from '@/modules/index.ts'
 import {type MetaFunction} from '@remix-run/node'
 
 export const meta: MetaFunction = () => {

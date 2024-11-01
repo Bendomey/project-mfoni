@@ -1,13 +1,12 @@
 import {initiateTwitterAuth, useAuthenticate} from '@/api/auth/index.ts'
 import {Button} from '@/components/button/index.tsx'
-import {QUERY_KEYS, TWITTER_BASE_URL} from '@/constants/index.ts'
+import {TWITTER_BASE_URL} from '@/constants/index.ts'
 import {useSearchParams, useLocation, useNavigate} from '@remix-run/react'
 import {useCallback, useEffect} from 'react'
 import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useLoginAuth} from '../context/index.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
-import {useQueryClient} from '@tanstack/react-query'
 
 export const TwitterButton = () => {
   const {mutate} = useAuthenticate()
@@ -16,7 +15,6 @@ export const TwitterButton = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [params] = useSearchParams()
-  const queryClient = useQueryClient()
 
   const checkForTwitterResponse = useCallback(() => {
     const oAuthToken = params.get('oauth_token')
@@ -48,16 +46,15 @@ export const TwitterButton = () => {
           onSuccess: successRes => {
             if (successRes) {
               onSignin(successRes)
-              queryClient.setQueryData(
-                [QUERY_KEYS.CURRENT_USER],
-                successRes.user,
-              )
 
-              if (successRes.user.accountSetupAt) {
-                navigate('/')
+              const returnTo = params.get('return_to')
+              if (successRes.user.role) {
+                navigate(returnTo ?? '/')
                 toast.success(`Welcome ${successRes.user.name}`)
               } else {
-                navigate('/auth/onboarding')
+                navigate(
+                  `/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''}`,
+                )
                 toast.success('Setup account')
               }
             }
@@ -74,7 +71,6 @@ export const TwitterButton = () => {
     navigate,
     onSignin,
     params,
-    queryClient,
     setErrorMessage,
     setIsLoading,
   ])
@@ -104,8 +100,7 @@ export const TwitterButton = () => {
   return (
     <Button
       onClick={initiateLogin}
-      variant="unstyled"
-      externalClassName="flex w-full items-center justify-center gap-3 rounded-md bg-[#1D9BF0] px-3 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
+      className="justify-center bg-[#1D9BF0] hover:bg-[#1D9BF0]/80 px-3 py-2 "
     >
       <svg
         className="h-5 w-5"
