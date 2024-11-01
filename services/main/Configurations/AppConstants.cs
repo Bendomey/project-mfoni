@@ -28,5 +28,5 @@ public class AppConstants
     public string SmsAppSecret { get; set; } = null!;
     public string ResendApiKey { get; set; } = null!;
     public string EmailFrom { get; init; } = "Mfoni Notifications <noreply@notifications.mfoni.app>";
-
+    public string RegisterSwaggerDocs { get; set; } = null!;
 }

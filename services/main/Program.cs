@@ -163,11 +163,12 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsProduction())
+if (builder.Configuration["AppConstants:RegisterSwaggerDocs"] == "true")
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 // app.UseHttpsRedirection();
 
