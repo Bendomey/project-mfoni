@@ -24,7 +24,6 @@ public class AdminController : ControllerBase
 
     private readonly SearchAdmin _searchAdminService;
     private readonly CreatorApplicationService _creatorApplicationService;
-    private readonly UserService _userService;
     private readonly AdminTransformer _adminTransformer;
     private readonly UserTransformer _userTransformer;
     private readonly CreatorApplicationTransformer _creatorApplicationTransformer;
@@ -46,7 +45,6 @@ public class AdminController : ControllerBase
         this._adminService = adminService;
         this._searchAdminService = searchAdminService;
         this._creatorApplicationService = creatorApplicationService;
-        this._userService = userService;
         this._adminTransformer = adminTransformer;
         this._userTransformer = userTransformer;
         this._creatorApplicationTransformer = creatorApplicationTransformer;
@@ -265,161 +263,4 @@ public class AdminController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Retrieves all users on the platform
-    /// </summary>
-    /// <param name="status">Can be `ACTIVE` or `SUSPENDED`</param>
-    /// <param name="role">Can be `CLIENT` or `CREATOR`</param>
-    /// <param name="provider">Can be `FACEBOOK` or `TWITTER` or `GOOGLE` </param>
-    /// <param name="search">Search by name</param>
-    /// <param name="page">The page to be navigated to</param>
-    /// <param name="pageSize">The number of items on a page</param>
-    /// <param name="sort">To sort response data either by `asc` or `desc`</param>
-    /// <param name="sortBy">What field to sort by.</param>
-    /// <response code="200">Users Retrieved Successfully</response>
-    /// <response code="500">An unexpected error occured</response>
-    [Authorize(Policy = "Admin")]
-    [HttpGet("users")]
-    [ProducesResponseType(
-        StatusCodes.Status200OK,
-        Type = typeof(ApiEntityResponse<EntityWithPagination<OutputUser>>)
-    )]
-    [ProducesResponseType(
-        StatusCodes.Status500InternalServerError,
-        Type = typeof(StatusCodeResult)
-    )]
-    public async Task<IActionResult> GetUsersByAdmin(
-        [FromQuery] string? status,
-        [FromQuery] string? role,
-        [FromQuery] string? provider,
-        [FromQuery] string? search,
-        [FromQuery] int? page,
-        [FromQuery] int? pageSize,
-        [FromQuery] string? sort,
-        [FromQuery] string sortBy = "created_at"
-    )
-    {
-        try
-        {
-            logger.LogInformation("Getting all users by admins");
-            var queryFilter = HttpLib.GenerateFilterQuery<User>(page, pageSize, sort, sortBy);
-            var input = new GetUsersInput
-            {
-                Role = role,
-                Status = status,
-                Provider = provider,
-                Search = search
-            };
-            var users = await _userService.GetUsers(queryFilter, input);
-            long count = await _userService.CountUsers(input);
-
-            var outUser = users.ConvertAll<OutputUser>(
-                new Converter<User, OutputUser>(user => _userTransformer.Transform(user))
-            );
-            var response = HttpLib.GeneratePagination<OutputUser, User>(
-                outUser,
-                count,
-                queryFilter
-            );
-
-            return new ObjectResult(
-                new GetEntityResponse<EntityWithPagination<OutputUser>>(response, null).Result()
-            )
-            {
-                StatusCode = (int)HttpStatusCode.OK
-            };
-        }
-        catch (HttpRequestException e)
-        {
-            var statusCode = e.StatusCode ?? HttpStatusCode.BadRequest;
-            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result())
-            {
-                StatusCode = (int)statusCode
-            };
-        }
-        catch (Exception e)
-        {
-            logger.LogError($"An error occured {e}");
-            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-        }
-    }
-
-    /// <summary>
-    /// Retrieves all creator applications on the platform
-    /// </summary>
-    /// <param name="status">Can be `PENDING`, `SUBMITTED`, `REJECTED` or `APPROVED` </param>
-    /// <param name="page">The page to be navigated to</param>
-    /// <param name="pageSize">The number of items on a page</param>
-    /// <param name="sort">To sort response data either by `asc` or `desc`</param>
-    /// <param name="sortBy">What field to sort by.</param>
-    /// <response code="200">Creator Applications Retrieved Successfully</response>
-    /// <response code="500">An unexpected error occured</response>
-    [Authorize(Policy = "Admin")]
-    [HttpGet("creator-applications")]
-    [ProducesResponseType(
-        StatusCodes.Status200OK,
-        Type = typeof(ApiEntityResponse<EntityWithPagination<OutputCreatorApplication>>)
-    )]
-    [ProducesResponseType(
-        StatusCodes.Status500InternalServerError,
-        Type = typeof(StatusCodeResult)
-    )]
-    public async Task<IActionResult> GetCreatorsByAdmin(
-        [FromQuery] string? status,
-        [FromQuery] int? page,
-        [FromQuery] int? pageSize,
-        [FromQuery] string? sort,
-        [FromQuery] string sortBy = "created_at"
-    )
-    {
-        try
-        {
-            logger.LogInformation("Getting all creator applications by admin");
-            var queryFilter = HttpLib.GenerateFilterQuery<CreatorApplication>(
-                page,
-                pageSize,
-                sort,
-                sortBy
-            );
-            var creatorApplications = await _creatorApplicationService.GetCreatorApplications(
-                queryFilter,
-                status
-            );
-
-            long count = await _creatorApplicationService.CountCreatorApplications(status);
-
-            var outCreatorApplications = creatorApplications.ConvertAll<OutputCreatorApplication>(
-                new Converter<CreatorApplication, OutputCreatorApplication>(creatorApplication =>
-                    _creatorApplicationTransformer.Transform(creatorApplication)
-                )
-            );
-            var response = HttpLib.GeneratePagination<OutputCreatorApplication, CreatorApplication>(
-                outCreatorApplications,
-                count,
-                queryFilter
-            );
-            return new ObjectResult(
-                new GetEntityResponse<EntityWithPagination<OutputCreatorApplication>>(
-                    response,
-                    null
-                ).Result()
-            )
-            {
-                StatusCode = (int)HttpStatusCode.OK
-            };
-        }
-        catch (HttpRequestException e)
-        {
-            var statusCode = e.StatusCode ?? HttpStatusCode.BadRequest;
-            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result())
-            {
-                StatusCode = (int)statusCode
-            };
-        }
-        catch (Exception e)
-        {
-            logger.LogError($"An error occured {e}");
-            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-        }
-    }
 }
