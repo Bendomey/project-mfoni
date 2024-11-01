@@ -34,14 +34,12 @@ export const ApproveApplicationModal = ({
       setOpened(false);
       toast({
         title: "Application approved",
-        description: "Application successfully approved",
         variant: "success",
         duration: 5000,
       });
     } else {
       toast({
         title: "Error approving application",
-        description: "There was a problem with your request.",
         variant: "destructive",
         duration: 5000,
       });
