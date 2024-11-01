@@ -212,14 +212,23 @@ public class CreatorApplicationService
             .Set(r => r.ApprovedById, adminId)
             .Set(r => r.UpdatedAt, DateTime.UtcNow);
         await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
+
+        var user = await _userCollection.Find(user => user.Id == creatorApplication.UserId).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            throw new HttpRequestException("UserNotFound");
+        }
+
         var creator = new Creator
         {
             CreatorApplicationId = creatorApplication.Id,
             UserId = creatorApplication.UserId,
+            Username = $"{user.Name.ToLower().Replace(" ", "")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 5)}",
         };
 
         await _creatorCollection.InsertOneAsync(creator);
 
+        // this check should always be true. 
         if (creatorApplication.IntendedPricingPackage is not null)
         {
             // TODO: Come back and think through this bit.
@@ -238,12 +247,6 @@ public class CreatorApplicationService
             throw new HttpRequestException("PackageTypeNotSet");
         }
 
-
-        var user = await _userCollection.Find(user => user.Id == creatorApplication.UserId).FirstOrDefaultAsync();
-        if (user is null)
-        {
-            throw new HttpRequestException("UserNotFound");
-        }
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
         {
             var _ = SmsConfiguration.SendSms(new SendSmsInput

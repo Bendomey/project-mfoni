@@ -13,6 +13,20 @@ export const QUERY_KEYS = {
   CREATOR_APPLICATIONS: 'creatorApplications',
 } as const
 
+export const MFONI_PACKAGES: Array<PackageType> = ['FREE', 'BASIC', 'ADVANCED']
+
+export const MFONI_PACKAGES_DETAILED: Record<PackageType, {name: string}> = {
+  FREE: {
+    name: 'Snap & Share (Free tier)',
+  },
+  BASIC: {
+    name: 'Pro Lens (Basic Premium Tier)',
+  },
+  ADVANCED: {
+    name: 'Master Shot (Premium Tier)',
+  },
+}
+
 export const PAGES = {
   LOGIN: '/auth',
   HOME: '/',

@@ -1,4 +1,5 @@
 import {Link} from '@remix-run/react'
+import {MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
 
 interface Props {
   mfoniPackage: string
@@ -29,11 +30,11 @@ export function SelectPackage({mfoniPackage, setMfoniPackage}: Props) {
             className="mt-2 block w-full rounded-md border-0 py-3 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
           >
             <option value="">Please Select</option>
-            <option value="FREE">Snap & Share (Free Tier)</option>
-            <option value="BASIC">Pro Lens (Basic Premium Tier)</option>
-            <option value="ADVANCED">
-              Master Shot (Advanced Premium Tier)
-            </option>
+            {Object.entries(MFONI_PACKAGES_DETAILED).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value.name}
+              </option>
+            ))}
           </select>
           <p className="text-xs text-gray-600 mt-1">
             <span className="font-bold">Note:</span> You can always change your

@@ -1,7 +1,9 @@
 import Confetti from 'react-confetti'
 import {Button} from '@/components/button/index.tsx'
+import {useSearchParams} from '@remix-run/react'
 
 export const WelcomeStep = () => {
+  const [searchParams] = useSearchParams()
   return (
     <>
       {/** @ts-expect-error - Confetti default export errors. */}
@@ -16,7 +18,7 @@ export const WelcomeStep = () => {
       </p>
 
       <div className="mt-5">
-        <Button isLink href="/" size="lg">
+        <Button isLink href={searchParams.get('return_to') ?? '/'} size="lg">
           Explore App
         </Button>
       </div>

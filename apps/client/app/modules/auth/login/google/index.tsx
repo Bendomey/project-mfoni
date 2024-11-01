@@ -8,7 +8,6 @@ import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {toast} from 'react-hot-toast'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useEnvContext} from '@/providers/env/index.tsx'
-import {getFullUrlPath} from '@/lib/url-helpers.ts'
 
 declare global {
   interface Window {
@@ -56,9 +55,7 @@ export const GoogleButton = () => {
                 } else {
                   navigate(
                     `/auth/onboarding${
-                      returnTo
-                        ? `?return_to=${getFullUrlPath(new URL(returnTo))}`
-                        : ''
+                      returnTo ? `?return_to=${returnTo}` : ''
                     }`,
                   )
                   toast.success('Setup account')

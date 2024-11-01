@@ -16,6 +16,7 @@ interface AuthContextProps {
   onUpdateUser: (user: User) => void
   onSignin: (input: {user: User; token: string}) => void
   onSignout: () => void
+  isNotVerified: boolean
 }
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -26,6 +27,7 @@ export const AuthContext = createContext<AuthContextProps>({
   getToken: () => null,
   currentUser: null,
   onUpdateUser: () => {},
+  isNotVerified: false,
 })
 
 interface Props {
@@ -66,6 +68,8 @@ export const AuthProvider = ({
         isLoading: false,
         currentUser,
         isLoggedIn: Boolean(authCipher),
+        isNotVerified:
+          !currentUser?.phoneNumberVerifiedAt || !currentUser.emailVerifiedAt,
       }}
     >
       {children}
