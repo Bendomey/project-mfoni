@@ -1,6 +1,6 @@
 "use client"
 import { ColumnDef } from "@tanstack/react-table";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { DataTable } from "@/components/table";
 import { ArrowUpDown, ChevronsUpDownIcon, CreditCardIcon, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { ApproveApplicationModal } from "./approve";
 
 interface ApplicationProps {
   data: Application[];
@@ -29,6 +30,9 @@ export const Application = ({
   error,
   refetch,
 }: ApplicationProps) => {
+  const [openApproveModal, setOpenApproveModal] = useState(false)
+  const [selectedApplication, setSelectedApplication] = useState<Application>()
+
 
   const columns = useMemo((): ColumnDef<Application>[] => {
     return [
@@ -113,7 +117,10 @@ export const Application = ({
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
                 <DropdownMenuItem><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
-                <DropdownMenuItem><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
+                <DropdownMenuItem  onClick={() => {
+                      setSelectedApplication(row.original)
+                      setOpenApproveModal(true)
+                    }}><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
                 <DropdownMenuItem><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -145,6 +152,8 @@ export const Application = ({
           refetch={refetch}
         />
       </div>
+      <ApproveApplicationModal opened={openApproveModal} setOpened={setOpenApproveModal} data={selectedApplication} refetch={refetch}/>
+
     </>
   );
 };

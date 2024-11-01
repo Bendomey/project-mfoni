@@ -1,5 +1,7 @@
+const isDataLoading = false; 
+const error = null;
 // Dummy data for simulating fetching state
-export const useApplicationQuery = () => {const isDataLoading = false; const error = null;
+export const useApplicationQuery = () => {
    const createdAtData = new Date()
    const updatedAtData = `${new Date().toLocaleString("en-GB", {hour12: true,day: "2-digit",month: "2-digit",year: "numeric",hour: "2-digit",minute: "2-digit",})}`
     // return dummy data to simulate the data returned by a query
@@ -64,3 +66,14 @@ export const useApplicationQuery = () => {const isDataLoading = false; const err
   
     return { isDataLoading, error, data };
   };
+
+
+export const useApproveApplication = () => {
+
+let status = 200
+  const mutate = async (id: string) => {
+      status =  200; // Mock response
+  };
+
+  return { mutate, isDataLoading, status, error };
+};
