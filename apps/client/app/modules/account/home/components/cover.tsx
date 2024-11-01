@@ -1,5 +1,4 @@
 import {
-  MapPinIcon,
   ShareIcon,
   UserIcon,
   CheckIcon,
@@ -11,6 +10,7 @@ import {useValidateImage} from '@/hooks/use-validate-image.tsx'
 import {useAccountContext} from '../context/index.tsx'
 import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
 import {classNames} from '@/lib/classNames.ts'
+import {MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
 
 export const profile = {
   name: 'Ricardo Cooper',
@@ -143,20 +143,19 @@ export const AccountCover = () => {
               ) : null}
             </div>
             <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-8">
-              <div className="mt-2 flex items-center text-sm text-gray-500">
-                <ArchiveBoxIcon
-                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                Snap & Share (Free Tier)
-              </div>
-              <div className="mt-2 flex items-center text-sm text-gray-500">
-                <MapPinIcon
-                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                East Legon, Accra - Ghana
-              </div>
+              {currentUser?.creator?.creatorPackage?.packageType ? (
+                <div className="mt-2 flex items-center text-sm text-gray-500">
+                  <ArchiveBoxIcon
+                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  {
+                    MFONI_PACKAGES_DETAILED[
+                      currentUser.creator.creatorPackage.packageType
+                    ].name
+                  }
+                </div>
+              ) : null}
             </div>
             {activeCreatorApplication &&
             ['SUBMITTED', 'REJECTED'].includes(

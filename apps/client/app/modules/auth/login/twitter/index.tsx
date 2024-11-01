@@ -7,7 +7,6 @@ import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useLoginAuth} from '../context/index.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
-import {getFullUrlPath} from '@/lib/url-helpers.ts'
 
 export const TwitterButton = () => {
   const {mutate} = useAuthenticate()
@@ -54,11 +53,7 @@ export const TwitterButton = () => {
                 toast.success(`Welcome ${successRes.user.name}`)
               } else {
                 navigate(
-                  `/auth/onboarding${
-                    returnTo
-                      ? `?return_to=${getFullUrlPath(new URL(returnTo))}`
-                      : ''
-                  }`,
+                  `/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''}`,
                 )
                 toast.success('Setup account')
               }

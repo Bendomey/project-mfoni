@@ -12,7 +12,7 @@ const getNameInitials = (name: string) =>
     .join('')
 
 export const UserAccountNav = () => {
-  const {currentUser} = useAuth()
+  const {currentUser, onSignout} = useAuth()
   const isProfilePhotoValid = useValidateImage(currentUser?.photo ?? '')
   const initials = getNameInitials(currentUser?.name ?? '')
 
@@ -69,6 +69,7 @@ export const UserAccountNav = () => {
               <button
                 type="button"
                 onClick={() => {
+                  onSignout()
                   window.location.href = '/auth'
                 }}
                 className={classNames(

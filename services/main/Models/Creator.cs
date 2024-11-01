@@ -27,7 +27,7 @@ public class Creator
     public required string UserId { get; init; }
 
     [BsonElement("username")]
-    public string? Username { get; set; }
+    public required string Username { get; set; }
 
     [BsonElement("social_media")]
     public SocialMedia[] SocialMedia { get; set; } = [];

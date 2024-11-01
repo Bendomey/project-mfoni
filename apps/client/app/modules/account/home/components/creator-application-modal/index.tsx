@@ -4,11 +4,12 @@ import {
   ArrowRightIcon,
   CheckIcon,
   ChevronLeftIcon,
+  DocumentMagnifyingGlassIcon,
 } from '@heroicons/react/24/outline'
-import {useSearchParams} from '@remix-run/react'
+import {Link, useSearchParams} from '@remix-run/react'
 import {SelectPackage} from './steps/select-package.tsx'
 import {UploadDocuments} from './steps/upload-documents/index.tsx'
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {ReactElement, useCallback, useEffect, useMemo, useState} from 'react'
 import {
   useCreateCreatorApplication,
   useSubmitCreatorApplication,
@@ -18,6 +19,10 @@ import {useAccountContext} from '@/modules/account/home/context/index.tsx'
 import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {Loader} from '@/components/loader/index.tsx'
+import creatorSvg from '@/assets/creator-svg.png'
+import {MFONI_PACKAGES} from '@/constants/index.ts'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
 
 interface Props {
   isOpened: boolean
@@ -34,6 +39,7 @@ export interface IImageType {
 }
 
 export function CreatorApplicationModal({isOpened}: Props) {
+  const {isNotVerified} = useAuth()
   const {activeCreatorApplication} = useAccountContext()
   const {
     mutateAsync: creatorCreatorApplication,
@@ -56,7 +62,11 @@ export function CreatorApplicationModal({isOpened}: Props) {
   const [backId, setBackId] = useState<IImageType>()
 
   useEffect(() => {
-    if (activeCreatorApplication) {
+    // when an active application is rejected, we'd want the user to create a new application with fresh information.
+    if (
+      activeCreatorApplication &&
+      activeCreatorApplication.status !== 'REJECTED'
+    ) {
       if (activeCreatorApplication.intendedPricingPackage) {
         setMfoniPackage(activeCreatorApplication.intendedPricingPackage)
         setStep('document')
@@ -79,7 +89,16 @@ export function CreatorApplicationModal({isOpened}: Props) {
           : undefined,
       )
     }
-  }, [activeCreatorApplication])
+
+    const packageFromUrl = searchParams.get('complete-creator-application')
+    if (
+      packageFromUrl &&
+      (MFONI_PACKAGES as Array<string>).includes(packageFromUrl)
+    ) {
+      setMfoniPackage(packageFromUrl)
+      setStep('document')
+    }
+  }, [activeCreatorApplication, searchParams])
 
   const onClose = useCallback(() => {
     searchParams.delete('complete-creator-application')
@@ -106,7 +125,10 @@ export function CreatorApplicationModal({isOpened}: Props) {
         return
       }
       let creatorApplicationId: string | undefined
-      if (activeCreatorApplication) {
+      if (
+        activeCreatorApplication &&
+        activeCreatorApplication.status !== 'REJECTED'
+      ) {
         creatorApplicationId = activeCreatorApplication.id
         await updateCreatorApplication({
           id: creatorApplicationId,
@@ -154,6 +176,144 @@ export function CreatorApplicationModal({isOpened}: Props) {
     updateCreatorApplication,
   ])
 
+  const isAlreadyAppliedOrApproved = activeCreatorApplication
+    ? ['SUBMITTED', 'APPROVED'].includes(activeCreatorApplication.status)
+    : false
+
+  let content: ReactElement
+
+  if (isNotVerified) {
+    content = (
+      <div className="flex flex-col items-center justify-center text-center pt-10 py-14 px-10 md:px-0">
+        <ExclamationTriangleIcon className="h-10 w-auto mb-1 text-yellow-400" />
+
+        <h1 className="font-bold text-lg">User not verified</h1>
+        <p className="mt-1 text-sm">
+          You can continue this application after verifying your account
+        </p>
+        <div className="flex flex-row items-center gap-2">
+          <Button asChild={true} className="mt-5 ">
+            <Link
+              to={`/account/verify?return_to=/account?complete-creator-application=${
+                searchParams.get('complete-creator-application') ?? 'true'
+              }`}
+            >
+              Verify Now
+            </Link>
+          </Button>
+          <Button variant="outlined" onClick={onClose} className="mt-5">
+            Close
+          </Button>
+        </div>
+      </div>
+    )
+  } else if (isAlreadyAppliedOrApproved) {
+    content = (
+      <div className="flex flex-col items-center justify-center text-center pt-10 py-14 px-10 md:px-0">
+        {activeCreatorApplication &&
+        activeCreatorApplication.status == 'APPROVED' ? (
+          <>
+            <img src={creatorSvg} className="h-20 w-auto mb-2" alt="" />
+            <h1 className="font-bold text-lg">You are a creator!</h1>
+            <p className="mt-1 text-sm">
+              You can always change your package you&apos;re on{' '}
+              <a href="/#pricing" className="text-blue-600">
+                here
+              </a>
+              .
+            </p>
+          </>
+        ) : (
+          <>
+            <DocumentMagnifyingGlassIcon className="h-10 w-auto mb-5" />
+            <h1 className="font-bold text-lg">
+              You already have an application in review.
+            </h1>
+            <p className="mt-1 text-sm">
+              Kindly wait for a response from support.
+            </p>
+          </>
+        )}
+        <Button onClick={onClose} className="mt-5 w-3/12">
+          Close
+        </Button>
+      </div>
+    )
+  } else {
+    content = (
+      <>
+        <div className="m-4">
+          {step === 'package' ? (
+            <SelectPackage
+              mfoniPackage={mfoniPackage}
+              setMfoniPackage={setMfoniPackage}
+            />
+          ) : (
+            <>
+              <div className="flex flex-row items-center mb-2">
+                <Button
+                  onClick={() => setStep('package')}
+                  variant="unstyled"
+                  className="font-bold text-sm"
+                >
+                  <ChevronLeftIcon className="h-4 w-4 mr-1" /> Back
+                </Button>
+              </div>
+              <UploadDocuments
+                idType={idType}
+                setIdType={setIdType}
+                frontId={frontId}
+                setFrontId={setFrontId}
+                backId={backId}
+                setBackId={setBackId}
+              />
+            </>
+          )}
+        </div>
+        <div className="mt-4 p-4 flex justify-end border-t gap-2">
+          <Button
+            variant="solid"
+            type="button"
+            color="secondaryGhost"
+            onClick={onClose}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          {step === 'package' ? (
+            <Button
+              variant="solid"
+              type="button"
+              disabled={isNextButtonDisabled}
+              onClick={() => setStep('document')}
+            >
+              Next <ArrowRightIcon className="ml-1 h-3 w-3" />
+            </Button>
+          ) : (
+            <Button
+              variant="solid"
+              type="button"
+              color="success"
+              disabled={isCompleteButtonDisabled}
+              onClick={handleSubmit}
+            >
+              {isLoading ? (
+                <>
+                  <Loader size="5" color="fill-white" />{' '}
+                  <span className="ml-2">Submitting</span>
+                </>
+              ) : (
+                <>
+                  Complete <CheckIcon className="ml-1 h-3 w-3" />
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </>
+    )
+  }
+
   return (
     <Modal
       className="w-full md:w-4/6 lg:w-3/6 p-0 relative"
@@ -164,74 +324,7 @@ export function CreatorApplicationModal({isOpened}: Props) {
       <div className="flex flex-row items-center justify-between bg-gray-100 p-4 text-gray-600">
         <h1 className="font-bold ">Creator Application</h1>
       </div>
-      <div className="m-4">
-        {step === 'package' ? (
-          <SelectPackage
-            mfoniPackage={mfoniPackage}
-            setMfoniPackage={setMfoniPackage}
-          />
-        ) : (
-          <>
-            <div className="flex flex-row items-center mb-2">
-              <Button
-                onClick={() => setStep('package')}
-                variant="unstyled"
-                className="font-bold text-sm"
-              >
-                <ChevronLeftIcon className="h-4 w-4 mr-1" /> Back
-              </Button>
-            </div>
-            <UploadDocuments
-              idType={idType}
-              setIdType={setIdType}
-              frontId={frontId}
-              setFrontId={setFrontId}
-              backId={backId}
-              setBackId={setBackId}
-            />
-          </>
-        )}
-      </div>
-      <div className="mt-4 p-4 flex justify-end border-t gap-2">
-        <Button
-          variant="solid"
-          type="button"
-          color="secondaryGhost"
-          onClick={onClose}
-          disabled={isLoading}
-        >
-          Cancel
-        </Button>
-        {step === 'package' ? (
-          <Button
-            variant="solid"
-            type="button"
-            disabled={isNextButtonDisabled}
-            onClick={() => setStep('document')}
-          >
-            Next <ArrowRightIcon className="ml-1 h-3 w-3" />
-          </Button>
-        ) : (
-          <Button
-            variant="solid"
-            type="button"
-            color="success"
-            disabled={isCompleteButtonDisabled}
-            onClick={handleSubmit}
-          >
-            {isLoading ? (
-              <>
-                <Loader size="5" color="fill-white" />{' '}
-                <span className="ml-2">Submitting</span>
-              </>
-            ) : (
-              <>
-                Complete <CheckIcon className="ml-1 h-3 w-3" />
-              </>
-            )}
-          </Button>
-        )}
-      </div>
+      {content}
     </Modal>
   )
 }

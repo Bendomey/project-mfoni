@@ -34,7 +34,10 @@ export const AccountProvider = ({children}: PropsWithChildren<Props>) => {
   })
 
   useEffect(() => {
-    if (searchParams.get('complete-creator-application')) {
+    const completeCreatorApplication = searchParams.get(
+      'complete-creator-application',
+    )
+    if (completeCreatorApplication && completeCreatorApplication !== 'false') {
       onOpenCreatorApplicationModal()
     } else {
       onCloseCreatorApplicationModal()

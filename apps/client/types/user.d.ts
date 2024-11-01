@@ -1,36 +1,17 @@
 type UserRole = 'CLIENT' | 'CREATOR'
+type UserStatus = 'ACTIVE' | 'SUSPENDED'
 
 interface User {
   id: string
-  role: UserRole | null
-  provider: 'GOOGLE' | 'TWITTER' | 'FACEBOOK'
+  role: Nullable<UserRole>
+  status: UserStatus
   name: string
-  oAuthId: string
   email: Nullable<string>
   emailVerifiedAt: Nullable<Date>
   phoneNumber: Nullable<string>
   phoneNumberVerifiedAt: Nullable<Date>
-  username: Nullable<string>
   photo: Nullable<string>
-  creatorApplicationId: Nullable<string>
-  creatorApplication: Nullable<CreatorApplication>
+  creator: Nullable<Creator>
   createdAt: Date
-  updatedAt: Date
-}
-
-interface CreatorApplication {
-  id: string
-  userId: string
-  status: 'PENDING' | 'SUBMITTED' | 'APPROVED' | 'REJECTED'
-  submittedAt: Nullable<Date>
-  approvedAt: Nullable<Date>
-  rejectedAt: Nullable<Date>
-  rejectedReason: Nullable<string>
-  intendedPricingPackage: Nullable<'FREE' | 'BASIC' | 'ADVANCED'>
-  idType: Nullable<'DRIVERS_LICENSE' | 'NATIONAL_ID' | 'VOTERS'>
-  idFrontImage: Nullable<string>
-  idBackImage: Nullable<string>
-  createdAt: Date
-  createdBy: string
   updatedAt: Date
 }
