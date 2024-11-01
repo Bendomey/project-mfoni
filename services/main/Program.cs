@@ -163,12 +163,12 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-// TODO: bring this back when we go to production.
-// if (!app.Environment.IsProduction())
-// {
-//     app.UseSwagger();
-//     app.UseSwaggerUI();
-// }
+if (builder.Configuration["AppConstants:RegisterSwaggerDocs"] == "true")
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 
 // app.UseHttpsRedirection();
 
