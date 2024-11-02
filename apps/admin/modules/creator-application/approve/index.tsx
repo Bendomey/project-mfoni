@@ -13,7 +13,7 @@ import { useApproveApplication } from "@/TestData";
 import { useToast } from "@/hooks/use-toast";
 
 interface AcceptApplicationModalProps {
-  data?: Application;
+  data?: CreatorApplication;
   refetch?: VoidFunction;
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;

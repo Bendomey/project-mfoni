@@ -18,7 +18,7 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ApproveApplicationModal } from "./approve";
 
 interface ApplicationProps {
-  data: Application[];
+  data: CreatorApplication[];
   isDataLoading?: boolean;
   error?: Error | null;
   refetch?: VoidFunction;
@@ -31,10 +31,10 @@ export const Application = ({
   refetch,
 }: ApplicationProps) => {
   const [openApproveModal, setOpenApproveModal] = useState(false)
-  const [selectedApplication, setSelectedApplication] = useState<Application>()
+  const [selectedApplication, setSelectedApplication] = useState<CreatorApplication>()
 
 
-  const columns = useMemo((): ColumnDef<Application>[] => {
+  const columns = useMemo((): ColumnDef<CreatorApplication>[] => {
     return [
       {
         accessorKey: "name",
