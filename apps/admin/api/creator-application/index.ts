@@ -3,7 +3,7 @@
  */
 
 import {useMutation, useQuery} from '@tanstack/react-query'
-// import {fetchClient, getQueryParams} from '@/lib'
+import {fetchClient, getQueryParams} from '@/lib'
 import {QUERY_KEYS} from '@/constants/misc'
 
 /**
@@ -25,7 +25,7 @@ const getCreatorApplications = async (
       `/v1/creator-applications?${params.toString()}`,
     )
 
-    return response.parsedBody.data
+    return response.parsedBody
   } catch (error) {
     if (error instanceof Error) {
       throw error
