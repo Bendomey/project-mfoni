@@ -51,8 +51,7 @@ export function LoginModule() {
           if (redirectTo) {
             document.location = redirectTo as string
           } else {
-            // document.location = '/'
-            document.location = ROUTES.DASHBOARD
+            document.location = ROUTES.DASHBOARD as string
           }
         }
       },
@@ -84,7 +83,7 @@ export function LoginModule() {
 
         <div className="p-5">
           <Form  {...form}>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
 
             <FormField
           control={form.control}
@@ -93,7 +92,7 @@ export function LoginModule() {
             <FormItem>
               <FormLabel htmlFor="email" className="text-lg text-gray-700 dark:text-gray-300 font-medium">Email</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your email" {...field} className="text-gray-800"/>
+                <Input placeholder="Enter your email" {...field} className="text-gray-800 dark:text-gray-200"/>
               </FormControl>
               <FormMessage />
             </FormItem>

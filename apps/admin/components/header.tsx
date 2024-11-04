@@ -13,6 +13,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { usePathname } from "next/navigation";
+import { ModeToggle } from "./ModeToggle";
 
 
 const links = [
@@ -69,7 +70,8 @@ export function Header() {
                    
                 </div>
             </div>
-            <div>
+            <div className="flex flex-row justify-between items-center space-x-4">
+                <div>
                 <DropdownMenu>
                     <DropdownMenuTrigger>
                         <Avatar>
@@ -85,7 +87,10 @@ export function Header() {
                         <DropdownMenuItem>Subscription</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-
+                </div>
+                <div>
+                    <ModeToggle />
+                </div>
             </div>
         </div>
     );

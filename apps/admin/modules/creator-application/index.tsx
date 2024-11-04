@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ApproveApplicationModal } from "./approve";
+import { RejectApplicationModal } from "./reject";
 
 interface ApplicationProps {
   data: CreatorApplication[];
@@ -31,6 +32,7 @@ export const Application = ({
   refetch,
 }: ApplicationProps) => {
   const [openApproveModal, setOpenApproveModal] = useState(false)
+  const [openRejectModal, setOpenRejectModal] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<CreatorApplication>()
 
 
@@ -121,7 +123,10 @@ export const Application = ({
                       setSelectedApplication(row.original)
                       setOpenApproveModal(true)
                     }}><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
-                <DropdownMenuItem><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                      setSelectedApplication(row.original)
+                      setOpenRejectModal(true)
+                    }}><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>             
               </DropdownMenuContent>
             </DropdownMenu>
           )
@@ -153,7 +158,7 @@ export const Application = ({
         />
       </div>
       <ApproveApplicationModal opened={openApproveModal} setOpened={setOpenApproveModal} data={selectedApplication} refetch={refetch}/>
-
+      <RejectApplicationModal opened={openRejectModal} setOpened={setOpenRejectModal} data={selectedApplication} refetch={refetch}/>
     </>
   );
 };

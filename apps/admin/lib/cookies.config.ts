@@ -3,9 +3,9 @@ import Cookies from 'js-cookie'
 class Auth {
   getCipher(key: string) {
     try {
-      let token = Cookies.get(key)
+      const token = Cookies.get(key)
       return token != undefined ? JSON.parse(token) : null
-    } catch (error) {}
+    } catch (_) {}
   }
 
   setCipher<T>(key: string, data: T) {
