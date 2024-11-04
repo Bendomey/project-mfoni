@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -9,23 +8,65 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Label } from "@/components/ui/label"
+import { useLogin } from "@/api"
+import { useToast } from "@/hooks/use-toast"
+import { useSearchParams } from "next/navigation"
+import { ROUTES } from "@/constants/pages"
+import { useCurrentUser } from "@/providers/auth"
+import { useEffect } from "react"
+
+const formSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+})
+
+type LoginFormProps = z.infer<typeof formSchema>
 
 export function LoginModule() {
+  const {mutate, isPending: isLoading} = useLogin()
+  const { signIn, signOut } = useCurrentUser()
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
 
-  const formSchema = z.object({
-    email: z.string().min(2, {
-      message: "Username must be at least 2 characters.",
-    }),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-  })
+  const redirectTo = searchParams.get('redirect_to');
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<LoginFormProps>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   })
+
+  useEffect(() => {
+    signOut();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSubmit = (values: LoginFormProps) => {
+    mutate(values, {
+      onSuccess: async data => {
+        if (data) {
+          await signIn(data)
+          if (redirectTo) {
+            document.location = redirectTo as string
+          } else {
+            // document.location = '/'
+            document.location = ROUTES.DASHBOARD
+          }
+        }
+      },
+      onError: e => {
+        if (e instanceof Error) {
+          toast({
+            title: 'Error Logging In!',
+            variant: "destructive",
+            duration: 5000,
+          });
+        }
+      },
+    })
+  }
 
   return (
     <>
@@ -88,9 +129,9 @@ export function LoginModule() {
             <Button
               type="submit"
               className="w-full bg-black text-white hover:bg-gray-800 mt-4"
-              // disabled={isLoading}
+              disabled={isLoading}
             >
-              {/* {isLoading ? "Signing in..." : "Sign in"} */}
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
           </Form>

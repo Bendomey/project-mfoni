@@ -6,4 +6,5 @@
 
 export * from './transport';
 export * from './get-param';
+export * from './cookies.config';
 
