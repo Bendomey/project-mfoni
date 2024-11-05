@@ -32,6 +32,7 @@ export const Application = ({
   refetch,
 }: ApplicationProps) => {
   const [openApproveModal, setOpenApproveModal] = useState(false)
+  const [openViewModal, setOpenViewModal] = useState(false)
   const [openRejectModal, setOpenRejectModal] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application>()
 
@@ -118,7 +119,10 @@ export const Application = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
-                <DropdownMenuItem><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                      setSelectedApplication(row.original)
+                      setOpenViewModal(true)
+                    }}><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
                 <DropdownMenuItem  onClick={() => {
                       setSelectedApplication(row.original)
                       setOpenApproveModal(true)
@@ -157,6 +161,7 @@ export const Application = ({
           refetch={refetch}
         />
       </div>
+      <RejectApplicationModal opened={openRejectModal} setOpened={setOpenRejectModal} data={selectedApplication} refetch={refetch}/>
       <ApproveApplicationModal opened={openApproveModal} setOpened={setOpenApproveModal} data={selectedApplication} refetch={refetch}/>
       <RejectApplicationModal opened={openRejectModal} setOpened={setOpenRejectModal} data={selectedApplication} refetch={refetch}/>
     </>
