@@ -263,4 +263,55 @@ public class AdminController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get current logged in admin
+    /// </summary>
+    /// <response code="200">Current Admin retrieved successfully</response>
+    /// <response code="401">Not Logged In</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize(Policy = "Admin")]
+    [HttpGet("me")]
+    [ProducesResponseType(typeof(OutputResponse<OutputAdmin>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult Me()
+    {
+        try
+        {
+            var currentAdmin = CurrentAdmin.GetCurrentAdmin(
+               HttpContext.User.Identity as ClaimsIdentity
+           );
+            var admin = _adminService.Me(currentAdmin.Id);
+
+            return new ObjectResult(
+                           new GetEntityResponse<OutputAdmin>(
+                               _adminTransformer.Transform(admin!),
+                               null
+                           ).Result()
+                       )
+            {
+                StatusCode = StatusCodes.Status200OK
+            };
+
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputUser>(null, e.Message).Result())
+            {
+                StatusCode = (int)statusCode
+            };
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError($"Failed to get me. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
 }
