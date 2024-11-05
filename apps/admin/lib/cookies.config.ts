@@ -5,7 +5,7 @@ class Auth {
     try {
       const token = Cookies.get(key)
       return token != undefined ? JSON.parse(token) : null
-    } catch (_) {}
+    } catch (error) {}
   }
 
   setCipher<T>(key: string, data: T) {
