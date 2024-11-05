@@ -20,7 +20,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "next/navigation";
 import { ROUTES } from "@/constants/pages";
 import { useCurrentUser } from "@/providers/auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { EyeOffIcon } from "lucide-react";
+import { EyeOpenIcon } from "@radix-ui/react-icons";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -34,6 +36,8 @@ export function LoginModule() {
   const { signIn, signOut } = useCurrentUser();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+
+  const [isVisible, setIsVisible] = useState(false);
 
   const redirectTo = searchParams.get("redirect_to");
 
@@ -131,13 +135,25 @@ export function LoginModule() {
                       >
                         Password
                       </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your password"
-                          {...field}
-                          type="password"
-                          className="text-gray-800"
-                        />
+                      <FormControl className="relative">
+                        <div className="relative">
+                          <Input
+                            placeholder="Enter your password"
+                            {...field}
+                            type={isVisible ? "text" : "password"}
+                            className="text-gray-800"
+                          />
+                          <div
+                            className="absolute inset-y-0 right-0 flex items-center p-3 cursor-pointer"
+                            onClick={() => setIsVisible(!isVisible)}
+                          >
+                            {isVisible ? (
+                              <EyeOffIcon className="h-6 w-6" />
+                            ) : (
+                              <EyeOpenIcon className="h-6 w-6" />
+                            )}
+                          </div>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

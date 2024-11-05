@@ -1,6 +1,8 @@
+"use client"
+
 import {auth} from '@/lib'
 import * as React from 'react'
-import {useRouter} from 'next/router'
+import { usePathname, useRouter } from 'next/navigation'
 import {USER_CIPHER} from '@/constants/misc'
 import {UNAUTH_ROUTES} from '@/constants/pages'
 import { LoginOutputProps, useGetCurrentAdmin } from '@/api'
@@ -25,6 +27,7 @@ export const AuthProvider = ({children}: React.PropsWithChildren) => {
   const [pageLoading, setpageLoading] = React.useState(true)
   const [state, setState] = React.useState<Partial<ContextState> | null>(null)
   const Router = useRouter()
+  const pathname = usePathname()
   const { toast } = useToast()
   const {mutate, data, isPending: isLoadingAdmin} = useGetCurrentAdmin()
 
@@ -54,14 +57,14 @@ export const AuthProvider = ({children}: React.PropsWithChildren) => {
           },
         )
       } else {
-        if (!UNAUTHENTICATED_ROUTES.includes(Router.pathname)) {
+        if (!UNAUTHENTICATED_ROUTES.includes(pathname)) {
           toast({
             title: "Session Expired",
             variant: "destructive",
             description: 'Login to access resource',
             duration: 5000,
           });
-          Router.replace(`/login?redirect_to=${Router.pathname}`)
+          Router.replace(`/login?redirect_to=${pathname}`)
         }
       }
       setpageLoading(false)

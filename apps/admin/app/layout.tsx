@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/Theme-provider";
 import { ReactQueryProvider } from "@/providers/react-query";
+import { AuthProvider } from "@/providers/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
         className={`${inter.className} bg-background text-foreground  antialiased`}
       >
         <ReactQueryProvider>
+          <AuthProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -31,6 +33,7 @@ export default function RootLayout({
           >
             {children}
           </ThemeProvider>
+            </AuthProvider>
         </ReactQueryProvider>
         <Toaster />
       </body>
