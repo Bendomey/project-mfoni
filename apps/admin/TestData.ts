@@ -1,4 +1,4 @@
-const isDataLoading = true; 
+const isDataLoading = false; 
 const error = null;
 // Dummy data for simulating fetching state
 export const useApplicationQuery = () => {
