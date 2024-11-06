@@ -110,4 +110,18 @@ public class AdminService
 
         return __admin;
     }
+
+    public Models.Admin? Me(string adminId)
+    {
+
+        var admin = _adminsCollection.Find<Models.Admin>(admin => admin.Id == adminId).FirstOrDefault();
+
+        if (admin is null)
+        {
+            throw new HttpRequestException("AdminNotFound");
+        }
+
+        return admin;
+    }
+
 }
