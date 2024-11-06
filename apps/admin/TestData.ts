@@ -5,7 +5,7 @@ export const useApplicationQuery = () => {
    const createdAtData = new Date()
    const updatedAtData = `${new Date().toLocaleString("en-GB", {hour12: true,day: "2-digit",month: "2-digit",year: "numeric",hour: "2-digit",minute: "2-digit",})}`
     // return dummy data to simulate the data returned by a query
-    const data: Application[] = [
+    const data: CreatorApplication[] = [
         {
             id: "m5gr84i9",
             name: "Domey Benjamin Armah Kessey Kofi",

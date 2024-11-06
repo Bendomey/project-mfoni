@@ -13,19 +13,19 @@ import { useApproveApplication } from "@/TestData";
 import { useToast } from "@/hooks/use-toast";
 import _ from "lodash";
 
-interface AcceptApplicationModalProps {
-  data?: Application;
+interface RejectApplicationModalProps {
+  data?: CreatorApplication;
   refetch?: VoidFunction;
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;
 }
 
-export const ApproveApplicationModal = ({
+export const RejectApplicationModal = ({
   data,
   refetch,
   opened,
   setOpened,
-}: AcceptApplicationModalProps) => {
+}: RejectApplicationModalProps) => {
   const { toast } = useToast();
   const { mutate, status } = useApproveApplication();
 
@@ -34,13 +34,13 @@ export const ApproveApplicationModal = ({
     if (status == 200) {
       setOpened(false);
       toast({
-        title: "Application approved",
+        title: "Application rejected",
         variant: "success",
         duration: 5000,
       });
     } else {
       toast({
-        title: "Error approving application",
+        title: "Error rejecting application",
         variant: "destructive",
         duration: 5000,
       });
@@ -53,16 +53,16 @@ export const ApproveApplicationModal = ({
       <DialogContent className="sm:max-w-[425px] bg-white dark:bg-black top-32">
         <DialogHeader>
           <DialogTitle className="leading-normal">
-          Approve {data?.name ? `${_.upperFirst(data.name)}'s` : "this"} application
+            Reject {data?.name ? `${_.upperFirst(data.name)}'s` : "this"} application
           </DialogTitle>
-          <DialogDescription className="text-gray-600 dark:text-gray-400">
-            Are you sure you want to approve{" "}
+          <DialogDescription className="text-gray-600 dark:text-gray-400 ">
+            Are you sure you want to reject{" "}
             {data?.name ? `${_.upperFirst(data.name)}'s` : "this"} application?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button type="button" onClick={() => handleSubmit()}>
-            Yes, Approve
+            Yes, Reject
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -19,7 +19,7 @@ import { ApproveApplicationModal } from "./approve";
 import { RejectApplicationModal } from "./reject";
 
 interface ApplicationProps {
-  data: Application[];
+  data: CreatorApplication[];
   isDataLoading?: boolean;
   error?: Error | null;
   refetch?: VoidFunction;
@@ -33,10 +33,10 @@ export const Application = ({
 }: ApplicationProps) => {
   const [openApproveModal, setOpenApproveModal] = useState(false)
   const [openRejectModal, setOpenRejectModal] = useState(false)
-  const [selectedApplication, setSelectedApplication] = useState<Application>()
+  const [selectedApplication, setSelectedApplication] = useState<CreatorApplication>()
 
 
-  const columns = useMemo((): ColumnDef<Application>[] => {
+  const columns = useMemo((): ColumnDef<CreatorApplication>[] => {
     return [
       {
         accessorKey: "name",

@@ -1,4 +1,4 @@
-interface Application  {
+interface CreatorApplication  {
   id: string;
   name: string;
   status: "submitted" | "canceled" | "approved";
@@ -6,3 +6,7 @@ interface Application  {
   createdAt: Date
   updatedAt: string
 };
+
+interface FetchCreatorApplicationFilter {
+  status?: "submitted" | "canceled" | "approved"
+}
