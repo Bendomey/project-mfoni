@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { DataTable } from "@/components/table";
 import { ArrowUpDown, ChevronsUpDownIcon, CreditCardIcon, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -17,24 +16,34 @@ import {
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ApproveApplicationModal } from "./approve";
 import { RejectApplicationModal } from "./reject";
+import { useGetCreatorApplications } from "@/api";
+import { useSearchParams } from "next/navigation";
 
-interface ApplicationProps {
-  data: CreatorApplication[];
-  isDataLoading?: boolean;
-  error?: Error | null;
-  refetch?: VoidFunction;
-}
 
-export const Application = ({
-  data,
-  isDataLoading,
-  error,
-  refetch,
-}: ApplicationProps) => {
+export const CreatorApplication = () => {
   const [openApproveModal, setOpenApproveModal] = useState(false)
   const [openRejectModal, setOpenRejectModal] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<CreatorApplication>()
+  const searchParams = useSearchParams();
 
+  // Retrieve query parameters
+  const page = searchParams.get('page');
+  const search = searchParams.get('search');
+  const creatorApplicationFilter = searchParams.get('status');
+
+
+  const {data, isPending: isDataLoading, refetch, error} = useGetCreatorApplications({
+    search: {
+      fields: ['firstName'],
+      query:  search || undefined,
+    },
+    sorter: {
+      sort: '-createdAt',
+    },
+    populate: [],
+    filters: {
+    },
+  })
 
   const columns = useMemo((): ColumnDef<CreatorApplication>[] => {
     return [
@@ -53,8 +62,8 @@ export const Application = ({
             </Button>
           );
         },
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("name")}</div>
+        cell: ({ row }) => (row.original.user ?
+          <div className="lowercase">{row.original.user.email}</div> : 'N/A'
         ),
       },
       {
@@ -72,8 +81,8 @@ export const Application = ({
             </Button>
           );
         },
-        cell: ({ row }) => (
-          <div className="lowercase">{row.getValue("email")}</div>
+        cell: ({ row }) => ( row.original.user ?
+          <div className="lowercase">{row.original.user.email}</div> : 'N/A'
         ),
       },
       {
@@ -149,7 +158,7 @@ export const Application = ({
 
         <DataTable
           columns={columns}
-          data={data}
+          data={data?.rows ?? []}
           isDataLoading={isDataLoading}
           error={
             error ? new Error("Can't fetch Creator Applications") : undefined
