@@ -64,10 +64,10 @@ export function fetchClient<T>(
 
     try {
       if (!config?.isUnAuthorizedRequest) {
-        const userToken: { token: string; username: string } | undefined =
+        const userToken: { token: string} | undefined =
         auth.getCipher(USER_CIPHER);
         if (userToken) {
-          headers.append('Authorization', `Bearer ${userToken?.token}`);
+          headers.append('Authorization', `Bearer ${userToken}`);
         }
       }
 

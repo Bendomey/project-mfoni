@@ -34,7 +34,14 @@ interface FetchMultipleDataResponse<T> {
     pageSize: number
     totalPages: number
 }
-  
+interface APIResponse<T> {
+  parsedBody: {
+    data: FetchMultipleDataResponse<T>
+    message: string
+    success: boolean
+  }
+}
+
 type NullableString = string | null
 type NullableNumber = number | null
 type NumberLike = string | number
@@ -42,3 +49,10 @@ type NullableDate = Date | null
 type StringList = Array<string>
 type NullableStringList = Array<string> | null
 type Empty = {}
+
+
+interface ApiResponse<T> {
+  data?: T
+  message: string
+  success: boolean
+}

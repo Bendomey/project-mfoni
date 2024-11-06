@@ -19,7 +19,7 @@ export interface LoginOutputProps {
 
 export const login = async (props: LoginProps) => {
   try {
-    const response = await fetchClient<LoginOutputProps>(
+    const response = await fetchClient<ApiResponse<LoginOutputProps>>(
       '/v1/admins/login',
       {
         method: 'POST',
@@ -46,8 +46,8 @@ export const useLogin = () => useMutation({mutationFn: login})
 
 const getCurrentAdmin = async ({}) => {
   try {
-    const response = await fetchClient<Admin>(
-      '/v1/admins/auth/current-user',
+    const response = await fetchClient<ApiResponse<Admin>>(
+      '/v1/admins/me',
     )
     return response.parsedBody
   } catch (error) {

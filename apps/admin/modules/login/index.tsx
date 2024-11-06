@@ -57,8 +57,8 @@ export function LoginModule() {
   const handleSubmit = (values: LoginFormProps) => {
     mutate(values, {
       onSuccess: async (data) => {
-        if (data) {
-          await signIn(data);
+        if (data?.data) {
+          await signIn(data.data);
           if (redirectTo) {
             document.location = redirectTo as string;
           } else {
@@ -141,7 +141,7 @@ export function LoginModule() {
                             placeholder="Enter your password"
                             {...field}
                             type={isVisible ? "text" : "password"}
-                            className="text-gray-800"
+                            className="text-gray-800 dark:text-gray-300 "
                           />
                           <div
                             className="absolute inset-y-0 right-0 flex items-center p-3 cursor-pointer"

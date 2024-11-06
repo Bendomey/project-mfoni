@@ -42,7 +42,7 @@ export const AuthProvider = ({children}: React.PropsWithChildren) => {
           {
             onSuccess: data => {
               if (data) {
-                setState({userData: data, token: userToken.token})
+                setState({userData: data.data, token: userToken.token})
               }
             },
             onError: e => {

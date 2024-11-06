@@ -24,16 +24,16 @@ export default function RootLayout({
         className={`${inter.className} bg-background text-foreground  antialiased`}
       >
         <ReactQueryProvider>
-          <AuthProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
+            <AuthProvider>
             {children}
-          </ThemeProvider>
             </AuthProvider>
+          </ThemeProvider>
         </ReactQueryProvider>
         <Toaster />
       </body>
