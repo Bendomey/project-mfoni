@@ -52,7 +52,7 @@ export const AuthProvider = ({children}: React.PropsWithChildren) => {
                 description: 'Login to access resource',
                 duration: 5000,
               });
-              Router.replace(`/login`)
+              Router.replace(`/login?redirect_to=${pathname}`)
             },
           },
         )
