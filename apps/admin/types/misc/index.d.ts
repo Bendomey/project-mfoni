@@ -11,7 +11,8 @@ interface PaginationDataMeta {
   }
   
   interface Sorter {
-    sort?: string
+    sort?: 'asc' | 'desc'
+    sortBy?: string
   }
   
   interface Search {

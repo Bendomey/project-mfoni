@@ -43,6 +43,6 @@ export const useGetCreatorApplications = (
   query: FetchMultipleDataInputParams<FetchCreatorApplicationFilter>,
 ) =>
   useQuery({
-    queryKey: [QUERY_KEYS.CREATOR_APPLICATIONS],
+    queryKey: [QUERY_KEYS.CREATOR_APPLICATIONS,JSON.stringify(query)],
     queryFn: () => getCreatorApplications(query),
   })

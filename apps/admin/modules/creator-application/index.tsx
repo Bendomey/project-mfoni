@@ -38,7 +38,8 @@ export const CreatorApplication = () => {
       query:  search || undefined,
     },
     sorter: {
-      sort: '-createdAt',
+      sort: 'asc',
+      sortBy: '-createdAt',
     },
     populate: [],
     filters: {
