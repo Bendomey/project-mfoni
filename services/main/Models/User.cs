@@ -58,6 +58,12 @@ public class User
     [BsonElement("photo")]
     public string? Photo { get; set; }
 
+    [BsonElement("commission")]
+    public double Commission { get; set; } = 0;
+
+    [BsonElement("book_commission")]
+    public double BookCommission { get; set; } = 0;
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
