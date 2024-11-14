@@ -18,25 +18,25 @@ public class OneTimePayment
     public string Id { get; set; } = null!;
 
     [BsonElement("reference")]
-    public required string Reference { get; set; }
+    public required string Reference { get; init; }
 
     [BsonElement("access_code")]
-    public required string AccessCode { get; set; }
+    public required string AccessCode { get; init; }
 
     [BsonElement("authorization_url")]
-    public required string AuthorizationUrl { get; set; }
+    public required string AuthorizationUrl { get; init; }
 
     [BsonElement("amount")]
-    public required double Amount { get; set; }
+    public required double Amount { get; init; }
 
     [BsonElement("status")]
-    public required string Status { get; set; }
+    public string Status { get; init; } = OneTimePaymentStatus.PENDING;
 
     [BsonElement("successful_at")]
-    public DateTime SuccessfulAt { get; init; }
+    public DateTime SuccessfulAt { get; set; }
 
     [BsonElement("failed_at")]
-    public DateTime FailedAt { get; init; }
+    public DateTime FailedAt { get; set; }
 
     // TODO: fix this
     // [BsonElement("error_obj")]

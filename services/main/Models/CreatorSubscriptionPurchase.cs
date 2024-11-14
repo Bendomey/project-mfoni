@@ -16,9 +16,9 @@ public class CreatorSubscriptionPurchase
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
 
-    [BsonElement("creator_id")]
+    [BsonElement("creator_subscription_id")]
     [BsonRepresentation(BsonType.ObjectId)]
-    public required string CreatorId { get; init; }
+    public required string CreatorSubscriptionId { get; init; }
 
     [BsonElement("type")]
     public required string Type { get; init; }
@@ -26,16 +26,12 @@ public class CreatorSubscriptionPurchase
     // if payment was done with user's card, log it here.
     [BsonElement("saved_card_id")]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? SavedCardId { get; init; }
+    public string? SavedCardId { get; set; }
 
     // if payment was done with user's commission, log it here.
     [BsonElement("commission_id")]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? CommissionId { get; init; }
-
-    [BsonElement("creator_subscription_id")]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public required string CreatorSubscriptionId { get; init; }
+    public string? CommissionId { get; set; }
 
     [BsonElement("amount")]
     public required double Amount { get; init; }

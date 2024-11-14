@@ -21,13 +21,13 @@ public class Commission
     public required string UserId { get; init; }
 
     [BsonElement("type")]
-    public required double Type { get; set; }
+    public required double Type { get; init; }
 
     [BsonElement("commission")]
-    public required double Amount { get; set; }
+    public required double Amount { get; init; }
 
     [BsonElement("reason_for_transfer")]
-    public required string ReasonForTransfer { get; set; }
+    public required string ReasonForTransfer { get; init; }
 
     // TODO: add content purchase related models later.
     // Pass this if someone bought their content or you’re buying someone’s content
