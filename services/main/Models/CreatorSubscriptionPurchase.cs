@@ -6,7 +6,7 @@ namespace main.Models;
 public static class CreatorSubscriptionPurchaseType
 {
     public static readonly string CARD = "CARD";
-    public static readonly string COMMISSION = "COMMISSION";
+    public static readonly string WALLET = "WALLET";
 }
 
 // On successful subscription purchase, save the deets of the purchase.
@@ -28,10 +28,10 @@ public class CreatorSubscriptionPurchase
     [BsonRepresentation(BsonType.ObjectId)]
     public string? SavedCardId { get; set; }
 
-    // if payment was done with user's commission, log it here.
-    [BsonElement("commission_id")]
+    // if payment was done with user's wallet, log it here.
+    [BsonElement("wallet_id")]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string? CommissionId { get; set; }
+    public string? WalletId { get; set; }
 
     [BsonElement("amount")]
     public required double Amount { get; init; }

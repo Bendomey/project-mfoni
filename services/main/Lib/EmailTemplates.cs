@@ -10,6 +10,7 @@ public class EmailTemplates
 Your OTP is {code}. Please use this code to complete your action.
 
 The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
     ";
 
     public static string WaitlistSubject = "You're in! Welcome to the mfoni crew 📸";
@@ -48,6 +49,7 @@ Email: {email}
 Password: {password}
 
 The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
     ";
 
     public static string CreatorApplicationApprovedSubject = "Your mfoni Creator Application has been approved! 🎉";
@@ -60,6 +62,7 @@ Congratulations! Your mfoni Creator Application has been approved. 🎉
 You can now start uploading your photos and earn money.
 
 The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
     ";
 
     public static string CreatorApplicationRejectedSubject = "Your mfoni Creator Application has been rejected";
@@ -72,6 +75,7 @@ We regret to inform you that your mfoni Creator Application has been rejected.
 Reason: {reason}
 
 The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
     ";
 
     public static string CreatorApplicationSubmittedSubject = "Your mfoni Creator Application has been submitted";
@@ -82,5 +86,23 @@ Hey {name},
 Your mfoni Creator Application has been submitted successfully. We'll review it and get back to you soon.
 
 The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
+    public static string NewCreatorWithPremiumPackageButLowWalletSubject = "⚠️ Your mfoni package subscription needs your attention!";
+
+    public static string NewCreatorWithPremiumPackageButLowWalletBody = @"
+Hey {name},
+
+You have insufficient funds in your wallet to activate your package. There are two ways to resolve this:
+
+1. Top up your wallet with your mobile money.
+
+2. Add a card to your account and we'll automatically deduct the amount from your account.
+
+Visit https://mfoni.app/account/your-subscriptions to manage this. If you have any questions, please reach out to us on our website. 
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
     ";
 }

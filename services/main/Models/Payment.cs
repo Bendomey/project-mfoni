@@ -56,5 +56,5 @@ public class OneTimePayment
 public class PaymentMetaData
 {
     [BsonElement("origin")]
-    public required string Origin { get; set; } // ContentPurchase | Commission
+    public required string Origin { get; init; } // ContentPurchase | WalletTopup
 }

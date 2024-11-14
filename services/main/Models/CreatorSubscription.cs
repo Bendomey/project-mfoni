@@ -28,10 +28,10 @@ public class CreatorSubscription
     public required DateTime StartedAt { get; init; }
 
     [BsonElement("ended_at")]
-    public DateTime EndedAt { get; set; }
+    public DateTime? EndedAt { get; set; }
 
     [BsonElement("period")]
-    public required double Period { get; init; } // in months
+    public double? Period { get; init; } // pass this only when its a paid package and for how long its paid for.
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;

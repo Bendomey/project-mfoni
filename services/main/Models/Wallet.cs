@@ -3,14 +3,14 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace main.Models;
 
-public static class CommissionType
+public static class WalletType
 {
     public static readonly string DEPOSIT = "DEPOSIT";
     public static readonly string WITHDRAW = "WITHDRAW";
 }
 
 // Our own form of e wallet. Keeps track of all transations made by a user with their wallet.
-public class Commission
+public class Wallet
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -23,7 +23,7 @@ public class Commission
     [BsonElement("type")]
     public required double Type { get; init; }
 
-    [BsonElement("commission")]
+    [BsonElement("amount")]
     public required double Amount { get; init; }
 
     [BsonElement("reason_for_transfer")]
@@ -35,7 +35,7 @@ public class Commission
     [BsonRepresentation(BsonType.ObjectId)]
     public string? ContentPurchaseId { get; set; }
 
-    // pass this when you use commission to pay for your subscription fees.
+    // pass this when you use wallet to pay for your subscription fees.
     [BsonElement("creator_subscription_purchase_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? CreatorSubscriptionPurchaseId { get; set; }

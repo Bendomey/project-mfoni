@@ -115,7 +115,7 @@ builder.Services.AddSingleton<AdminTransformer>();
 builder.Services.AddSingleton<UserTransformer>();
 builder.Services.AddSingleton<CreatorApplicationTransformer>();
 builder.Services.AddSingleton<CreatorTransformer>();
-builder.Services.AddSingleton<CreatorPackageTransformer>();
+builder.Services.AddSingleton<CreatorSubscriptionTransformer>();
 
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();
