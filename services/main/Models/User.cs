@@ -59,10 +59,10 @@ public class User
     public string? Photo { get; set; }
 
     [BsonElement("wallet")]
-    public double Wallet { get; set; } = 0;
+    public Int64 Wallet { get; set; } = 0;
 
     [BsonElement("book_wallet")]
-    public double BookWallet { get; set; } = 0;
+    public Int64 BookWallet { get; set; } = 0;
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;

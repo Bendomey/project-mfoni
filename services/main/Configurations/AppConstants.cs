@@ -1,3 +1,5 @@
+using Microsoft.VisualBasic;
+
 namespace main.Configuratons;
 
 public class AppConstants
@@ -7,6 +9,7 @@ public class AppConstants
     public string RedisConnectionString { get; set; } = null!;
     public string RabbitMQConnectionString { get; set; } = null!;
     public string AdminCollection { get; init; } = "admins";
+    public string AdminWalletCollection { get; init; } = "admin_wallets";
     public string UserCollection { get; init; } = "users";
     public string CollectionCollection { get; init; } = "collections";
     public string CollectionContentCollection { get; init; } = "collection_contents";
@@ -15,7 +18,11 @@ public class AppConstants
     public string CreatorCollection { get; init; } = "creators";
     public string TagCollection { get; init; } = "tags";
     public string WaitlistCollection { get; init; } = "waitlists";
-    public string CreatorPackageCollection { get; init; } = "creator_packages";
+    public string CreatorSubscriptionCollection { get; init; } = "creator_subscriptions";
+    public string CreatorSubscriptionPurchaseCollection { get; init; } = "creator_subscription_purchases";
+    public string PaymentCollection { get; init; } = "payments";
+    public string SavedCardCollection { get; init; } = "saved_cards";
+    public string WalletTransactionCollection { get; init; } = "wallet_transations";
     public string BucketName { get; set; } = null!;
     public string AWSRekognitionCollection { get; set; } = null!;
     public string ProcessImageQueueName { get; set; } = null!;

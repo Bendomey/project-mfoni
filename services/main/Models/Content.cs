@@ -52,7 +52,7 @@ public class Content
     public List<Tag>? Tags { get; set; }
 
     [BsonElement("amount")]
-    public int Amount { get; set; } = 0; // Pesewas equivalent. 0 for free
+    public Int64 Amount { get; set; } = 0; // Pesewas equivalent. 0 for free
 
     [BsonElement("rekognition_metadata")]
     public RekognitionMetaData? RekognitionMetaData { get; set; }

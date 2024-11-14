@@ -34,7 +34,7 @@ public class CreatorSubscriptionPurchase
     public string? WalletId { get; set; }
 
     [BsonElement("amount")]
-    public required double Amount { get; init; }
+    public required Int64 Amount { get; init; }
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;

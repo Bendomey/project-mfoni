@@ -27,7 +27,7 @@ public class OneTimePayment
     public required string AuthorizationUrl { get; init; }
 
     [BsonElement("amount")]
-    public required double Amount { get; init; }
+    public required Int64 Amount { get; init; }
 
     [BsonElement("status")]
     public string Status { get; init; } = OneTimePaymentStatus.PENDING;

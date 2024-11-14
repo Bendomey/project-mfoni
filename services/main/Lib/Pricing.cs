@@ -2,6 +2,16 @@ using System.Net;
 
 namespace main.Lib;
 
+
+/**
+* This class is responsible for pricing logic
+*
+* Pricing:
+* Free - GHS 0.00
+* Basic - GHS 50.00
+* Advanced - GHS 100.00
+*/
+
 public class PricingLib
 {
     private string _packageType;
@@ -11,16 +21,16 @@ public class PricingLib
         _packageType = packageType;
     }
 
-    public double GetPrice()
+    public Int64 GetPrice()
     {
         switch (_packageType)
         {
             case "FREE":
                 return 0;
             case "BASIC":
-                return 50;
+                return 5000;
             case "ADVANCED":
-                return 100;
+                return 10000;
             default:
                 throw new HttpRequestException("InvalidPackageType");
         }

@@ -1,11 +1,8 @@
 using main.Configurations;
 using main.Configuratons;
-using main.DTOs;
 using main.Lib;
 using main.Models;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using NanoidDotNet;
 
@@ -13,18 +10,20 @@ namespace main.Domains;
 
 public class CreatorService
 {
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<CreatorService> _logger;
     private readonly IMongoCollection<Models.Creator> __creatorCollection;
     private readonly IMongoCollection<Models.CreatorSubscription> __creatorSubscriptionCollection;
     private readonly IMongoCollection<Models.CreatorApplication> _creatorApplicationCollection;
     private readonly UserService _userService;
+    private readonly SubscriptionService _subscriptionService;
     private readonly AppConstants _appConstantsConfiguration;
 
     public CreatorService(
-       ILogger<UserService> logger,
+       ILogger<CreatorService> logger,
        DatabaseSettings databaseConfig,
        IOptions<AppConstants> appConstants,
-        UserService userService
+        UserService userService,
+        SubscriptionService subscriptionService
    )
     {
         _logger = logger;
@@ -32,7 +31,7 @@ public class CreatorService
             appConstants.Value.CreatorCollection
         );
         __creatorSubscriptionCollection = databaseConfig.Database.GetCollection<Models.CreatorSubscription>(
-           appConstants.Value.CreatorPackageCollection
+           appConstants.Value.CreatorSubscriptionCollection
        );
 
         _creatorApplicationCollection =
@@ -41,6 +40,7 @@ public class CreatorService
              );
 
         _userService = userService;
+        _subscriptionService = subscriptionService;
         _appConstantsConfiguration = appConstants.Value;
 
         logger.LogDebug("Creator service initialized");
@@ -86,8 +86,14 @@ public class CreatorService
         {
             if (canIPayWithWallet)
             {
-                // substract money from user's wallet
-                // TODO: call Wallet service to do the needful.
+                // subscribe with wallet
+                await _subscriptionService.SubscribeWithWallet(new SubscribeWithWalletInput
+                {
+                    Amount = pricingLib.GetPrice(),
+                    SubscriptionId = creatorSubscription.Id,
+                    UserId = user.Id,
+                });
+               
             }
             else
             {
