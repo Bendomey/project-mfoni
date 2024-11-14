@@ -93,7 +93,7 @@ public class CreatorService
                     SubscriptionId = creatorSubscription.Id,
                     UserId = user.Id,
                 });
-               
+
             }
             else
             {

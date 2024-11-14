@@ -45,12 +45,12 @@ public class AdminWalletService
         catch (HttpRequestException)
         {
 
-             var newAdminWallet = new Models.AdminWallet { };
+            var newAdminWallet = new Models.AdminWallet { };
 
-                await _adminWalletCollection.InsertOneAsync(newAdminWallet);
-                _logger.LogInformation("Admin Wallet Bootstrapped now!");
+            await _adminWalletCollection.InsertOneAsync(newAdminWallet);
+            _logger.LogInformation("Admin Wallet Bootstrapped now!");
 
-                return;
+            return;
         }
 
     }
