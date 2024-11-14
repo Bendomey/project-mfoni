@@ -6,7 +6,7 @@ namespace main.Models;
 public static class CommissionType
 {
     public static readonly string DEPOSIT = "DEPOSIT";
-    public static readonly string ADVANCED = "ADVANCED";
+    public static readonly string WITHDRAW = "WITHDRAW";
 }
 
 // Our own form of e wallet. Keeps track of all transations made by a user with their wallet.
@@ -19,6 +19,9 @@ public class Commission
     [BsonElement("user_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public required string UserId { get; init; }
+
+    [BsonElement("type")]
+    public required double Type { get; set; }
 
     [BsonElement("commission")]
     public required double Amount { get; set; }
