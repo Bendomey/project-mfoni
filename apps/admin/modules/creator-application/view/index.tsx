@@ -68,12 +68,12 @@ export const ViewApplicationModal = ({
 
           <div>
             <Label className={`${labelCSS}`}>Pricing Package:</Label>
-            <p>{data?.intendedPricingPackage}</p>
+            <p>{_.startCase(_.lowerCase(data?.intendedPricingPackage))}</p>
           </div>
 
           <div>
             <Label className={`${labelCSS}`}>ID Type:</Label>
-            <p>{data?.idType}</p>
+            <p>{_.startCase(data?.idType).replace(/ /g, ' ')}</p>
           </div>
 
           <div>
