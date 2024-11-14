@@ -73,14 +73,14 @@ export const ViewApplicationModal = ({
 
           <div>
             <Label className={`${labelCSS}`}>ID Type:</Label>
-            <p>{_.startCase(data?.idType).replace(/ /g, ' ')}</p>
+            <p>{_.startCase(data?.idType).replace(/ /g, " ")}</p>
           </div>
 
           <div>
             <Label className={`${labelCSS}`}>ID Back:</Label>
             <div className="h-48 w-full relative mt-2">
               <Image
-                src={data?.idBackImage ?? "/images/thumbnail.png"}
+                src={data?.idBackImage ?? "/images/thumbnail.jpg"}
                 alt="ID Back"
                 fill
                 className="rounded-md object-cover"
@@ -92,7 +92,7 @@ export const ViewApplicationModal = ({
             <Label className={`${labelCSS}`}>ID Front:</Label>
             <div className="h-48 w-full relative mt-2">
               <Image
-                src={data?.idFrontImage ?? "/images/thumbnail.png"}
+                src={data?.idFrontImage ?? "/images/thumbnail.jpg"}
                 alt="ID Back"
                 fill
                 className="rounded-md object-cover"
