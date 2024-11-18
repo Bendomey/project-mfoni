@@ -23,7 +23,7 @@ public class Creator
     public string Status { get; set; } = CreatorStatus.ACTIVE;
 
     [BsonElement("pricing_package")]
-    public required string PricingPackage { get; init; }// FREE | BASIC | ADVANCED
+    public required string PricingPackage { get; set; }// FREE | BASIC | ADVANCED
 
     [BsonElement("user_id")]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -34,9 +34,6 @@ public class Creator
 
     [BsonElement("social_media")]
     public SocialMedia[] SocialMedia { get; set; } = [];
-
-    [BsonElement("default_subscription_payment_method")]
-    public string DefaultSubscriptionPaymentMethod { get; set; } = "WALLET"; // CARD | WALLET
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;

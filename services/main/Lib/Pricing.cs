@@ -35,4 +35,19 @@ public class PricingLib
                 throw new HttpRequestException("InvalidPackageType");
         }
     }
+
+    public string GetPackageName()
+    {
+        switch (_packageType)
+        {
+            case "FREE":
+                return "Snap & Share";
+            case "BASIC":
+                return "Pro Lens";
+            case "ADVANCED":
+                return "Master Shot";
+            default:
+                throw new HttpRequestException("InvalidPackageType");
+        }
+    }
 }

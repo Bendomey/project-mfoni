@@ -125,6 +125,7 @@ builder.Services.AddSingleton<CreatorSubscriptionTransformer>();
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();
 builder.Services.AddHostedService<StartUpService>();
+builder.Services.AddHostedService<SubscriptionProcessorCron>();
 
 builder.Services.AddControllers();
 

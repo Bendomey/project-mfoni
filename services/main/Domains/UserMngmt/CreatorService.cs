@@ -54,6 +54,11 @@ public class CreatorService
             throw new HttpRequestException("CreatorApplicationNotFound");
         }
 
+        if (creatorApplication.IntendedPricingPackage is null)
+        {
+            throw new HttpRequestException("IntendedPricingPackageNotSet");
+        }
+
         var user = await _userService.GetUserById(creatorApplication.UserId);
 
         var creator = new Creator
@@ -61,23 +66,23 @@ public class CreatorService
             CreatorApplicationId = creatorApplication.Id,
             UserId = creatorApplication.UserId,
             Username = $"{user.Name.ToLower().Replace(" ", "")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 5)}",
-            PricingPackage = creatorApplication.IntendedPricingPackage!, // should be available before application is submitted
+            PricingPackage = creatorApplication.IntendedPricingPackage,
         };
 
         await __creatorCollection.InsertOneAsync(creator);
 
-        var pricingLib = new PricingLib(creatorApplication.IntendedPricingPackage!);
+        var pricingLib = new PricingLib(creatorApplication.IntendedPricingPackage);
         bool isItAPremiumPackage = creatorApplication.IntendedPricingPackage != CreatorSubscriptionPackageType.FREE;
         bool canIPayWithWallet = user.BookWallet >= pricingLib.GetPrice();
 
-        // Create a trail of the package the creator has activated.
+        // Create a trail of the package the creator has been activated.
         var creatorSubscription = new CreatorSubscription
         {
             CreatorId = creator.Id,
-            PackageType = creatorApplication.IntendedPricingPackage!,
-            Period = isItAPremiumPackage ? canIPayWithWallet ? 1 : 0.1 : null,
+            PackageType = creatorApplication.IntendedPricingPackage,
+            Period = isItAPremiumPackage ? canIPayWithWallet ? 1 : 0.5 : null,
             StartedAt = DateTime.UtcNow,
-            EndedAt = isItAPremiumPackage ? canIPayWithWallet ? DateTime.UtcNow.AddMonths(1) : DateTime.UtcNow.AddDays(1) : null,
+            EndedAt = isItAPremiumPackage ? canIPayWithWallet ? DateTime.UtcNow.AddMonths(1) : DateTime.UtcNow.AddDays(5) : null,
         };
 
         await __creatorSubscriptionCollection.InsertOneAsync(creatorSubscription);
@@ -123,6 +128,13 @@ public class CreatorService
         }
 
         return creator;
+    }
+
+    // get creators who are due for subscription renewal.
+    public async Task<List<CreatorSubscription>> GetSubscribersDueForRenewal()
+    {
+        // TODO: work on this.
+        return [];
     }
 
 }
