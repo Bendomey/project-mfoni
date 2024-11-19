@@ -129,10 +129,51 @@ public class CreatorService
         return creator;
     }
 
-    // TODO: work on this.
+    public async Task<CreatorSubscription> CancelCreatorSubscription(string creatorId)
+    {
+        // find last subscription of creator based on date created
+        var lastSubscription = await __creatorSubscriptionCollection.Find(subscription => subscription.CreatorId == creatorId)
+            .SortByDescending(subscription => subscription.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        // if it's free, then we don't do anything.
+        if (lastSubscription.PackageType == CreatorSubscriptionPackageType.FREE)
+        {
+            return lastSubscription;
+        }
+
+        // if it's premium, then we cancel it by creating a new subscription record with FREE as the package type.
+        var newSubscription = await _subscriptionService.CreateAFreeTierSubscription(creatorId);
+        return newSubscription;
+    }
+
     public async Task<CreatorSubscription> GetActiveCreatorSubscription(string creatorId)
     {
-        return await __creatorSubscriptionCollection.Find(subscription => subscription.CreatorId == creatorId).FirstOrDefaultAsync();
+
+        // find last subscription of creator based on date created.
+        var lastSubscription = await __creatorSubscriptionCollection.Find(subscription => subscription.CreatorId == creatorId)
+            .SortByDescending(subscription => subscription.CreatedAt)
+            .Limit(2)
+            .ToListAsync();
+
+        if (lastSubscription.Count == 0)
+        {
+            throw new Exception("CreatorSubscriptionNotFound");
+        }
+
+        // if last subscription is free, then we verify it's active or not.
+        if (lastSubscription[0].PackageType == CreatorSubscriptionPackageType.FREE)
+        {
+            if (lastSubscription[0].StartedAt >= DateTime.Today)
+            {
+                return lastSubscription[0];
+            }
+
+            return lastSubscription[1];
+        }
+
+        // if it's not free, then we know the last subcription record is the active one.
+        return lastSubscription[0];
     }
 
     // get creators who are due for subscription renewal.

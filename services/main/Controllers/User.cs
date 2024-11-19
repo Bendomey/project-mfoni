@@ -20,23 +20,29 @@ public class UserController : ControllerBase
     private readonly UserService userService;
     private readonly UserTransformer _userTransformer;
     private readonly CreatorApplicationService _creatorApplicationService;
+    private readonly CreatorService _creatorService;
     private readonly CreatorApplicationTransformer _creatorApplicationTransformer;
     private readonly CreatorTransformer _creatorTransformer;
+    private readonly CreatorSubscriptionTransformer _creatorSubscriptionTransformer;
 
     public UserController(
         ILogger<UserController> logger,
         UserService userService,
         CreatorApplicationService creatorApplicationService,
+        CreatorService creatorService,
         CreatorApplicationTransformer creatorApplicationTransformer,
         CreatorTransformer creatorTransformer,
+        CreatorSubscriptionTransformer creatorSubscriptionTransformer,
         UserTransformer userTransformer
     )
     {
         this.logger = logger;
+        this._creatorService = creatorService;
         this.userService = userService;
         this._creatorApplicationService = creatorApplicationService;
         this._creatorApplicationTransformer = creatorApplicationTransformer;
         this._creatorTransformer = creatorTransformer;
+        this._creatorSubscriptionTransformer = creatorSubscriptionTransformer;
         this._userTransformer = userTransformer;
     }
 
@@ -545,6 +551,43 @@ public class UserController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
+
+    [Authorize]
+    [HttpPatch("creator-subscriptions/cancel")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> CancelSubscription(string id)
+    {
+        try
+        {
+            logger.LogInformation($"cancel creator subscription {id}");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var creatorSubscription = await _creatorService.CancelCreatorSubscription(currentUser.Id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorSubscription>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"cancel creator subscription exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
 
 }
 

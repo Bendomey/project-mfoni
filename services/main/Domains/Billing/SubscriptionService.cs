@@ -154,14 +154,7 @@ public class SubscriptionService
                 else if (daysOverdue > 3)
                 {
                     // demote them to the free tier
-                    var freeTierSubscription = new Models.CreatorSubscription
-                    {
-                        CreatorId = creator.Id,
-                        PackageType = CreatorSubscriptionPackageType.FREE,
-                        StartedAt = DateTime.UtcNow,
-                    };
-
-                    await _creatorSubscriptionCollection.InsertOneAsync(freeTierSubscription);
+                    await CreateAFreeTierSubscription(creator.Id);
 
                     // send a sorry notification for demotion.
                     SendNotification(
@@ -206,6 +199,20 @@ public class SubscriptionService
 
         await _creatorSubscriptionPurchaseCollection.InsertOneAsync(newSubscriptionPurchase);
 
+    }
+
+    public async Task<CreatorSubscription> CreateAFreeTierSubscription(string creatorId)
+    {
+        var freeTierSubscription = new Models.CreatorSubscription
+        {
+            CreatorId = creatorId,
+            PackageType = CreatorSubscriptionPackageType.FREE,
+            StartedAt = DateTime.UtcNow,
+        };
+
+        await _creatorSubscriptionCollection.InsertOneAsync(freeTierSubscription);
+
+        return freeTierSubscription;
     }
 
     private void SendNotification(Models.User user, string subject, string body)
