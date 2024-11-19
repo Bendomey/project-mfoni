@@ -163,11 +163,6 @@ public class SubscriptionService
 
                     await _creatorSubscriptionCollection.InsertOneAsync(freeTierSubscription);
 
-                    creator.PricingPackage = CreatorSubscriptionPackageType.FREE;
-                    creator.UpdatedAt = DateTime.UtcNow;
-
-                    await _creatorCollection.ReplaceOneAsync(c => c.Id == creator.Id, creator);
-
                     // send a sorry notification for demotion.
                     SendNotification(
                         user,

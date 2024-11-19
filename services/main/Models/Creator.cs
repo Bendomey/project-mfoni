@@ -22,9 +22,6 @@ public class Creator
     [BsonElement("status")]
     public string Status { get; set; } = CreatorStatus.ACTIVE;
 
-    [BsonElement("pricing_package")]
-    public required string PricingPackage { get; set; }// FREE | BASIC | ADVANCED
-
     [BsonElement("user_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public required string UserId { get; init; }

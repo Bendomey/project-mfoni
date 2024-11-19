@@ -66,7 +66,6 @@ public class CreatorService
             CreatorApplicationId = creatorApplication.Id,
             UserId = creatorApplication.UserId,
             Username = $"{user.Name.ToLower().Replace(" ", "")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 5)}",
-            PricingPackage = creatorApplication.IntendedPricingPackage,
         };
 
         await __creatorCollection.InsertOneAsync(creator);
@@ -128,6 +127,12 @@ public class CreatorService
         }
 
         return creator;
+    }
+
+    // TODO: work on this.
+    public async Task<CreatorSubscription> GetActiveCreatorSubscription(string creatorId)
+    {
+        return await __creatorSubscriptionCollection.Find(subscription => subscription.CreatorId == creatorId).FirstOrDefaultAsync();
     }
 
     // get creators who are due for subscription renewal.

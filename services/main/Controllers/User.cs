@@ -324,7 +324,7 @@ public class UserController : ControllerBase
                 CreatorApplicationId = id
             }, currentAdmin.Id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreator>(_creatorTransformer.Transform(creator), null).Result()
+            new GetEntityResponse<OutputCreator>(await _creatorTransformer.Transform(creator), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
