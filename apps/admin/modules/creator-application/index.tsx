@@ -18,11 +18,13 @@ import { ApproveApplicationModal } from "./approve";
 import { RejectApplicationModal } from "./reject";
 import { useGetCreatorApplications } from "@/api";
 import { useSearchParams } from "next/navigation";
+import { ViewApplicationModal } from "./view";
 
 
 export const CreatorApplication = () => {
   const [openApproveModal, setOpenApproveModal] = useState(false)
   const [openRejectModal, setOpenRejectModal] = useState(false)
+  const [openViewModal, setOpenViewModal] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<CreatorApplication>()
   const searchParams = useSearchParams();
 
@@ -128,7 +130,10 @@ export const CreatorApplication = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
-                <DropdownMenuItem><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                      setSelectedApplication(row.original)
+                      setOpenViewModal(true)
+                    }}><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
                 <DropdownMenuItem  onClick={() => {
                       setSelectedApplication(row.original)
                       setOpenApproveModal(true)
@@ -167,6 +172,7 @@ export const CreatorApplication = () => {
           refetch={refetch}
         />
       </div>
+      <ViewApplicationModal opened={openViewModal} setOpened={setOpenViewModal} data={selectedApplication} refetch={refetch}/>
       <ApproveApplicationModal opened={openApproveModal} setOpened={setOpenApproveModal} data={selectedApplication} refetch={refetch}/>
       <RejectApplicationModal opened={openRejectModal} setOpened={setOpenRejectModal} data={selectedApplication} refetch={refetch}/>
     </>

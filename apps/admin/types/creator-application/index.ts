@@ -3,9 +3,15 @@ interface CreatorApplication  {
   name: string;
   user: User;
   status: "submitted" | "canceled" | "approved";
+  idBackImage: string
+  idFrontImage: string
+  idType: "NATIONAL_ID"
+  intendedPricingPackage: string
   email: string;
   createdAt: Date
-  updatedAt: string
+  approvedAt: NullableDate
+  submittedAt: NullableDate
+  updatedAt: NullableDate
 };
 
 interface FetchCreatorApplicationFilter {
