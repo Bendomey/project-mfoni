@@ -3,6 +3,7 @@ using main.Configuratons;
 using main.Lib;
 using main.Models;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using NanoidDotNet;
 
@@ -101,33 +102,69 @@ public class CreatorService
             }
             else
             {
-                if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
-                {
-                    var _ = SmsConfiguration.SendSms(new SendSmsInput
-                    {
-                        PhoneNumber = user.PhoneNumber,
-                        Message = EmailTemplates.NewCreatorWithPremiumPackageButLowWalletBody.Replace("{name}", user.Name),
-                        AppId = _appConstantsConfiguration.SmsAppId,
-                        AppSecret = _appConstantsConfiguration.SmsAppSecret
-                    });
-                }
 
-                if (user.Email is not null && user.EmailVerifiedAt is not null)
-                {
-                    var _ = EmailConfiguration.Send(new SendEmailInput
-                    {
-                        From = _appConstantsConfiguration.EmailFrom,
-                        Email = user.Email,
-                        Subject = EmailTemplates.NewCreatorWithPremiumPackageButLowWalletSubject,
-                        Message = EmailTemplates.NewCreatorWithPremiumPackageButLowWalletBody.Replace("{name}", user.Name),
-                        ApiKey = _appConstantsConfiguration.ResendApiKey
-                    });
-                }
+                SendNotification(
+                    user,
+                    EmailTemplates.NewCreatorWithPremiumPackageButLowWalletSubject,
+                    EmailTemplates.NewCreatorWithPremiumPackageButLowWalletBody.Replace("{name}", user.Name)
+                );
             }
         }
 
         return creator;
     }
+
+    public async Task<CreatorSubscription> ActivateCreatorSubscription(ActivateCreatorSubscriptionInput input)
+    {
+        var creator = await __creatorCollection.Find(creator => creator.Id == input.CreatorId).FirstOrDefaultAsync();
+        var user = await _userService.GetUserById(creator.UserId);
+
+        var pricingLib = new PricingLib(input.PricingPackage);
+        var pricing = pricingLib.GetPrice() * input.Period;
+        bool canIPayWithWallet = user.BookWallet >= pricing;
+
+        if (!canIPayWithWallet)
+        {
+            throw new HttpRequestException("InsufficientFundsInWallet");
+        }
+
+        var today = DateTime.UtcNow;
+        var nextRenewalDate = DateTime.UtcNow.AddMonths(input.Period);
+
+        // Create a trail of the package the creator has been activated.
+        var creatorSubscription = new CreatorSubscription
+        {
+            CreatorId = creator.Id,
+            PackageType = input.PricingPackage,
+            Period = input.Period,
+            StartedAt = DateTime.UtcNow,
+            EndedAt = nextRenewalDate,
+        };
+
+        await __creatorSubscriptionCollection.InsertOneAsync(creatorSubscription);
+
+        await _subscriptionService.SubscribeWithWallet(new SubscribeWithWalletInput
+        {
+            Amount = pricingLib.GetPrice(),
+            SubscriptionId = creatorSubscription.Id,
+            UserId = user.Id
+        });
+
+        // send them a notification that their subscription has been renewed.
+        SendNotification(
+            user,
+            EmailTemplates.SuccessfulSubscriptionSubject,
+            EmailTemplates.SuccessfulSubscriptionBody
+                .Replace("{name}", user.Name)
+                .Replace("{package}", pricingLib.GetPackageName())
+                .Replace("{renewalDate}", today.ToString("dd/MM/yyyy"))
+                .Replace("{nextRenewalDate}", nextRenewalDate.ToString("dd/MM/yyyy"))
+                .Replace("{renewalAmount}", MoneyLib.ConvertPesewasToCedis(pricing) + ".00")
+        );
+
+        return creatorSubscription;
+    }
+
 
     public async Task<CreatorSubscription> CancelCreatorSubscription(string creatorId)
     {
@@ -179,8 +216,70 @@ public class CreatorService
     // get creators who are due for subscription renewal.
     public async Task<List<CreatorSubscription>> GetSubscribersDueForRenewal()
     {
-        // TODO: work on this.
-        return [];
+        var pipeline = new[]
+        {
+            // Sort by createdAt in descending order
+            new BsonDocument("$sort", new BsonDocument("created_at", -1)),
+
+            // Group by creatorId and get the latest record (first one after sorting)
+            new BsonDocument("$group", new BsonDocument
+            {
+                { "_id", "$creator_id" },
+                { "latestRecord", new BsonDocument("$first", "$$ROOT") }
+            }),
+
+            // Match the latestRecord where packageType is not "FREE" and endDate.AddDays(-5) <= today.
+            new BsonDocument("$match", new BsonDocument
+            {
+                { "latestRecord.package_type", new BsonDocument("$ne", CreatorSubscriptionPackageType.FREE) },
+                { "$expr", new BsonDocument("$and", new BsonArray
+                    {
+                        new BsonDocument("$gte", new BsonArray
+                        {
+                            new BsonDateTime(DateTime.UtcNow),
+                            new BsonDocument("$subtract", new BsonArray
+                            {
+                                "$latestRecord.end_date",
+                                5 * 24 * 60 * 60 * 1000 // 5 days in milliseconds
+                            })
+                        })
+                    })
+                }
+            }),
+
+            // Replace the root with the latestRecord
+            new BsonDocument("$replaceRoot", new BsonDocument("newRoot", "$latestRecord"))
+        };
+
+        return await __creatorSubscriptionCollection
+            .Aggregate<CreatorSubscription>(pipeline)
+            .ToListAsync();
+    }
+
+    private void SendNotification(Models.User user, string subject, string body)
+    {
+        if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
+        {
+            var _ = SmsConfiguration.SendSms(new SendSmsInput
+            {
+                PhoneNumber = user.PhoneNumber,
+                Message = body,
+                AppId = _appConstantsConfiguration.SmsAppId,
+                AppSecret = _appConstantsConfiguration.SmsAppSecret
+            });
+        }
+
+        if (user.Email is not null && user.EmailVerifiedAt is not null)
+        {
+            var _ = EmailConfiguration.Send(new SendEmailInput
+            {
+                From = _appConstantsConfiguration.EmailFrom,
+                Email = user.Email,
+                Subject = subject,
+                Message = body,
+                ApiKey = _appConstantsConfiguration.ResendApiKey
+            });
+        }
     }
 
 }

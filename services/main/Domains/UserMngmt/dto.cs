@@ -32,3 +32,11 @@ public class GetUsersInput
     public string? Provider { get; set; }
     public string? Search { get; set; }
 }
+
+
+public class ActivateCreatorSubscriptionInput
+{
+    public required string CreatorId { get; set; }
+    public required string PricingPackage { get; set; }
+    public required int Period { get; set; }
+}
