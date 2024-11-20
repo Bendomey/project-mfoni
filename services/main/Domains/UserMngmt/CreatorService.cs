@@ -47,6 +47,17 @@ public class CreatorService
         logger.LogDebug("Creator service initialized");
     }
 
+    public async Task<Models.Creator> GetCreatorByUserId(string userId)
+    {
+        var creator = await __creatorCollection.Find(creator => creator.UserId == userId).FirstOrDefaultAsync();
+        if (creator is null)
+        {
+            throw new HttpRequestException("CreatorNotFound");
+        }
+
+        return creator;
+    }
+
     public async Task<Creator> Create(string creatorApplicationId)
     {
         var creatorApplication = await _creatorApplicationCollection.Find(application => application.Id == creatorApplicationId).FirstOrDefaultAsync();
@@ -119,6 +130,43 @@ public class CreatorService
         var creator = await __creatorCollection.Find(creator => creator.Id == input.CreatorId).FirstOrDefaultAsync();
         var user = await _userService.GetUserById(creator.UserId);
 
+        // check if the creator has an active subscription.
+        var activeSubscription = await GetActiveCreatorSubscription(input.CreatorId);
+
+        if (activeSubscription.PackageType != CreatorSubscriptionPackageType.FREE)
+        {
+            // we check if the current subscription was cancelled but hasn't expired yet.
+            var lastSubscriptionRecord = await __creatorSubscriptionCollection.Find(subscription => subscription.CreatorId == input.CreatorId)
+                .SortByDescending(subscription => subscription.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            if (lastSubscriptionRecord.PackageType == CreatorSubscriptionPackageType.FREE)
+            {
+                // delete the record and let the system resume the subscription.
+                await __creatorSubscriptionCollection.DeleteOneAsync(subscription => subscription.Id == lastSubscriptionRecord.Id);
+
+                // if it's the same package, we can easily resume it by deleting old record.
+                if (lastSubscriptionRecord.PackageType != input.PricingPackage)
+                {
+                    // TODO: work on an upgrade/downgrade scenario.
+                }
+                else
+                {
+                    return lastSubscriptionRecord;
+                }
+            }
+            else
+            {
+                if (activeSubscription.PackageType == input.PricingPackage)
+                {
+                    throw new HttpRequestException("AlreadySubscribedToPackage");
+                }
+
+                // TODO: work on an upgrade/downgrade scenario.
+            }
+
+        }
+
         var pricingLib = new PricingLib(input.PricingPackage);
         var pricing = pricingLib.GetPrice() * input.Period;
         bool canIPayWithWallet = user.BookWallet >= pricing;
@@ -165,9 +213,23 @@ public class CreatorService
         return creatorSubscription;
     }
 
+    public async Task<Models.Creator> GetCreatorById(string creatorId)
+    {
+        var creator = await __creatorCollection.Find(creator => creator.Id == creatorId).FirstOrDefaultAsync();
+        if (creator is null)
+        {
+            throw new HttpRequestException("CreatorNotFound");
+        }
+
+        return creator;
+    }
+
 
     public async Task<CreatorSubscription> CancelCreatorSubscription(string creatorId)
     {
+        var creator = await GetCreatorById(creatorId);
+        var user = await _userService.GetUserById(creator.UserId);
+
         // find last subscription of creator based on date created
         var lastSubscription = await __creatorSubscriptionCollection.Find(subscription => subscription.CreatorId == creatorId)
             .SortByDescending(subscription => subscription.CreatedAt)
@@ -176,11 +238,32 @@ public class CreatorService
         // if it's free, then we don't do anything.
         if (lastSubscription.PackageType == CreatorSubscriptionPackageType.FREE)
         {
-            return lastSubscription;
+            throw new HttpRequestException("AlreadyOnFreeTier");
         }
 
         // if it's premium, then we cancel it by creating a new subscription record with FREE as the package type.
-        var newSubscription = await _subscriptionService.CreateAFreeTierSubscription(creatorId);
+        var newSubscription = await _subscriptionService.CreateAFreeTierSubscription(creatorId, lastSubscription.EndedAt);
+
+        if (lastSubscription.EndedAt is null)
+        {
+            throw new HttpRequestException("SubscriptionEndDateNotFound");
+        }
+
+        DateTime expiryDate = (DateTime)lastSubscription.EndedAt;
+
+        var pricingLib = new PricingLib(lastSubscription.PackageType);
+
+        SendNotification(
+            user,
+            EmailTemplates.CreatorSubscriptionCancelledSubject
+                .Replace("{expiryDate}", expiryDate.ToString("dd/MM/yyyy")),
+            EmailTemplates.CreatorSubscriptionCancelledBody
+                .Replace("{name}", user.Name)
+                .Replace("{package}", pricingLib.GetPackageName())
+                .Replace("{cancellationDate}", DateTime.UtcNow.ToString("dd/MM/yyyy"))
+                .Replace("{expiryDate}", expiryDate.ToString("dd/MM/yyyy"))
+        );
+
         return newSubscription;
     }
 
@@ -198,15 +281,20 @@ public class CreatorService
             throw new Exception("CreatorSubscriptionNotFound");
         }
 
+        if (lastSubscription.Count == 1)
+        {
+            return lastSubscription[0];
+        }
+
         // if last subscription is free, then we verify it's active or not.
         if (lastSubscription[0].PackageType == CreatorSubscriptionPackageType.FREE)
         {
-            if (lastSubscription[0].StartedAt >= DateTime.Today)
+            if (lastSubscription[0].StartedAt.Date > DateTime.Today.Date)
             {
-                return lastSubscription[0];
+                return lastSubscription[1];
             }
 
-            return lastSubscription[1];
+            return lastSubscription[0];
         }
 
         // if it's not free, then we know the last subcription record is the active one.
@@ -232,14 +320,15 @@ public class CreatorService
             new BsonDocument("$match", new BsonDocument
             {
                 { "latestRecord.package_type", new BsonDocument("$ne", CreatorSubscriptionPackageType.FREE) },
-                { "$expr", new BsonDocument("$and", new BsonArray
+
+                { "$expr", new BsonDocument("$and",  new BsonArray
                     {
                         new BsonDocument("$gte", new BsonArray
                         {
-                            new BsonDateTime(DateTime.UtcNow),
+                            "$$NOW",
                             new BsonDocument("$subtract", new BsonArray
                             {
-                                "$latestRecord.end_date",
+                                "$latestRecord.ended_at",
                                 5 * 24 * 60 * 60 * 1000 // 5 days in milliseconds
                             })
                         })

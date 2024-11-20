@@ -191,7 +191,7 @@ Twitter(https://twitter.com/mfoniapp)
     public static string FailedSubscriptionBody = @"
 Hey {name},
 
-We attempted to renew your subscription for {package} package on {renewalDate}, but unfortunately, the payment could not be processed due to insufficient funds in your wallet.
+We attempted to renew your subscription for {package} package, but unfortunately, the payment could not be processed due to insufficient funds in your wallet.
 
 As a result, your account has been moved to the Free Tier. While you can still enjoy limited access to mfoni, some premium benefits have been paused.
 
@@ -202,11 +202,32 @@ Log in to your account at https://mfoni.app/auth.
 Navigate to the Wallet section and top up your balance.
 Once topped up, you can reactivate your subscription under the Plans section.
 
-Thank you for ensuring your wallet was topped up. You’re all set for an uninterrupted access to {package} package.
-
 If you have any questions or need further assistance, feel free to reach out to us at support@mfoni.app.
 
-Thank you for being a valued member of our community!
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
+    public static string CreatorSubscriptionCancelledSubject = "⚠️ Your Subscription Has Been Canceled – Access Until {expiryDate}";
+
+    public static string CreatorSubscriptionCancelledBody = @"
+Hey {name},
+
+We’re writing to confirm that your subscription to {package} package has been successfully canceled as of {cancellationDate}.
+
+While your subscription won’t renew, you’ll continue to enjoy all the benefits of {package} package until the end of your current billing period on {expiryDate}.
+
+Here are the details of your cancellation:
+
+- Subscription Package: {package}
+- Cancellation Date: {cancellationDate}
+- Access End Date: {expiryDate}
+
+We’re sorry to see you go and hope you’ve enjoyed using mfoni. If there’s anything we can do to improve or help you reconsider, we’d love to hear from you!
+
+If you have any questions or need further assistance, please don’t hesitate to reach out to our support team at support@mfoni.app.
+
+Thank you for giving us the opportunity to serve you.
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)

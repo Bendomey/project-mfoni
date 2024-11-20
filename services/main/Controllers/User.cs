@@ -553,6 +553,43 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
+    [HttpGet("creator-subscriptions/active")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ActiveSubscription()
+    {
+        try
+        {
+            logger.LogInformation($"get active creator subscription");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
+            var creatorSubscription = await _creatorService.GetActiveCreatorSubscription(creator.Id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorSubscription>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"get active subscription failed. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
     [HttpPatch("creator-subscriptions/cancel")]
     [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
@@ -563,7 +600,8 @@ public class UserController : ControllerBase
         {
             logger.LogInformation($"cancel creator subscription");
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
-            var creatorSubscription = await _creatorService.CancelCreatorSubscription(currentUser.Id);
+            var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
+            var creatorSubscription = await _creatorService.CancelCreatorSubscription(creator.Id);
             return new ObjectResult(
             new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
             )
@@ -599,9 +637,10 @@ public class UserController : ControllerBase
         {
             logger.LogInformation($"activate a creator subscription");
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
             var creatorSubscription = await _creatorService.ActivateCreatorSubscription(new Domains.ActivateCreatorSubscriptionInput
             {
-                CreatorId = currentUser.Id,
+                CreatorId = creator.Id,
                 PricingPackage = input.PricingPackage,
                 Period = input.Period
             });

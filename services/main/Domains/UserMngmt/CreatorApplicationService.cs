@@ -218,6 +218,10 @@ public class CreatorApplicationService
             throw new HttpRequestException("UserNotFound");
         }
 
+        user.Role = UserRole.CREATOR;
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
+
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
         {
             var _ = SmsConfiguration.SendSms(new SendSmsInput
@@ -297,6 +301,11 @@ public class CreatorApplicationService
         var creatorApplication = await _creatorApplicationCollection.Find(application => application.UserId == userId)
             .SortByDescending(application => application.CreatedAt)
             .FirstOrDefaultAsync();
+
+        if (creatorApplication is null)
+        {
+            throw new HttpRequestException("CreatorApplicationNotFound");
+        }
 
         return creatorApplication;
     }

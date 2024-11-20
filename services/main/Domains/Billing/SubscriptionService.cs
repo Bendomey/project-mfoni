@@ -73,9 +73,12 @@ public class SubscriptionService
 
         if (canIPay)
         {
+            _logger.LogDebug($"User {user.Id} has enough balance to renew subscription");
+
             //  check if renewal date is due
-            if (today >= renewalDate)
+            if (today.Date >= renewalDate.Date)
             {
+                _logger.LogInformation($"User {user.Id} is renewing subscription");
                 DateTime nextRenewalDate = today.AddMonths(1);
 
                 // renew their subscription
@@ -108,19 +111,24 @@ public class SubscriptionService
                         .Replace("{nextRenewalDate}", nextRenewalDate.ToString("dd/MM/yyyy"))
                         .Replace("{renewalAmount}", MoneyLib.ConvertPesewasToCedis(pricingLib.GetPrice()) + ".00")
                 );
+                return;
             }
 
             // wait for their renewal date to come and then renew their subscription
+            _logger.LogDebug($"User {user.Id} is waiting for renewal date to renew subscription");
             return;
 
         }
         else
         {
+            _logger.LogDebug($"User {user.Id} does not have enough balance to renew subscription");
 
             DateTime startDateOf5dayThreshold = renewalDate.AddDays(-5);
-            if (today >= startDateOf5dayThreshold && today <= renewalDate)
+            if (today.Date >= startDateOf5dayThreshold.Date && today.Date <= renewalDate.Date)
             {
-                int daysLeft = (renewalDate - today).Days;
+                _logger.LogDebug($"We are alerting User {user.Id} to topup their wallet");
+
+                int daysLeft = (renewalDate.Date - today.Date).Days;
 
                 // send them a notification to top up their wallet
                 SendNotification(
@@ -134,13 +142,15 @@ public class SubscriptionService
                         .Replace("{renewalDate}", renewalDate.ToString("dd/MM/yyyy"))
                 );
             }
-            else if (today > renewalDate)
+            else if (today.Date > renewalDate.Date)
             {
                 // check if they've exceeded the grace period. For now it's 3 days after their subscription expires.
-                int daysOverdue = (today - renewalDate).Days;
+                int daysOverdue = (today.Date - renewalDate.Date).Days;
 
                 if (daysOverdue > 0 && daysOverdue <= 3)
                 {
+                    _logger.LogDebug($"We are alerting User {user.Id} to topup their wallet. Payment is overdue");
+
                     // send them an overdue notification
                     SendNotification(
                         user,
@@ -153,6 +163,7 @@ public class SubscriptionService
                 }
                 else if (daysOverdue > 3)
                 {
+                    _logger.LogDebug($"Demoting {user.Id} to free tier.");
                     // demote them to the free tier
                     await CreateAFreeTierSubscription(creator.Id);
 
@@ -201,13 +212,13 @@ public class SubscriptionService
 
     }
 
-    public async Task<CreatorSubscription> CreateAFreeTierSubscription(string creatorId)
+    public async Task<CreatorSubscription> CreateAFreeTierSubscription(string creatorId, DateTime? startDate = null)
     {
         var freeTierSubscription = new Models.CreatorSubscription
         {
             CreatorId = creatorId,
             PackageType = CreatorSubscriptionPackageType.FREE,
-            StartedAt = DateTime.UtcNow,
+            StartedAt = startDate is not null ? (DateTime)startDate : DateTime.UtcNow,
         };
 
         await _creatorSubscriptionCollection.InsertOneAsync(freeTierSubscription);
