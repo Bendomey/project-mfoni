@@ -9,7 +9,6 @@ import {
   DialogFooter,
   DialogOverlay,
 } from "@/components/ui/dialog";
-import { useApproveApplication } from "@/TestData";
 import { useToast } from "@/hooks/use-toast";
 import _ from "lodash";
 
@@ -27,25 +26,25 @@ export const RejectApplicationModal = ({
   setOpened,
 }: RejectApplicationModalProps) => {
   const { toast } = useToast();
-  const { mutate, status } = useApproveApplication();
+  // const { mutate, status } = useApproveApplication();
 
-  const handleSubmit = () => {
-    mutate(data!.id);
-    if (status == 200) {
-      setOpened(false);
-      toast({
-        title: "Application rejected",
-        variant: "success",
-        duration: 5000,
-      });
-    } else {
-      toast({
-        title: "Error rejecting application",
-        variant: "destructive",
-        duration: 5000,
-      });
-    }
-  };
+  // const handleSubmit = () => {
+  //   mutate(data!.id);
+  //   if (status == 200) {
+  //     setOpened(false);
+  //     toast({
+  //       title: "Application rejected",
+  //       variant: "success",
+  //       duration: 5000,
+  //     });
+  //   } else {
+  //     toast({
+  //       title: "Error rejecting application",
+  //       variant: "destructive",
+  //       duration: 5000,
+  //     });
+  //   }
+  // };
 
   return (
     <Dialog open={opened} onOpenChange={() => setOpened(false)}>
@@ -61,7 +60,7 @@ export const RejectApplicationModal = ({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button type="button" onClick={() => handleSubmit()}>
+          <Button type="button" onClick={() => {}}>
             Yes, Reject
           </Button>
         </DialogFooter>

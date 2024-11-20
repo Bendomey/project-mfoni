@@ -9,13 +9,14 @@ import {
   DialogFooter,
   DialogOverlay,
 } from "@/components/ui/dialog";
-import { useApproveApplication } from "@/TestData";
 import { useToast } from "@/hooks/use-toast";
 import _ from "lodash";
+import { useApproveCreatorApplication } from "@/api";
+import { Loader2Icon } from "lucide-react";
 
 interface AcceptApplicationModalProps {
   data?: CreatorApplication;
-  refetch?: VoidFunction;
+  refetch: VoidFunction;
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;
 }
@@ -27,24 +28,26 @@ export const ApproveApplicationModal = ({
   setOpened,
 }: AcceptApplicationModalProps) => {
   const { toast } = useToast();
-  const { mutate, status } = useApproveApplication();
+  const { mutate, isPending: isLoading } = useApproveCreatorApplication();
 
   const handleSubmit = () => {
-    mutate(data!.id);
-    if (status == 200) {
-      setOpened(false);
+    mutate(data!.id),{
+      onError: () => {
+        toast({
+          title: "Error approving application",
+          variant: "destructive",
+          duration: 5000,
+        })   
+      },
+      onSuccess: () => {
+      refetch()
       toast({
         title: "Application approved",
         variant: "success",
         duration: 5000,
       });
-    } else {
-      toast({
-        title: "Error approving application",
-        variant: "destructive",
-        duration: 5000,
-      });
-    }
+      setOpened(false);
+    }}
   };
 
   return (
@@ -61,8 +64,8 @@ export const ApproveApplicationModal = ({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button type="button" onClick={() => handleSubmit()}>
-            Yes, Approve
+          <Button disabled={isLoading} type="button" onClick={() => handleSubmit()}>
+          { isLoading && (<Loader2Icon className="animate-spin" />)} Yes, Approve
           </Button>
         </DialogFooter>
       </DialogContent>
