@@ -28,26 +28,24 @@ export const ApproveApplicationModal = ({
   setOpened,
 }: AcceptApplicationModalProps) => {
   const { toast } = useToast();
-  const { mutate, isPending: isLoading } = useApproveCreatorApplication();
+  const { mutateAsync, isPending: isLoading } = useApproveCreatorApplication();
 
-  const handleSubmit = () => {
-    mutate(data!.id),{
-      onError: () => {
-        toast({
-          title: "Error approving application",
-          variant: "destructive",
-          duration: 5000,
-        })   
-      },
-      onSuccess: () => {
+  const handleSubmit = async () => {
+    try {
+      await mutateAsync(data!.id)
       refetch()
       toast({
         title: "Application approved",
         variant: "success",
-        duration: 5000,
       });
       setOpened(false);
-    }}
+      
+    } catch (err){
+      toast({
+        title: "Error approving application",
+        variant: "destructive",
+      })   
+    }
   };
 
   return (
