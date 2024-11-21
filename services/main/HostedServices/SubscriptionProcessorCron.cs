@@ -4,16 +4,14 @@ namespace main.HostedServices
 {
     public class SubscriptionProcessorCron : IHostedService, IDisposable
     {
-        private readonly CreatorService _creatorService;
         private readonly SubscriptionService _subscriptionService;
         private readonly ILogger<SubscriptionProcessorCron> _logger;
         private Timer _timer = null;
         private TimeSpan _taskTime = new TimeSpan(0, 0, 0); // Set to 12:00 AM.
 
-        public SubscriptionProcessorCron(SubscriptionService subscriptionService, CreatorService creatorService, ILogger<SubscriptionProcessorCron> logger)
+        public SubscriptionProcessorCron(SubscriptionService subscriptionService, ILogger<SubscriptionProcessorCron> logger)
         {
             _subscriptionService = subscriptionService;
-            _creatorService = creatorService;
             _logger = logger;
         }
 
@@ -57,7 +55,7 @@ namespace main.HostedServices
         {
             try
             {
-                var creators = await _creatorService.GetSubscribersDueForRenewal();
+                var creators = await _subscriptionService.GetSubscribersDueForRenewal();
 
                 foreach (var creator in creators)
                 {

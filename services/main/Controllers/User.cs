@@ -21,6 +21,7 @@ public class UserController : ControllerBase
     private readonly UserTransformer _userTransformer;
     private readonly CreatorApplicationService _creatorApplicationService;
     private readonly CreatorService _creatorService;
+    private readonly SubscriptionService _subscriptionService;
     private readonly CreatorApplicationTransformer _creatorApplicationTransformer;
     private readonly CreatorTransformer _creatorTransformer;
     private readonly CreatorSubscriptionTransformer _creatorSubscriptionTransformer;
@@ -30,6 +31,7 @@ public class UserController : ControllerBase
         UserService userService,
         CreatorApplicationService creatorApplicationService,
         CreatorService creatorService,
+        SubscriptionService subscriptionService,
         CreatorApplicationTransformer creatorApplicationTransformer,
         CreatorTransformer creatorTransformer,
         CreatorSubscriptionTransformer creatorSubscriptionTransformer,
@@ -38,6 +40,7 @@ public class UserController : ControllerBase
     {
         this.logger = logger;
         this._creatorService = creatorService;
+        this._subscriptionService = subscriptionService;
         this.userService = userService;
         this._creatorApplicationService = creatorApplicationService;
         this._creatorApplicationTransformer = creatorApplicationTransformer;
@@ -564,7 +567,7 @@ public class UserController : ControllerBase
             logger.LogInformation($"get active creator subscription");
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
-            var creatorSubscription = await _creatorService.GetActiveCreatorSubscription(creator.Id);
+            var creatorSubscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
             return new ObjectResult(
             new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
             )
@@ -601,7 +604,7 @@ public class UserController : ControllerBase
             logger.LogInformation($"cancel creator subscription");
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
-            var creatorSubscription = await _creatorService.CancelCreatorSubscription(creator.Id);
+            var creatorSubscription = await _subscriptionService.CancelCreatorSubscription(creator.Id);
             return new ObjectResult(
             new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
             )
@@ -638,11 +641,12 @@ public class UserController : ControllerBase
             logger.LogInformation($"activate a creator subscription");
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
-            var creatorSubscription = await _creatorService.ActivateCreatorSubscription(new Domains.ActivateCreatorSubscriptionInput
+            var creatorSubscription = await _subscriptionService.ActivateCreatorSubscription(new Domains.ActivateCreatorSubscriptionInput
             {
                 CreatorId = creator.Id,
                 PricingPackage = input.PricingPackage,
-                Period = input.Period
+                Period = input.Period,
+                UpgradeEffect = input.UpgradeEffect
             });
             return new ObjectResult(
             new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()

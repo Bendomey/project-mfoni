@@ -1,4 +1,4 @@
-using System.Net;
+using main.Models;
 
 namespace main.Lib;
 
@@ -48,6 +48,32 @@ public class PricingLib
                 return "Master Shot";
             default:
                 throw new HttpRequestException("InvalidPackageType");
+        }
+    }
+
+    public string DetermineIfItsAnUpgradeOrDowngrade(string newPackage)
+    {
+        string[] levels = { CreatorSubscriptionPackageType.FREE, CreatorSubscriptionPackageType.BASIC, CreatorSubscriptionPackageType.ADVANCED };
+
+        int oldIndex = Array.IndexOf(levels, _packageType.ToUpper());
+        int newIndex = Array.IndexOf(levels, newPackage.ToUpper());
+
+        if (oldIndex == -1 || newIndex == -1)
+        {
+            throw new Exception("InvalidPackageType");
+        }
+
+        if (newIndex > oldIndex)
+        {
+            return "UPGRADE";
+        }
+        else if (newIndex < oldIndex)
+        {
+            return "DOWNGRADE";
+        }
+        else
+        {
+            return "NO_CHANGE";
         }
     }
 }

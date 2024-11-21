@@ -164,9 +164,9 @@ The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
     ";
 
-    public static string SuccessfulSubscriptionSubject = "🎉 Your Subscription Has Been Successfully Renewed!";
+    public static string SuccessfulSubscriptionRenewalSubject = "🎉 Your Subscription Has Been Successfully Renewed!";
 
-    public static string SuccessfulSubscriptionBody = @"
+    public static string SuccessfulSubscriptionRenewalBody = @"
 Hey {name},
 
 Great news! Your subscription for {package} package has been successfully renewed on {renewalDate}. We’re excited to continue providing you with more ways to share your content!
@@ -232,4 +232,107 @@ Thank you for giving us the opportunity to serve you.
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
     ";
+
+    public static string SuccessfulSubscriptionSubject = "Welcome! Your Subscription Is Confirmed";
+
+    public static string SuccessfulSubscriptionBody = @"
+Hey {name},
+
+Thank you for subscribing to {package} package! We’re thrilled to have you join our community.
+
+Here’s what you can expect:
+
+Access: Your subscription is now active, giving you full access to {package} benefits.
+Support: If you need assistance, our support team is here for you at support@mfoni.app.
+Explore: Get started by https://mfoni.app.
+Your Details:
+
+Package: {package}
+Subscription Start Date: {startDate}
+Renews On: {renewalDate}
+Amount Paid: GH¢ {renewalAmount}
+
+We’re here to ensure you get the most out of your subscription. Don’t hesitate to reach out if you have questions or need help.
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
+    public static string SuccessfulSubscriptionImmediateUpgradeSubject = "Your Upgrade to {package} is Active!";
+
+    public static string SuccessfulSubscriptionImmediateUpgradeBody = @"
+Hey {name},
+
+Congratulations! Your upgrade to {package} package is now live and ready to use. 🎉
+
+Here’s what you can enjoy right away:
+
+Upgraded Features: https:/mfoni.app/#pricing.
+Payment Details:
+
+Upgrade Fee: GH¢ {upgradeAmount}
+Effective Date: {effectiveDate}
+Renewal Date: {renewalDate}
+
+We’ve applied your balance toward the new plan, and you’ll now enjoy all the benefits of your upgraded package without delay.
+
+If you have any questions about your upgrade or need further assistance, don’t hesitate to reach out to us at support@mfoni.app.
+
+Thank you for choosing mfoni. We’re excited to support your journey!
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
+    public static string SuccessfulSubscriptionScheduledUpgradeSubject = "Your Upgrade to {package} is Scheduled!";
+
+    public static string SuccessfulSubscriptionScheduledUpgradeBody = @"
+Hey {name},
+
+Thank you for upgrading to {package} package! We’re thrilled to see you take this step with us.
+
+Your new package will activate at the start of your next billing cycle:
+
+Key Details:
+
+Package Name: {package}
+Activation Date: {nextRenewalDate}
+New Monthly Fee: GH¢ {newMonthlyFee}
+
+For now, you’ll continue to enjoy your current plan until {nextRenewalDate}. On that date, your account will seamlessly switch to the upgraded plan, giving you access to:
+
+Enhanced Features: https://mfoni.app/#pricing
+
+If you have any questions about your upgrade or billing, feel free to contact us at support@mfoni.app.
+
+Thank you for choosing mfoni. We’re excited for you to experience the benefits of your upgraded package soon!
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
+    public static string SuccessfulSubscriptionScheduledDowngradeSubject = "Your Downgrade to {package} is Scheduled!";
+
+    public static string SuccessfulSubscriptionScheduledDowngradeBody = @"
+Hey {name},
+
+We’ve received your request to downgrade to {package} package, and we want to confirm the details for you.
+
+Your current plan, {currentPackage} package, will remain active until the end of your current billing cycle, which you’ve already paid for. Starting on {nextRenewalDate}, your account will switch to the downgraded plan.
+
+What to Expect:
+
+Until {currentCycleEndDate}: You’ll continue to enjoy all the benefits of your current plan.
+Starting {nextRenewalDate}: Your account will move to the {package} package.
+
+New Billing Amount: GH¢ {newMonthlyFee}
+
+If you have any questions or would like to make further changes to your account, feel free to contact us at support@mfoni.app.
+
+Thank you for choosing mfoni. We’re here to support you every step of the way!
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
 }

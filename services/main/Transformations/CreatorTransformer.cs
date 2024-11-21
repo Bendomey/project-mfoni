@@ -9,19 +9,19 @@ namespace main.Transformations;
 
 public class CreatorTransformer
 {
-    private readonly CreatorService _creatorService;
+    private readonly SubscriptionService _subscriptionService;
     private readonly CreatorSubscriptionTransformer _creatorSubscriptionTransformer;
 
-    public CreatorTransformer(CreatorService creatorService, CreatorSubscriptionTransformer creatorSubscriptionTransformer)
+    public CreatorTransformer(SubscriptionService subscriptionService, CreatorSubscriptionTransformer creatorSubscriptionTransformer)
     {
-        _creatorService = creatorService;
+        _subscriptionService = subscriptionService;
         _creatorSubscriptionTransformer = creatorSubscriptionTransformer;
     }
 
     public async Task<OutputCreator> Transform(Creator creator)
     {
 
-        var subscription = await _creatorService.GetActiveCreatorSubscription(creator.Id);
+        var subscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
         var subscriptionTransformer = _creatorSubscriptionTransformer.Transform(subscription);
 
         return new OutputCreator
