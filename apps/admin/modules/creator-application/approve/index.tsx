@@ -15,7 +15,7 @@ import { useApproveCreatorApplication } from "@/api";
 import { Loader2Icon } from "lucide-react";
 
 interface AcceptApplicationModalProps {
-  data: CreatorApplication;
+  data?: CreatorApplication;
   refetch: VoidFunction;
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;
@@ -31,6 +31,14 @@ export const ApproveApplicationModal = ({
   const { mutate, isPending: isLoading } = useApproveCreatorApplication();
 
   const handleSubmit = () => {
+    if (!data) {
+      toast({
+        title: "Application data is undefined or null",
+        variant: "destructive",
+      })
+      return;
+    }
+
       mutate(
         data.id,
         {
