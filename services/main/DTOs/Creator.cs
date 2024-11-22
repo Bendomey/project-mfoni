@@ -12,7 +12,7 @@ public class ActivateCreatorSubscriptionInput
     /// <summary>
     /// Package Type
     /// </summary>
-    /// <example>BASIC | ADVANCE</example>
+    /// <example>BASIC | ADVANCED</example>
     [Required]
     public required string PricingPackage { get; set; }
 

@@ -286,7 +286,8 @@ public class SubscriptionService
             Builders<CreatorSubscription>.Filter.Eq("creator_id", ObjectId.Parse(sub.CreatorId)),
              Builders<CreatorSubscription>.Filter.And(
                 Builders<CreatorSubscription>.Filter.Eq("package_type", CreatorSubscriptionPackageType.FREE),
-                Builders<CreatorSubscription>.Filter.Gte("started_at", sub.EndedAt)
+                Builders<CreatorSubscription>.Filter.Gte("started_at", sub.EndedAt),
+                Builders<CreatorSubscription>.Filter.Eq("ended_at", BsonNull.Value)
             )
         );
 
@@ -299,17 +300,19 @@ public class SubscriptionService
     public async Task<CreatorSubscription> GetActiveCreatorSubscription(string creatorId)
     {
 
+        var today = DateTime.UtcNow;
         var filter = Builders<CreatorSubscription>.Filter.And(
             Builders<CreatorSubscription>.Filter.Eq("creator_id", ObjectId.Parse(creatorId)),
             Builders<CreatorSubscription>.Filter.Or(
                 Builders<CreatorSubscription>.Filter.And(
                     Builders<CreatorSubscription>.Filter.Ne("package_type", CreatorSubscriptionPackageType.FREE),
-                    Builders<CreatorSubscription>.Filter.Lte("started_at", DateTime.UtcNow),
-                    Builders<CreatorSubscription>.Filter.Gt("ended_at", DateTime.UtcNow)
+                    Builders<CreatorSubscription>.Filter.Lte("started_at", today),
+                    Builders<CreatorSubscription>.Filter.Gt("ended_at", today)
                 ),
                 Builders<CreatorSubscription>.Filter.And(
                     Builders<CreatorSubscription>.Filter.Eq("package_type", CreatorSubscriptionPackageType.FREE),
-                    Builders<CreatorSubscription>.Filter.Lte("started_at", DateTime.UtcNow)
+                    Builders<CreatorSubscription>.Filter.Lte("started_at", today),
+                    Builders<CreatorSubscription>.Filter.Eq("ended_at", BsonNull.Value)
                 )
             )
         );
@@ -346,6 +349,12 @@ public class SubscriptionService
                 throw new HttpRequestException("InsufficientFundsInWallet");
             }
 
+            // end the free tier
+            await _creatorSubscriptionCollection.UpdateOneAsync(
+                subscription => subscription.Id == activeSubscription.Id,
+                Builders<CreatorSubscription>.Update.Set(subscription => subscription.EndedAt, DateTime.UtcNow)
+            );
+
             var today = DateTime.UtcNow;
             var nextRenewalDate = DateTime.UtcNow.AddMonths(input.Period);
 
@@ -355,7 +364,7 @@ public class SubscriptionService
                 CreatorId = creator.Id,
                 PackageType = input.PricingPackage,
                 Period = input.Period,
-                StartedAt = today,
+                StartedAt = DateTime.UtcNow,
                 EndedAt = nextRenewalDate,
             };
 
@@ -367,12 +376,6 @@ public class SubscriptionService
                 SubscriptionId = creatorSubscription.Id,
                 UserId = user.Id
             });
-
-            // end the free tier
-            await _creatorSubscriptionCollection.UpdateOneAsync(
-                subscription => subscription.Id == activeSubscription.Id,
-                Builders<CreatorSubscription>.Update.Set(subscription => subscription.EndedAt, DateTime.UtcNow.AddDays(-1))
-            );
 
             // send them a notification that their subscription has been successful.
             SendNotification(
@@ -415,7 +418,6 @@ public class SubscriptionService
             await _creatorSubscriptionCollection.DeleteOneAsync(subscription => subscription.Id == __cancelledSubscriptionRecord.Id);
         }
 
-
         // ======================= UPGRADE THE SUBSCRIPTION. =============================
 
         if (pricingChange == "UPGRADE")
@@ -424,14 +426,23 @@ public class SubscriptionService
 
             if (upgradeEffect == "INSTANT")
             {
+                var today = DateTime.UtcNow;
+
+
+                // calculate how much the person has paid for the old billing.
+                var activePricingLib = new PricingLib(activeSubscription.PackageType);
+                var daysUsed = (today.Date - activeSubscription.StartedAt.Date).Days; // (((DateTime)activeSubscription.EndedAt!).Date - today.Date).Days;
+                Int64 pricingForWhatsBeenUsed = (Int64)(activePricingLib.GetPrice() / 30 * daysUsed);
+                Int64 remainingAmount = activePricingLib.GetPrice() - pricingForWhatsBeenUsed;
 
                 // calculate the balance
-                var today = DateTime.UtcNow;
                 var newUpgradeSubEndDate = (DateTime)activeSubscription.EndedAt!;
-                var daysLeft = (((DateTime)activeSubscription.EndedAt!).Date - today.Date).Days;
+                var daysLeft = (newUpgradeSubEndDate.Date - today.Date).Days;
 
                 // 30 days = month
-                Int64 pricing = (Int64)(pricingLib.GetPrice() / 30 * daysLeft);
+                Int64 pricingForWhatToPayFor = (Int64)(pricingLib.GetPrice() / 30 * daysLeft);
+                Int64 pricingChanges = pricingForWhatToPayFor - remainingAmount;
+                Int64 pricing = pricingChanges < 0 ? 0 : pricingChanges;
                 bool canIPayWithWallet = user.BookWallet >= pricing;
 
                 if (!canIPayWithWallet)
@@ -439,22 +450,22 @@ public class SubscriptionService
                     throw new HttpRequestException("InsufficientFundsInWallet");
                 }
 
+                // end the free tier
+                await _creatorSubscriptionCollection.UpdateOneAsync(
+                    subscription => subscription.Id == activeSubscription.Id,
+                    Builders<CreatorSubscription>.Update.Set(subscription => subscription.EndedAt, DateTime.UtcNow)
+                );
+
                 var newUpgradeSub = new CreatorSubscription
                 {
                     CreatorId = creator.Id,
                     PackageType = input.PricingPackage,
-                    Period = 0.1,
-                    StartedAt = today,
+                    Period = 1,
+                    StartedAt = DateTime.UtcNow,
                     EndedAt = newUpgradeSubEndDate,
                 };
 
                 await _creatorSubscriptionCollection.InsertOneAsync(newUpgradeSub);
-
-                // backdate the active subscription to the yesterday's date so that the new one kicks in.
-                await _creatorSubscriptionCollection.UpdateOneAsync(
-                    subscription => subscription.Id == activeSubscription.Id,
-                    Builders<CreatorSubscription>.Update.Set(subscription => subscription.EndedAt, today.AddDays(-1))
-                );
 
                 await SubscribeWithWallet(new SubscribeWithWalletInput
                 {
@@ -511,6 +522,7 @@ public class SubscriptionService
         }
 
         // ======================= DOWNGRADE THE SUBSCRIPTION. =============================
+
         var newDowngradeSubStartDate = (DateTime)activeSubscription.EndedAt!;
         var downgradeNextRenewalDate = newDowngradeSubStartDate.AddDays(1);
         var currentPricingLib = new PricingLib(activeSubscription.PackageType);
