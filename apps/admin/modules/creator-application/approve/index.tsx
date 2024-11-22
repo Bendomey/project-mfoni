@@ -15,7 +15,7 @@ import { useApproveCreatorApplication } from "@/api";
 import { Loader2Icon } from "lucide-react";
 
 interface AcceptApplicationModalProps {
-  data?: CreatorApplication;
+  data: CreatorApplication;
   refetch: VoidFunction;
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;
@@ -28,24 +28,29 @@ export const ApproveApplicationModal = ({
   setOpened,
 }: AcceptApplicationModalProps) => {
   const { toast } = useToast();
-  const { mutateAsync, isPending: isLoading } = useApproveCreatorApplication();
+  const { mutate, isPending: isLoading } = useApproveCreatorApplication();
 
-  const handleSubmit = async () => {
-    try {
-      await mutateAsync(data!.id)
-      refetch()
-      toast({
-        title: "Application approved",
-        variant: "success",
-      });
-      setOpened(false);
+  const handleSubmit = () => {
+      mutate(
+        data.id,
+        {
+          onError: () => {
+            toast({
+              title: "Error approving application",
+              variant: "destructive",
+            })   
+            
+          }, onSuccess: () => {
+          refetch()
+          toast({
+            title: "Application approved",
+            variant: "success",
+          });
+          setOpened(false);
+        }
+      }
+      )
       
-    } catch (err){
-      toast({
-        title: "Error approving application",
-        variant: "destructive",
-      })   
-    }
   };
 
   return (
@@ -63,7 +68,7 @@ export const ApproveApplicationModal = ({
         </DialogHeader>
         <DialogFooter>
           <Button disabled={isLoading} type="button" onClick={() => handleSubmit()}>
-          { isLoading && (<Loader2Icon className="animate-spin" />)} Yes, Approve
+          { isLoading ? <Loader2Icon className="animate-spin" /> : null} Yes, Approve
           </Button>
         </DialogFooter>
       </DialogContent>
