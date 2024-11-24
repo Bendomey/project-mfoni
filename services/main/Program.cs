@@ -88,12 +88,17 @@ builder.Services.AddSingleton<CacheProvider>();
 builder.Services.AddSingleton<AdminAuthService>();
 builder.Services.AddSingleton<AdminService>();
 builder.Services.AddSingleton<SearchAdmin>();
+builder.Services.AddSingleton<AdminWalletService>();
 
 // user services
 builder.Services.AddSingleton<UserAuth>();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<CreatorApplicationService>();
 builder.Services.AddSingleton<CreatorService>();
+
+// billing services
+builder.Services.AddSingleton<WalletService>();
+builder.Services.AddSingleton<SubscriptionService>();
 
 // search services
 builder.Services.AddSingleton<SearchTag>();
@@ -115,10 +120,12 @@ builder.Services.AddSingleton<AdminTransformer>();
 builder.Services.AddSingleton<UserTransformer>();
 builder.Services.AddSingleton<CreatorApplicationTransformer>();
 builder.Services.AddSingleton<CreatorTransformer>();
-builder.Services.AddSingleton<CreatorPackageTransformer>();
+builder.Services.AddSingleton<CreatorSubscriptionTransformer>();
 
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();
+builder.Services.AddHostedService<StartUpService>();
+builder.Services.AddHostedService<SubscriptionProcessorCron>();
 
 builder.Services.AddControllers();
 

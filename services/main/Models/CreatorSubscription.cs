@@ -3,20 +3,15 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace main.Models;
 
-public static class CreatorPackageType
+public static class CreatorSubscriptionPackageType
 {
     public static readonly string FREE = "FREE";
     public static readonly string BASIC = "BASIC";
     public static readonly string ADVANCED = "ADVANCED";
 }
 
-public static class CreatorPackageStatus
-{
-    public static readonly string ACTIVE = "ACTIVE";
-    public static readonly string DEACTIVATED = "DEACTIVATED";
-}
-
-public class CreatorPackage
+// Holds trail of all packages a creator has ever activated before.
+public class CreatorSubscription
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -27,13 +22,16 @@ public class CreatorPackage
     public required string CreatorId { get; init; }
 
     [BsonElement("package_type")]
-    public required string PackageType { get; set; }
+    public required string PackageType { get; init; }
 
-    [BsonElement("status")]
-    public string Status { get; set; } = CreatorPackageStatus.ACTIVE;
+    [BsonElement("started_at")]
+    public required DateTime StartedAt { get; init; }
 
-    [BsonElement("deactivated_at")]
-    public DateTime? DeactivatedAt { get; init; }
+    [BsonElement("ended_at")]
+    public DateTime? EndedAt { get; set; }
+
+    [BsonElement("period")]
+    public double? Period { get; init; } // pass this only when its a paid package and for how long its paid for.
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;

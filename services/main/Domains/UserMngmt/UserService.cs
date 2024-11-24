@@ -280,4 +280,15 @@ public class UserService
         long usersCount = await _userCollection.CountDocumentsAsync(filter);
         return usersCount;
     }
+
+    public async Task<Models.User> GetUserById(string userId)
+    {
+        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            throw new HttpRequestException("UserNotFound");
+        }
+
+        return user;
+    }
 }

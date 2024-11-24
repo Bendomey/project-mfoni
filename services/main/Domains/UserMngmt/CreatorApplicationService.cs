@@ -17,14 +17,14 @@ public class CreatorApplicationService
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.Admin> _adminCollection;
     private readonly IMongoCollection<Models.CreatorApplication> _creatorApplicationCollection;
-    private readonly IMongoCollection<Models.Creator> _creatorCollection;
-    private readonly IMongoCollection<Models.CreatorPackage> _creatorPackageCollection;
     private readonly AppConstants _appConstantsConfiguration;
+    private readonly CreatorService _creatorService;
 
     public CreatorApplicationService(
         ILogger<UserService> logger,
         DatabaseSettings databaseConfig,
-        IOptions<AppConstants> appConstants
+        IOptions<AppConstants> appConstants,
+        CreatorService creatorService
     )
     {
         _logger = logger;
@@ -38,11 +38,8 @@ public class CreatorApplicationService
             databaseConfig.Database.GetCollection<Models.CreatorApplication>(
                 appConstants.Value.CreatorApplicatonCollection
             );
-        _creatorCollection = databaseConfig.Database.GetCollection<Models.Creator>(
-            appConstants.Value.CreatorCollection
-        );
-        _creatorPackageCollection = databaseConfig.Database.GetCollection<Models.CreatorPackage>(appConstants.Value.CreatorPackageCollection);
         _appConstantsConfiguration = appConstants.Value;
+        _creatorService = creatorService;
 
         logger.LogDebug("User service initialized");
     }
@@ -213,39 +210,17 @@ public class CreatorApplicationService
             .Set(r => r.UpdatedAt, DateTime.UtcNow);
         await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
 
+        var creator = await _creatorService.Create(input.CreatorApplicationId);
+
         var user = await _userCollection.Find(user => user.Id == creatorApplication.UserId).FirstOrDefaultAsync();
         if (user is null)
         {
             throw new HttpRequestException("UserNotFound");
         }
 
-        var creator = new Creator
-        {
-            CreatorApplicationId = creatorApplication.Id,
-            UserId = creatorApplication.UserId,
-            Username = $"{user.Name.ToLower().Replace(" ", "")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 5)}",
-        };
-
-        await _creatorCollection.InsertOneAsync(creator);
-
-        // this check should always be true. 
-        if (creatorApplication.IntendedPricingPackage is not null)
-        {
-            // TODO: Come back and think through this bit.
-            var creatorPackage = new CreatorPackage
-            {
-                CreatorId = creator.Id,
-                PackageType = creatorApplication.IntendedPricingPackage,
-                Status = CreatorPackageStatus.ACTIVE,
-            };
-
-            await _creatorPackageCollection.InsertOneAsync(creatorPackage);
-        }
-        else
-        {
-            // this shouldn't happen. but just in case
-            throw new HttpRequestException("PackageTypeNotSet");
-        }
+        user.Role = UserRole.CREATOR;
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
 
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
         {
@@ -263,7 +238,7 @@ public class CreatorApplicationService
             {
                 From = _appConstantsConfiguration.EmailFrom,
                 Email = user.Email,
-                Subject = EmailTemplates.CreatorApplicationApprovedBody,
+                Subject = EmailTemplates.CreatorApplicationApprovedSubject,
                 Message = EmailTemplates.CreatorApplicationApprovedBody.Replace("{name}", user.Name),
                 ApiKey = _appConstantsConfiguration.ResendApiKey
             });
@@ -326,6 +301,11 @@ public class CreatorApplicationService
         var creatorApplication = await _creatorApplicationCollection.Find(application => application.UserId == userId)
             .SortByDescending(application => application.CreatedAt)
             .FirstOrDefaultAsync();
+
+        if (creatorApplication is null)
+        {
+            throw new HttpRequestException("CreatorApplicationNotFound");
+        }
 
         return creatorApplication;
     }

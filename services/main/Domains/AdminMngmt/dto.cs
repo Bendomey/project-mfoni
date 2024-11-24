@@ -12,3 +12,9 @@ public class AdminAuthenticateResponse
     public required Models.Admin Admin { get; set; }
     public required string Token { get; set; }
 }
+
+public class UpdateAdminWalletInput
+{
+    public required Int64 BookWallet { get; set; }
+    public required Int64 Wallet { get; set; }
+}
