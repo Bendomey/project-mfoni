@@ -46,3 +46,33 @@ export const useGetCreatorApplications = (
     queryKey: [QUERY_KEYS.CREATOR_APPLICATIONS,JSON.stringify(query)],
     queryFn: () => getCreatorApplications(query),
   })
+
+
+  /**
+   * Approve creator application
+   *
+   * @throws {Error} - Throws an error if there's a problem with the API response.
+   *
+   *  @returns {Promise<object>} - The creator application data.
+   */
+  
+  const approveCreatorApplication = async (id: string) => {
+    try {
+      await fetchClient<CreatorApplication>(`/v1/creator-applications/${id}/approve`, {
+        method: 'PATCH',
+      })
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error
+      }
+  
+      // Error from server.
+      if (error instanceof Response) {
+        const response = await error.json()
+        throw new Error(response.message)
+      }
+    }
+  }
+  
+  export const useApproveCreatorApplication = () => useMutation({mutationFn: approveCreatorApplication})
+  
