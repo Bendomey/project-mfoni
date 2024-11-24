@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System.Text;
 using RabbitMQ.Client;
+using main.Lib;
 
 namespace main.Domains;
 
@@ -82,7 +83,7 @@ public class IndexContent
             {
                 Title = media.Title,
                 Visibility = media.Visibility,
-                Amount = Convert.ToInt32(media.Amount * 100),
+                Amount = MoneyLib.ConvertCedisToPesewas(Convert.ToInt64(media.Amount)),
                 Media = media.Content,
                 CreatedById = user.Id,
             };

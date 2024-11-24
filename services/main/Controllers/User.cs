@@ -20,23 +20,32 @@ public class UserController : ControllerBase
     private readonly UserService userService;
     private readonly UserTransformer _userTransformer;
     private readonly CreatorApplicationService _creatorApplicationService;
+    private readonly CreatorService _creatorService;
+    private readonly SubscriptionService _subscriptionService;
     private readonly CreatorApplicationTransformer _creatorApplicationTransformer;
     private readonly CreatorTransformer _creatorTransformer;
+    private readonly CreatorSubscriptionTransformer _creatorSubscriptionTransformer;
 
     public UserController(
         ILogger<UserController> logger,
         UserService userService,
         CreatorApplicationService creatorApplicationService,
+        CreatorService creatorService,
+        SubscriptionService subscriptionService,
         CreatorApplicationTransformer creatorApplicationTransformer,
         CreatorTransformer creatorTransformer,
+        CreatorSubscriptionTransformer creatorSubscriptionTransformer,
         UserTransformer userTransformer
     )
     {
         this.logger = logger;
+        this._creatorService = creatorService;
+        this._subscriptionService = subscriptionService;
         this.userService = userService;
         this._creatorApplicationService = creatorApplicationService;
         this._creatorApplicationTransformer = creatorApplicationTransformer;
         this._creatorTransformer = creatorTransformer;
+        this._creatorSubscriptionTransformer = creatorSubscriptionTransformer;
         this._userTransformer = userTransformer;
     }
 
@@ -324,7 +333,7 @@ public class UserController : ControllerBase
                 CreatorApplicationId = id
             }, currentAdmin.Id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreator>(_creatorTransformer.Transform(creator), null).Result()
+            new GetEntityResponse<OutputCreator>(await _creatorTransformer.Transform(creator), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -545,6 +554,124 @@ public class UserController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
+
+    [Authorize]
+    [HttpGet("creator-subscriptions/active")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ActiveSubscription()
+    {
+        try
+        {
+            logger.LogInformation($"get active creator subscription");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
+            var creatorSubscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorSubscription>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"get active subscription failed. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
+    [HttpPatch("creator-subscriptions/cancel")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> CancelSubscription()
+    {
+        try
+        {
+            logger.LogInformation($"cancel creator subscription");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
+            var creatorSubscription = await _subscriptionService.CancelCreatorSubscription(creator.Id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorSubscription>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"cancel creator subscription failed. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
+    [HttpPatch("creator-subscriptions/activate")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ActivateSubscription([FromBody] DTOs.ActivateCreatorSubscriptionInput input)
+    {
+        try
+        {
+            logger.LogInformation($"activate a creator subscription");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
+            var creatorSubscription = await _subscriptionService.ActivateCreatorSubscription(new Domains.ActivateCreatorSubscriptionInput
+            {
+                CreatorId = creator.Id,
+                PricingPackage = input.PricingPackage,
+                Period = input.Period,
+                UpgradeEffect = input.UpgradeEffect
+            });
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorSubscription>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"activate a creator subscription failed. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
 
 }
 

@@ -12,7 +12,7 @@ public class OutputContent
     public DateTime? DoneAt { get; set; } = null!;
     public List<OutputTag>? Tags { get; set; }
     public string Media { get; set; } = null!;
-    public int Amount { get; set; } = 0;
+    public Int64 Amount { get; set; } = 0;
     public required string CreatedById { get; set; }
     public OutputUser? CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
