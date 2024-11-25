@@ -13,12 +13,3 @@ interface Creator {
 interface FetchCreatorFilter {
   status?: string
 }
-
-
-
-  // "socialMedia": [
-  //   {
-  //     "platform": "string",
-  //     "handle": "string"
-  //   }
-  // ],
