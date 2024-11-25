@@ -58,7 +58,7 @@ export const RejectApplicationModal = ({
   const handleSubmit = ({ reason }: RejectCreatorApplcationInputParams) => {
     if (!data) {
       toast({
-        title: "Application data is undefined or null",
+        title: "Application data not found",
         variant: "destructive",
       });
       return;
@@ -72,7 +72,7 @@ export const RejectApplicationModal = ({
       {
         onError: () => {
           toast({
-            title: "Error rejecting application",
+            title: "We couldn't process your request",
             variant: "destructive",
           });
         },
