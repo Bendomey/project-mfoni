@@ -21,6 +21,7 @@ import {
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { useGetUsers } from "@/api";
 import { useSearchParams } from "next/navigation";
+import { localizedDayjs } from "@/lib/date";
 
 export const ListUsers = () => {
   const [openViewModal, setOpenViewModal] = useState(false);
@@ -140,7 +141,7 @@ export const ListUsers = () => {
         accessorKey: "updatedAt",
         header: "Updated At",
         cell: ({ row }) => (
-          <div className="lowercase">{row.getValue("updatedAt")}</div>
+          localizedDayjs(row.getValue("updatedAt")).format("DD/MM/YYYY hh:mm a")
         ),
       },
       {

@@ -19,6 +19,7 @@ import { RejectApplicationModal } from "./reject";
 import { useGetCreatorApplications } from "@/api";
 import { useSearchParams } from "next/navigation";
 import { ViewApplicationModal } from "./view";
+import { localizedDayjs } from "@/lib/date";
 
 
 export const CreatorApplication = () => {
@@ -111,7 +112,7 @@ export const CreatorApplication = () => {
         accessorKey: "updatedAt",
         header: "Updated At",
         cell: ({ row }) => (
-          <div className="lowercase">{row.getValue("updatedAt")}</div>
+          localizedDayjs(row.getValue("updatedAt")).format("DD/MM/YYYY hh:mm a")
         ),
       },
       {
