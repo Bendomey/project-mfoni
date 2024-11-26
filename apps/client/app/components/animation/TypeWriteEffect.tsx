@@ -1,5 +1,3 @@
-'use client'
-
 import {classNames} from '@/lib/classNames.ts'
 import {motion} from 'framer-motion'
 

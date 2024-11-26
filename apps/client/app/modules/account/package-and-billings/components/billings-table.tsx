@@ -1,27 +1,8 @@
-'use client'
 import { Button } from "@/components/button/index.tsx";
 import { classNames } from "@/lib/classNames.ts"
 import { CheckIcon, DocumentTextIcon, EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 import { useLayoutEffect, useRef, useState } from 'react'
-
-
-
-/*
-This example requires some changes to your config:
- 
-```
-// tailwind.config.js
-module.exports = {
-  // ...
-  plugins: [
-    // ...
-    require('@tailwindcss/forms'),
-  ],
-}
-```
-*/
-
 
 const people = [
     {

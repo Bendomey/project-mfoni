@@ -27,6 +27,14 @@ import {EnvContext} from './providers/env/index.tsx'
 import {extractAuthCookie} from './lib/actions/extract-auth-cookie.ts'
 import {getCurrentUser} from './api/auth/index.ts'
 import {getFullUrlPath} from './lib/url-helpers.ts'
+import dayjs from 'dayjs'
+// @ts-expect-error - dayjs plugin not typed
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import 'dayjs/locale/en-gb'
+
+
+dayjs.locale('en-gb')
+dayjs.extend(localizedFormat);
 
 export const links: LinksFunction = () => {
   return [

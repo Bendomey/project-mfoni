@@ -1,4 +1,4 @@
-import {PackageAndBillingsModule} from '@/modules/index.ts'
+import {WalletModule} from '@/modules/index.ts'
 import {
   type MetaFunction,
   type LoaderFunctionArgs,
@@ -7,8 +7,8 @@ import {protectRouteLoader} from '@/lib/actions/protect-route-loader.ts'
 
 export const meta: MetaFunction = () => {
   return [
-    {title: 'Package And Billings | mfoni'},
-    {name: 'description', content: 'Manage your package and billings on mfoni'},
+    {title: 'Your Wallet | mfoni'},
+    {name: 'description', content: 'Manage your e-wallet and its transactions here on mfoni'},
     {name: 'keywords', content: 'mfoni'},
   ]
 }
@@ -22,4 +22,4 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
   return res
 }
 
-export default PackageAndBillingsModule
+export default WalletModule

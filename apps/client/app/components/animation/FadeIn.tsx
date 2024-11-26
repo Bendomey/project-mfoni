@@ -1,6 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-'use client'
-
 import {createContext, useContext} from 'react'
 import {motion, useReducedMotion} from 'framer-motion'
 
