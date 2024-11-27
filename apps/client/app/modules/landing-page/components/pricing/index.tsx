@@ -148,7 +148,7 @@ export const Pricing = () => {
                 navigate(`/account?complete-creator-application=${tier.id}`)
               }}
               disabled={
-                currentUser?.creator?.creatorPackage?.packageType === tier.id
+                currentUser?.creator?.subscription.packageType === tier.id
               }
               aria-describedby={tier.id}
               className="w-full mt-8"
@@ -157,7 +157,7 @@ export const Pricing = () => {
               {currentUser
                 ? currentUser.role === 'CLIENT'
                   ? 'Apply'
-                  : currentUser.creator?.creatorPackage?.packageType === tier.id
+                  : currentUser.creator?.subscription.packageType === tier.id
                     ? 'Selected'
                     : 'Apply'
                 : 'Get started today'}
