@@ -143,7 +143,7 @@ export const AccountCover = () => {
               ) : null}
             </div>
             <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-8">
-              {currentUser?.creator?.creatorPackage?.packageType ? (
+              {currentUser?.creator?.subscription.packageType ? (
                 <div className="mt-2 flex items-center text-sm text-gray-500">
                   <ArchiveBoxIcon
                     className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
@@ -151,7 +151,7 @@ export const AccountCover = () => {
                   />
                   {
                     MFONI_PACKAGES_DETAILED[
-                      currentUser.creator.creatorPackage.packageType
+                      currentUser.creator.subscription.packageType
                     ].name
                   }
                 </div>

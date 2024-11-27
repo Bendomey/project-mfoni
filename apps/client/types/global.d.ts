@@ -65,4 +65,11 @@ interface FetchMultipleDataResponse<T> {
   page: number
   pageSize: number
   totalPages: number
+  prevPage: Nullable<number>
+  nextPage: Nullable<number>
+}
+
+interface ApiConfigForServerConfig {
+  authToken: string
+  baseUrl: string
 }

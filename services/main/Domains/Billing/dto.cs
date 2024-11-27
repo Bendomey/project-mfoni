@@ -25,3 +25,16 @@ public class SubscribeWithWalletInput
     public required string SubscriptionId { get; set; }
     public required string UserId { get; set; }
 }
+
+public class GetWalletTransactionsInput
+{
+    public required string UserId { get; set; }
+    public string? Type { get; set; }
+    public string? Search { get; set; }
+}
+
+public class GetSubscriptionsInput
+{
+    public required string CreatorId { get; set; }
+    public string? PackageType { get; set; }
+}

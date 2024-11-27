@@ -17,3 +17,11 @@ export const formatAmountWithoutCurrency = (amount: number): string => {
   })
   return `${formattedAmount.substring(3)}`
 }
+
+export const convertPesewasToCedis = (amount: number): number => {
+  return amount / 100
+}
+
+export const convertCedisToPesewas = (amount: number): number => {
+  return amount * 100
+}

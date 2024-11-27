@@ -6,18 +6,31 @@ namespace main.Transformations;
 
 public class UserTransformer
 {
-    public UserTransformer() { }
-
-    public OutputUser Transform(User user)
+    private readonly CreatorService _creatorService;
+    private readonly CreatorTransformer _creatorTransformer;
+    public UserTransformer(CreatorService creatorService, CreatorTransformer creatorTransformer)
     {
-        // OutputCreator? outputCreator = null;
-        // if (user. is not null)
+        _creatorService = creatorService;
+        _creatorTransformer = creatorTransformer;
+    }
+
+    public async Task<OutputUser> Transform(User user)
+    {
+        OutputCreator? creatorTransformed = null;
+        if (user.Role == UserRole.CREATOR)
+        {
+            var creator = await _creatorService.GetCreatorByUserId(user.Id);
+            var creatorTransformer = await _creatorTransformer.Transform(creator);
+            creatorTransformed = creatorTransformer;
+        }
+        // try
         // {
-        //     var createdBy = _adminService.GetAdminById(user.CreatedById);
-        //     if (createdBy is not null)
-        //     {
-        //         outputCreatedByAdmin = Transform(createdBy);
-        //     }
+        //     var creator = await _creatorService.GetCreatorByUserId(user.Id);
+        //     var creatorTransformer = await _creatorTransformer.Transform(creator);
+        //     creatorTransformed = creatorTransformer;
+        // }
+        // catch (Exception)
+        // {
         // }
 
         return new OutputUser
@@ -31,6 +44,9 @@ public class UserTransformer
             PhoneNumber = user.PhoneNumber,
             PhoneNumberVerifiedAt = user.PhoneNumberVerifiedAt,
             Photo = user.Photo,
+            Wallet = user.Wallet,
+            BookWallet = user.BookWallet,
+            Creator = creatorTransformed,
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt,
         };

@@ -96,7 +96,7 @@ Hey {name},
 
 You have insufficient funds in your wallet to activate your package. Fund your wallet to activate your package.
 
-Visit https://mfoni.app/account/your-subscriptions to manage this. If you have any questions, please reach out to us on our website. 
+Visit https://mfoni.app/account/wallet to manage this. If you have any questions, please reach out to us on our website. 
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)

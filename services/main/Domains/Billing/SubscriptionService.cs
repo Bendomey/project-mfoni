@@ -627,4 +627,69 @@ public class SubscriptionService
             });
         }
     }
+
+    public async Task<List<Models.CreatorSubscription>> GetSubscriptions(
+        FilterQuery<Models.CreatorSubscription> queryFilter,
+        GetSubscriptionsInput input
+    )
+    {
+        FilterDefinitionBuilder<Models.CreatorSubscription> builder = Builders<Models.CreatorSubscription>.Filter;
+        var userIdFilter = builder.Eq(sub => sub.CreatorId, input.CreatorId);
+        var typeFilter = builder.Eq(sub => sub.PackageType, input.PackageType);
+
+
+        var filters = Builders<CreatorSubscription>.Filter.And(userIdFilter);
+
+        if (input.PackageType is not null)
+        {
+            filters = Builders<CreatorSubscription>.Filter.And(userIdFilter, typeFilter);
+        }
+
+        var subs = await _creatorSubscriptionCollection
+            .Find(filters)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return subs ?? [];
+    }
+
+    public async Task<long> CountSubscriptions(GetSubscriptionsInput input)
+    {
+        FilterDefinitionBuilder<Models.CreatorSubscription> builder = Builders<Models.CreatorSubscription>.Filter;
+        var userIdFilter = builder.Eq(wallet => wallet.CreatorId, input.CreatorId);
+        var typeFilter = builder.Eq(wallet => wallet.PackageType, input.PackageType);
+
+
+        var filters = Builders<CreatorSubscription>.Filter.And(userIdFilter);
+
+        if (input.PackageType is not null)
+        {
+            filters = Builders<CreatorSubscription>.Filter.And(userIdFilter, typeFilter);
+        }
+
+
+        long usersCount = await _creatorSubscriptionCollection.CountDocumentsAsync(filters);
+        return usersCount;
+    }
+
+    public async Task<List<Models.CreatorSubscriptionPurchase>> GetSubscriptionPurchases(
+        string creatorSubscriptionId
+    )
+    {
+        FilterDefinitionBuilder<Models.CreatorSubscriptionPurchase> builder = Builders<Models.CreatorSubscriptionPurchase>.Filter;
+        var creatorSubscriptionIdFilter = builder.Eq(sub => sub.CreatorSubscriptionId, creatorSubscriptionId);
+
+
+        var filters = Builders<CreatorSubscriptionPurchase>.Filter.And(creatorSubscriptionIdFilter);
+
+        var subsPurchases = await _creatorSubscriptionPurchaseCollection
+            .Find(filters)
+            .ToListAsync();
+
+        return subsPurchases ?? [];
+    }
+
+
 }

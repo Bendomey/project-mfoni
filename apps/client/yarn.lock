@@ -8715,6 +8715,13 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
+use-dehydrated-state@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/use-dehydrated-state/-/use-dehydrated-state-0.1.0.tgz#a85027b0b1f38ed7e76c21a98b4fe06725d44d8f"
+  integrity sha512-E2E1Mx9UeHiK1fxabnUULJEc7BNMmdsMy7hBGiDxDvxgP5/QIYJawQ2g2ZQvqvoXIkyzJA7wWG07hBWa5yuM9Q==
+  dependencies:
+    deepmerge "^4.2.2"
+
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz"

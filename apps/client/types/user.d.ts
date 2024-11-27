@@ -12,6 +12,8 @@ interface User {
   phoneNumberVerifiedAt: Nullable<Date>
   photo: Nullable<string>
   creator: Nullable<Creator>
+  wallet: number
+  bookWallet: number
   createdAt: Date
   updatedAt: Date
 }

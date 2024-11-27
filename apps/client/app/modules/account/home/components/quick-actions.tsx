@@ -9,7 +9,13 @@ const teams = [
     initial: 'P',
     current: false,
   },
-  {id: 2, name: 'Saved Cards', href: '/account/saved-cards', initial: 'C', current: false},
+  {
+    id: 2,
+    name: 'Saved Cards',
+    href: '/account/saved-cards',
+    initial: 'C',
+    current: false,
+  },
 ]
 
 export function QuickActions() {

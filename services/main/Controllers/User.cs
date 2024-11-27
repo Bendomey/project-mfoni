@@ -444,9 +444,11 @@ public class UserController : ControllerBase
             var users = await userService.GetUsers(queryFilter, input);
             long count = await userService.CountUsers(input);
 
-            var outUser = users.ConvertAll<OutputUser>(
-                new Converter<User, OutputUser>(user => _userTransformer.Transform(user))
-            );
+            var outUser = new List<OutputUser>();
+            foreach (var user in users)
+            {
+                outUser.Add(await _userTransformer.Transform(user));
+            }
             var response = HttpLib.GeneratePagination<OutputUser, User>(
                 outUser,
                 count,
@@ -569,7 +571,7 @@ public class UserController : ControllerBase
             var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
             var creatorSubscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            new GetEntityResponse<OutputCreatorSubscription>(await _creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -606,7 +608,7 @@ public class UserController : ControllerBase
             var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
             var creatorSubscription = await _subscriptionService.CancelCreatorSubscription(creator.Id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            new GetEntityResponse<OutputCreatorSubscription>(await _creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -649,7 +651,7 @@ public class UserController : ControllerBase
                 UpgradeEffect = input.UpgradeEffect
             });
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            new GetEntityResponse<OutputCreatorSubscription>(await _creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
