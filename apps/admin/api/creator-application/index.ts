@@ -76,3 +76,37 @@ export const useGetCreatorApplications = (
   
   export const useApproveCreatorApplication = () => useMutation({mutationFn: approveCreatorApplication})
   
+
+  interface RejectCreatorApplcationProps {
+    id: string;
+    reason: string;
+  }
+  /**
+   * Reject creator application
+   *
+   * @throws {Error} - Throws an error if there's a problem with the API response.
+   *
+   *  @returns {Promise<object>} - The creator application data.
+   */
+  
+  const rejectCreatorApplication = async ( props: RejectCreatorApplcationProps) => {
+    try {
+      await fetchClient<CreatorApplication>(`/v1/creator-applications/${props.id}/reject`, {
+        method: 'PATCH',
+        body: JSON.stringify({ reason: props.reason }),
+      })
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error
+      }
+  
+      // Error from server.
+      if (error instanceof Response) {
+        const response = await error.json()
+        throw new Error(response.message)
+      }
+    }
+  }
+  
+  export const useRejectCreatorApplication = () => useMutation({mutationFn: rejectCreatorApplication})
+  

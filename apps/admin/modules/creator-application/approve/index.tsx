@@ -33,7 +33,7 @@ export const ApproveApplicationModal = ({
   const handleSubmit = () => {
     if (!data) {
       toast({
-        title: "Application data is undefined or null",
+        title: "Application data not found",
         variant: "destructive",
       })
       return;
@@ -44,7 +44,7 @@ export const ApproveApplicationModal = ({
         {
           onError: () => {
             toast({
-              title: "Error approving application",
+              title: "We couldn't process your request",
               variant: "destructive",
             })   
             
