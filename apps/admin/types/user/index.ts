@@ -8,6 +8,7 @@ interface User {
   phoneNumber: NullableString
   phoneNumberVerifiedAt: NullableDate
   photo: string
+  creator: Creator | null
   createdAt: Date
   updatedAt: NullableDate
   deletedBy: string
