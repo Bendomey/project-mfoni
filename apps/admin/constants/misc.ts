@@ -6,4 +6,5 @@ export const USER_CIPHER = '@mfoni-admin-account'
 
 export const QUERY_KEYS = {
   CREATOR_APPLICATIONS: 'creator-applications',
+  USERS: 'users',
 } as const

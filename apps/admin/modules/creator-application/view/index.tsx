@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,10 +15,12 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { localizedDayjs } from "@/lib/date";
+import { ApproveApplicationModal } from "../approve";
+import { RejectApplicationModal } from "../reject";
 
 interface ViewApplicationModalProps {
   data?: CreatorApplication;
-  refetch?: VoidFunction;
+  refetch: VoidFunction;
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;
 }
@@ -31,7 +33,11 @@ export const ViewApplicationModal = ({
   opened,
   setOpened,
 }: ViewApplicationModalProps) => {
+  const [openApproveModal, setOpenApproveModal] = useState(false)
+  const [openRejectModal, setOpenRejectModal] = useState(false)
+ 
   return (
+    <>
     <Dialog open={opened} onOpenChange={() => setOpened(false)}>
       <DialogOverlay className="bg-black/10" />
       <DialogContent className="sm:max-w-[850px] bg-white dark:bg-black top-96">
@@ -112,14 +118,14 @@ export const ViewApplicationModal = ({
             <Button
               type="button"
               className="bg-red-700 text-white hover:bg-red-400"
-              onClick={() => {}}
+              onClick={() => { setOpenRejectModal(true)}}
             >
               Reject
             </Button>
             <Button
               type="button"
               className="bg-green-800 text-white hover:bg-green-400"
-              onClick={() => {}}
+              onClick={() => {setOpenApproveModal(true)}}
             >
               Approve
             </Button>
@@ -127,5 +133,10 @@ export const ViewApplicationModal = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <ApproveApplicationModal opened={openApproveModal} setOpened={setOpenApproveModal} data={data} refetch={refetch}/>
+    <RejectApplicationModal opened={openRejectModal} setOpened={setOpenRejectModal} data={data} refetch={refetch}/>
+  
+</>
   );
 };

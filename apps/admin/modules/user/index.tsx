@@ -1,8 +1,13 @@
-"use client"
+"use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { DataTable } from "@/components/table";
-import { ArrowUpDown, ChevronsUpDownIcon, CreditCardIcon, UserIcon } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronsUpDownIcon,
+  CreditCardIcon,
+  UserIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,50 +17,48 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import { ApproveApplicationModal } from "./approve";
-import { RejectApplicationModal } from "./reject";
-import { useGetCreatorApplications } from "@/api";
+import { useGetUsers } from "@/api";
 import { useSearchParams } from "next/navigation";
-import { ViewApplicationModal } from "./view";
 import { localizedDayjs } from "@/lib/date";
 
-
-export const CreatorApplication = () => {
-  const [openApproveModal, setOpenApproveModal] = useState(false)
-  const [openRejectModal, setOpenRejectModal] = useState(false)
-  const [openViewModal, setOpenViewModal] = useState(false)
-  const [selectedApplication, setSelectedApplication] = useState<CreatorApplication>()
+export const ListUsers = () => {
+  const [openViewModal, setOpenViewModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User>();
   const searchParams = useSearchParams();
 
   // Retrieve query parameters
-  const page = searchParams.get('page');
-  const search = searchParams.get('search');
-  const creatorApplicationFilter = searchParams.get('status');
+  const page = searchParams.get("page");
+  const search = searchParams.get("search");
+  const userFilter = searchParams.get("status");
 
-
-  const {data, isPending: isDataLoading, refetch, error} = useGetCreatorApplications({
+  const {
+    data,
+    isPending: isDataLoading,
+    refetch,
+    error,
+  } = useGetUsers({
     search: {
-      fields: ['firstName'],
-      query:  search || undefined,
+      fields: ["name"],
+      query: search || undefined,
     },
     sorter: {
-      sort: 'asc',
-      sortBy: 'createdAt',
+      sort: "asc",
+      sortBy: "createdAt",
     },
     populate: [],
-    filters: {
-    },
-  })
+    filters: {},
+  });
 
-  const columns = useMemo((): ColumnDef<CreatorApplication>[] => {
+  const columns = useMemo((): ColumnDef<User>[] => {
     return [
       {
         accessorKey: "name",
         header: ({ column }) => {
           return (
             <Button
+              className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
@@ -66,15 +69,14 @@ export const CreatorApplication = () => {
             </Button>
           );
         },
-        cell: ({ row }) => (row.original.user ?
-          <div className="lowercase">{row.original.user.email}</div> : 'N/A'
-        ),
+        cell: ({ row }) => <div className="lowercase">{row.original.name}</div>,
       },
       {
         accessorKey: "email",
         header: ({ column }) => {
           return (
             <Button
+              className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
@@ -85,21 +87,48 @@ export const CreatorApplication = () => {
             </Button>
           );
         },
-        cell: ({ row }) => ( row.original.user ?
-          <div className="lowercase">{row.original.user.email}</div> : 'N/A'
-        ),
+        cell: ({ row }) =>
+          row.original.email ? (
+            <div className="lowercase">{row.original.email}</div>
+          ) : (
+            "N/A"
+          ),
+      },
+      {
+        accessorKey: "phoneNumber",
+        header: ({ column }) => {
+          return (
+            <Button
+              className="pl-0"
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Phone
+              <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+        cell: ({ row }) =>
+          row.original.phoneNumber ? (
+            <div className="lowercase">{row.original.phoneNumber}</div>
+          ) : (
+            "N/A"
+          ),
       },
       {
         accessorKey: "status",
         header: ({ column }) => {
           return (
             <Button
+              className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-            Status
+              Status
               <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
             </Button>
           );
@@ -119,8 +148,6 @@ export const CreatorApplication = () => {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-          const payment = row.original
-     
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -131,21 +158,18 @@ export const CreatorApplication = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => {
-                      setSelectedApplication(row.original)
-                      setOpenViewModal(true)
-                    }}><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
-                <DropdownMenuItem  onClick={() => {
-                      setSelectedApplication(row.original)
-                      setOpenApproveModal(true)
-                    }}><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => {
-                      setSelectedApplication(row.original)
-                      setOpenRejectModal(true)
-                    }}><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>             
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedUser(row.original);
+                    setOpenViewModal(true);
+                  }}
+                >
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  View
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )
+          );
         },
       },
     ];
@@ -156,10 +180,8 @@ export const CreatorApplication = () => {
       <div className="px-7 mx-auto">
         <div className="flex flex-row justify-start pb-8">
           <div>
-            <h2 className="text-4xl font-bold">Creator Applications</h2>
-            <p className="text-lg text-gray-500">
-              Here’s a list of applications that needs attention!
-            </p>
+            <h2 className="text-4xl font-bold">Users</h2>
+            <p className="text-lg text-gray-500">Here’s a list of all users!</p>
           </div>
         </div>
 
@@ -167,15 +189,10 @@ export const CreatorApplication = () => {
           columns={columns}
           data={data?.rows ?? []}
           isDataLoading={isDataLoading}
-          error={
-            error ? new Error("Can't fetch Creator Applications") : undefined
-          }
+          error={error ? new Error("Can't fetch users") : undefined}
           refetch={refetch}
         />
       </div>
-      <ViewApplicationModal opened={openViewModal} setOpened={setOpenViewModal} data={selectedApplication} refetch={refetch}/>
-      <ApproveApplicationModal opened={openApproveModal} setOpened={setOpenApproveModal} data={selectedApplication} refetch={refetch}/>
-      <RejectApplicationModal opened={openRejectModal} setOpened={setOpenRejectModal} data={selectedApplication} refetch={refetch}/>
     </>
   );
 };
