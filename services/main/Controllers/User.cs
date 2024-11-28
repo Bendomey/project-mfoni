@@ -595,6 +595,42 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
+    [HttpGet("creator-subscriptions/{id}/is-cancelled")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> isSubscriptionCancelled(string id)
+    {
+        try
+        {
+            logger.LogInformation($"is creator subscription cancelled");
+            var creatorSubscription = await _subscriptionService.IsSubscriptionCancelled(id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorSubscription>(creatorSubscription is not null ? await _creatorSubscriptionTransformer.Transform(creatorSubscription) : null, null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorSubscription>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"is creator subscription cancelled failed. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+
+    [Authorize]
     [HttpPatch("creator-subscriptions/cancel")]
     [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]

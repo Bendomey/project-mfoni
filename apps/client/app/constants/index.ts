@@ -47,5 +47,8 @@ export const PAGES = {
   AUTHENTICATED_PAGES: {
     ONBOARDING: '/auth/onboarding',
     UPLOAD: '/upload',
+    ACCOUNT: '/account',
+    WALLET: '/account/wallet',
+    PACKAGE_AND_BILLINGS: '/account/package-and-billings',
   },
 }

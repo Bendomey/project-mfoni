@@ -272,7 +272,7 @@ public class SubscriptionService
     }
 
 
-    public async Task<CreatorSubscription> IsSubscriptionCancelled(string creatorSubscriptionId)
+    public async Task<CreatorSubscription?> IsSubscriptionCancelled(string creatorSubscriptionId)
     {
 
         var sub = await _creatorSubscriptionCollection.Find(sub => sub.Id == creatorSubscriptionId).FirstOrDefaultAsync();
@@ -294,7 +294,7 @@ public class SubscriptionService
 
         var cancelledSubscription = await _creatorSubscriptionCollection.Find(filter).FirstOrDefaultAsync();
 
-        return cancelledSubscription;
+        return cancelledSubscription is null ? null : cancelledSubscription;
     }
 
     public async Task<CreatorSubscription> GetActiveCreatorSubscription(string creatorId)

@@ -74,11 +74,11 @@ export async function loader(args: LoaderFunctionArgs) {
         const res = await getCurrentUser(token)
 
         if (res?.data) {
-          user = res?.data
+          user = res.data
 
           // eslint-disable-next-line max-depth
           if (
-            !res?.data.role &&
+            !res.data.role &&
             url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
           ) {
             return redirect(

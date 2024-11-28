@@ -1,6 +1,6 @@
 import {PackageAndBillingsModule} from '@/modules/index.ts'
 import {type MetaFunction, type LoaderFunctionArgs} from '@remix-run/node'
-import {protectRouteLoader} from '@/lib/actions/protect-route-loader.ts'
+import {protectCreatorRouteLoader} from '@/lib/actions/protect-creator-route-loader.ts'
 import {dehydrate, QueryClient} from '@tanstack/react-query'
 import {extractAuthCookie} from '@/lib/actions/extract-auth-cookie.ts'
 import {QUERY_KEYS} from '@/constants/index.ts'
@@ -15,7 +15,7 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
-  const res = await protectRouteLoader(loaderArgs)
+  const res = await protectCreatorRouteLoader(loaderArgs)
   if (!res) {
     const queryClient = new QueryClient()
     const searchParams = new URL(loaderArgs.request.url).searchParams

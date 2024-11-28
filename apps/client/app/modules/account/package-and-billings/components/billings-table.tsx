@@ -67,7 +67,7 @@ export function BillingsTable({data, isError}: Props) {
                       scope="col"
                       className="px-3 py-3.5 text-left text-xs font-semibold text-gray-900"
                     >
-                      Expired date
+                      Expiring date
                     </th>
                     <th
                       scope="col"
@@ -94,6 +94,7 @@ export function BillingsTable({data, isError}: Props) {
                     <>
                       {data.rows.map(sub => {
                         const isActive = activeSub?.id === sub.id
+                        const isUpcoming = dayjs().isBefore(sub.startedAt)
                         const pkg = MFONI_PACKAGES_DETAILED[sub.packageType]
 
                         return (
@@ -147,6 +148,10 @@ export function BillingsTable({data, isError}: Props) {
                                 {isActive ? (
                                   <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-700/10">
                                     Active
+                                  </span>
+                                ) : isUpcoming ? (
+                                  <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-700/10">
+                                    Pending
                                   </span>
                                 ) : (
                                   <span className="inline-flex items-center rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700 ring-1 ring-inset ring-orange-700/10">
@@ -208,7 +213,7 @@ export function BillingsTable({data, isError}: Props) {
                                       </td>
                                       <td />
                                       <td />
-                                      <td className="text-xs text-center">
+                                      <td className="text-xs px-3">
                                         {formatAmount(
                                           convertPesewasToCedis(
                                             purchase.amount,

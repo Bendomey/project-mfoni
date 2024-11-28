@@ -100,7 +100,7 @@ export const getCurrentUser = async (token: string) => {
       },
     })
 
-    const response = await res.json()
+    const response = (await res.json()) as ApiResponse<User>
     return response
   } catch (error: unknown) {
     if (error instanceof Error) {
