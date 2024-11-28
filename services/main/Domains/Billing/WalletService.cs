@@ -1,7 +1,9 @@
 
 using main.Configuratons;
+using main.Lib;
 using main.Models;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace main.Domains;
@@ -93,8 +95,6 @@ public class WalletService
         return newWalletTransation;
     }
 
-
-
     public async Task<WalletTransaction> Withdraw(WalletWithdrawInput input)
     {
         string userId = input.UserId;
@@ -144,5 +144,52 @@ public class WalletService
 
         return newWalletTransation;
     }
+
+    public async Task<List<Models.WalletTransaction>> GetWalletTransactions(
+    FilterQuery<Models.WalletTransaction> queryFilter,
+    GetWalletTransactionsInput input
+)
+    {
+        FilterDefinitionBuilder<Models.WalletTransaction> builder = Builders<Models.WalletTransaction>.Filter;
+        var userIdFilter = builder.Eq(wallet => wallet.UserId, input.UserId);
+        var typeFilter = builder.Eq(wallet => wallet.Type, input.Type);
+
+
+        var filters = Builders<WalletTransaction>.Filter.And(userIdFilter);
+
+        if (input.Type is not null)
+        {
+            filters = Builders<WalletTransaction>.Filter.And(userIdFilter, typeFilter);
+        }
+
+        var transactions = await _walletTransationCollection
+            .Find(filters)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return transactions ?? [];
+    }
+
+    public async Task<long> CountWalletTransactions(GetWalletTransactionsInput input)
+    {
+        FilterDefinitionBuilder<Models.WalletTransaction> builder = Builders<Models.WalletTransaction>.Filter;
+        var userIdFilter = builder.Eq(wallet => wallet.UserId, input.UserId);
+        var typeFilter = builder.Eq(wallet => wallet.Type, input.Type);
+
+
+        var filters = Builders<WalletTransaction>.Filter.And(userIdFilter);
+
+        if (input.Type is not null)
+        {
+            filters = Builders<WalletTransaction>.Filter.And(userIdFilter, typeFilter);
+        }
+
+
+        long usersCount = await _walletTransationCollection.CountDocumentsAsync(filters);
+        return usersCount;
+    }
+
 
 }

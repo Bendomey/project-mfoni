@@ -121,6 +121,8 @@ builder.Services.AddSingleton<UserTransformer>();
 builder.Services.AddSingleton<CreatorApplicationTransformer>();
 builder.Services.AddSingleton<CreatorTransformer>();
 builder.Services.AddSingleton<CreatorSubscriptionTransformer>();
+builder.Services.AddSingleton<WalletTransactionTransformer>();
+builder.Services.AddSingleton<CreatorSubscriptionPurchaseTransformer>();
 
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();

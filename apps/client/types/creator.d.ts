@@ -23,9 +23,7 @@ interface Creator {
   userId: string
   username: string
   socialMedia: Array<CreatorSocialMedia>
-  commission: number
-  bookCommission: number
-  creatorPackage: Nullable<CreatorPackage>
+  subscription: CreatorSubscription
   createdAt: Date
   updatedAt: Date
 }
@@ -33,12 +31,4 @@ interface Creator {
 interface CreatorSocialMedia {
   platform: 'FACEBOOK' | 'TWITTER' | 'GOOGLE' | 'INSTAGRAM' | 'YOUTUBE'
   handle: string
-}
-
-interface CreatorPackage {
-  id: string
-  packageType: PackageType
-  deactivatedAt: Nullable<Date>
-  createdAt: Date
-  updatedAt: Date
 }

@@ -444,9 +444,11 @@ public class UserController : ControllerBase
             var users = await userService.GetUsers(queryFilter, input);
             long count = await userService.CountUsers(input);
 
-            var outUser = users.ConvertAll<OutputUser>(
-                new Converter<User, OutputUser>(user => _userTransformer.Transform(user))
-            );
+            var outUser = new List<OutputUser>();
+            foreach (var user in users)
+            {
+                outUser.Add(await _userTransformer.Transform(user));
+            }
             var response = HttpLib.GeneratePagination<OutputUser, User>(
                 outUser,
                 count,
@@ -569,7 +571,7 @@ public class UserController : ControllerBase
             var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
             var creatorSubscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            new GetEntityResponse<OutputCreatorSubscription>(await _creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -593,6 +595,42 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
+    [HttpGet("creator-subscriptions/{id}/is-cancelled")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> isSubscriptionCancelled(string id)
+    {
+        try
+        {
+            logger.LogInformation($"is creator subscription cancelled");
+            var creatorSubscription = await _subscriptionService.IsSubscriptionCancelled(id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorSubscription>(creatorSubscription is not null ? await _creatorSubscriptionTransformer.Transform(creatorSubscription) : null, null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorSubscription>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"is creator subscription cancelled failed. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+
+    [Authorize]
     [HttpPatch("creator-subscriptions/cancel")]
     [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
@@ -606,7 +644,7 @@ public class UserController : ControllerBase
             var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
             var creatorSubscription = await _subscriptionService.CancelCreatorSubscription(creator.Id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            new GetEntityResponse<OutputCreatorSubscription>(await _creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -649,7 +687,7 @@ public class UserController : ControllerBase
                 UpgradeEffect = input.UpgradeEffect
             });
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorSubscription>(_creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+            new GetEntityResponse<OutputCreatorSubscription>(await _creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }

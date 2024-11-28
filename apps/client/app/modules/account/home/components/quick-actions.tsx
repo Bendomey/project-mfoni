@@ -4,12 +4,18 @@ import {Link} from '@remix-run/react'
 const teams = [
   {
     id: 1,
-    name: 'Your purchases',
-    href: '/account/your-purchases',
+    name: 'Purchases',
+    href: '/account/purchases',
     initial: 'P',
     current: false,
   },
-  {id: 2, name: 'Your Saved Cards', href: '#', initial: 'C', current: false},
+  {
+    id: 2,
+    name: 'Saved Cards',
+    href: '/account/saved-cards',
+    initial: 'C',
+    current: false,
+  },
 ]
 
 export function QuickActions() {

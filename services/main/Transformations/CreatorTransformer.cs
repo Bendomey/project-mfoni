@@ -22,7 +22,7 @@ public class CreatorTransformer
     {
 
         var subscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
-        var subscriptionTransformer = _creatorSubscriptionTransformer.Transform(subscription);
+        var subscriptionTransformer = await _creatorSubscriptionTransformer.Transform(subscription);
 
         return new OutputCreator
         {

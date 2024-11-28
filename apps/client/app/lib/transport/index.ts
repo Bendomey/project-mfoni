@@ -34,9 +34,13 @@ export function transport(
 
 interface FetchClientConfig extends RequestInit {
   /**
-   * If not set, defaults to the staff api address {API_ADDRESS}.
+   * If not set, defaults to the api address {API_ADDRESS}.
    */
   baseUrl?: string
+  /**
+   * If not set, defaults to client cookie.
+   */
+  authToken?: string
   /**
    * Most of our requests will be made with a token.
    * So to make sure we don't set this everytime(ux reasons), I'm rather
@@ -75,7 +79,14 @@ export function fetchClient<T>(
 
     try {
       if (!config?.isUnAuthorizedRequest) {
-        const userToken: string | undefined = auth.getCipher(USER_CIPHER)
+        let userToken: string | undefined
+
+        if (config?.authToken) {
+          userToken = config.authToken
+        } else {
+          userToken = auth.getCipher(USER_CIPHER)
+        }
+
         if (userToken) {
           headers.append('Authorization', `Bearer ${userToken}`)
         }

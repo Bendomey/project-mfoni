@@ -39,7 +39,7 @@ public class AuthController : ControllerBase
         StatusCodes.Status200OK
     )]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
-    public IActionResult Authenticate([FromBody][Required] AuthenticateInput input)
+    public async Task<IActionResult> Authenticate([FromBody][Required] AuthenticateInput input)
     {
         try
         {
@@ -49,7 +49,7 @@ public class AuthController : ControllerBase
             var output = new DTOs.AuthenticateResponse
             {
                 Token = res.Token,
-                User = _userTransformer.Transform(res.User)
+                User = await _userTransformer.Transform(res.User)
             };
             return new ObjectResult(
                 new GetEntityResponse<DTOs.AuthenticateResponse>(output, null).Result()
@@ -123,7 +123,7 @@ public class AuthController : ControllerBase
     [HttpGet("auth/me")]
     [ProducesResponseType(typeof(OutputResponse<OutputUser>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
-    public IActionResult Me()
+    public async Task<IActionResult> Me()
     {
         try
         {
@@ -133,7 +133,7 @@ public class AuthController : ControllerBase
             var res = _authService.Me(currentUser);
 
             return new ObjectResult(
-                new GetEntityResponse<OutputUser>(_userTransformer.Transform(res!), null).Result()
+                new GetEntityResponse<OutputUser>(await _userTransformer.Transform(res!), null).Result()
             )
             {
                 StatusCode = StatusCodes.Status200OK

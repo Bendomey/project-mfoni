@@ -54,6 +54,7 @@
     "close-with-grace": "1.2.0",
     "clsx": "2.1.1",
     "crypto-es": "2.1.0",
+    "dayjs": "1.11.13",
     "dotenv": "16.3.1",
     "esbuild": "0.19.3",
     "execa": "8.0.1",

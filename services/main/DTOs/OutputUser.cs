@@ -12,6 +12,8 @@ public class OutputUser
     public string? PhoneNumber { get; set; }
     public DateTime? PhoneNumberVerifiedAt { get; set; }
     public string? Photo { get; set; }
+    public Int64 Wallet { get; set; }
+    public Int64 BookWallet { get; set; }
     public OutputCreator? Creator { get; set; }
     public required DateTime CreatedAt { get; set; }
     public required DateTime UpdatedAt { get; set; }

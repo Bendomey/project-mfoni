@@ -10,6 +10,7 @@ public class OutputCreatorSubscription
     public required DateTime StartedAt { get; set; }
     public DateTime? EndedAt { get; set; }
     public double? Period { get; set; }
+    public List<OutputCreatorSubscriptionPurchase>? CreatorSubscriptionPurchases { get; set; }
     public required DateTime CreatedAt { get; set; }
     public required DateTime UpdatedAt { get; set; }
 }
