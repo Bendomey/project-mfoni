@@ -29,7 +29,7 @@ import {getCurrentUser} from './api/auth/index.ts'
 import {getFullUrlPath} from './lib/url-helpers.ts'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat.js'
-import 'dayjs/locale/en-gb'
+import 'dayjs/locale/en-gb.js'
 
 dayjs.locale('en-gb')
 dayjs.extend(localizedFormat)
