@@ -1,5 +1,5 @@
-import {USER_CIPHER} from '@/constants/index.ts'
-import {auth} from '@/lib/cookies.config.ts'
+import { USER_CIPHER } from '@/constants/index.ts'
+import { auth } from '@/lib/cookies.config.ts'
 import {
   type PropsWithChildren,
   createContext,
@@ -14,19 +14,20 @@ interface AuthContextProps {
   currentUser: User | null
   getToken: () => Nullable<string>
   onUpdateUser: (user: User) => void
-  onSignin: (input: {user: User; token: string}) => void
+  onSignin: (input: { user: User; token: string }) => void
   onSignout: () => void
   isNotVerified: boolean
+  activeSubcription?: CreatorSubscription
 }
 
 export const AuthContext = createContext<AuthContextProps>({
   isLoading: false,
   isLoggedIn: false,
-  onSignin: () => {},
-  onSignout: () => {},
+  onSignin: () => { },
+  onSignout: () => { },
   getToken: () => null,
   currentUser: null,
-  onUpdateUser: () => {},
+  onUpdateUser: () => { },
   isNotVerified: false,
 })
 
@@ -43,7 +44,7 @@ export const AuthProvider = ({
 
   const authController = useMemo(
     () => ({
-      onSignin: ({user, token}: {user: User; token: string}) => {
+      onSignin: ({ user, token }: { user: User; token: string }) => {
         setCurrentUser(user)
         auth.setCipher(USER_CIPHER, token)
       },
@@ -61,6 +62,13 @@ export const AuthProvider = ({
     [],
   )
 
+  const activeSubcription = useMemo(() => {
+    if (currentUser?.creator?.subscription) {
+      return currentUser.creator.subscription
+    }
+  }, [currentUser])
+
+
   return (
     <AuthContext.Provider
       value={{
@@ -70,6 +78,7 @@ export const AuthProvider = ({
         isLoggedIn: Boolean(authCipher),
         isNotVerified:
           !currentUser?.phoneNumberVerifiedAt || !currentUser.emailVerifiedAt,
+        activeSubcription
       }}
     >
       {children}

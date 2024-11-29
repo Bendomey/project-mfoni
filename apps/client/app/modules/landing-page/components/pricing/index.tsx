@@ -1,9 +1,9 @@
-import {classNames} from '@/lib/classNames.ts'
-import {CheckIcon} from '@heroicons/react/24/outline'
-import {useAuth} from '@/providers/auth/index.tsx'
-import {formatAmount} from '@/lib/format-amount.ts'
-import {useNavigate} from '@remix-run/react'
-import {Button} from '@/components/button/index.tsx'
+import { classNames } from '@/lib/classNames.ts'
+import { CheckIcon } from '@heroicons/react/24/outline'
+import { useAuth } from '@/providers/auth/index.tsx'
+import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
+import { Button } from '@/components/button/index.tsx'
+import { PAGES } from '@/constants/index.ts'
 
 const tiers = [
   {
@@ -24,7 +24,7 @@ const tiers = [
   {
     name: 'Pro Lens',
     id: 'BASIC',
-    priceMonthly: 50,
+    priceMonthly: 5000,
     description:
       'Grow your photography business with premium support and exclusive opportunities.',
     features: [
@@ -40,7 +40,7 @@ const tiers = [
   {
     name: 'Master Shot',
     id: 'ADVANCED',
-    priceMonthly: 100,
+    priceMonthly: 10000,
     description:
       'Elevate your brand and streamline workflow with advanced features.',
     features: [
@@ -58,8 +58,7 @@ const tiers = [
 ]
 
 export const Pricing = () => {
-  const {currentUser} = useAuth()
-  const navigate = useNavigate()
+  const { currentUser } = useAuth()
   return (
     <div
       id="pricing"
@@ -117,7 +116,7 @@ export const Pricing = () => {
                   'text-3xl font-bold tracking-tight',
                 )}
               >
-                {formatAmount(tier.priceMonthly)}
+                {formatAmount(convertPesewasToCedis(tier.priceMonthly))}
               </span>
               <span
                 className={classNames(
@@ -138,15 +137,12 @@ export const Pricing = () => {
             </p>
 
             <Button
-              onClick={() => {
-                if (currentUser && currentUser.role == 'CREATOR') {
-                  // TODO: maybe change this to a page when working on change package feature.
-                  navigate(`/account?change-package=${tier.id}`)
-                  return
-                }
-
-                navigate(`/account?complete-creator-application=${tier.id}`)
-              }}
+              isLink
+              href={
+                currentUser && currentUser.role == 'CREATOR'
+                  ? `${PAGES.AUTHENTICATED_PAGES.PACKAGE_AND_BILLINGS}?change-package=${tier.id}`
+                  : `${PAGES.AUTHENTICATED_PAGES.ACCOUNT}?complete-creator-application=${tier.id}`
+              }
               disabled={
                 currentUser?.creator?.subscription.packageType === tier.id
               }
@@ -158,8 +154,8 @@ export const Pricing = () => {
                 ? currentUser.role === 'CLIENT'
                   ? 'Apply'
                   : currentUser.creator?.subscription.packageType === tier.id
-                    ? 'Selected'
-                    : 'Apply'
+                    ? 'Active'
+                    : 'Select'
                 : 'Get started today'}
             </Button>
 

@@ -1,17 +1,17 @@
 import * as React from 'react'
 import {Slot} from '@radix-ui/react-slot'
-import {Link} from '@remix-run/react'
+import {Link, type LinkProps} from '@remix-run/react'
 import {cva, type VariantProps} from 'class-variance-authority'
 import {classNames} from '@/lib/classNames.ts'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-md font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed aria-disabled:pointer-events-none aria-disabled:opacity-50 aria-disabled:cursor-not-allowed',
   {
     variants: {
       variant: {
         solid: '',
         outlined:
-          'bg-white border border-gray-300 disabled:bg-gray-200 disabled:hover:bg-gray-200',
+          'bg-white border border-gray-300 aria-disabled:bg-gray-200 aria-disabled:hover:bg-gray-200 disabled:bg-gray-200 disabled:hover:bg-gray-200',
         unstyled: '',
       },
       size: {
@@ -72,6 +72,7 @@ export interface ButtonProps
   isLink?: boolean
   href?: string
   asChild?: boolean
+  linkProps?: Partial<LinkProps>
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -84,6 +85,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       isLink = false,
       asChild = false,
       type = 'button',
+      linkProps,
       ...props
     },
     ref,
@@ -97,6 +99,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             buttonVariants({variant, size, className, color}),
           )}
           aria-disabled={props.disabled}
+          // default to 'intent' prefetching for links. If we don't like this, we can add a prop to override it
+          prefetch='intent'
+          {...linkProps}
         >
           {props.children}
         </Link>

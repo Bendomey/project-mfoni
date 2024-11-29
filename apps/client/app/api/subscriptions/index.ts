@@ -99,3 +99,44 @@ export const useCancelSubscription = () =>
   useMutation({
     mutationFn: cancelSubscription,
   })
+
+interface ActivateSubscriptionRequest {
+  pricingPackage: PackageType
+  period: number
+  upgradeEffect?: 'INSTANT' | 'DEFER'
+}
+
+export const activateSubscription = async (
+  input: ActivateSubscriptionRequest,
+) => {
+  try {
+    const response = await fetchClient<ApiResponse<boolean>>(
+      '/v1/creator-subscriptions/activate',
+      {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      },
+    )
+
+    if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+      throw new Error(response.parsedBody.errorMessage)
+    }
+
+    return response.parsedBody.data
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw error
+    }
+
+    // Error from server.
+    if (error instanceof Response) {
+      const response = await error.json()
+      throw new Error(response.errorMessage)
+    }
+  }
+}
+
+export const useActiveSubscription = () =>
+  useMutation({
+    mutationFn: activateSubscription,
+  })

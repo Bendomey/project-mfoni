@@ -18,7 +18,7 @@ export function CancelSubscriptionDialog({onClose, isOpened}: Props) {
     setIsLoading(true)
     mutate(undefined, {
       onError: () => {
-        toast.error('Creator Application is Required')
+        toast.error('Failed to cancel subscription, try again later.')
         setIsLoading(false)
       },
       onSuccess: () => {

@@ -38,3 +38,9 @@ public class GetSubscriptionsInput
     public required string CreatorId { get; set; }
     public string? PackageType { get; set; }
 }
+
+public class CalculateUpgradePricingOutput
+{
+    public required Int64 Pricing { get; set; }
+    public required Int64 RemainingAmount { get; set; }
+}

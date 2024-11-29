@@ -1,29 +1,16 @@
-import {Button} from '@/components/button/index.tsx'
-import {MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
-import {convertPesewasToCedis, formatAmount} from '@/lib/format-amount.ts'
-import {useAuth} from '@/providers/auth/index.tsx'
-import {ArrowPathIcon} from '@heroicons/react/24/outline'
-import {ArrowUpRightIcon} from '@heroicons/react/24/solid'
-import {useMemo} from 'react'
-import {CancelSubscriptionDialog} from './cancel-subscription-dialog.tsx'
-import {useDisclosure} from '@/hooks/use-disclosure.tsx'
-import {useIsSubscriptionCancelled} from '@/api/subscriptions/index.ts'
+import { Button } from '@/components/button/index.tsx'
+import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
+import { ArrowPathIcon } from '@heroicons/react/24/outline'
+import { ArrowUpRightIcon } from '@heroicons/react/24/solid'
+import { CancelSubscriptionDialog } from './cancel-subscription-dialog.tsx'
+import { useDisclosure } from '@/hooks/use-disclosure.tsx'
+import { usePackageAndBillingsContext } from '../context/index.tsx'
+import { ReactivateSubscriptionDialog } from './reactivate-subscription-dialog.tsx'
 
 export function PackageCard() {
-  const {currentUser} = useAuth()
-  const {isOpened, onToggle} = useDisclosure()
-  const subscriptionId = currentUser?.creator?.subscription.id ?? ''
-  const {data, isPending} = useIsSubscriptionCancelled(subscriptionId)
-
-  const activePackage = useMemo(() => {
-    if (currentUser?.creator?.subscription.packageType) {
-      return MFONI_PACKAGES_DETAILED[
-        currentUser.creator.subscription.packageType
-      ]
-    }
-  }, [currentUser?.creator?.subscription.packageType])
-
-  const isActiveSubscriptionCancelled = !Boolean(data) && !isPending
+  const { isOpened, onToggle } = useDisclosure()
+  const { isOpened: isOpenedReactivateModal, onToggle: onToggleReactivateModal } = useDisclosure()
+  const { isActiveSubscriptionCancelled, activePackage, setIsChangePackageModalOpened, isActiveSubscriptionCancelledRequestPending } = usePackageAndBillingsContext()
 
   return (
     <>
@@ -114,18 +101,30 @@ export function PackageCard() {
           </div>
         </div>
         <div className="border-t border-gray-200 px-4 py-2 flex justify-end gap-2">
-          {activePackage?.id !== 'FREE' && isActiveSubscriptionCancelled ? (
-            <Button
-              onClick={onToggle}
-              variant="solid"
-              color="danger"
-              className="gap-1"
-            >
-              Cancel Subscription
-            </Button>
-          ) : null}
+          {
+            isActiveSubscriptionCancelledRequestPending ? null :
+              activePackage?.id !== 'FREE' && isActiveSubscriptionCancelled ? (
+                <Button
+                  onClick={onToggle}
+                  variant="solid"
+                  color="danger"
+                  className="gap-1"
+                >
+                  Cancel Subscription
+                </Button>
+              ) : (
+                <Button
+                  onClick={onToggleReactivateModal}
+                  variant="solid"
+                  color="success"
+                  className="gap-1"
+                >
+                  Re-activate Subscription
+                </Button>
+              )
+          }
 
-          <Button variant="outlined" className="gap-1">
+          <Button variant="outlined" className="gap-1" onClick={() => setIsChangePackageModalOpened(true)}>
             {activePackage?.id === 'ADVANCED' ? (
               <>
                 Change
@@ -141,6 +140,7 @@ export function PackageCard() {
         </div>
       </div>
       <CancelSubscriptionDialog isOpened={isOpened} onClose={onToggle} />
+      <ReactivateSubscriptionDialog isOpened={isOpenedReactivateModal} onClose={onToggleReactivateModal} />
     </>
   )
 }

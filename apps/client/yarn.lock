@@ -3025,6 +3025,18 @@
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.17.4.tgz#3c216f76935dad59818890dc60250c9cd0a7ca5a"
   integrity sha512-1J2vINgJ6OH1/qgN/ouDjnRZc67TnKQ2mlIODKQr36Aa2vjMdH6Fb3pIbCRh5N6u95q6z1olp90n22eTlp9Ykg==
 
+"@tanstack/query-devtools@5.61.4":
+  version "5.61.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-devtools/-/query-devtools-5.61.4.tgz#86a3be0ffb97d810525600e3787b5b69808cf9db"
+  integrity sha512-21Tw+u8E3IJJj4A/Bct4H0uBaDTEu7zBrR79FeSyY+mS2gx5/m316oDtJiKkILc819VSTYt+sFzODoJNcpPqZQ==
+
+"@tanstack/react-query-devtools@5.61.5":
+  version "5.61.5"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-devtools/-/react-query-devtools-5.61.5.tgz#0c89cd3d7e883f603c22a2f8b061b23c7dab3ab6"
+  integrity sha512-P2DwlKyoGar6FX2XL324gM7AX8fuXm6DecLvfUoGpWbxtbuAtfzglRiCDLKkc5tJ7pekuaZsFFas/cyfTymoCQ==
+  dependencies:
+    "@tanstack/query-devtools" "5.61.4"
+
 "@tanstack/react-query@5.17.4":
   version "5.17.4"
   resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.17.4.tgz#ff4de451f55aca50a5fabb5b880998634cabf70f"
@@ -8714,13 +8726,6 @@ uri-js@^4.2.2:
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"
-
-use-dehydrated-state@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/use-dehydrated-state/-/use-dehydrated-state-0.1.0.tgz#a85027b0b1f38ed7e76c21a98b4fe06725d44d8f"
-  integrity sha512-E2E1Mx9UeHiK1fxabnUULJEc7BNMmdsMy7hBGiDxDvxgP5/QIYJawQ2g2ZQvqvoXIkyzJA7wWG07hBWa5yuM9Q==
-  dependencies:
-    deepmerge "^4.2.2"
 
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"

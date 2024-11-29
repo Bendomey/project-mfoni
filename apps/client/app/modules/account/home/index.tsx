@@ -6,11 +6,15 @@ import {UserTimeline} from './components/timeline.tsx'
 import {OtherCreators} from './components/other-creators.tsx'
 import {Contents} from './components/content.tsx'
 import {QuickActions} from './components/quick-actions.tsx'
-import {AccountProvider, useAccountContext} from './context/index.tsx'
+import {AccountProvider} from './context/index.tsx'
 import {CreatorApplicationModal} from './components/creator-application-modal/index.tsx'
+import { useSearchParams } from '@remix-run/react'
 
 const AccountModuleComponent = () => {
-  const {isCreatorApplicationModalOpened} = useAccountContext()
+  const [searchParams] = useSearchParams()
+
+  const completeCreatorApplicationParam = searchParams.get('complete-creator-application')
+  const isCompleteCreatorApplicationModalOpened = Boolean(completeCreatorApplicationParam && completeCreatorApplicationParam !== 'false')
 
   return (
     <>
@@ -28,7 +32,7 @@ const AccountModuleComponent = () => {
         </div>
       </div>
       <Footer />
-      <CreatorApplicationModal isOpened={isCreatorApplicationModalOpened} />
+      <CreatorApplicationModal isOpened={isCompleteCreatorApplicationModalOpened} />
     </>
   )
 }

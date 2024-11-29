@@ -36,6 +36,11 @@ public class PricingLib
         }
     }
 
+    public long GetPricePerDay()
+    {
+        return GetPrice() / 30;
+    }
+
     public string GetPackageName()
     {
         switch (_packageType)

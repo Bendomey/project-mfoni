@@ -1,5 +1,9 @@
 import {PackageAndBillingsModule} from '@/modules/index.ts'
-import {type MetaFunction, type LoaderFunctionArgs} from '@remix-run/node'
+import {
+  type MetaFunction,
+  type LoaderFunctionArgs,
+  json,
+} from '@remix-run/node'
 import {protectCreatorRouteLoader} from '@/lib/actions/protect-creator-route-loader.ts'
 import {dehydrate, QueryClient} from '@tanstack/react-query'
 import {extractAuthCookie} from '@/lib/actions/extract-auth-cookie.ts'
@@ -39,13 +43,18 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
               baseUrl,
             },
           ),
+        staleTime: 5000,
       })
     }
 
     const dehydratedState = dehydrate(queryClient)
-    return {
+    return json({
       dehydratedState,
-    }
+    }, {
+      headers: {
+				'Cache-Control': 'public, max-age=3600',
+			},
+    })
   }
 
   return res

@@ -1,20 +1,20 @@
-import {Fragment, useState} from 'react'
-import {Dialog} from '@headlessui/react'
-import {Bars3Icon, XMarkIcon} from '@heroicons/react/24/outline'
-import {Link} from '@remix-run/react'
-import {APP_NAME} from '@/constants/index.ts'
-import {Button} from '@/components/button/index.tsx'
-import {SearchPhotos} from './search/index.tsx'
-import {SearchPhotosForMobile} from './search-for-mobile/index.tsx'
-import {useAuth} from '@/providers/auth/index.tsx'
-import {UserAccountMobileNav, UserAccountNav} from './user-account/index.tsx'
+import { Fragment, useState } from 'react'
+import { Dialog } from '@headlessui/react'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Link } from '@remix-run/react'
+import { APP_NAME } from '@/constants/index.ts'
+import { Button } from '@/components/button/index.tsx'
+import { SearchPhotos } from './search/index.tsx'
+import { SearchPhotosForMobile } from './search-for-mobile/index.tsx'
+import { useAuth } from '@/providers/auth/index.tsx'
+import { UserAccountMobileNav, UserAccountNav } from './user-account/index.tsx'
 import useScroll from '@/hooks/use-scroll.ts'
-import {NoticeBanner} from './notice-banner/index.tsx'
+import { NoticeBanner } from './notice-banner/index.tsx'
 
 const navigation = (isLoggedIn: boolean) => [
-  {name: 'Explore', href: '/explore', routeType: 'link'},
+  { name: 'Explore', href: '/explore', routeType: 'link' },
   isLoggedIn
-    ? {name: 'My Account', href: '/account', routeType: 'link'}
+    ? { name: 'My Account', href: '/account', routeType: 'link' }
     : undefined,
 ]
 
@@ -27,7 +27,7 @@ export const Header = ({
   isHeroSearchInVisible,
   shouldHeaderBlur = true,
 }: Props) => {
-  const {isLoggedIn} = useAuth()
+  const { isLoggedIn } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const scrolled = useScroll(50)
 
@@ -48,7 +48,7 @@ export const Header = ({
         className="mx-auto flex max-w-8xl items-center justify-between py-4 px-4 lg:px-8"
         aria-label="Global"
       >
-        <Link to="/" className="-m-1.5 p-1.5">
+        <Link to="/" prefetch='intent' className="-m-1.5 p-1.5">
           <div className="flex flex-row items-end">
             <span className="text-4xl text-blue-700 font-extrabold">
               {APP_NAME.slice(0, 1)}
@@ -117,7 +117,7 @@ export const Header = ({
         <div className="fixed inset-0 z-10" />
         <Dialog.Panel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <Link to="/" className="-m-1.5 p-1.5">
+            <Link to="/" prefetch='intent' className="-m-1.5 p-1.5">
               <div className="flex flex-row items-end">
                 <span className="text-4xl text-blue-500 font-extrabold">
                   {APP_NAME.slice(0, 1)}
@@ -144,6 +144,7 @@ export const Header = ({
                     <Fragment key={idx}>
                       {item && item.routeType === 'link' ? (
                         <Link
+                          prefetch='intent'
                           key={item.name}
                           to={item.href}
                           className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"

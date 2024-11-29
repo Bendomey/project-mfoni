@@ -1,5 +1,5 @@
-import {classNames} from '@/lib/classNames.ts'
-import {Link} from '@remix-run/react'
+import { classNames } from '@/lib/classNames.ts'
+import { Link } from '@remix-run/react'
 
 const teams = [
   {
@@ -28,6 +28,7 @@ export function QuickActions() {
         {teams.map(team => (
           <li key={team.name}>
             <Link
+              prefetch='intent'
               to={team.href}
               className={classNames(
                 team.current

@@ -91,9 +91,9 @@ public class CreatorService
         {
             CreatorId = creator.Id,
             PackageType = creatorApplication.IntendedPricingPackage,
-            Period = isItAPremiumPackage ? canIPayWithWallet ? 1 : 0.5 : null,
+            Period = isItAPremiumPackage ? canIPayWithWallet ? 1 : 0 : null,
             StartedAt = DateTime.UtcNow,
-            EndedAt = isItAPremiumPackage ? canIPayWithWallet ? DateTime.UtcNow.AddMonths(1) : DateTime.UtcNow.AddDays(5) : null,
+            EndedAt = isItAPremiumPackage ? canIPayWithWallet ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow : null,
         };
 
         await __creatorSubscriptionCollection.InsertOneAsync(creatorSubscription);
