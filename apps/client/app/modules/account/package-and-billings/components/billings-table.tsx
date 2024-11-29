@@ -1,10 +1,10 @@
-import { useGetCreatorSubscriptions } from '@/api/subscriptions/index.ts'
-import { Button } from '@/components/button/index.tsx'
-import { Pagination } from '@/components/pagination/index.tsx'
-import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
-import { classNames } from '@/lib/classNames.ts'
-import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
-import { useAuth } from '@/providers/auth/index.tsx'
+import {useGetCreatorSubscriptions} from '@/api/subscriptions/index.ts'
+import {Button} from '@/components/button/index.tsx'
+import {Pagination} from '@/components/pagination/index.tsx'
+import {MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
+import {classNames} from '@/lib/classNames.ts'
+import {convertPesewasToCedis, formatAmount} from '@/lib/format-amount.ts'
+import {useAuth} from '@/providers/auth/index.tsx'
 import {
   ArrowDownTrayIcon,
   CheckIcon,
@@ -14,18 +14,18 @@ import {
   ExclamationCircleIcon,
   FolderPlusIcon,
 } from '@heroicons/react/24/outline'
-import { useSearchParams } from '@remix-run/react'
+import {useSearchParams} from '@remix-run/react'
 import dayjs from 'dayjs'
 
-import { Fragment, useState } from 'react'
+import {Fragment, useState} from 'react'
 
 export function BillingsTable() {
-  const { activeSubcription } = useAuth()
+  const {activeSubcription} = useAuth()
   const [selectedSub, setSelectedSub] = useState<string | null>(null)
 
   const [searchParams] = useSearchParams()
   const page = searchParams.get('page') ?? '0'
-  const { data, isError } = useGetCreatorSubscriptions({
+  const {data, isError} = useGetCreatorSubscriptions({
     pagination: {
       page: Number(page),
       per: 50,
@@ -197,7 +197,7 @@ export function BillingsTable() {
                                             index ===
                                             sub.creatorSubscriptionPurchases
                                               .length -
-                                            1,
+                                              1,
                                         },
                                       )}
                                     >
@@ -221,7 +221,8 @@ export function BillingsTable() {
                                       </td>
                                       <td className="pb-2 px-3">
                                         <span className="inline-flex capitalize items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-bue-700 ring-1 ring-inset ring-bue-700/10">
-                                          {purchase.type.toLowerCase()} Transaction
+                                          {purchase.type.toLowerCase()}{' '}
+                                          Transaction
                                         </span>
                                       </td>
                                       <td />

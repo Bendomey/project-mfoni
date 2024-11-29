@@ -1,6 +1,6 @@
-import { Link } from '@remix-run/react'
-import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
-import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import {Link} from '@remix-run/react'
+import {MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
+import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
 
 interface Props {
   mfoniPackage: string
@@ -8,8 +8,11 @@ interface Props {
   isWalletLow: boolean
 }
 
-export function SelectPackage({ mfoniPackage, setMfoniPackage, isWalletLow }: Props) {
-
+export function SelectPackage({
+  mfoniPackage,
+  setMfoniPackage,
+  isWalletLow,
+}: Props) {
   return (
     <div>
       <h1 className="font-bold text-xl">1. Choose a package</h1>
@@ -17,7 +20,7 @@ export function SelectPackage({ mfoniPackage, setMfoniPackage, isWalletLow }: Pr
         <p className="text-sm text-gray-600 mt-1">
           The package you select will reflect what your benefits are!{' '}
           <Link
-            prefetch='intent'
+            prefetch="intent"
             to="/#pricing"
             target="_blank"
             className="text-blue-600 hover:underline"
@@ -45,29 +48,31 @@ export function SelectPackage({ mfoniPackage, setMfoniPackage, isWalletLow }: Pr
             package and make your payments after we&apos;ve approved your
             application.
           </p>
-
-
         </div>
-        {
-          isWalletLow ? (
-            <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4 mt-3">
-              <div className="flex">
-                <div className="shrink-0">
-                  <ExclamationTriangleIcon aria-hidden="true" className="size-5 text-yellow-400" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-yellow-700">
-                    You are low on wallet balance.
-                    <Link to="/account/wallet" prefetch='intent' className="font-medium text-yellow-700 underline hover:text-yellow-600">
-                      Top up here
-                    </Link>
-                  </p>
-                </div>
+        {isWalletLow ? (
+          <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4 mt-3">
+            <div className="flex">
+              <div className="shrink-0">
+                <ExclamationTriangleIcon
+                  aria-hidden="true"
+                  className="size-5 text-yellow-400"
+                />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700">
+                  You are low on wallet balance.
+                  <Link
+                    to="/account/wallet"
+                    prefetch="intent"
+                    className="font-medium text-yellow-700 underline hover:text-yellow-600"
+                  >
+                    Top up here
+                  </Link>
+                </p>
               </div>
             </div>
-          ) : null
-        }
-
+          </div>
+        ) : null}
       </div>
     </div>
   )

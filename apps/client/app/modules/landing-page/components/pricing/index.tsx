@@ -1,9 +1,9 @@
-import { classNames } from '@/lib/classNames.ts'
-import { CheckIcon } from '@heroicons/react/24/outline'
-import { useAuth } from '@/providers/auth/index.tsx'
-import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
-import { Button } from '@/components/button/index.tsx'
-import { PAGES } from '@/constants/index.ts'
+import {classNames} from '@/lib/classNames.ts'
+import {CheckIcon} from '@heroicons/react/24/outline'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {convertPesewasToCedis, formatAmount} from '@/lib/format-amount.ts'
+import {Button} from '@/components/button/index.tsx'
+import {PAGES} from '@/constants/index.ts'
 
 const tiers = [
   {
@@ -58,7 +58,7 @@ const tiers = [
 ]
 
 export const Pricing = () => {
-  const { currentUser } = useAuth()
+  const {currentUser} = useAuth()
   return (
     <div
       id="pricing"

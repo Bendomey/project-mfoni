@@ -1,37 +1,39 @@
-import { useActiveSubscription } from '@/api/subscriptions/index.ts'
-import { Button } from '@/components/button/index.tsx'
-import { Modal } from '@/components/modal/index.tsx'
-import { useAuth } from '@/providers/auth/index.tsx'
-import { useState } from 'react'
-import { toast } from 'react-hot-toast'
+import {useActiveSubscription} from '@/api/subscriptions/index.ts'
+import {Button} from '@/components/button/index.tsx'
+import {Modal} from '@/components/modal/index.tsx'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {useState} from 'react'
+import {toast} from 'react-hot-toast'
 
 interface Props {
   onClose: () => void
   isOpened: boolean
 }
 
-export function ReactivateSubscriptionDialog({ onClose, isOpened }: Props) {
-  const { activeSubcription } = useAuth()
+export function ReactivateSubscriptionDialog({onClose, isOpened}: Props) {
+  const {activeSubcription} = useAuth()
   const [isLoading, setIsLoading] = useState(false)
-  const { mutate } = useActiveSubscription()
+  const {mutate} = useActiveSubscription()
 
   const handleSubmit = () => {
     setIsLoading(true)
     if (activeSubcription) {
-      mutate({
-        period: activeSubcription.period ?? 1,
-        pricingPackage: activeSubcription.packageType,
-      }, {
-        onError: () => {
-          toast.error('Failed to re-activate subscription, try again later.')
-          setIsLoading(false)
+      mutate(
+        {
+          period: activeSubcription.period ?? 1,
+          pricingPackage: activeSubcription.packageType,
         },
-        onSuccess: () => {
-          window.location.reload()
+        {
+          onError: () => {
+            toast.error('Failed to re-activate subscription, try again later.')
+            setIsLoading(false)
+          },
+          onSuccess: () => {
+            window.location.reload()
+          },
         },
-      })
+      )
     }
-
   }
   return (
     <Modal

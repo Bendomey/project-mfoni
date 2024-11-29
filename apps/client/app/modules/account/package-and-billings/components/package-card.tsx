@@ -1,16 +1,22 @@
-import { Button } from '@/components/button/index.tsx'
-import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
-import { ArrowPathIcon } from '@heroicons/react/24/outline'
-import { ArrowUpRightIcon } from '@heroicons/react/24/solid'
-import { CancelSubscriptionDialog } from './cancel-subscription-dialog.tsx'
-import { useDisclosure } from '@/hooks/use-disclosure.tsx'
-import { usePackageAndBillingsContext } from '../context/index.tsx'
-import { ReactivateSubscriptionDialog } from './reactivate-subscription-dialog.tsx'
+import {Button} from '@/components/button/index.tsx'
+import {convertPesewasToCedis, formatAmount} from '@/lib/format-amount.ts'
+import {ArrowPathIcon} from '@heroicons/react/24/outline'
+import {ArrowUpRightIcon} from '@heroicons/react/24/solid'
+import {CancelSubscriptionDialog} from './cancel-subscription-dialog.tsx'
+import {useDisclosure} from '@/hooks/use-disclosure.tsx'
+import {usePackageAndBillingsContext} from '../context/index.tsx'
+import {ReactivateSubscriptionDialog} from './reactivate-subscription-dialog.tsx'
 
 export function PackageCard() {
-  const { isOpened, onToggle } = useDisclosure()
-  const { isOpened: isOpenedReactivateModal, onToggle: onToggleReactivateModal } = useDisclosure()
-  const { isActiveSubscriptionCancelled, activePackage, setIsChangePackageModalOpened, isActiveSubscriptionCancelledRequestPending } = usePackageAndBillingsContext()
+  const {isOpened, onToggle} = useDisclosure()
+  const {isOpened: isOpenedReactivateModal, onToggle: onToggleReactivateModal} =
+    useDisclosure()
+  const {
+    isActiveSubscriptionCancelled,
+    activePackage,
+    setIsChangePackageModalOpened,
+    isActiveSubscriptionCancelledRequestPending,
+  } = usePackageAndBillingsContext()
 
   return (
     <>
@@ -101,30 +107,32 @@ export function PackageCard() {
           </div>
         </div>
         <div className="border-t border-gray-200 px-4 py-2 flex justify-end gap-2">
-          {
-            isActiveSubscriptionCancelledRequestPending ? null :
-              activePackage?.id !== 'FREE' && isActiveSubscriptionCancelled ? (
-                <Button
-                  onClick={onToggle}
-                  variant="solid"
-                  color="danger"
-                  className="gap-1"
-                >
-                  Cancel Subscription
-                </Button>
-              ) : (
-                <Button
-                  onClick={onToggleReactivateModal}
-                  variant="solid"
-                  color="success"
-                  className="gap-1"
-                >
-                  Re-activate Subscription
-                </Button>
-              )
-          }
+          {isActiveSubscriptionCancelledRequestPending ? null : activePackage?.id !==
+              'FREE' && isActiveSubscriptionCancelled ? (
+            <Button
+              onClick={onToggle}
+              variant="solid"
+              color="danger"
+              className="gap-1"
+            >
+              Cancel Subscription
+            </Button>
+          ) : (
+            <Button
+              onClick={onToggleReactivateModal}
+              variant="solid"
+              color="success"
+              className="gap-1"
+            >
+              Re-activate Subscription
+            </Button>
+          )}
 
-          <Button variant="outlined" className="gap-1" onClick={() => setIsChangePackageModalOpened(true)}>
+          <Button
+            variant="outlined"
+            className="gap-1"
+            onClick={() => setIsChangePackageModalOpened(true)}
+          >
             {activePackage?.id === 'ADVANCED' ? (
               <>
                 Change
@@ -140,7 +148,10 @@ export function PackageCard() {
         </div>
       </div>
       <CancelSubscriptionDialog isOpened={isOpened} onClose={onToggle} />
-      <ReactivateSubscriptionDialog isOpened={isOpenedReactivateModal} onClose={onToggleReactivateModal} />
+      <ReactivateSubscriptionDialog
+        isOpened={isOpenedReactivateModal}
+        onClose={onToggleReactivateModal}
+      />
     </>
   )
 }

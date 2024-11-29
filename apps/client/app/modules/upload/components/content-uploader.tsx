@@ -1,11 +1,11 @@
-import { Button } from '@/components/button/index.tsx'
-import { ArrowUpTrayIcon } from '@heroicons/react/24/outline'
-import { CheckBadgeIcon } from '@heroicons/react/24/solid'
-import { Link } from '@remix-run/react'
-import { useContentUpload } from '../context.tsx'
+import {Button} from '@/components/button/index.tsx'
+import {ArrowUpTrayIcon} from '@heroicons/react/24/outline'
+import {CheckBadgeIcon} from '@heroicons/react/24/solid'
+import {Link} from '@remix-run/react'
+import {useContentUpload} from '../context.tsx'
 
 export const ContentUploader = () => {
-  const { openFileSelector } = useContentUpload()
+  const {openFileSelector} = useContentUpload()
   return (
     <>
       <div className="flex justify-center">
@@ -59,7 +59,7 @@ export const ContentUploader = () => {
               <CheckBadgeIcon className="text-blue-600 h-5 w-auto" />
               Read the{' '}
               <Link
-                prefetch='intent'
+                prefetch="intent"
                 to="/terms"
                 target="_blank"
                 className="border-b border-dashed border-zinc-600"

@@ -1,13 +1,13 @@
-import { imageUrls } from '@/modules/index.ts'
-import { Fragment } from 'react'
-import { Content } from '@/components/Content/index.tsx'
-import { classNames } from '@/lib/classNames.ts'
+import {imageUrls} from '@/modules/index.ts'
+import {Fragment} from 'react'
+import {Content} from '@/components/Content/index.tsx'
+import {classNames} from '@/lib/classNames.ts'
 import {
   HeartIcon,
   PhotoIcon,
   RectangleStackIcon,
 } from '@heroicons/react/24/solid'
-import { Link } from '@remix-run/react'
+import {Link} from '@remix-run/react'
 
 export function Contents() {
   return (
@@ -23,7 +23,7 @@ export function Contents() {
       <div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8 ">
         {imageUrls.map((url, index) => (
           <Fragment key={index}>
-            <Content content={{ media: url } as any} />
+            <Content content={{media: url} as any} />
           </Fragment>
         ))}
       </div>
@@ -32,7 +32,7 @@ export function Contents() {
 }
 
 const tabs = [
-  { name: 'All', href: '#', count: '52', current: true, icon: PhotoIcon },
+  {name: 'All', href: '#', count: '52', current: true, icon: PhotoIcon},
   {
     name: 'Collections',
     href: '#',
@@ -40,7 +40,7 @@ const tabs = [
     current: false,
     icon: RectangleStackIcon,
   },
-  { name: 'Bookmarks', href: '#', count: '4', current: false, icon: HeartIcon },
+  {name: 'Bookmarks', href: '#', count: '4', current: false, icon: HeartIcon},
 ]
 
 function Tabs() {
@@ -66,7 +66,7 @@ function Tabs() {
           <nav aria-label="Tabs" className="-mb-px flex space-x-8">
             {tabs.map(tab => (
               <Link
-                prefetch='intent'
+                prefetch="intent"
                 key={tab.name}
                 to="#"
                 aria-current={tab.current ? 'page' : undefined}

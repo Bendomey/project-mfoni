@@ -1,14 +1,14 @@
-import { PAGES } from '@/constants/index.ts'
-import { classNames } from '@/lib/classNames.ts'
-import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
-import { useAuth } from '@/providers/auth/index.tsx'
-import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
-import { Link } from '@remix-run/react'
+import {PAGES} from '@/constants/index.ts'
+import {classNames} from '@/lib/classNames.ts'
+import {convertPesewasToCedis, formatAmount} from '@/lib/format-amount.ts'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {ArrowDownIcon, ArrowUpIcon} from '@heroicons/react/20/solid'
+import {Link} from '@remix-run/react'
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
+import {useMemo} from 'react'
 
 export const CreatorAnalytics = () => {
-  const { currentUser } = useAuth()
+  const {currentUser} = useAuth()
 
   const stats = useMemo(() => {
     const initStats: any = [
@@ -59,7 +59,7 @@ export const CreatorAnalytics = () => {
         <dl className="mt-2 grid grid-cols-1 divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow md:grid-cols-3 md:divide-x md:divide-y-0">
           {stats.map((item: any) => (
             <Link
-              prefetch='intent'
+              prefetch="intent"
               to={item.href}
               key={item.name}
               className="px-4 py-5 sm:p-6 hover:bg-gray-50"

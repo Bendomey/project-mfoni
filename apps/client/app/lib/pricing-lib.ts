@@ -25,7 +25,8 @@ export const determineIfItsAnUpgradeOrDowngrade = ({
   return 'NO_CHANGE'
 }
 
-export const isPackagePremium = (packageType: PackageType) => packageType !== 'FREE'
+export const isPackagePremium = (packageType: PackageType) =>
+  packageType !== 'FREE'
 
 export const getPriceForPackage = (packageType: PackageType) => {
   const selectedPackage = MFONI_PACKAGES_DETAILED[packageType]

@@ -100,7 +100,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           )}
           aria-disabled={props.disabled}
           // default to 'intent' prefetching for links. If we don't like this, we can add a prop to override it
-          prefetch='intent'
+          prefetch="intent"
           {...linkProps}
         >
           {props.children}

@@ -8,13 +8,18 @@ import {Contents} from './components/content.tsx'
 import {QuickActions} from './components/quick-actions.tsx'
 import {AccountProvider} from './context/index.tsx'
 import {CreatorApplicationModal} from './components/creator-application-modal/index.tsx'
-import { useSearchParams } from '@remix-run/react'
+import {useSearchParams} from '@remix-run/react'
 
 const AccountModuleComponent = () => {
   const [searchParams] = useSearchParams()
 
-  const completeCreatorApplicationParam = searchParams.get('complete-creator-application')
-  const isCompleteCreatorApplicationModalOpened = Boolean(completeCreatorApplicationParam && completeCreatorApplicationParam !== 'false')
+  const completeCreatorApplicationParam = searchParams.get(
+    'complete-creator-application',
+  )
+  const isCompleteCreatorApplicationModalOpened = Boolean(
+    completeCreatorApplicationParam &&
+      completeCreatorApplicationParam !== 'false',
+  )
 
   return (
     <>
@@ -32,7 +37,9 @@ const AccountModuleComponent = () => {
         </div>
       </div>
       <Footer />
-      <CreatorApplicationModal isOpened={isCompleteCreatorApplicationModalOpened} />
+      <CreatorApplicationModal
+        isOpened={isCompleteCreatorApplicationModalOpened}
+      />
     </>
   )
 }
