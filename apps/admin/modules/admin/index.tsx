@@ -139,15 +139,6 @@ export const ListAdmins = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => {
-                    setSelectedAdmin(row.original);
-                    setOpenViewModal(true);
-                  }}
-                >
-                  <UserIcon className="mr-2 h-4 w-4" />
-                  View
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           );
