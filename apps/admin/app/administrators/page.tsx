@@ -1,5 +1,5 @@
 import { Header } from "@/components/header";
-import ComingSoon from "@/modules/coming-soon";
+import { ListAdmins } from "@/modules";
 
 import { Metadata } from "next";
 
@@ -13,7 +13,7 @@ export default function Administrators() {
             <Header />
 
             <div className="mt-20">
-                <ComingSoon />
+                <ListAdmins />
             </div>
         </>
     )

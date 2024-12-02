@@ -22,6 +22,7 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { useGetAdmins } from "@/api";
 import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
+import _ from "lodash";
 
 export const ListAdmins = () => {
   const [openViewModal, setOpenViewModal] = useState(false);
@@ -69,7 +70,7 @@ export const ListAdmins = () => {
             </Button>
           );
         },
-        cell: ({ row }) => <div className="lowercase">{row.original.name}</div>,
+        cell: ({ row }) => <div>{_.upperFirst(row.original.name)}</div>,
       },
       {
         accessorKey: "email",
@@ -94,31 +95,8 @@ export const ListAdmins = () => {
             "N/A"
           ),
       },
-      // {
-      //   accessorKey: "phoneNumber",
-      //   header: ({ column }) => {
-      //     return (
-      //       <Button
-      //         className="pl-0"
-      //         variant="ghost"
-      //         onClick={() =>
-      //           column.toggleSorting(column.getIsSorted() === "asc")
-      //         }
-      //       >
-      //         Phone
-      //         <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
-      //       </Button>
-      //     );
-      //   },
-      //   cell: ({ row }) =>
-      //     row.original.phoneNumber ? (
-      //       <div className="lowercase">{row.original.phoneNumber}</div>
-      //     ) : (
-      //       "N/A"
-      //     ),
-      // },
       {
-        accessorKey: "status",
+        accessorKey: "createdBy",
         header: ({ column }) => {
           return (
             <Button
@@ -128,15 +106,18 @@ export const ListAdmins = () => {
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              Status
+              Created By
               <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
             </Button>
           );
         },
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("status")}</div>
-        ),
-      },
+        cell: ({ row }) =>
+          row.original.createdBy ? (
+            <div>{_.upperFirst((row.original.createdBy as Admin).name)}</div>
+          ) : (
+            "N/A"
+          ),
+      },  
       {
         accessorKey: "updatedAt",
         header: "Updated At",
