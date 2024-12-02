@@ -21,7 +21,7 @@ const getAdmins = async (
     const removeAllNullableValues = getQueryParams<FetchAdminFilter>(props)
     const params = new URLSearchParams(removeAllNullableValues)
 
-    const response: APIResponse<CreatorApplication> = await fetchClient(
+    const response: APIResponse<Admin> = await fetchClient(
       `/v1/admins?${params.toString()}`,
     )
 
