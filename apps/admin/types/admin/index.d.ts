@@ -3,7 +3,7 @@ interface Admin {
   name: string;
   email: string;
   createdAt: Date;
-  createdById: Admin | NullableString;
+  createdBy: Admin | NullableString;
   updatedAt: NullableDate;
   updatedBy: Admin | NullableString;
 }
