@@ -66,6 +66,7 @@ function Tabs() {
           <nav aria-label="Tabs" className="-mb-px flex space-x-8">
             {tabs.map(tab => (
               <Link
+                prefetch="intent"
                 key={tab.name}
                 to="#"
                 aria-current={tab.current ? 'page' : undefined}

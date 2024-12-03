@@ -24,6 +24,7 @@ export const HeroSection = () => {
             <div className="relative rounded-full px-3 py-1 text-xs md:text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
               Announcing visual search feature.{' '}
               <Link
+                prefetch="intent"
                 to="/blog/visual-search"
                 className="font-semibold text-blue-600"
               >

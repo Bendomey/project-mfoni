@@ -14,13 +14,16 @@ public class UserTransformer
         _creatorTransformer = creatorTransformer;
     }
 
-    public async Task<OutputUser> Transform(User user)
+    public async Task<OutputUser> Transform(User user, string[]? populate = null)
     {
+
+        populate ??= Array.Empty<string>();
+
         OutputCreator? creatorTransformed = null;
-        if (user.Role == UserRole.CREATOR)
+        if (user.Role == UserRole.CREATOR && populate.Any(p => p.Contains(PopulateKeys.CREATOR)))
         {
             var creator = await _creatorService.GetCreatorByUserId(user.Id);
-            var creatorTransformer = await _creatorTransformer.Transform(creator);
+            var creatorTransformer = await _creatorTransformer.Transform(creator, populate);
             creatorTransformed = creatorTransformer;
         }
         // try
@@ -37,7 +40,7 @@ public class UserTransformer
         {
             Id = user.Id,
             Name = user.Name,
-            Role = user.Role!,
+            Role = user.Role,
             Status = user.Status,
             Email = user.Email,
             EmailVerifiedAt = user.EmailVerifiedAt,

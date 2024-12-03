@@ -9,7 +9,13 @@ import {
 import {Link, useSearchParams} from '@remix-run/react'
 import {SelectPackage} from './steps/select-package.tsx'
 import {UploadDocuments} from './steps/upload-documents/index.tsx'
-import {ReactElement, useCallback, useEffect, useMemo, useState} from 'react'
+import {
+  type ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import {
   useCreateCreatorApplication,
   useSubmitCreatorApplication,
@@ -20,7 +26,7 @@ import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {Loader} from '@/components/loader/index.tsx'
 import creatorSvg from '@/assets/creator-svg.png'
-import {MFONI_PACKAGES} from '@/constants/index.ts'
+import {MFONI_PACKAGES, MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
 
@@ -39,7 +45,7 @@ export interface IImageType {
 }
 
 export function CreatorApplicationModal({isOpened}: Props) {
-  const {isNotVerified} = useAuth()
+  const {isNotVerified, currentUser} = useAuth()
   const {activeCreatorApplication} = useAccountContext()
   const {
     mutateAsync: creatorCreatorApplication,
@@ -69,7 +75,6 @@ export function CreatorApplicationModal({isOpened}: Props) {
     ) {
       if (activeCreatorApplication.intendedPricingPackage) {
         setMfoniPackage(activeCreatorApplication.intendedPricingPackage)
-        setStep('document')
       }
       setIdType(activeCreatorApplication.idType ?? '')
       setFrontId(
@@ -96,7 +101,6 @@ export function CreatorApplicationModal({isOpened}: Props) {
       (MFONI_PACKAGES as Array<string>).includes(packageFromUrl)
     ) {
       setMfoniPackage(packageFromUrl)
-      setStep('document')
     }
   }, [activeCreatorApplication, searchParams])
 
@@ -113,10 +117,31 @@ export function CreatorApplicationModal({isOpened}: Props) {
     [isCreatingApplication, isSubmitingApplication, isUpdatingApplication],
   )
 
-  const isNextButtonDisabled = useMemo(() => !mfoniPackage, [mfoniPackage])
+  const isWalletLow = useMemo(() => {
+    if (!currentUser) return false
+
+    // @ts-expect-error - we're making sure that if it's not in the object, it's false
+    if (!MFONI_PACKAGES_DETAILED[mfoniPackage]) return false
+
+    return (
+      currentUser.bookWallet <
+      MFONI_PACKAGES_DETAILED[mfoniPackage as PackageType].amount
+    )
+  }, [currentUser, mfoniPackage])
+
+  const isNextButtonDisabled = useMemo(
+    () => !mfoniPackage || isWalletLow,
+    [isWalletLow, mfoniPackage],
+  )
   const isCompleteButtonDisabled = useMemo(
-    () => !mfoniPackage || !idType || !frontId || !backId || isLoading,
-    [backId, frontId, idType, isLoading, mfoniPackage],
+    () =>
+      !mfoniPackage ||
+      !idType ||
+      !frontId ||
+      !backId ||
+      isWalletLow ||
+      isLoading,
+    [backId, frontId, idType, isLoading, isWalletLow, mfoniPackage],
   )
 
   const handleSubmit = useCallback(async () => {
@@ -194,6 +219,7 @@ export function CreatorApplicationModal({isOpened}: Props) {
         <div className="flex flex-row items-center gap-2">
           <Button asChild={true} className="mt-5 ">
             <Link
+              prefetch="intent"
               to={`/account/verify?return_to=/account?complete-creator-application=${
                 searchParams.get('complete-creator-application') ?? 'true'
               }`}
@@ -217,9 +243,14 @@ export function CreatorApplicationModal({isOpened}: Props) {
             <h1 className="font-bold text-lg">You are a creator!</h1>
             <p className="mt-1 text-sm">
               You can always change your package you&apos;re on{' '}
-              <a href="/#pricing" className="text-blue-600">
+              <Link
+                prefetch="intent"
+                to="/#pricing"
+                reloadDocument={true}
+                className="text-blue-600"
+              >
                 here
-              </a>
+              </Link>
               .
             </p>
           </>
@@ -247,6 +278,7 @@ export function CreatorApplicationModal({isOpened}: Props) {
             <SelectPackage
               mfoniPackage={mfoniPackage}
               setMfoniPackage={setMfoniPackage}
+              isWalletLow={isWalletLow}
             />
           ) : (
             <>

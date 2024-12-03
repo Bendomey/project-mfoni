@@ -17,6 +17,7 @@ interface AuthContextProps {
   onSignin: (input: {user: User; token: string}) => void
   onSignout: () => void
   isNotVerified: boolean
+  activeSubcription?: CreatorSubscription
 }
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -61,6 +62,12 @@ export const AuthProvider = ({
     [],
   )
 
+  const activeSubcription = useMemo(() => {
+    if (currentUser?.creator?.subscription) {
+      return currentUser.creator.subscription
+    }
+  }, [currentUser])
+
   return (
     <AuthContext.Provider
       value={{
@@ -70,6 +77,7 @@ export const AuthProvider = ({
         isLoggedIn: Boolean(authCipher),
         isNotVerified:
           !currentUser?.phoneNumberVerifiedAt || !currentUser.emailVerifiedAt,
+        activeSubcription,
       }}
     >
       {children}

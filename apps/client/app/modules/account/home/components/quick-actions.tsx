@@ -28,6 +28,7 @@ export function QuickActions() {
         {teams.map(team => (
           <li key={team.name}>
             <Link
+              prefetch="intent"
               to={team.href}
               className={classNames(
                 team.current

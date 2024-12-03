@@ -402,6 +402,7 @@ public class UserController : ControllerBase
     /// <param name="status">Can be `ACTIVE` or `SUSPENDED`</param>
     /// <param name="role">Can be `CLIENT` or `CREATOR`</param>
     /// <param name="provider">Can be `FACEBOOK` or `TWITTER` or `GOOGLE` </param>
+    /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="search">Search by name</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
@@ -422,6 +423,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUsersByAdmin(
         [FromQuery] string? status,
         [FromQuery] string? role,
+        [FromQuery] string? populate,
         [FromQuery] string? provider,
         [FromQuery] string? search,
         [FromQuery] int? page,
@@ -433,7 +435,7 @@ public class UserController : ControllerBase
         try
         {
             logger.LogInformation("Getting all users by admins");
-            var queryFilter = HttpLib.GenerateFilterQuery<User>(page, pageSize, sort, sortBy);
+            var queryFilter = HttpLib.GenerateFilterQuery<User>(page, pageSize, sort, sortBy, populate);
             var input = new GetUsersInput
             {
                 Role = role,
@@ -447,7 +449,7 @@ public class UserController : ControllerBase
             var outUser = new List<OutputUser>();
             foreach (var user in users)
             {
-                outUser.Add(await _userTransformer.Transform(user));
+                outUser.Add(await _userTransformer.Transform(user, populate: queryFilter.Populate));
             }
             var response = HttpLib.GeneratePagination<OutputUser, User>(
                 outUser,
@@ -482,6 +484,7 @@ public class UserController : ControllerBase
     /// Retrieves all creator applications on the platform
     /// </summary>
     /// <param name="status">Can be `PENDING`, `SUBMITTED`, `REJECTED` or `APPROVED` </param>
+    /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
     /// <param name="sort">To sort response data either by `asc` or `desc`</param>
@@ -501,6 +504,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetCreatorsByAdmin(
         [FromQuery] string? status,
         [FromQuery] int? page,
+        [FromQuery] string? populate,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
         [FromQuery] string sortBy = "created_at"
@@ -513,7 +517,8 @@ public class UserController : ControllerBase
                 page,
                 pageSize,
                 sort,
-                sortBy
+                sortBy,
+                populate
             );
             var creatorApplications = await _creatorApplicationService.GetCreatorApplications(
                 queryFilter,
@@ -524,7 +529,7 @@ public class UserController : ControllerBase
 
             var outCreatorApplications = creatorApplications.ConvertAll<OutputCreatorApplication>(
                 new Converter<CreatorApplication, OutputCreatorApplication>(creatorApplication =>
-                    _creatorApplicationTransformer.Transform(creatorApplication)
+                    _creatorApplicationTransformer.Transform(creatorApplication, populate: queryFilter.Populate)
                 )
             );
             var response = HttpLib.GeneratePagination<OutputCreatorApplication, CreatorApplication>(
@@ -557,12 +562,15 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <param name="populate">Comma separated values to populate fields</param>
     [Authorize]
     [HttpGet("creator-subscriptions/active")]
     [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> ActiveSubscription()
+    public async Task<IActionResult> ActiveSubscription(
+        [FromQuery] string? populate
+    )
     {
         try
         {
@@ -570,8 +578,10 @@ public class UserController : ControllerBase
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
             var creatorSubscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
+
+            populate ??= "";
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorSubscription>(await _creatorSubscriptionTransformer.Transform(creatorSubscription), null).Result()
+                new GetEntityResponse<OutputCreatorSubscription>(await _creatorSubscriptionTransformer.Transform(creatorSubscription, populate: populate.Split(",")), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -593,42 +603,6 @@ public class UserController : ControllerBase
             return new StatusCodeResult(500);
         }
     }
-
-    [Authorize]
-    [HttpGet("creator-subscriptions/{id}/is-cancelled")]
-    [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> isSubscriptionCancelled(string id)
-    {
-        try
-        {
-            logger.LogInformation($"is creator subscription cancelled");
-            var creatorSubscription = await _subscriptionService.IsSubscriptionCancelled(id);
-            return new ObjectResult(
-            new GetEntityResponse<OutputCreatorSubscription>(creatorSubscription is not null ? await _creatorSubscriptionTransformer.Transform(creatorSubscription) : null, null).Result()
-            )
-            { StatusCode = StatusCodes.Status200OK };
-        }
-        catch (HttpRequestException e)
-        {
-            var statusCode = HttpStatusCode.BadRequest;
-            if (e.StatusCode != null)
-            {
-                statusCode = (HttpStatusCode)e.StatusCode;
-            }
-
-            return new ObjectResult(new GetEntityResponse<OutputCreatorSubscription>(null, e.Message).Result()) { StatusCode = (int)statusCode };
-        }
-
-        catch (Exception e)
-        {
-            // sentry error
-            logger.LogError($"is creator subscription cancelled failed. Exception: {e}");
-            return new StatusCodeResult(500);
-        }
-    }
-
 
     [Authorize]
     [HttpPatch("creator-subscriptions/cancel")]

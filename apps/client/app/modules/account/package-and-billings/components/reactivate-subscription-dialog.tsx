@@ -1,8 +1,8 @@
-import {useCancelSubscription} from '@/api/subscriptions/index.ts'
+import {useActiveSubscription} from '@/api/subscriptions/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {Modal} from '@/components/modal/index.tsx'
 import { PAGES } from '@/constants/index.ts'
-import dayjs from 'dayjs'
+import {useAuth} from '@/providers/auth/index.tsx'
 import {useState} from 'react'
 import {toast} from 'react-hot-toast'
 
@@ -11,21 +11,30 @@ interface Props {
   isOpened: boolean
 }
 
-export function CancelSubscriptionDialog({onClose, isOpened}: Props) {
+export function ReactivateSubscriptionDialog({onClose, isOpened}: Props) {
+  const {activeSubcription} = useAuth()
   const [isLoading, setIsLoading] = useState(false)
-  const {mutate} = useCancelSubscription()
+  const {mutate} = useActiveSubscription()
 
   const handleSubmit = () => {
     setIsLoading(true)
-    mutate(undefined, {
-      onError: () => {
-        toast.error('Failed to cancel subscription, try again later.')
-        setIsLoading(false)
-      },
-      onSuccess: () => {
-        window.location.href = PAGES.AUTHENTICATED_PAGES.PACKAGE_AND_BILLINGS
-      },
-    })
+    if (activeSubcription) {
+      mutate(
+        {
+          period: activeSubcription.period ?? 1,
+          pricingPackage: activeSubcription.packageType,
+        },
+        {
+          onError: () => {
+            toast.error('Failed to re-activate subscription, try again later.')
+            setIsLoading(false)
+          },
+          onSuccess: () => {
+           window.location.href = PAGES.AUTHENTICATED_PAGES.PACKAGE_AND_BILLINGS
+          },
+        },
+      )
+    }
   }
   return (
     <Modal
@@ -33,12 +42,11 @@ export function CancelSubscriptionDialog({onClose, isOpened}: Props) {
       onClose={onClose}
       isOpened={isOpened}
     >
-      <h1 className="font-bold text-lg">Cancel Subscription?</h1>
+      <h1 className="font-bold text-lg">Reactivate Subscription?</h1>
 
       <div className="mt-3">
         <p className="text-sm text-gray-600">
-          This action will end your current subscription plan. You&apos;ll still
-          have access to your current subscription until {dayjs().format('L')}
+          This action will reactivate your current subscription plan.
         </p>
       </div>
 
@@ -47,7 +55,7 @@ export function CancelSubscriptionDialog({onClose, isOpened}: Props) {
           onClick={handleSubmit}
           variant="solid"
           disabled={isLoading}
-          color="danger"
+          color="success"
           type="button"
         >
           Continue

@@ -1,5 +1,5 @@
 import {PackageAndBillingsModule} from '@/modules/index.ts'
-import {type MetaFunction, type LoaderFunctionArgs} from '@remix-run/node'
+import {type MetaFunction, type LoaderFunctionArgs, json} from '@remix-run/node'
 import {protectCreatorRouteLoader} from '@/lib/actions/protect-creator-route-loader.ts'
 import {dehydrate, QueryClient} from '@tanstack/react-query'
 import {extractAuthCookie} from '@/lib/actions/extract-auth-cookie.ts'
@@ -26,26 +26,32 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
     const baseUrl = `${process.env.API_ADDRESS}/api`
 
     if (authToken) {
+      const query = {
+        pagination: {page: Number(page), per: 50},
+        populate: ['purchase', 'wallet'],
+      }
       await queryClient.prefetchQuery({
-        queryKey: [
-          QUERY_KEYS.CREATOR_SUBSCRIPTIONS,
-          {pagination: {page: Number(page), per: 50}},
-        ],
+        queryKey: [QUERY_KEYS.CREATOR_SUBSCRIPTIONS, query],
         queryFn: () =>
-          getCreatorSubscriptions(
-            {pagination: {page: Number(page), per: 50}},
-            {
-              authToken,
-              baseUrl,
-            },
-          ),
+          getCreatorSubscriptions(query, {
+            authToken,
+            baseUrl,
+          }),
+        staleTime: 5000,
       })
     }
 
     const dehydratedState = dehydrate(queryClient)
-    return {
-      dehydratedState,
-    }
+    return json(
+      {
+        dehydratedState,
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, max-age=3600',
+        },
+      },
+    )
   }
 
   return res

@@ -18,11 +18,16 @@ public class CreatorTransformer
         _creatorSubscriptionTransformer = creatorSubscriptionTransformer;
     }
 
-    public async Task<OutputCreator> Transform(Creator creator)
+    public async Task<OutputCreator> Transform(Creator creator, string[]? populate = null)
     {
+        populate ??= Array.Empty<string>();
 
-        var subscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
-        var subscriptionTransformer = await _creatorSubscriptionTransformer.Transform(subscription);
+        OutputCreatorSubscription? subscriptionTransformer = null;
+        if (populate.Any(p => p.Contains(PopulateKeys.SUBSCRIPTION)))
+        {
+            var subscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
+            subscriptionTransformer = await _creatorSubscriptionTransformer.Transform(subscription, populate);
+        }
 
         return new OutputCreator
         {

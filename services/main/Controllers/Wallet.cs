@@ -35,6 +35,7 @@ public class WalletController : ControllerBase
     /// Retrieves all wallet transactions of a user
     /// </summary>
     /// <param name="type">Can be `DEPOSIT` or `WITHDRAW`</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
     /// <param name="sort">To sort response data either by `asc` or `desc`</param>
@@ -53,6 +54,7 @@ public class WalletController : ControllerBase
     )]
     public async Task<IActionResult> GetWalletTransactions(
         [FromQuery] string? type,
+        [FromQuery] string? populate,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
@@ -62,7 +64,7 @@ public class WalletController : ControllerBase
         try
         {
             logger.LogInformation("Getting all wallet transactions");
-            var queryFilter = HttpLib.GenerateFilterQuery<WalletTransaction>(page, pageSize, sort, sortBy);
+            var queryFilter = HttpLib.GenerateFilterQuery<WalletTransaction>(page, pageSize, sort, sortBy, populate);
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             logger.LogInformation($"Current user is {currentUser.Id}");
             var input = new GetWalletTransactionsInput
@@ -73,9 +75,12 @@ public class WalletController : ControllerBase
             var transactions = await walletService.GetWalletTransactions(queryFilter, input);
             long count = await walletService.CountWalletTransactions(input);
 
-            var outputTransactions = transactions.ConvertAll<OutputWalletTransaction>(
-                new Converter<WalletTransaction, OutputWalletTransaction>(wal => _walletTransactionTransformer.Transform(wal))
-            );
+            var outputTransactions = new List<OutputWalletTransaction>();
+            foreach (var transaction in transactions)
+            {
+                outputTransactions.Add(await _walletTransactionTransformer.Transform(transaction, populate: queryFilter.Populate));
+            }
+
             var response = HttpLib.GeneratePagination<OutputWalletTransaction, WalletTransaction>(
                 outputTransactions,
                 count,

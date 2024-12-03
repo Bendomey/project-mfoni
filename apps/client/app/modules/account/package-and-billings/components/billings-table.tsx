@@ -1,3 +1,4 @@
+import {useGetCreatorSubscriptions} from '@/api/subscriptions/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {Pagination} from '@/components/pagination/index.tsx'
 import {MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
@@ -13,24 +14,24 @@ import {
   ExclamationCircleIcon,
   FolderPlusIcon,
 } from '@heroicons/react/24/outline'
+import {useSearchParams} from '@remix-run/react'
 import dayjs from 'dayjs'
 
-import {Fragment, useMemo, useState} from 'react'
+import {Fragment, useState} from 'react'
 
-interface Props {
-  data?: FetchMultipleDataResponse<CreatorSubscription>
-  isError?: boolean
-}
-
-export function BillingsTable({data, isError}: Props) {
-  const {currentUser} = useAuth()
+export function BillingsTable() {
+  const {activeSubcription} = useAuth()
   const [selectedSub, setSelectedSub] = useState<string | null>(null)
 
-  const activeSub = useMemo(() => {
-    if (currentUser?.creator?.subscription) {
-      return currentUser.creator.subscription
-    }
-  }, [currentUser?.creator?.subscription])
+  const [searchParams] = useSearchParams()
+  const page = searchParams.get('page') ?? '0'
+  const {data, isError} = useGetCreatorSubscriptions({
+    pagination: {
+      page: Number(page),
+      per: 50,
+    },
+    populate: ['purchase', 'wallet'],
+  })
 
   return (
     <div className=" bg-white pt-5 pb-1 rounded-md border border-gray-200">
@@ -55,13 +56,19 @@ export function BillingsTable({data, isError}: Props) {
                       scope="col"
                       className="min-w-[12rem] py-3.5 px-3 text-left text-xs font-semibold text-gray-900"
                     >
-                      Reciept
+                      Package
                     </th>
                     <th
                       scope="col"
                       className="px-3 py-3.5 text-left text-xs font-semibold text-gray-900"
                     >
                       Status
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-xs font-semibold text-gray-900"
+                    >
+                      Start Date
                     </th>
                     <th
                       scope="col"
@@ -77,15 +84,9 @@ export function BillingsTable({data, isError}: Props) {
                     </th>
                     <th
                       scope="col"
-                      className="px-3 py-3.5 text-left text-xs font-semibold text-gray-900"
-                    >
-                      Package
-                    </th>
-                    <th
-                      scope="col"
                       className="relative py-3.5 pl-3 pr-4 sm:pr-3"
                     >
-                      <span className="sr-only">Edit</span>
+                      <span className="sr-only">Actions</span>
                     </th>
                   </tr>
                 </thead>
@@ -93,7 +94,7 @@ export function BillingsTable({data, isError}: Props) {
                   {data?.rows.length ? (
                     <>
                       {data.rows.map(sub => {
-                        const isActive = activeSub?.id === sub.id
+                        const isActive = activeSubcription?.id === sub.id
                         const isUpcoming = dayjs().isBefore(sub.startedAt)
                         const pkg = MFONI_PACKAGES_DETAILED[sub.packageType]
 
@@ -117,7 +118,7 @@ export function BillingsTable({data, isError}: Props) {
                                   isActive ? 'text-blue-600' : 'text-gray-900',
                                 )}
                               >
-                                {sub.creatorSubscriptionPurchases.length ? (
+                                {sub.creatorSubscriptionPurchases?.length ? (
                                   <Button
                                     onClick={() =>
                                       setSelectedSub(prev =>
@@ -135,9 +136,9 @@ export function BillingsTable({data, isError}: Props) {
                                   </Button>
                                 ) : null}
                                 <DocumentTextIcon className="h-6 w-auto" />
-                                Receipt -{' '}
-                                {dayjs(sub.startedAt).format('MMM, YYYY')}
-                                {sub.packageType === 'FREE' ? null : (
+                                {pkg.name}
+                                {sub.packageType === 'FREE' ||
+                                isUpcoming ? null : (
                                   <span className="inline-flex items-center gap-x-1.5 rounded-full px-2 py-1 ml-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
                                     <CheckIcon className="h-3 w-auto" />
                                     Paid
@@ -160,6 +161,9 @@ export function BillingsTable({data, isError}: Props) {
                                 )}
                               </td>
                               <td className="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
+                                {dayjs(sub.startedAt).format('ll')}
+                              </td>
+                              <td className="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
                                 {sub.endedAt
                                   ? dayjs(sub.endedAt).format('ll')
                                   : '-'}
@@ -169,11 +173,9 @@ export function BillingsTable({data, isError}: Props) {
                                   convertPesewasToCedis(pkg.amount),
                                 )}
                               </td>
-                              <td className="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
-                                {pkg.name}
-                              </td>
                               <td className="whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 flex">
                                 <Button
+                                  disabled={isUpcoming}
                                   size="sm"
                                   variant="outlined"
                                   title="Download Receipt"
@@ -184,9 +186,8 @@ export function BillingsTable({data, isError}: Props) {
                               </td>
                             </tr>
 
-                            {selectedSub === sub.id ? (
-                              <>
-                                {sub.creatorSubscriptionPurchases.map(
+                            {selectedSub === sub.id
+                              ? sub.creatorSubscriptionPurchases?.map(
                                   (purchase, index) => (
                                     <tr
                                       key={purchase.id}
@@ -196,8 +197,10 @@ export function BillingsTable({data, isError}: Props) {
                                           'bg-gray-50': isActive,
                                           'border-b':
                                             index ===
-                                            sub.creatorSubscriptionPurchases
-                                              .length -
+                                            (
+                                              sub.creatorSubscriptionPurchases ??
+                                              []
+                                            ).length -
                                               1,
                                         },
                                       )}
@@ -206,7 +209,11 @@ export function BillingsTable({data, isError}: Props) {
                                         {isActive ? (
                                           <div className="absolute inset-y-0 left-0 w-0.5 bg-blue-600" />
                                         ) : null}
-                                        Payment #{index + 1} -{' '}
+                                        {purchase.walletTransaction?.type ===
+                                        'DEPOSIT'
+                                          ? 'Refund'
+                                          : 'Payment'}{' '}
+                                        #{index + 1} -{' '}
                                         {dayjs(purchase.createdAt).format(
                                           'dddd, MMM',
                                         )}
@@ -221,17 +228,16 @@ export function BillingsTable({data, isError}: Props) {
                                         )}
                                       </td>
                                       <td className="pb-2 px-3">
-                                        <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-bue-700 ring-1 ring-inset ring-bue-700/10">
-                                          Paid with{' '}
-                                          {purchase.type.toLowerCase()}
+                                        <span className="inline-flex capitalize items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-bue-700 ring-1 ring-inset ring-bue-700/10">
+                                          {purchase.type.toLowerCase()}{' '}
+                                          Transaction
                                         </span>
                                       </td>
                                       <td />
                                     </tr>
                                   ),
-                                )}
-                              </>
-                            ) : null}
+                                )
+                              : null}
                           </Fragment>
                         )
                       })}

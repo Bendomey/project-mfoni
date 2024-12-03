@@ -5,19 +5,16 @@ import {PaymentMethodCard} from './components/payment-method-card.tsx'
 import {BillingsTable} from './components/billings-table.tsx'
 import {Button} from '@/components/button/index.tsx'
 import {ChevronLeftIcon} from '@heroicons/react/24/outline'
-import {useLoaderData, useSearchParams} from '@remix-run/react'
+import {useLoaderData} from '@remix-run/react'
 import {HydrationBoundary, type DehydratedState} from '@tanstack/react-query'
-import {useGetCreatorSubscriptions} from '@/api/subscriptions/index.ts'
+import {
+  PackageAndBillingsProvider,
+  usePackageAndBillingsContext,
+} from './context/index.tsx'
+import {ChangePackageModal} from './components/change-package-modal/index.tsx'
 
 const PackageAndBillingsPage = () => {
-  const [searchParams] = useSearchParams()
-  const page = searchParams.get('page') ?? '0'
-  const {data, isError} = useGetCreatorSubscriptions({
-    pagination: {
-      page: Number(page),
-      per: 50,
-    },
-  })
+  const {isChangePackageModalOpened} = usePackageAndBillingsContext()
 
   return (
     <>
@@ -43,10 +40,11 @@ const PackageAndBillingsPage = () => {
         </div>
 
         <div className="mt-10">
-          <BillingsTable data={data} isError={isError} />
+          <BillingsTable />
         </div>
       </div>
       <Footer />
+      <ChangePackageModal isOpened={isChangePackageModalOpened} />
     </>
   )
 }
@@ -58,7 +56,9 @@ export const PackageAndBillingsModule = () => {
 
   return (
     <HydrationBoundary state={loaderData.dehydratedState}>
-      <PackageAndBillingsPage />
+      <PackageAndBillingsProvider>
+        <PackageAndBillingsPage />
+      </PackageAndBillingsProvider>
     </HydrationBoundary>
   )
 }

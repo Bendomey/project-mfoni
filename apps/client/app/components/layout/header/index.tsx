@@ -48,7 +48,7 @@ export const Header = ({
         className="mx-auto flex max-w-8xl items-center justify-between py-4 px-4 lg:px-8"
         aria-label="Global"
       >
-        <Link to="/" className="-m-1.5 p-1.5">
+        <Link to="/" prefetch="intent" className="-m-1.5 p-1.5">
           <div className="flex flex-row items-end">
             <span className="text-4xl text-blue-700 font-extrabold">
               {APP_NAME.slice(0, 1)}
@@ -117,7 +117,7 @@ export const Header = ({
         <div className="fixed inset-0 z-10" />
         <Dialog.Panel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <Link to="/" className="-m-1.5 p-1.5">
+            <Link to="/" prefetch="intent" className="-m-1.5 p-1.5">
               <div className="flex flex-row items-end">
                 <span className="text-4xl text-blue-500 font-extrabold">
                   {APP_NAME.slice(0, 1)}
@@ -144,6 +144,7 @@ export const Header = ({
                     <Fragment key={idx}>
                       {item && item.routeType === 'link' ? (
                         <Link
+                          prefetch="intent"
                           key={item.name}
                           to={item.href}
                           className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"

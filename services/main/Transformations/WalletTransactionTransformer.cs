@@ -8,8 +8,9 @@ public class WalletTransactionTransformer
 {
     public WalletTransactionTransformer() { }
 
-    public OutputWalletTransaction Transform(WalletTransaction transaction)
+    public async Task<OutputWalletTransaction> Transform(WalletTransaction transaction, string[]? populate = null)
     {
+        populate ??= Array.Empty<string>();
         // OutputCreator? outputCreator = null;
         // if (user. is not null)
         // {

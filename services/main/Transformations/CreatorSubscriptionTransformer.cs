@@ -19,11 +19,18 @@ public class CreatorSubscriptionTransformer
         _creatorSubscriptionPurchaseTransformer = creatorSubscriptionPurchaseTransformer;
     }
 
-    public async Task<OutputCreatorSubscription> Transform(CreatorSubscription creatorSubscription)
+    public async Task<OutputCreatorSubscription> Transform(CreatorSubscription creatorSubscription, string[]? populate = null)
     {
-        var purchases = await _subscriptionService.GetSubscriptionPurchases(creatorSubscription.Id);
+        populate ??= Array.Empty<string>();
 
-        var purchasesTransformed = purchases.Select(purchase => _creatorSubscriptionPurchaseTransformer.Transform(purchase)).ToList();
+        List<OutputCreatorSubscriptionPurchase>? purchasesTransformed = null;
+        if (populate.Any(p => p.Contains(PopulateKeys.PURCHASE)))
+        {
+            purchasesTransformed = [];
+            var purchases = await _subscriptionService.GetSubscriptionPurchases(creatorSubscription.Id);
+
+            purchasesTransformed = (await Task.WhenAll(purchases.Select(purchase => _creatorSubscriptionPurchaseTransformer.Transform(purchase, populate)))).ToList();
+        }
 
         return new OutputCreatorSubscription
         {

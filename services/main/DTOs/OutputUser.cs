@@ -5,7 +5,7 @@ public class OutputUser
 {
     public required string Id { get; set; }
     public required string Status { get; set; }
-    public required string Role { get; set; }
+    public string? Role { get; set; }
     public required string Name { get; set; }
     public string? Email { get; set; }
     public DateTime? EmailVerifiedAt { get; set; }

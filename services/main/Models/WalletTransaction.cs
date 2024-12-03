@@ -12,6 +12,7 @@ public static class WalletTransactionType
 public static class WalletTransactionReasonForTransfer
 {
     public static readonly string SUBSCRIPTION = "SUBSCRIPTION";
+    public static readonly string SUBSCRIPTION_REFUND = "SUBSCRIPTION REFUND";
     public static readonly string CONTENT_PURCHASE = "CONTENT_PURCHASE";
     public static readonly string TOPUP = "TOPUP";
 }

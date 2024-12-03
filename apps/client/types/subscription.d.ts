@@ -4,7 +4,7 @@ interface CreatorSubscription {
   startedAt: Date
   endedAt: Nullable<Date>
   period: Nullable<number>
-  creatorSubscriptionPurchases: Array<CreatorSubscriptionPurchase>
+  creatorSubscriptionPurchases: Nullable<Array<CreatorSubscriptionPurchase>>
   createdAt: Date
   updatedAt: Date
 }
@@ -15,6 +15,7 @@ interface CreatorSubscriptionPurchase {
   type: 'WALLET' | 'CARD'
   savedCardId: Nullable<string>
   walletId: Nullable<string>
+  walletTransaction: Nullable<WalletTransaction>
   amount: number
   createdAt: Date
   updatedAt: Date
