@@ -57,10 +57,7 @@ export const PackageAndBillingsProvider = ({
     }
   }, [searchParams, setSearchParams])
 
-  const isActiveSubscriptionCancelled = useMemo(
-    () => Boolean(data),
-    [data],
-  )
+  const isActiveSubscriptionCancelled = useMemo(() => Boolean(data), [data])
 
   console.log({data})
 

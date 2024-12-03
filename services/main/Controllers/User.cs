@@ -578,7 +578,7 @@ public class UserController : ControllerBase
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
             var creatorSubscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
-            
+
             populate ??= "";
             return new ObjectResult(
                 new GetEntityResponse<OutputCreatorSubscription>(await _creatorSubscriptionTransformer.Transform(creatorSubscription, populate: populate.Split(",")), null).Result()

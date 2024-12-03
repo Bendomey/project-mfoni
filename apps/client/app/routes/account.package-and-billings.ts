@@ -26,20 +26,17 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
     const baseUrl = `${process.env.API_ADDRESS}/api`
 
     if (authToken) {
-      const query = {pagination: {page: Number(page), per: 50}, populate: ['purchase', 'wallet']}
+      const query = {
+        pagination: {page: Number(page), per: 50},
+        populate: ['purchase', 'wallet'],
+      }
       await queryClient.prefetchQuery({
-        queryKey: [
-          QUERY_KEYS.CREATOR_SUBSCRIPTIONS,
-          query
-        ],
+        queryKey: [QUERY_KEYS.CREATOR_SUBSCRIPTIONS, query],
         queryFn: () =>
-          getCreatorSubscriptions(
-            query,
-            {
-              authToken,
-              baseUrl,
-            },
-          ),
+          getCreatorSubscriptions(query, {
+            authToken,
+            baseUrl,
+          }),
         staleTime: 5000,
       })
     }

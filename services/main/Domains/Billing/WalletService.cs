@@ -191,7 +191,7 @@ public class WalletService
         return usersCount;
     }
 
-        public async Task<WalletTransaction> GetWalletById(string walletId)
+    public async Task<WalletTransaction> GetWalletById(string walletId)
     {
         var walletTransaction = await _walletTransationCollection.Find(application => application.Id == walletId)
             .FirstOrDefaultAsync();

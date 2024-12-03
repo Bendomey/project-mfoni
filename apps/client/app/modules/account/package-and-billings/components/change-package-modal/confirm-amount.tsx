@@ -9,7 +9,7 @@ import {
   isPackagePremium,
 } from '@/lib/pricing-lib.ts'
 import {usePackageAndBillingsContext} from '../../context/index.tsx'
-import { useAuth } from '@/providers/auth/index.tsx'
+import {useAuth} from '@/providers/auth/index.tsx'
 
 interface Props {
   mfoniPackage: string
@@ -170,7 +170,9 @@ function UpgradeForm({setUpgradeType, upgradeType}: UpgradeFormProps) {
           <div className="text-sm/6">
             <label htmlFor="candidates" className="font-medium text-gray-900">
               Defer to next billing cycle{' '}
-              <span className="text-blue-600">({dayjs(activeSubcription?.endedAt).format('ll')})</span>
+              <span className="text-blue-600">
+                ({dayjs(activeSubcription?.endedAt).format('ll')})
+              </span>
             </label>
           </div>
         </div>

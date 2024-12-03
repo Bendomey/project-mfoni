@@ -18,7 +18,7 @@ public class AdminTransformer
     public OutputAdmin Transform(Admin admin, string[]? populate = null)
     {
 
-        populate ??= Array.Empty<string>(); 
+        populate ??= Array.Empty<string>();
 
         OutputAdmin? outputCreatedByAdmin = null;
         if (admin.CreatedById is not null && populate.Any(p => p.Contains(PopulateKeys.ADMIN_CREATED_BY)))

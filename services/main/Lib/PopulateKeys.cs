@@ -7,5 +7,5 @@ public class PopulateKeys
     public static readonly string WALLET = "wallet";
     public static readonly string PURCHASE = "purchase";
     public static readonly string SUBSCRIPTION = "subscription";
-    
+
 }

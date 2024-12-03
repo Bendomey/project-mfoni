@@ -16,7 +16,7 @@ public class CreatorApplicationTransformer
     public OutputCreatorApplication Transform(CreatorApplication creatorApplication, string[]? populate = null)
     {
 
-        populate ??= Array.Empty<string>(); 
+        populate ??= Array.Empty<string>();
 
         return new OutputCreatorApplication
         {
