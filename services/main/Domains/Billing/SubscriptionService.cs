@@ -216,7 +216,7 @@ public class SubscriptionService
     public async Task RefundToWallet(SubscribeWithWalletInput input)
     {
         // withdraw from admin
-        var wallet = await _walletService.Withdraw(new WalletWithdrawInput
+        await _walletService.Withdraw(new WalletWithdrawInput
         {
             Amount = input.Amount,
             UserId = "SYSTEM",
@@ -224,7 +224,7 @@ public class SubscriptionService
         });
 
         // deposit to user
-        await _walletService.Deposit(new WalletDepositInput
+        var wallet = await _walletService.Deposit(new WalletDepositInput
         {
             Amount = input.Amount,
             UserId = input.UserId,
@@ -469,9 +469,8 @@ public class SubscriptionService
 
                 // calculate the balance
                 var newUpgradeSubEndDate = DateTime.UtcNow.AddDays(input.Period * 30);
-                int daysLeft = (newUpgradeSubEndDate.Date - today.Date).Days;
 
-                Int64 pricingForWhatToPayFor = (Int64)(pricingLib.GetPricePerDay() * daysLeft);
+                Int64 pricingForWhatToPayFor = (Int64)(pricingLib.GetPrice() * input.Period);
 
                 Int64 yourMoney = remainingAmount + user.BookWallet;
                 bool canIPayWithWallet = yourMoney >= pricingForWhatToPayFor;

@@ -13,8 +13,11 @@ public class CreatorApplicationTransformer
     {
     }
 
-    public OutputCreatorApplication Transform(CreatorApplication creatorApplication)
+    public OutputCreatorApplication Transform(CreatorApplication creatorApplication, string[]? populate = null)
     {
+
+        populate ??= Array.Empty<string>(); 
+
         return new OutputCreatorApplication
         {
             Id = creatorApplication.Id,

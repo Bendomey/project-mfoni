@@ -15,15 +15,18 @@ public class AdminTransformer
         _adminService = adminService;
     }
 
-    public OutputAdmin Transform(Admin admin)
+    public OutputAdmin Transform(Admin admin, string[]? populate = null)
     {
+
+        populate ??= Array.Empty<string>(); 
+
         OutputAdmin? outputCreatedByAdmin = null;
-        if (admin.CreatedById is not null)
+        if (admin.CreatedById is not null && populate.Any(p => p.Contains(PopulateKeys.ADMIN_CREATED_BY)))
         {
             var createdBy = _adminService.GetAdminById(admin.CreatedById);
             if (createdBy is not null)
             {
-                outputCreatedByAdmin = Transform(createdBy);
+                outputCreatedByAdmin = Transform(createdBy, populate);
             }
         }
 

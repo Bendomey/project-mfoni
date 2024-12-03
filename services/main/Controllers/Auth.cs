@@ -49,7 +49,7 @@ public class AuthController : ControllerBase
             var output = new DTOs.AuthenticateResponse
             {
                 Token = res.Token,
-                User = await _userTransformer.Transform(res.User)
+                User = await _userTransformer.Transform(res.User, populate: [PopulateKeys.CREATOR, PopulateKeys.SUBSCRIPTION])
             };
             return new ObjectResult(
                 new GetEntityResponse<DTOs.AuthenticateResponse>(output, null).Result()
@@ -133,7 +133,7 @@ public class AuthController : ControllerBase
             var res = _authService.Me(currentUser);
 
             return new ObjectResult(
-                new GetEntityResponse<OutputUser>(await _userTransformer.Transform(res!), null).Result()
+                new GetEntityResponse<OutputUser>(await _userTransformer.Transform(res!, populate: [PopulateKeys.CREATOR, PopulateKeys.SUBSCRIPTION]), null).Result()
             )
             {
                 StatusCode = StatusCodes.Status200OK

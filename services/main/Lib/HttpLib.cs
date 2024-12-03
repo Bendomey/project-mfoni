@@ -7,6 +7,7 @@ public class FilterQuery<T>
 {
     public required int Skip { get; set; }
     public required int Limit { get; set; }
+    public required string[] Populate { get; set; }
     public SortDefinition<T>? Sort { get; set; }
 }
 
@@ -16,7 +17,8 @@ public class HttpLib
         int? skip,
         int? limit,
         string? sortParam,
-        string sortBy
+        string sortBy,
+        string? populate = ""
     )
     {
         var sort = Builders<T>.Sort.Descending(sortBy);
@@ -30,6 +32,7 @@ public class HttpLib
             Skip = skip ?? 0,
             Limit = limit ?? 50,
             Sort = sort,
+            Populate = populate?.Split(",") ?? Array.Empty<string>(),
         };
 
         return queryFilter;

@@ -34,8 +34,8 @@ export const ExploreModule = () => {
         </div>
         {empty ? (
           <EmptyState
-            message={'It seems like the category currently has no items for.'}
-            title={'Detty December'}
+            message="It seems like the category currently has no items for."
+            title="Detty December"
           />
         ) : (
           <div className="col-span-1 lg:col-span-3">

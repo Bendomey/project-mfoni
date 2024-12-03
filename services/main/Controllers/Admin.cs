@@ -120,7 +120,7 @@ public class AdminController : ControllerBase
             var output = new DTOs.AdminAuthenticateResponse
             {
                 Token = admin.Token,
-                Admin = _adminTransformer.Transform(admin.Admin)
+                Admin = _adminTransformer.Transform(admin.Admin, populate: [PopulateKeys.ADMIN_CREATED_BY])
             };
 
             return new ObjectResult(
@@ -200,6 +200,7 @@ public class AdminController : ControllerBase
     /// To retrieve all admins in the system
     /// </summary>
     /// <param name="search">Search by name</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
     /// <param name="sort">To sort response data either by `asc` or `desc`</param>
@@ -218,6 +219,7 @@ public class AdminController : ControllerBase
     )]
     public async Task<IActionResult> GetAll(
         [FromQuery] string? search,
+        [FromQuery] string? populate,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
@@ -227,13 +229,13 @@ public class AdminController : ControllerBase
         try
         {
             logger.LogInformation("Getting all admins");
-            var queryFilter = HttpLib.GenerateFilterQuery<Admin>(page, pageSize, sort, sortBy);
+            var queryFilter = HttpLib.GenerateFilterQuery<Admin>(page, pageSize, sort, sortBy, populate);
             var admins = await _searchAdminService.GetAdmins(queryFilter, search);
 
             long count = await _searchAdminService.CountAdmins(search);
 
             var outAdmin = admins.ConvertAll<OutputAdmin>(
-                new Converter<Admin, OutputAdmin>(admin => _adminTransformer.Transform(admin))
+                new Converter<Admin, OutputAdmin>(admin => _adminTransformer.Transform(admin, populate: queryFilter.Populate))
             );
             var response = HttpLib.GeneratePagination<OutputAdmin, Admin>(
                 outAdmin,
@@ -285,7 +287,7 @@ public class AdminController : ControllerBase
 
             return new ObjectResult(
                            new GetEntityResponse<OutputAdmin>(
-                               _adminTransformer.Transform(admin!),
+                               _adminTransformer.Transform(admin!, populate: [PopulateKeys.ADMIN_CREATED_BY]),
                                null
                            ).Result()
                        )

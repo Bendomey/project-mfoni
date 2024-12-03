@@ -59,6 +59,7 @@ public class SubscriptionController : ControllerBase
     /// Retrieves all subscriptions of a user
     /// </summary>
     /// <param name="type">Can be `FREE` or `BASIC` or `ADVANCED`</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
     /// <param name="sort">To sort response data either by `asc` or `desc`</param>
@@ -77,6 +78,7 @@ public class SubscriptionController : ControllerBase
     )]
     public async Task<IActionResult> GetSubscriptions(
         [FromQuery] string? type,
+        [FromQuery] string? populate,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
@@ -86,7 +88,7 @@ public class SubscriptionController : ControllerBase
         try
         {
             logger.LogInformation("Getting all subscriptions");
-            var queryFilter = HttpLib.GenerateFilterQuery<CreatorSubscription>(page, pageSize, sort, sortBy);
+            var queryFilter = HttpLib.GenerateFilterQuery<CreatorSubscription>(page, pageSize, sort, sortBy, populate);
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             logger.LogInformation($"Current user is {currentUser.Id}");
             var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
@@ -102,7 +104,7 @@ public class SubscriptionController : ControllerBase
             var outputTransactions = new List<OutputCreatorSubscription>();
             foreach (var transaction in transactions)
             {
-                outputTransactions.Add(await _creatorSubscriptionTransformer.Transform(transaction));
+                outputTransactions.Add(await _creatorSubscriptionTransformer.Transform(transaction, populate: queryFilter.Populate));
             }
 
             var response = HttpLib.GeneratePagination<OutputCreatorSubscription, CreatorSubscription>(

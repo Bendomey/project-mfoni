@@ -1,10 +1,10 @@
-import {useGetCreatorSubscriptions} from '@/api/subscriptions/index.ts'
-import {Button} from '@/components/button/index.tsx'
-import {Pagination} from '@/components/pagination/index.tsx'
-import {MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
-import {classNames} from '@/lib/classNames.ts'
-import {convertPesewasToCedis, formatAmount} from '@/lib/format-amount.ts'
-import {useAuth} from '@/providers/auth/index.tsx'
+import { useGetCreatorSubscriptions } from '@/api/subscriptions/index.ts'
+import { Button } from '@/components/button/index.tsx'
+import { Pagination } from '@/components/pagination/index.tsx'
+import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
+import { classNames } from '@/lib/classNames.ts'
+import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
+import { useAuth } from '@/providers/auth/index.tsx'
 import {
   ArrowDownTrayIcon,
   CheckIcon,
@@ -14,23 +14,26 @@ import {
   ExclamationCircleIcon,
   FolderPlusIcon,
 } from '@heroicons/react/24/outline'
-import {useSearchParams} from '@remix-run/react'
+import { useSearchParams } from '@remix-run/react'
 import dayjs from 'dayjs'
 
-import {Fragment, useState} from 'react'
+import { Fragment, useState } from 'react'
 
 export function BillingsTable() {
-  const {activeSubcription} = useAuth()
+  const { activeSubcription } = useAuth()
   const [selectedSub, setSelectedSub] = useState<string | null>(null)
 
   const [searchParams] = useSearchParams()
   const page = searchParams.get('page') ?? '0'
-  const {data, isError} = useGetCreatorSubscriptions({
+  const { data, isError } = useGetCreatorSubscriptions({
     pagination: {
       page: Number(page),
       per: 50,
     },
+    populate: ['purchase', 'wallet']
   })
+
+  console.log(data)
 
   return (
     <div className=" bg-white pt-5 pb-1 rounded-md border border-gray-200">
@@ -117,7 +120,7 @@ export function BillingsTable() {
                                   isActive ? 'text-blue-600' : 'text-gray-900',
                                 )}
                               >
-                                {sub.creatorSubscriptionPurchases.length ? (
+                                {sub.creatorSubscriptionPurchases?.length ? (
                                   <Button
                                     onClick={() =>
                                       setSelectedSub(prev =>
@@ -184,52 +187,50 @@ export function BillingsTable() {
                             </tr>
 
                             {selectedSub === sub.id ? (
-                              <>
-                                {sub.creatorSubscriptionPurchases.map(
-                                  (purchase, index) => (
-                                    <tr
-                                      key={purchase.id}
-                                      className={classNames(
-                                        'relative w-full border-gray-200',
-                                        {
-                                          'bg-gray-50': isActive,
-                                          'border-b':
-                                            index ===
-                                            sub.creatorSubscriptionPurchases
-                                              .length -
-                                              1,
-                                        },
+                              sub.creatorSubscriptionPurchases?.map(
+                                (purchase, index) => (
+                                  <tr
+                                    key={purchase.id}
+                                    className={classNames(
+                                      'relative w-full border-gray-200',
+                                      {
+                                        'bg-gray-50': isActive,
+                                        'border-b':
+                                          index ===
+                                          (sub.creatorSubscriptionPurchases ?? [])
+                                            .length -
+                                          1,
+                                      },
+                                    )}
+                                  >
+                                    <td className="pb-2 pl-20 text-sm text-gray-500">
+                                      {isActive ? (
+                                        <div className="absolute inset-y-0 left-0 w-0.5 bg-blue-600" />
+                                      ) : null}
+                                      {purchase.walletTransaction?.type === 'DEPOSIT' ? "Refund" : "Payment"} #{index + 1} -{' '}
+                                      {dayjs(purchase.createdAt).format(
+                                        'dddd, MMM',
                                       )}
-                                    >
-                                      <td className="pb-2 pl-20 text-sm text-gray-500">
-                                        {isActive ? (
-                                          <div className="absolute inset-y-0 left-0 w-0.5 bg-blue-600" />
-                                        ) : null}
-                                        Payment #{index + 1} -{' '}
-                                        {dayjs(purchase.createdAt).format(
-                                          'dddd, MMM',
-                                        )}
-                                      </td>
-                                      <td />
-                                      <td />
-                                      <td className="text-xs px-3">
-                                        {formatAmount(
-                                          convertPesewasToCedis(
-                                            purchase.amount,
-                                          ),
-                                        )}
-                                      </td>
-                                      <td className="pb-2 px-3">
-                                        <span className="inline-flex capitalize items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-bue-700 ring-1 ring-inset ring-bue-700/10">
-                                          {purchase.type.toLowerCase()}{' '}
-                                          Transaction
-                                        </span>
-                                      </td>
-                                      <td />
-                                    </tr>
-                                  ),
-                                )}
-                              </>
+                                    </td>
+                                    <td />
+                                    <td />
+                                    <td className="text-xs px-3">
+                                      {formatAmount(
+                                        convertPesewasToCedis(
+                                          purchase.amount,
+                                        ),
+                                      )}
+                                    </td>
+                                    <td className="pb-2 px-3">
+                                      <span className="inline-flex capitalize items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-bue-700 ring-1 ring-inset ring-bue-700/10">
+                                        {purchase.type.toLowerCase()}{' '}
+                                        Transaction
+                                      </span>
+                                    </td>
+                                    <td />
+                                  </tr>
+                                ),
+                              )
                             ) : null}
                           </Fragment>
                         )
