@@ -172,6 +172,42 @@ public class SubscriptionController : ControllerBase
     }
 
     [Authorize]
+    [HttpDelete("{id}")]
+    [ProducesResponseType(typeof(OutputResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> deleteSubscription(string id)
+    {
+        try
+        {
+            logger.LogInformation($"delete subscription");
+            var isSubscriptionDeleted = await _subscriptionService.DeletePendingSubscription(id);
+            return new ObjectResult(
+            new GetEntityResponse<bool>(isSubscriptionDeleted, null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<bool>(false, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"delete subscription failed. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+
+    [Authorize]
     [HttpGet("{id}/is-pending-downgrade")]
     [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]

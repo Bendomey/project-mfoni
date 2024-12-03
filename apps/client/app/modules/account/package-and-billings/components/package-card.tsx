@@ -136,7 +136,7 @@ export function PackageCard() {
                   color="success"
                   className="gap-1"
                 >
-                  Re-activate Active Subscription
+                  Re-activate Subscription
                 </Button>
               ) : null}
             </>

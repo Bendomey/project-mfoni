@@ -99,6 +99,37 @@ export const useIsSubscriptionPendingDowngrade = (id?: string) =>
     enabled: Boolean(id),
   })
 
+export const deleteSubscription = async (id: string) => {
+  try {
+    const response = await fetchClient<ApiResponse<CreatorSubscription>>(
+      `/v1/creator-subscriptions/${id}`,
+      {
+        method: 'DELETE',
+      },
+    )
+
+    if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+      throw new Error(response.parsedBody.errorMessage)
+    }
+
+    return response.parsedBody.data
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw error
+    }
+
+    // Error from server.
+    if (error instanceof Response) {
+      const response = await error.json()
+      throw new Error(response.errorMessage)
+    }
+  }
+}
+export const useDeleteSubscription = () =>
+  useMutation({
+    mutationFn: deleteSubscription,
+  })
+
 export const cancelSubscription = async () => {
   try {
     const response = await fetchClient<ApiResponse<boolean>>(

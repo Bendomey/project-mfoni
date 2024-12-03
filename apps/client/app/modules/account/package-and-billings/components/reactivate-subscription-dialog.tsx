@@ -1,6 +1,7 @@
 import {useActiveSubscription} from '@/api/subscriptions/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {Modal} from '@/components/modal/index.tsx'
+import { PAGES } from '@/constants/index.ts'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useState} from 'react'
 import {toast} from 'react-hot-toast'
@@ -29,7 +30,7 @@ export function ReactivateSubscriptionDialog({onClose, isOpened}: Props) {
             setIsLoading(false)
           },
           onSuccess: () => {
-            window.location.reload()
+           window.location.href = PAGES.AUTHENTICATED_PAGES.PACKAGE_AND_BILLINGS
           },
         },
       )

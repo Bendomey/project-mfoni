@@ -1,6 +1,7 @@
 import {useCancelSubscription} from '@/api/subscriptions/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {Modal} from '@/components/modal/index.tsx'
+import { PAGES } from '@/constants/index.ts'
 import dayjs from 'dayjs'
 import {useState} from 'react'
 import {toast} from 'react-hot-toast'
@@ -22,7 +23,7 @@ export function CancelSubscriptionDialog({onClose, isOpened}: Props) {
         setIsLoading(false)
       },
       onSuccess: () => {
-        window.location.reload()
+        window.location.href = PAGES.AUTHENTICATED_PAGES.PACKAGE_AND_BILLINGS
       },
     })
   }

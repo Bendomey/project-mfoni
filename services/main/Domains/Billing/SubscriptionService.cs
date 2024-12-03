@@ -670,6 +670,13 @@ public class SubscriptionService
     }
 
 
+    public async Task<bool> DeletePendingSubscription(string subscriptionId)
+    {
+        await _creatorSubscriptionCollection.DeleteOneAsync(subscription => subscription.Id == subscriptionId);
+        return true;
+    }
+
+
     private void SendNotification(Models.User user, string subject, string body)
     {
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
