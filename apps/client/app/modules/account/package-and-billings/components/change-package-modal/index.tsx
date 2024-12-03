@@ -129,8 +129,8 @@ export function ChangePackageModal({ isOpened }: Props) {
   }
 
   const isCompleteButtonDisabled = useMemo(
-    () => !mfoniPackage || submittedForm,
-    [mfoniPackage, submittedForm],
+    () => !mfoniPackage || submittedForm || isWalletLow,
+    [isWalletLow, mfoniPackage, submittedForm],
   )
 
   const handleDeletion = () => {
