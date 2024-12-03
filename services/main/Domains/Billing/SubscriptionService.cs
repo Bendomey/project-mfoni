@@ -328,6 +328,29 @@ public class SubscriptionService
         return cancelledSubscription is null ? null : cancelledSubscription;
     }
 
+    public async Task<CreatorSubscription?> IsSubscriptionPendingDowngrade(string creatorSubscriptionId)
+    {
+        var sub = await _creatorSubscriptionCollection.Find(sub => sub.Id == creatorSubscriptionId).FirstOrDefaultAsync();
+
+        if (sub is null)
+        {
+            throw new HttpRequestException("CreatorSubscriptionNotFound");
+        }
+
+        var filter = Builders<CreatorSubscription>.Filter.And(
+            Builders<CreatorSubscription>.Filter.Eq("creator_id", ObjectId.Parse(sub.CreatorId)),
+             Builders<CreatorSubscription>.Filter.And(
+                Builders<CreatorSubscription>.Filter.Ne("package_type", CreatorSubscriptionPackageType.FREE),
+                Builders<CreatorSubscription>.Filter.Gt("started_at", DateTime.UtcNow)
+            )
+        );
+
+
+        var pendingDowngradeSubscription = await _creatorSubscriptionCollection.Find(filter).FirstOrDefaultAsync();
+
+        return pendingDowngradeSubscription is null ? null : pendingDowngradeSubscription;
+    }
+
     public async Task<CreatorSubscription> GetActiveCreatorSubscription(string creatorId)
     {
 
@@ -613,13 +636,20 @@ public class SubscriptionService
             throw new HttpRequestException("AlreadyOnFreeTier");
         }
 
-        // if it's premium, then we cancel it by creating a new subscription record with FREE as the package type.
-        var newSubscription = await CreateAFreeTierSubscription(creatorId, lastSubscription.EndedAt);
-
         if (lastSubscription.EndedAt is null)
         {
             throw new HttpRequestException("SubscriptionEndDateNotFound");
         }
+
+        // if its an upcoming subscription, then we delete it before we create the FREE
+        if (lastSubscription.StartedAt > DateTime.UtcNow)
+        {
+            await _creatorSubscriptionCollection.DeleteOneAsync(subscription => subscription.Id == lastSubscription.Id);
+        }
+
+        // if it's premium, then we cancel it by creating a new subscription record with FREE as the package type.
+        var newSubscription = await CreateAFreeTierSubscription(creatorId, lastSubscription.EndedAt);
+
 
         DateTime expiryDate = (DateTime)lastSubscription.EndedAt;
 

@@ -13,7 +13,7 @@ using main.Lib;
 namespace main.Controllers;
 
 [ApiController]
-[Route("api/v1")]
+[Route("api/v1/creator-subscriptions")]
 public class SubscriptionController : ControllerBase
 {
     private readonly ILogger<UserController> logger;
@@ -67,7 +67,7 @@ public class SubscriptionController : ControllerBase
     /// <response code="200">Transactions Retrieved Successfully</response>
     /// <response code="500">An unexpected error occured</response>
     [Authorize]
-    [HttpGet("subscriptions")]
+    [HttpGet]
     [ProducesResponseType(
         StatusCodes.Status200OK,
         Type = typeof(ApiEntityResponse<EntityWithPagination<OutputUser>>)
@@ -134,6 +134,79 @@ public class SubscriptionController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
+
+
+    [Authorize]
+    [HttpGet("{id}/is-cancelled")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> isSubscriptionCancelled(string id)
+    {
+        try
+        {
+            logger.LogInformation($"is creator subscription cancelled");
+            var creatorSubscription = await _subscriptionService.IsSubscriptionCancelled(id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorSubscription>(creatorSubscription is not null ? await _creatorSubscriptionTransformer.Transform(creatorSubscription) : null, null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorSubscription>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"is creator subscription cancelled failed. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
+    [HttpGet("{id}/is-pending-downgrade")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreatorSubscription>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> isSubscriptioPendingDowngrade(string id)
+    {
+        try
+        {
+            logger.LogInformation($"is creator subscription pending downgrade");
+            var creatorSubscription = await _subscriptionService.IsSubscriptionPendingDowngrade(id);
+            return new ObjectResult(
+            new GetEntityResponse<OutputCreatorSubscription>(creatorSubscription is not null ? await _creatorSubscriptionTransformer.Transform(creatorSubscription) : null, null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputCreatorSubscription>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+
+        catch (Exception e)
+        {
+            // sentry error
+            logger.LogError($"is creator subscription pending downgrade failed. Exception: {e}");
+            return new StatusCodeResult(500);
+        }
+    }
+
+
 
 }
 

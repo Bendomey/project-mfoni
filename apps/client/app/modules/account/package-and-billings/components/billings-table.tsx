@@ -33,8 +33,6 @@ export function BillingsTable() {
     populate: ['purchase', 'wallet']
   })
 
-  console.log(data)
-
   return (
     <div className=" bg-white pt-5 pb-1 rounded-md border border-gray-200">
       <div className="sm:flex sm:items-center px-4 sm:px-6 lg:px-5">
@@ -88,7 +86,7 @@ export function BillingsTable() {
                       scope="col"
                       className="relative py-3.5 pl-3 pr-4 sm:pr-3"
                     >
-                      <span className="sr-only">Edit</span>
+                      <span className="sr-only">Actions</span>
                     </th>
                   </tr>
                 </thead>
@@ -139,7 +137,7 @@ export function BillingsTable() {
                                 ) : null}
                                 <DocumentTextIcon className="h-6 w-auto" />
                                 {pkg.name}
-                                {sub.packageType === 'FREE' ? null : (
+                                {sub.packageType === 'FREE' || isUpcoming ? null : (
                                   <span className="inline-flex items-center gap-x-1.5 rounded-full px-2 py-1 ml-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
                                     <CheckIcon className="h-3 w-auto" />
                                     Paid
@@ -176,6 +174,7 @@ export function BillingsTable() {
                               </td>
                               <td className="whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-3 flex">
                                 <Button
+                                  disabled={isUpcoming}
                                   size="sm"
                                   variant="outlined"
                                   title="Download Receipt"

@@ -6,6 +6,9 @@ import { CancelSubscriptionDialog } from './cancel-subscription-dialog.tsx'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { usePackageAndBillingsContext } from '../context/index.tsx'
 import { ReactivateSubscriptionDialog } from './reactivate-subscription-dialog.tsx'
+import { useIsSubscriptionPendingDowngrade } from '@/api/subscriptions/index.ts'
+import { useAuth } from '@/providers/auth/index.tsx'
+import { safeString } from '@/lib/strings.ts'
 
 export function PackageCard() {
   const { isOpened, onToggle } = useDisclosure()
@@ -17,6 +20,10 @@ export function PackageCard() {
     setIsChangePackageModalOpened,
     isActiveSubscriptionCancelledRequestPending,
   } = usePackageAndBillingsContext()
+
+  const { activeSubcription } = useAuth()
+  const subscriptionId = safeString(activeSubcription?.id)
+  const { data: subscriptionPendingDowngrade } = useIsSubscriptionPendingDowngrade(subscriptionId)
 
   return (
     <>
@@ -128,7 +135,7 @@ export function PackageCard() {
                     color="success"
                     className="gap-1"
                   >
-                    Re-activate Subscription
+                    Re-activate Active Subscription
                   </Button>
                 ) : null}
               </>
@@ -136,24 +143,28 @@ export function PackageCard() {
           }
 
 
+          {
+            Boolean(subscriptionPendingDowngrade) ? null : (
+              <Button
+                variant="outlined"
+                className="gap-1"
+                onClick={() => setIsChangePackageModalOpened(true)}
+              >
+                {activePackage?.id === 'ADVANCED' ? (
+                  <>
+                    Change
+                    <ArrowPathIcon className="h-3 w-auto" />
+                  </>
+                ) : (
+                  <>
+                    Upgrade
+                    <ArrowUpRightIcon className="h-3 w-auto" />
+                  </>
+                )}
+              </Button>
+            )
+          }
 
-          <Button
-            variant="outlined"
-            className="gap-1"
-            onClick={() => setIsChangePackageModalOpened(true)}
-          >
-            {activePackage?.id === 'ADVANCED' ? (
-              <>
-                Change
-                <ArrowPathIcon className="h-3 w-auto" />
-              </>
-            ) : (
-              <>
-                Upgrade
-                <ArrowUpRightIcon className="h-3 w-auto" />
-              </>
-            )}
-          </Button>
         </div>
       </div>
       <CancelSubscriptionDialog isOpened={isOpened} onClose={onToggle} />
