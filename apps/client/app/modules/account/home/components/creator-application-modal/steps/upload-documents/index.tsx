@@ -3,6 +3,7 @@ import {Button} from '@/components/button/index.tsx'
 import {PhotoIcon} from '@heroicons/react/24/outline'
 import {UploadDialog} from '@/components/upload-dialog/index.tsx'
 import {type IImageType} from '../../index.tsx'
+import {Image} from 'remix-image'
 
 interface Props {
   idType: string
@@ -100,7 +101,7 @@ function UploadItem({image, setImage}: UploadItemProps) {
           <div className="flex flex-row items-center gap-x-2">
             {image ? (
               <>
-                <img
+                <Image
                   src={image.url}
                   alt={image.name}
                   className="h-10 w-auto rounded-md"

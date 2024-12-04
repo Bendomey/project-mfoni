@@ -1,21 +1,22 @@
-import {Footer} from '@/components/footer/index.tsx'
-import {Header} from '@/components/layout/index.ts'
-import {RelatedContent} from './components/related-content.tsx'
-import {ShareButton} from '@/components/share-button/index.tsx'
-import {Button} from '@/components/button/index.tsx'
+import { Footer } from '@/components/footer/index.tsx'
+import { Header } from '@/components/layout/index.ts'
+import { ShareButton } from '@/components/share-button/index.tsx'
+import { Button } from '@/components/button/index.tsx'
 
-import {Menu, MenuButton, MenuItem, MenuItems} from '@headlessui/react'
-import {ChevronDownIcon} from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import {
   BookmarkIcon,
   CalendarDaysIcon,
   HeartIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline'
-import {Link} from '@remix-run/react'
-import {PAGES} from '@/constants/index.ts'
+import { Link } from '@remix-run/react'
+import { blurDataURL, PAGES } from '@/constants/index.ts'
 import dayjs from 'dayjs'
-import {imageUrls} from '../landing-page/index.tsx'
+import { imageUrls } from '../landing-page/index.tsx'
+import { Image } from 'remix-image'
+import { RelatedContent } from './components/related-content.tsx'
 
 const tags = [
   'wallpaper',
@@ -62,7 +63,16 @@ export const PhotoModule = () => {
           </div>
 
           <div className="my-10 flex justify-center">
-            <img src={imageUrls[1]} className="object-cover" />
+            <Image
+              src={imageUrls[3]}
+              alt={imageUrls[3]}
+              className="object-cover"
+              placeholder="blur"
+              blurDataURL={blurDataURL}
+              options={{
+                fit: "cover",
+              }}
+            />
           </div>
 
           <div className="flex flex-row items-start md:items-center justify-between">
@@ -124,9 +134,9 @@ export const PhotoModule = () => {
 }
 
 const items = [
-  {name: 'Small', size: '100 x 500', href: '#'},
-  {name: 'Medium', size: '600 x 1200', href: '#'},
-  {name: 'Large', size: '1000 x 5000', href: '#'},
+  { name: 'Small', size: '100 x 500', href: '#' },
+  { name: 'Medium', size: '600 x 1200', href: '#' },
+  { name: 'Large', size: '1000 x 5000', href: '#' },
 ]
 
 export default function DownloadButton() {
@@ -165,7 +175,7 @@ export default function DownloadButton() {
                 <span className="text-gray-400 ml-1 text-xs">
                   (1024 x 1024)
                 </span>
-y              </button>
+              </button>
             </MenuItem>
           </div>
         </MenuItems>

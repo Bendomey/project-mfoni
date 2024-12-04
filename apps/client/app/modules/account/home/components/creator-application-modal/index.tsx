@@ -29,6 +29,7 @@ import creatorSvg from '@/assets/creator-svg.png'
 import {MFONI_PACKAGES, MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
+import {Image} from 'remix-image'
 
 interface Props {
   isOpened: boolean
@@ -239,7 +240,7 @@ export function CreatorApplicationModal({isOpened}: Props) {
         {activeCreatorApplication &&
         activeCreatorApplication.status == 'APPROVED' ? (
           <>
-            <img src={creatorSvg} className="h-20 w-auto mb-2" alt="" />
+            <Image src={creatorSvg} className="h-20 w-auto mb-2" alt="" />
             <h1 className="font-bold text-lg">You are a creator!</h1>
             <p className="mt-1 text-sm">
               You can always change your package you&apos;re on{' '}

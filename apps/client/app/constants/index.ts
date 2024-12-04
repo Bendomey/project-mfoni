@@ -66,3 +66,8 @@ export const PAGES = {
     COLLECTIONS: '/search/collections/:query',
   },
 }
+
+// base64 1px png's generated from https://png-pixel.com/
+const placeholderColor =
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8+/79fwAJaAPMsmQeyQAAAABJRU5ErkJggg==' // grey-10 as 1px png in base64
+export const blurDataURL = `data:image/png;base64,${placeholderColor}`

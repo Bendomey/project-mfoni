@@ -6,6 +6,7 @@ import {Loader} from '@/components/loader/index.tsx'
 import useImageUpload from '@/hooks/use-image-upload.ts'
 import {VisibilityPicker} from './visibility-picker.tsx'
 import {TagsPicker} from './tags-picker.tsx'
+import {Image} from 'remix-image'
 
 export const ContentEditor = ({contentId}: {contentId: string}) => {
   const {contents, updateContent, deleteContent} = useContentUpload()
@@ -60,7 +61,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
     <div className="flex flex-row items-center gap-4 mx-5 md:mx-0">
       <div className="w-full">
         <div className="md:hidden">
-          <img
+          <Image
             src={imageUrl}
             alt={content?.file.name}
             className="rounded-2xl"
@@ -84,7 +85,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
         >
           <div className="grid grid-cols-2 gap-10 items-center ">
             <div className="relative w-full col-span-1  hidden md:block">
-              <img
+              <Image
                 src={imageUrl}
                 alt={content?.file.name}
                 className="rounded-2xl"

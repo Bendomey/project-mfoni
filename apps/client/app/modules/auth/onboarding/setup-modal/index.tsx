@@ -14,6 +14,7 @@ import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useSearchParams} from '@remix-run/react'
 import {useValidateImage} from '@/hooks/use-validate-image.tsx'
+import {Image} from 'remix-image'
 
 interface Props {
   open: boolean
@@ -109,7 +110,7 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="flex justify-center mb-3">
                     {isProfilePhotoValid && currentUser?.photo ? (
-                      <img
+                      <Image
                         className="inline-block h-14 w-14 rounded-full"
                         src={currentUser.photo}
                         alt={currentUser.name}

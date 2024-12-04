@@ -1,3 +1,5 @@
+import {Image} from 'remix-image'
+
 const people = [
   {
     name: 'Leonard Krasner',
@@ -36,7 +38,7 @@ export function OtherCreators() {
         {people.map(person => (
           <li key={person.name} className="rounded-md border p-4 ">
             <div className="flex items-center gap-2 ">
-              <img
+              <Image
                 alt=""
                 src={person.imageUrl}
                 className="h-20 w-20 rounded-md"

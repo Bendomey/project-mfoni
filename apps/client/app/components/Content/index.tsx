@@ -4,6 +4,8 @@ import {useAsyncImage} from '@/hooks/use-async-image.ts'
 import {PhotographerCreatorCard} from '../creator-card/index.tsx'
 import {FlyoutContainer} from '../flyout/flyout-container.tsx'
 import {Link} from '@remix-run/react'
+import {Image} from 'remix-image'
+import {blurDataURL} from '@/constants/index.ts'
 
 interface Props {
   content: Content
@@ -16,9 +18,11 @@ export const Content = ({content, showFlyout = false}: Props) => {
   return (
     <Link to="/photos/hello-world" state={{modal: true}}>
       <div className="cursor-zoom-in mb-5 relative ">
-        <img
-          className="h-auto max-w-full rounded-lg"
+        <Image
           src={content.media}
+          className="h-auto max-w-full rounded-lg"
+          placeholder="blur"
+          blurDataURL={blurDataURL}
           alt={content.media}
         />
         {pending ? (
@@ -46,7 +50,7 @@ export const Content = ({content, showFlyout = false}: Props) => {
                   FlyoutContent={PhotographerCreatorCard}
                 >
                   <div className="flex items-center">
-                    <img
+                    <Image
                       className="inline-block h-7 w-7 rounded-full"
                       src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                       alt="creator"

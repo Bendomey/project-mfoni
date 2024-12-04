@@ -1,6 +1,7 @@
 import Webcam, {type WebcamProps} from 'react-webcam'
 import {Button} from '@/components/button/index.tsx'
 import {Fragment, useCallback, useRef, useState} from 'react'
+import {Image} from 'remix-image'
 
 export const VisualSearch = () => {
   const [imgSrc, setImgSrc] = useState<string | null>(null)
@@ -32,7 +33,7 @@ export const VisualSearch = () => {
       <div className="p-3 bg-gray-50 relative h-[55vh] md:h-[48vh] lg:[44vh] 2xl:[15vh]">
         <div className=" rounded-md p-1">
           {imgSrc ? (
-            <img
+            <Image
               src={imgSrc}
               className="h-auto w-auto rounded-md"
               alt="user-capture"

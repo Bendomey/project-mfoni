@@ -10,6 +10,7 @@ import {useMemo, useState} from 'react'
 import {type FileRejection, useDropzone} from 'react-dropzone-esm'
 import {Loader} from '../loader/index.tsx'
 import {toast} from 'react-hot-toast'
+import {Image} from 'remix-image'
 
 interface Props {
   onClose: () => void
@@ -74,7 +75,7 @@ export const UploadDialog = ({isOpened, onClose, onSave}: Props) => {
       <div className="my-5">
         {imageUrl ? (
           <div className="flex justify-center items-center relative h-60 w-full">
-            <img
+            <Image
               src={imageUrl}
               alt={selectedFile?.name}
               className="h-60 w-auto rounded-md"
