@@ -54,4 +54,15 @@ export const PAGES = {
     WALLET: '/account/wallet',
     PACKAGE_AND_BILLINGS: '/account/package-and-billings',
   },
+  PHOTO: '/photos/:slug',
+  TAGS: '/tags',
+  TAG: '/tags/:tag',
+  COLLECTIONS: '/collections',
+  COLLECTION: '/collections/:collection',
+  USER: ':username',
+  SEARCH: {
+    CREATORS: '/search/creators/:query',
+    PHOTOS: '/search/photos/:query',
+    COLLECTIONS: '/search/collections/:query',
+  },
 }
