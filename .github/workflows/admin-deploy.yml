@@ -32,4 +32,4 @@ jobs:
           run:
             flyctl deploy --remote-only 
               --build-arg COMMIT_SHA=${{ github.sha }} 
-              --build-arg API_ADDRESS=${{ secrets.API_ADDRESS }}
+              --build-arg NEXT_PUBLIC_API_URL=${{ secrets.API_ADDRESS }}
