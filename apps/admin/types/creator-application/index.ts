@@ -2,7 +2,7 @@ interface CreatorApplication  {
   id: string;
   name: string;
   user: User;
-  status: "submitted" | "canceled" | "approved";
+  status: "SUBMITTED" | "CANCELED" | "APPROVED";
   idBackImage: string
   idFrontImage: string
   idType: "NATIONAL_ID"
@@ -15,5 +15,5 @@ interface CreatorApplication  {
 };
 
 interface FetchCreatorApplicationFilter {
-  status?: "submitted" | "canceled" | "approved"
+  status?: "SUBMITTED" | "CANCELED" | "APPROVED"
 }

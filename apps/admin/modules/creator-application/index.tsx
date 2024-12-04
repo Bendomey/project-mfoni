@@ -135,14 +135,19 @@ export const CreatorApplication = () => {
                       setSelectedApplication(row.original)
                       setOpenViewModal(true)
                     }}><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
+               {row.original.status === "SUBMITTED" ? (
+                <>
                 <DropdownMenuItem  onClick={() => {
-                      setSelectedApplication(row.original)
-                      setOpenApproveModal(true)
-                    }}><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
+                  setSelectedApplication(row.original)
+                  setOpenApproveModal(true)
+                }}><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
+                    
                 <DropdownMenuItem onClick={() => {
-                      setSelectedApplication(row.original)
-                      setOpenRejectModal(true)
-                    }}><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>             
+                  setSelectedApplication(row.original)
+                  setOpenRejectModal(true)
+                }}><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>  
+                </>
+   ): null }           
               </DropdownMenuContent>
             </DropdownMenu>
           )
