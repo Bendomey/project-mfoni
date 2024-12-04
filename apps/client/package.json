@@ -66,6 +66,7 @@
     "google-auth-library": "9.4.1",
     "isbot": "3.6.8",
     "js-cookie": "3.0.5",
+    "lottie-react": "^2.4.0",
     "react": "18.2.0",
     "react-confetti": "6.1.0",
     "react-dom": "18.2.0",
