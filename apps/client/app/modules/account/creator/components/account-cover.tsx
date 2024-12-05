@@ -53,7 +53,7 @@ export const AccountCover = () => {
                                     className="size-24 rounded-full ring-4 ring-white sm:size-32"
                                 />
                             ) : (
-                                <span className="inline-flex h-32 w-32 items-center justify-center rounded-full bg-blue-600 text-white ring-4 ring-white">
+                                <span className="inline-flex size-24 items-center justify-center rounded-full bg-blue-600 text-white ring-4 ring-white">
                                     <span className="text-4xl font-medium leading-none">
                                         {getNameInitials(profile.name)}
                                     </span>
