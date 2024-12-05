@@ -34,13 +34,13 @@ public class CollectionTransformer
     {
         populate ??= Array.Empty<string>();
 
-        OutputUser? outputCreatedByUser = null;
+        OutputBasicUser? outputCreatedByUser = null;
         if (collection.CreatedById is not null && populate.Any(p => p.Contains(PopulateKeys.COLLECTION_CREATED_BY)))
         {
             var createdBy = await _userService.GetUserById(collection.CreatedById);
             if (createdBy is not null)
             {
-                outputCreatedByUser = await _userTransformer.Transform(createdBy, populate);
+                outputCreatedByUser = _userTransformer.TransformBasicUser(createdBy);
             }
         }
 

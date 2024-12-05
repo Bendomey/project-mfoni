@@ -2,6 +2,8 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using main.Configuratons;
 using main.DTOs;
+using main.Lib;
+using main.Models;
 
 namespace main.Domains;
 
@@ -27,12 +29,12 @@ public class CollectionService
         logger.LogDebug("Collection service initialized");
     }
 
-    public Models.Collection SaveCollection(SaveCollection input)
+    public Models.Collection SaveCollection(Domains.SaveCollection input)
     {
         var oldCollection = _collectionCollection.Find(collection => collection.Name == input.Name).FirstOrDefault();
         if (oldCollection is not null)
         {
-            throw new Exception("CollectionAlreadyExists");
+            throw new HttpRequestException("CollectionAlreadyExists");
         }
 
         var collection = new Models.Collection
@@ -63,10 +65,63 @@ public class CollectionService
         var collection = _collectionCollection.Find(collection => collection.Id == collectionId).FirstOrDefault();
         if (collection is null)
         {
-            throw new Exception("CollectionNotFound");
+            throw new HttpRequestException("CollectionNotFound");
         }
 
         return collection;
+    }
+
+    public Models.Collection GetCollectionBySlug(string slug)
+    {
+        var collection = _collectionCollection.Find(collection => collection.Slug == slug).FirstOrDefault();
+        if (collection is null)
+        {
+            throw new HttpRequestException("CollectionNotFound");
+        }
+
+        return collection;
+    }
+
+    public async Task<List<Models.Collection>> GetCollections(
+        FilterQuery<Models.Collection> queryFilter,
+        string? query
+    )
+    {
+        FilterDefinitionBuilder<Models.Collection> builder = Builders<Models.Collection>.Filter;
+        var filter = builder.Empty;
+
+        filter &= builder.Eq(r => r.Visibility, CollectionVisibility.PUBLIC);
+
+        if (!string.IsNullOrEmpty(query))
+        {
+            filter &= builder.Regex(r => r.Name, new MongoDB.Bson.BsonRegularExpression(query, "i"));
+        }
+
+        var users = await _collectionCollection
+            .Find(filter)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return users ?? [];
+    }
+
+    public async Task<long> CountCollections(string? query)
+    {
+        FilterDefinitionBuilder<Models.Collection> builder = Builders<Models.Collection>.Filter;
+        var filter = builder.Empty;
+
+        filter &= builder.Eq(r => r.Visibility, CollectionVisibility.PUBLIC);
+
+        if (!string.IsNullOrEmpty(query))
+        {
+            filter &= builder.Regex(r => r.Name, new MongoDB.Bson.BsonRegularExpression(query, "i"));
+        }
+
+        var count = await _collectionCollection.CountDocumentsAsync(filter);
+
+        return count;
     }
 
     public Models.Collection ResolveCollection(SaveCollection input)

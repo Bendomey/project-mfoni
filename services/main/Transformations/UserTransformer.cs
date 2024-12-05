@@ -71,5 +71,17 @@ public class UserTransformer
         };
     }
 
+    public OutputBasicUser TransformBasicUser(User user)
+    {
+
+        return new OutputBasicUser
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Photo = user.Photo,
+            Role = user.Role,
+        };
+    }
+
 }
 

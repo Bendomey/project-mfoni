@@ -21,6 +21,14 @@ public class OutputUser
     public required DateTime UpdatedAt { get; set; }
 }
 
+public class OutputBasicUser
+{
+    public required string Id { get; set; }
+    public string? Role { get; set; }
+    public required string Name { get; set; }
+    public string? Photo { get; set; }
+}
+
 public class OutputBasicCreator
 {
     public required string Id { get; set; }
