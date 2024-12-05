@@ -59,12 +59,16 @@ export const PAGES = {
   TAG: '/tags/:tag',
   COLLECTIONS: '/collections',
   COLLECTION: '/collections/:collection',
-  USER: ':username',
   SEARCH: {
     CREATORS: '/search/creators/:query',
     PHOTOS: '/search/photos/:query',
     COLLECTIONS: '/search/collections/:query',
   },
+  CREATOR: {
+    PHOTOS: '/:username',
+    LIKES: '/:username/likes',
+    COLLECTIONS: '/:username/collections',
+  }
 }
 
 // base64 1px png's generated from https://png-pixel.com/
