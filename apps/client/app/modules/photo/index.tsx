@@ -67,7 +67,6 @@ export const PhotoModule = () => {
               src={imageUrls[3]}
               alt={imageUrls[3]}
               className="object-cover"
-              placeholder="blur"
               blurDataURL={blurDataURL}
               options={{
                 fit: "cover",

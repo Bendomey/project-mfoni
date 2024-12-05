@@ -19,8 +19,8 @@ import {
 } from '@remix-run/react'
 import {NODE_ENV, PAGES} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
-import globalStyles from '@/styles/global.css'
 import remixImageStyles from 'remix-image/remix-image.css'
+import globalStyles from '@/styles/global.css'
 import {Toaster} from 'react-hot-toast'
 import {Providers} from './providers/index.tsx'
 import {RouteLoader} from './components/loader/route-loader.tsx'
@@ -57,8 +57,8 @@ export const links: LinksFunction = () => {
     // },
     {rel: 'icon', href: '/favicon.ico'},
     {rel: 'stylesheet', href: tailwindStyles},
-    {rel: 'stylesheet', href: globalStyles},
     {rel: 'stylesheet', href: remixImageStyles},
+    {rel: 'stylesheet', href: globalStyles},
     ...(cssBundleHref ? [{rel: 'stylesheet', href: cssBundleHref}] : []),
   ]
 }
