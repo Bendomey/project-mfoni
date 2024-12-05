@@ -6,12 +6,13 @@ import {
     HeartIcon,
     PhotoIcon,
 } from '@heroicons/react/24/solid'
-import { Link, useLocation, useParams } from '@remix-run/react'
+import { Link, useLocation, useNavigate, useParams } from '@remix-run/react'
 import { useMemo } from 'react'
 
 export function Tabs() {
     const { username: usernameParam } = useParams()
     const location = useLocation()
+    const navigate = useNavigate()
 
     const tabs = useMemo(
         () => [
@@ -48,6 +49,7 @@ export function Tabs() {
         ],
         [location.pathname, usernameParam],
     )
+    const activeTab = tabs.find(tab => tab.current)?.name ?? 'Photos'
 
     return (
         <div>
@@ -57,6 +59,16 @@ export function Tabs() {
                 </label>
                 {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
                 <select
+                    value={activeTab}
+                    onChange={e => {
+                        navigate(
+                            tabs.find(tab => tab.name === e.target.value)?.href ??
+                            PAGES.CREATOR.PHOTOS.replace(
+                                ':username',
+                                safeString(usernameParam),
+                            ),
+                        )
+                    }}
                     id="tabs"
                     name="tabs"
                     className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
