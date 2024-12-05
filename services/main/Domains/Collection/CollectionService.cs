@@ -27,7 +27,7 @@ public class CollectionService
         logger.LogDebug("Collection service initialized");
     }
 
-    public Models.Collection SaveCollection(SaveCollection input, string userId)
+    public Models.Collection SaveCollection(SaveCollection input)
     {
         var oldCollection = _collectionCollection.Find(collection => collection.Name == input.Name).FirstOrDefault();
         if (oldCollection is not null)
@@ -38,12 +38,20 @@ public class CollectionService
         var collection = new Models.Collection
         {
             Name = input.Name,
-            ContentsCount = 0,
-            Type = input.Type,
-            Visibility = input.Visibility,
+            Slug = input.Slug,
             Description = input.Description,
-            CreatedById = userId
+            CreatedById = input.CreatedById
         };
+
+        if (input.Visibility is not null)
+        {
+            collection.Visibility = input.Visibility;
+        }
+
+        if (input.CreatedByRole is not null)
+        {
+            collection.CreatedByRole = input.CreatedByRole;
+        }
 
         _collectionCollection.InsertOne(collection);
 
@@ -61,12 +69,12 @@ public class CollectionService
         return collection;
     }
 
-    public Models.Collection ResolveCollection(SaveCollection input, string userId)
+    public Models.Collection ResolveCollection(SaveCollection input)
     {
         var collection = _collectionCollection.Find(collection => collection.Name == input.Name).FirstOrDefault();
         if (collection is null)
         {
-            return this.SaveCollection(input, userId);
+            return SaveCollection(input);
         }
 
         return collection;
@@ -81,6 +89,26 @@ public class CollectionService
         _collectionCollection.UpdateOne(filter, updates);
 
         return true;
+    }
+
+    public void BootstrapCollections()
+    {
+        _logger.LogInformation("Bootsrapping collections");
+        string[] collections = { "Featured::Contents", "Featured::Tags", "Featured::Collections" };
+        string collectionDescription = "Carefully curated collection of contents for your viewing pleasure by our team of experts at mfoni";
+
+        foreach (var collection in collections)
+        {
+            ResolveCollection(new SaveCollection
+            {
+                Name = collection,
+                Slug = $"{collection.ToLower().Replace("::", "_")}",
+                Description = collectionDescription,
+
+            });
+        }
+        _logger.LogInformation("Collections Bootstrapped now!");
+
     }
 
 }

@@ -6,6 +6,7 @@ using MongoDB.Driver;
 using System.Text;
 using RabbitMQ.Client;
 using main.Lib;
+using NanoidDotNet;
 
 namespace main.Domains;
 
@@ -16,12 +17,12 @@ public class IndexContent
     private readonly IMongoCollection<Content> _contentsCollection;
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly RabbitMQ.Client.IConnection _rabbitMqChannel;
-    private readonly SaveTags _saveTagsService;
+    private readonly SaveTagsService _saveTagsService;
     private readonly CollectionService _collectionService;
     private readonly CollectionContentService _collectionContentService;
     private readonly AppConstants _appConstantsConfiguration;
 
-    public IndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants, SaveTags saveTagsService, CollectionService collectionService, CollectionContentService collectionContentService)
+    public IndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants, SaveTagsService saveTagsService, CollectionService collectionService, CollectionContentService collectionContentService)
     {
         _logger = logger;
 
@@ -62,10 +63,11 @@ public class IndexContent
         var collection = _collectionService.ResolveCollection(new SaveCollection
         {
             Name = $"{user.Id}::Uploads",
+            Slug = $"{user.Name.ToLower().Replace(" ", "_")}_uploads_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}",
             Description = $"{user.Name}'s collection for all their uploads",
-            Type = CollectionType.USER,
-            Visibility = CollectionVisibility.PRIVATE,
-        }, user.Id);
+            CreatedByRole = CollectionCreatedByRole.USER,
+            CreatedById = user.Id
+        });
 
         if (collection is null)
         {
@@ -82,6 +84,7 @@ public class IndexContent
             var content = new Content
             {
                 Title = media.Title,
+                Slug = $"{media.Title.ToLower().Replace(" ", "_")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}",
                 Visibility = media.Visibility,
                 Amount = MoneyLib.ConvertCedisToPesewas(Convert.ToInt64(media.Amount)),
                 Media = media.Content,
@@ -93,21 +96,20 @@ public class IndexContent
             // save tags
             dbTags.ForEach(tag =>
             {
-                var contentTag = new Models.ContenTag
+                var contentTag = new Models.ContentTag
                 {
                     ContentId = content.Id,
                     TagId = tag.Id
                 };
             });
 
-            content.Tags = dbTags;
-
             // create collection content
             _collectionContentService.SaveCollectionContent(new SaveCollectionContent
             {
                 CollectionId = collection.Id,
-                ContentId = content.Id
-            }, user.Id);
+                ContentId = content.Id,
+                Type = CollectionContentType.CONTENT
+            });
 
             contents.Add(content);
         });

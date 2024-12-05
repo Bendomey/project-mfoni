@@ -15,13 +15,13 @@ namespace main.Controllers;
 [Route("api/v1")]
 public class AuthController : ControllerBase
 {
-    private readonly ILogger<MediaController> _logger;
+    private readonly ILogger<AuthController> _logger;
     private readonly UserAuth _authService;
     private readonly UserService _userService;
     private readonly UserTransformer _userTransformer;
 
     public AuthController(
-        ILogger<MediaController> logger,
+        ILogger<AuthController> logger,
         UserAuth authService,
         UserService userService,
         UserTransformer userTransformer

@@ -147,6 +147,7 @@ public class ProcessIndexContent
                     BucketName = _appConstantsConfiguration.BucketName,
                     Image = newImage,
                     KeyName = content.Media.Key,
+                    Orientation = content.Media.Orientation,
                 });
 
                 // save to db
@@ -159,6 +160,7 @@ public class ProcessIndexContent
                         Key = imageResponse.Key,
                         Location = imageResponse.Location,
                         ServerSideEncryption = imageResponse.ServerSideEncryption,
+                        Orientation = imageResponse.Orientation
                     })
                     .Set(r => r.UpdatedAt, DateTime.Now);
 

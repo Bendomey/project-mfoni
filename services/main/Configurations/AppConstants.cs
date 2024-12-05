@@ -14,9 +14,12 @@ public class AppConstants
     public string CollectionCollection { get; init; } = "collections";
     public string CollectionContentCollection { get; init; } = "collection_contents";
     public string ContentCollection { get; init; } = "contents";
+    public string ContentLikeCollection { get; init; } = "content_likes";
+    public string ContentDownloadCollection { get; init; } = "content_downloads";
     public string CreatorApplicatonCollection { get; init; } = "creator_applications";
     public string CreatorCollection { get; init; } = "creators";
     public string TagCollection { get; init; } = "tags";
+    public string ContentTagCollection { get; init; } = "content_tags";
     public string WaitlistCollection { get; init; } = "waitlists";
     public string CreatorSubscriptionCollection { get; init; } = "creator_subscriptions";
     public string CreatorSubscriptionPurchaseCollection { get; init; } = "creator_subscription_purchases";

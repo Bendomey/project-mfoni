@@ -6,18 +6,20 @@ using main.Lib;
 
 namespace main.Domains;
 
-public class SearchTag
+public class SearchTagService
 {
     private readonly ILogger<IndexContent> _logger;
     private readonly IMongoCollection<Models.Tag> _tagsCollection;
+    private readonly IMongoCollection<Models.ContentTag> _contentTagsCollection;
 
-    public SearchTag(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
+    public SearchTagService(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
     {
         _logger = logger;
 
         var database = databaseConfig.Database;
 
         _tagsCollection = database.GetCollection<Models.Tag>(appConstants.Value.TagCollection);
+        _contentTagsCollection = database.GetCollection<Models.ContentTag>(appConstants.Value.ContentTagCollection);
 
         _logger.LogDebug("SearchTagService initialized");
     }
@@ -88,5 +90,29 @@ public class SearchTag
 
         var tags = await _tagsCollection.Find(filter).Skip(0).Limit(10).ToListAsync();
         return tags ?? [];
+    }
+
+    public async Task<List<Models.Tag>> GetTagsForContent(string contentId)
+    {
+        FilterDefinitionBuilder<Models.Tag> builder = Builders<Models.Tag>.Filter;
+        var filter = Builders<Models.ContentTag>.Filter.Eq("content_id", ObjectId.Parse(contentId));
+
+
+        var contentTags = await _contentTagsCollection
+            .Find(filter)
+            .ToListAsync();
+
+        var tags = new List<Models.Tag>();
+
+        contentTags.ForEach(contentTag =>
+        {
+            var tag = _tagsCollection.Find(tag => tag.Id == contentTag.TagId).FirstOrDefault();
+            if (tag != null)
+            {
+                tags.Add(tag);
+            }
+        });
+
+        return tags;
     }
 }

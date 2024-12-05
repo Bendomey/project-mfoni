@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace main.Models;
 
-public class ContentTag
+public class ContentLike
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -13,9 +13,9 @@ public class ContentTag
     [BsonRepresentation(BsonType.ObjectId)]
     public required string ContentId { get; set; }
 
-    [BsonElement("tag_id")]
+    [BsonElement("user_id")]
     [BsonRepresentation(BsonType.ObjectId)]
-    public required string TagId { get; set; }
+    public required string UserId { get; set; }
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

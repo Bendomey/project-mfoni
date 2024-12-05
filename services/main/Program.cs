@@ -101,10 +101,10 @@ builder.Services.AddSingleton<WalletService>();
 builder.Services.AddSingleton<SubscriptionService>();
 
 // search services
-builder.Services.AddSingleton<SearchTag>();
-builder.Services.AddSingleton<SearchContent>();
+builder.Services.AddSingleton<SearchTagService>();
+builder.Services.AddSingleton<SearchContentService>();
 
-builder.Services.AddSingleton<SaveTags>();
+builder.Services.AddSingleton<SaveTagsService>();
 
 builder.Services.AddSingleton<CollectionService>();
 builder.Services.AddSingleton<CollectionContentService>();
@@ -117,12 +117,16 @@ builder.Services.AddSingleton<WaitlistService>();
 
 // inject transformers
 builder.Services.AddSingleton<AdminTransformer>();
+builder.Services.AddSingleton<ContentTransformer>();
 builder.Services.AddSingleton<UserTransformer>();
 builder.Services.AddSingleton<CreatorApplicationTransformer>();
 builder.Services.AddSingleton<CreatorTransformer>();
 builder.Services.AddSingleton<CreatorSubscriptionTransformer>();
 builder.Services.AddSingleton<WalletTransactionTransformer>();
 builder.Services.AddSingleton<CreatorSubscriptionPurchaseTransformer>();
+builder.Services.AddSingleton<CollectionTransformer>();
+builder.Services.AddSingleton<CollectionContentTransformer>();
+builder.Services.AddSingleton<TagTransformer>();
 
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();

@@ -8,7 +8,7 @@ public class SaveCollection
 
     public string? Description { get; set; }
 
-    public required string Type { get; set; }
+    public required string CreatedByRole { get; set; }
 
     public required string Visibility { get; set; }
 }

@@ -15,15 +15,17 @@ namespace main.Controllers;
 [Route("api/v1/tags")]
 public class TagsController : ControllerBase
 {
-    private readonly ILogger<MediaController> _logger;
-    private readonly SaveTags _saveTagsService;
-    private readonly SearchTag _searchTagsService;
+    private readonly ILogger<TagsController> _logger;
+    private readonly SaveTagsService _saveTagsService;
+    private readonly SearchTagService _searchTagsService;
+    private readonly TagTransformer _tagTransformer;
 
-    public TagsController(ILogger<MediaController> logger, SaveTags saveTagsService, SearchTag searchTagService)
+    public TagsController(ILogger<TagsController> logger, SaveTagsService saveTagsService, SearchTagService searchTagService, TagTransformer tagTransformer)
     {
         _logger = logger;
         _saveTagsService = saveTagsService;
         _searchTagsService = searchTagService;
+        _tagTransformer = tagTransformer;
     }
 
     [Authorize]
@@ -87,18 +89,49 @@ public class TagsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retrieves all tags on the platform
+    /// </summary>
+    /// <param name="populate">Comma separated values to populate fields</param>
+    /// <param name="search">Search by name</param>
+    /// <param name="page">The page to be navigated to</param>
+    /// <param name="pageSize">The number of items on a page</param>
+    /// <param name="sort">To sort response data either by `asc` or `desc`</param>
+    /// <param name="sortBy">What field to sort by.</param>
+    /// <response code="200">Users Retrieved Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] int? page, [FromQuery] int? pageSize, [FromQuery] string? sort, [FromQuery] string sortBy = "created_at")
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<EntityWithPagination<OutputTag>>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? populate,
+        [FromQuery] string? search,
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] string? sort,
+        [FromQuery] string sortBy = "created_at"
+    )
     {
         try
         {
             _logger.LogInformation("Getting all tags");
-            var queryFilter = HttpLib.GenerateFilterQuery<Models.Tag>(page, pageSize, sort, sortBy);
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.Tag>(page, pageSize, sort, sortBy, populate);
             var tags = await _searchTagsService.GetAll(queryFilter, search);
             var tagsCount = await _searchTagsService.Count(search);
 
-            var response = HttpLib.GeneratePagination(tags, tagsCount, queryFilter);
-            return new ObjectResult(new GetEntityResponse<EntityWithPagination<Models.Tag>>(response, null).Result()) { StatusCode = StatusCodes.Status200OK };
+            var outputTags = new List<OutputTag>();
+            foreach (var tag in tags)
+            {
+                outputTags.Add(await _tagTransformer.Transform(tag, populate: queryFilter.Populate));
+            }
+            var response = HttpLib.GeneratePagination(outputTags, tagsCount, queryFilter);
+            return new ObjectResult(new GetEntityResponse<EntityWithPagination<OutputTag>>(response, null).Result()) { StatusCode = (int)HttpStatusCode.OK };
         }
         catch (HttpRequestException e)
         {
@@ -113,7 +146,7 @@ public class TagsController : ControllerBase
         catch (Exception e)
         {
             this._logger.LogError($"Failed to get tags. Exception: {e}");
-            return new StatusCodeResult(500);
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 
