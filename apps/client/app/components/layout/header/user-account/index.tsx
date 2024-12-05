@@ -4,6 +4,7 @@ import {useAuth} from '@/providers/auth/index.tsx'
 import {Menu, Transition} from '@headlessui/react'
 import {Link} from '@remix-run/react'
 import {Fragment} from 'react'
+import {Image} from 'remix-image'
 
 const getNameInitials = (name: string) =>
   name
@@ -23,7 +24,7 @@ export const UserAccountNav = () => {
           <span className="absolute -inset-1.5" />
           <span className="sr-only">Open user menu</span>
           {isProfilePhotoValid && currentUser?.photo ? (
-            <img
+            <Image
               className="h-8 w-8 rounded-full"
               src={currentUser.photo}
               alt={currentUser.name}
@@ -97,7 +98,7 @@ export const UserAccountMobileNav = () => {
       <div className="flex items-center">
         <div className="flex-shrink-0">
           {isProfilePhotoValid && currentUser?.photo ? (
-            <img
+            <Image
               className="h-8 w-8 rounded-full"
               src={currentUser.photo}
               alt={currentUser.name}

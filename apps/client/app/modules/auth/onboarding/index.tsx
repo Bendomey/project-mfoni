@@ -10,6 +10,7 @@ import {SetupAccountModal} from './setup-modal/index.tsx'
 import {ArrowLeftIcon} from '@heroicons/react/20/solid'
 import {TypewriterEffectSmooth} from '@/components/animation/TypeWriteEffect.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
+import {Image} from 'remix-image'
 
 const words = [
   {
@@ -96,7 +97,7 @@ export const OnboardingModule = () => {
                     : 'border-dashed border-zinc-300'
                 } p-5 rounded-lg`}
               >
-                <img
+                <Image
                   className="hidden md:block rounded-lg max-w-full h-auto"
                   src={userImage}
                   alt="I'm here to download photos and videos"
@@ -117,7 +118,7 @@ export const OnboardingModule = () => {
                     : 'border-dashed border-zinc-300'
                 } p-5 rounded-lg cursor-pointer`}
               >
-                <img
+                <Image
                   className="hidden md:block rounded-lg max-w-full h-auto"
                   src={creatorImage}
                   alt="I'm here to share my photos and videos with the world"

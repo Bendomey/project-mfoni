@@ -11,6 +11,7 @@ import {useAccountContext} from '../context/index.tsx'
 import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
 import {classNames} from '@/lib/classNames.ts'
 import {MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
+import {Image} from 'remix-image'
 
 export const profile = {
   name: 'Ricardo Cooper',
@@ -96,8 +97,8 @@ export const AccountCover = () => {
     <div className="border border-gray-200 bg-white rounded-md shadow-sm">
       <div>
         <div>
-          <img
-            alt=""
+          <Image
+            alt={`${profile.name}'s cover photo`}
             src={profile.coverImageUrl}
             className="h-32 w-full object-cover lg:h-48 rounded-t-md"
           />
@@ -106,7 +107,7 @@ export const AccountCover = () => {
           <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
             <div className="flex">
               {isProfilePhotoValid && currentUser?.photo ? (
-                <img
+                <Image
                   alt={currentUser.name}
                   src={currentUser.photo}
                   className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"

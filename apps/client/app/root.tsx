@@ -1,5 +1,5 @@
 import {cssBundleHref} from '@remix-run/css-bundle'
-import {type PropsWithChildren} from 'react'
+import { type PropsWithChildren} from 'react'
 import {
   json,
   type LoaderFunctionArgs,
@@ -19,6 +19,7 @@ import {
 } from '@remix-run/react'
 import {NODE_ENV, PAGES} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
+import remixImageStyles from 'remix-image/remix-image.css'
 import globalStyles from '@/styles/global.css'
 import {Toaster} from 'react-hot-toast'
 import {Providers} from './providers/index.tsx'
@@ -56,6 +57,7 @@ export const links: LinksFunction = () => {
     // },
     {rel: 'icon', href: '/favicon.ico'},
     {rel: 'stylesheet', href: tailwindStyles},
+    {rel: 'stylesheet', href: remixImageStyles},
     {rel: 'stylesheet', href: globalStyles},
     ...(cssBundleHref ? [{rel: 'stylesheet', href: cssBundleHref}] : []),
   ]
