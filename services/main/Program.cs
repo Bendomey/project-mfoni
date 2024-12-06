@@ -22,10 +22,10 @@ builder.WebHost.UseSentry(options =>
 
     options.Environment = builder.Configuration["AppConstants:Environment"];
 
-    #if DEBUG
-        // Log debug information about the Sentry SDK
-        options.Debug = true;
-    #endif
+#if DEBUG
+    // Log debug information about the Sentry SDK
+    options.Debug = true;
+#endif
 });
 
 
