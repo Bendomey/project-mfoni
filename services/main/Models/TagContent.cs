@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace main.Models;
 
-public class ContentTag
+public class TagContent
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]

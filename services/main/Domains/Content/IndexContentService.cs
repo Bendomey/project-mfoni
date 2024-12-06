@@ -96,7 +96,7 @@ public class IndexContent
             // save tags
             dbTags.ForEach(tag =>
             {
-                var contentTag = new Models.ContentTag
+                var tagContent = new Models.TagContent
                 {
                     ContentId = content.Id,
                     TagId = tag.Id

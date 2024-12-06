@@ -16,7 +16,7 @@ public class UpdateCollectionInput
 
 public class AddContentsToCollectionInput
 {
-    public required string[] ContentIds { get; set; }
+    public required Domains.CollectionContentInput[] ContentIds { get; set; }
 }
 
 public class RemoveContentsFromCollectionInput

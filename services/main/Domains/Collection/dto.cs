@@ -19,6 +19,27 @@ public class UpdateCollection
     public string? Visibility { get; set; }
 }
 
+
+public class CollectionContentInput
+{
+    public required string Type { get; set; }
+    public required string Id { get; set; }
+}
+
+public class AddContentsToCollectionInput
+{
+    public required string Id { get; set; }
+    public string? UserId { get; set; }
+    public required CollectionContentInput[] ContentIds { get; set; }
+}
+
+public class RemoveContentsFromCollectionInput
+{
+    public required string Id { get; set; }
+    public string? UserId { get; set; }
+    public required string[] ContentIds { get; set; }
+}
+
 public class GetCollectionContentsInput
 {
     public string? CollectionId { get; set; }

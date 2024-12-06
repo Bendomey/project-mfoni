@@ -105,7 +105,7 @@ export const PhotoModule = () => {
               <div className="flex flex-row items-center gap-2 mt-2">
                 <ShieldCheckIcon className="h-5 w-5 text-gray-500" />
                 <span className="text-sm text-gray-500 font-medium">
-                  Free to use under the Unsplash License
+                  Free to use under the mfoni License
                 </span>
               </div>
             </div>

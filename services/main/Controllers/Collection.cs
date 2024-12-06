@@ -19,17 +19,23 @@ public class CollectionsController : ControllerBase
 {
     private readonly ILogger<CollectionsController> _logger;
     private readonly CollectionService _collectionService;
+    private readonly CollectionContentService _collectionContentService;
+    private readonly CollectionContentTransformer _collectionContentTransformer;
     private readonly CollectionTransformer _collectionTransformer;
 
     public CollectionsController(
         ILogger<CollectionsController> logger,
         CollectionService collectionService,
-        CollectionTransformer collectionTransformer
+        CollectionContentService collectionContentService,
+        CollectionTransformer collectionTransformer,
+        CollectionContentTransformer collectionContentTransformer
     )
     {
         _logger = logger;
         _collectionService = collectionService;
+        _collectionContentService = collectionContentService;
         _collectionTransformer = collectionTransformer;
+        _collectionContentTransformer = collectionContentTransformer;
     }
 
     /// <summary>
@@ -40,7 +46,7 @@ public class CollectionsController : ControllerBase
     /// <response code="500">An unexpected error occured</response>
     [Authorize]
     [HttpPost]
-    [ProducesResponseType(typeof(OutputResponse<Models.Collection>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<Models.Collection>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult Create([FromBody] CreateCollectionInput input)
@@ -73,7 +79,7 @@ public class CollectionsController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogDebug($"Failed to create collection. Exception: {e}");
+            this._logger.LogError($"Failed to create collection. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
             {
                 scope.SetTags(new Dictionary<string, string>
@@ -127,7 +133,7 @@ public class CollectionsController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogDebug($"Failed to create collection for admin. Exception: {e}");
+            this._logger.LogError($"Failed to create collection for admin. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
            {
                scope.SetTags(new Dictionary<string, string>
@@ -151,16 +157,15 @@ public class CollectionsController : ControllerBase
     /// <response code="201">Collections Retrieved Successfully</response>
     /// <response code="500">An unexpected error occured</response>
     [HttpGet("{id}")]
-    [ProducesResponseType(typeof(OutputResponse<OutputCollection>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(OutputResponse<OutputCollection>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Get(
         string id,
-        [FromQuery] string? populate,
+        [FromQuery] string populate = "",
         [FromQuery] int contentItemsLimit = 4
     )
     {
-        populate ??= "";
         try
         {
             _logger.LogInformation("Getting collection: " + id);
@@ -184,7 +189,7 @@ public class CollectionsController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogDebug($"Failed to get collection. Exception: {e}");
+            this._logger.LogError($"Failed to get collection. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
            {
                scope.SetTags(new Dictionary<string, string>
@@ -214,11 +219,10 @@ public class CollectionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetBySlug(
         string slug,
-        [FromQuery] string? populate,
+        [FromQuery] string populate = "",
         [FromQuery] int contentItemsLimit = 4
     )
     {
-        populate ??= "";
         try
         {
             _logger.LogInformation("Getting collection: " + slug);
@@ -242,7 +246,7 @@ public class CollectionsController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogDebug($"Failed to get collection. Exception: {e}");
+            this._logger.LogError($"Failed to get collection. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
            {
                scope.SetTags(new Dictionary<string, string>
@@ -261,6 +265,7 @@ public class CollectionsController : ControllerBase
     /// <summary>
     /// Retrieves all collections on the platform
     /// </summary>
+    /// <param name="visibility">could be `ALL` or `PUBLIC` or `PRIVATE`</param>
     /// <param name="contentItemsLimit">Number of content items to populate on collection</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="search">Search by name</param>
@@ -280,13 +285,14 @@ public class CollectionsController : ControllerBase
         Type = typeof(StatusCodeResult)
     )]
     public async Task<IActionResult> GetAll(
-        [FromQuery] string? populate,
         [FromQuery] string? search,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
+        [FromQuery] string populate = "",
         [FromQuery] string sortBy = "created_at",
-        [FromQuery] int contentItemsLimit = 4
+        [FromQuery] int contentItemsLimit = 4,
+        [FromQuery] string visibility = "PUBLIC"
     )
     {
         try
@@ -294,8 +300,8 @@ public class CollectionsController : ControllerBase
             _logger.LogInformation("Getting all collections");
             var queryFilter = HttpLib.GenerateFilterQuery<Models.Collection>(page, pageSize, sort, sortBy, populate);
 
-            var contents = await _collectionService.GetCollections(queryFilter, search);
-            long count = await _collectionService.CountCollections(search);
+            var contents = await _collectionService.GetCollections(queryFilter, search, visibility);
+            long count = await _collectionService.CountCollections(search, visibility);
 
             var outContent = new List<OutputCollection>();
             foreach (var content in contents)
@@ -327,7 +333,7 @@ public class CollectionsController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogDebug($"Failed to get collections. Exception: {e}");
+            this._logger.LogError($"Failed to get collections. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
           {
               scope.SetTags(new Dictionary<string, string>
@@ -389,7 +395,7 @@ public class CollectionsController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogDebug($"Failed to update collection. Exception: {e}");
+            this._logger.LogError($"Failed to update collection. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
           {
               scope.SetTags(new Dictionary<string, string>
@@ -425,7 +431,7 @@ public class CollectionsController : ControllerBase
         catch (Exception e)
         {
 
-            this._logger.LogDebug($"Failed to delete collection. Exception: {e}");
+            this._logger.LogError($"Failed to delete collection. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
              {
                  scope.SetTags(new Dictionary<string, string>
@@ -453,16 +459,35 @@ public class CollectionsController : ControllerBase
     [ProducesResponseType(typeof(OutputResponse<List<Models.CollectionContent>>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public IActionResult AddContentToCollection(string id, [FromBody] AddContentsToCollectionInput input)
+    public IActionResult AddContentToCollection(string id, [FromBody] DTOs.AddContentsToCollectionInput input)
     {
         try
         {
-            throw new Exception("Not Implemented");
+            _logger.LogInformation("adding collection contents: " + input);
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var contents = _collectionContentService.AddContentsToCollection(new Domains.AddContentsToCollectionInput
+            {
+                ContentIds = input.ContentIds,
+                Id = id,
+                UserId = currentUser.Id
+            });
+
+            return new ObjectResult(new GetEntityResponse<List<Models.CollectionContent>>(contents, null).Result()) { StatusCode = StatusCodes.Status201Created };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {
 
-            this._logger.LogDebug($"Failed to add contents to collection. Exception: {e}");
+            this._logger.LogError($"Failed to add contents to collection. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
              {
                  scope.SetTags(new Dictionary<string, string>
@@ -491,16 +516,35 @@ public class CollectionsController : ControllerBase
     [ProducesResponseType(typeof(OutputResponse<bool>), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public IActionResult RemoveContentFromCollection(string id, [FromBody] RemoveContentsFromCollectionInput input)
+    public IActionResult RemoveContentFromCollection(string id, [FromBody] DTOs.RemoveContentsFromCollectionInput input)
     {
         try
         {
-            throw new Exception("Not Implemented");
+            _logger.LogInformation("remove collection contents: " + input);
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var res = _collectionContentService.RemoveContentsFromCollection(new Domains.RemoveContentsFromCollectionInput
+            {
+                ContentIds = input.ContentIds,
+                Id = id,
+                UserId = currentUser.Id
+            });
+
+            return new ObjectResult(new GetEntityResponse<bool>(res, null).Result()) { StatusCode = StatusCodes.Status204NoContent };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {
 
-            this._logger.LogDebug($"Failed to remove contents from collection. Exception: {e}");
+            this._logger.LogError($"Failed to remove contents from collection. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
              {
                  scope.SetTags(new Dictionary<string, string>
@@ -521,6 +565,7 @@ public class CollectionsController : ControllerBase
     /// Get contents in a collection by slug
     /// </summary>
     /// <param name="slug">slug of collection</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
     /// <param name="sort">To sort response data either by `asc` or `desc`</param>
@@ -528,25 +573,66 @@ public class CollectionsController : ControllerBase
     /// <response code="200">Retrieved contents from a collection Successfully</response>
     /// <response code="500">An unexpected error occured</response>
     [HttpGet("{slug}/contents/slug")]
-    [ProducesResponseType(typeof(OutputResponse<List<Models.CollectionContent>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<List<OutputCollectionContent>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public IActionResult GetContentFromCollectionBySlug(
+    public async Task<IActionResult> GetContentsFromCollectionBySlug(
         string slug,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
+        [FromQuery] string populate = "",
         [FromQuery] string sortBy = "created_at"
     )
     {
         try
         {
-            throw new Exception("Not Implemented");
+            _logger.LogInformation("Getting collection contents");
+            var collection = _collectionService.GetCollectionBySlug(slug);
+
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.CollectionContent>(page, pageSize, sort, sortBy, populate);
+
+            var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+            {
+                CollectionId = collection.Id,
+            });
+            long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
+            {
+                CollectionId = collection.Id,
+            });
+
+            var outContent = new List<OutputCollectionContent>();
+            foreach (var content in contents)
+            {
+                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate));
+            }
+            var response = HttpLib.GeneratePagination(
+                outContent,
+                count,
+                queryFilter
+            );
+
+            return new ObjectResult(
+                new GetEntityResponse<EntityWithPagination<OutputCollectionContent>>(response, null).Result()
+            )
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {
 
-            this._logger.LogDebug($"Failed to get contents from collection by slug. Exception: {e}");
+            this._logger.LogError($"Failed to get contents from collection by slug. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
              {
                  scope.SetTags(new Dictionary<string, string>
@@ -568,6 +654,7 @@ public class CollectionsController : ControllerBase
     /// Get all contents in a collection by id
     /// </summary>
     /// <param name="id">id of collection</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
     /// <param name="sort">To sort response data either by `asc` or `desc`</param>
@@ -578,21 +665,61 @@ public class CollectionsController : ControllerBase
     [ProducesResponseType(typeof(OutputResponse<List<Models.CollectionContent>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public IActionResult GetContentFromCollection(
+    public async Task<IActionResult> GetContentFromCollection(
         string id,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
+        [FromQuery] string populate = "",
         [FromQuery] string sortBy = "created_at"
     )
     {
         try
         {
-            throw new Exception("Not Implemented");
+            _logger.LogInformation("Getting collection contents");
+
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.CollectionContent>(page, pageSize, sort, sortBy, populate);
+
+            var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+            {
+                CollectionId = id,
+            });
+            long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
+            {
+                CollectionId = id,
+            });
+
+            var outContent = new List<OutputCollectionContent>();
+            foreach (var content in contents)
+            {
+                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate));
+            }
+            var response = HttpLib.GeneratePagination(
+                outContent,
+                count,
+                queryFilter
+            );
+
+            return new ObjectResult(
+                new GetEntityResponse<EntityWithPagination<OutputCollectionContent>>(response, null).Result()
+            )
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
         }
         catch (Exception e)
         {
-            this._logger.LogDebug($"Failed to get contents from collection by id. Exception: {e}");
+            this._logger.LogError($"Failed to get contents from collection by id. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
              {
                  scope.SetTags(new Dictionary<string, string>

@@ -124,13 +124,17 @@ public class CollectionService
 
     public async Task<List<Models.Collection>> GetCollections(
         FilterQuery<Models.Collection> queryFilter,
-        string? query
+        string? query,
+        string visibility
     )
     {
         FilterDefinitionBuilder<Models.Collection> builder = Builders<Models.Collection>.Filter;
         var filter = builder.Empty;
 
-        filter &= builder.Eq(r => r.Visibility, CollectionVisibility.PUBLIC);
+        if (visibility != "ALL")
+        {
+            filter &= builder.Eq(r => r.Visibility, visibility);
+        }
 
         if (!string.IsNullOrEmpty(query))
         {
@@ -147,12 +151,15 @@ public class CollectionService
         return users ?? [];
     }
 
-    public async Task<long> CountCollections(string? query)
+    public async Task<long> CountCollections(string? query, string visibility)
     {
         FilterDefinitionBuilder<Models.Collection> builder = Builders<Models.Collection>.Filter;
         var filter = builder.Empty;
 
-        filter &= builder.Eq(r => r.Visibility, CollectionVisibility.PUBLIC);
+        if (visibility != "ALL")
+        {
+            filter &= builder.Eq(r => r.Visibility, visibility);
+        }
 
         if (!string.IsNullOrEmpty(query))
         {

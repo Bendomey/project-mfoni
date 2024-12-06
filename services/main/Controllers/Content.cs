@@ -87,10 +87,9 @@ public class ContentController : ControllerBase
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetById(
         string id,
-        [FromQuery] string? populate
+        [FromQuery] string populate = ""
     )
     {
-        populate ??= "";
         // Don't break the request if user is not authenticated
         string? userId = null;
         try
@@ -136,15 +135,14 @@ public class ContentController : ControllerBase
     /// </summary>
     /// <param name="slug">Slug of content</param>
     /// <param name="populate">Comma separated values to populate fields</param>
-    [HttpGet("slug/{slug}")]
+    [HttpGet("{slug}/slug")]
     [ProducesResponseType(typeof(OutputResponse<OutputContent>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetBySlug(
         string slug,
-        [FromQuery] string? populate
+        [FromQuery] string populate = ""
     )
     {
-        populate ??= "";
         // Don't break the request if user is not authenticated
         string? userId = null;
         try
@@ -395,4 +393,6 @@ public class ContentController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
+
+
 }

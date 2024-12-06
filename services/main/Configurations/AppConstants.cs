@@ -19,7 +19,7 @@ public class AppConstants
     public string CreatorApplicatonCollection { get; init; } = "creator_applications";
     public string CreatorCollection { get; init; } = "creators";
     public string TagCollection { get; init; } = "tags";
-    public string ContentTagCollection { get; init; } = "content_tags";
+    public string TagContentCollection { get; init; } = "tag_contents";
     public string WaitlistCollection { get; init; } = "waitlists";
     public string CreatorSubscriptionCollection { get; init; } = "creator_subscriptions";
     public string CreatorSubscriptionPurchaseCollection { get; init; } = "creator_subscription_purchases";
