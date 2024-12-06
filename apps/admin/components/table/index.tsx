@@ -35,7 +35,7 @@ import {
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { LoadingContainer } from "../LoadingContainer";
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -94,19 +94,19 @@ export function DataTable<TData, TValue>({
         newPageIndex = Math.min(pageIndex + 1, totalPages - 1);
         pageThreshold = newPageIndex * pageSize;
         isApiFetchNeeded = pageThreshold >= dataPerPage
-        isApiFetchNeeded && (setDataPerPage(dataPerPage + dataMeta.pageSize), apiPageChange(direction))
+        if (isApiFetchNeeded){setDataPerPage(dataPerPage + dataMeta.pageSize); apiPageChange(direction)}
         break;
       case "previous":
         newPageIndex = Math.max(pageIndex - 1, 0);
         pageThreshold = newPageIndex * pageSize
         isApiFetchNeeded = pageThreshold < dataPerPage - dataMeta.pageSize
-        isApiFetchNeeded && (setDataPerPage(dataPerPage - dataMeta.pageSize), apiPageChange(direction))
+        if (isApiFetchNeeded){ setDataPerPage(dataPerPage - dataMeta.pageSize); apiPageChange(direction)}
         break;
       case "first":
         newPageIndex = 0;
         isApiFetchNeeded = dataMeta.pageSize !== dataPerPage
         pageNumber = isApiFetchNeeded ? 1 : 0
-        isApiFetchNeeded && (setDataPerPage(dataMeta.pageSize), apiPageChange(direction, pageNumber))
+        if (isApiFetchNeeded) {setDataPerPage(dataMeta.pageSize); apiPageChange(direction, pageNumber)}
         break;
       case "last":
         newPageIndex = totalPages - 1;
@@ -114,7 +114,7 @@ export function DataTable<TData, TValue>({
         pageNumber = isApiFetchNeeded 
         ? Math.floor((newPageIndex * pageSize) / dataMeta.pageSize) + 1 
         : 0;
-        isApiFetchNeeded ? (setDataPerPage(dataMeta.totalPages === 1 ? 1 : (dataMeta.totalPages* dataMeta.pageSize)), apiPageChange(direction, pageNumber)): null
+        if (isApiFetchNeeded){ setDataPerPage(dataMeta.totalPages === 1 ? 1 : (dataMeta.totalPages* dataMeta.pageSize)); apiPageChange(direction, pageNumber)}
         break;
       default:
         newPageIndex = pageIndex;
@@ -123,19 +123,7 @@ export function DataTable<TData, TValue>({
     // Prevent invalid page navigation (below first page or above max page count)
     if (newPageIndex < 0 || newPageIndex >= totalPages) return;
     
-
-    // const pageThreshold = direction === "next" ? (newPageIndex ) * pageSize :  newPageIndex * pageSize;
-
-    // const isApiFetchNeeded = (direction === "next" && pageThreshold >= dataPerPage) ||
-    // (direction === "previous" && pageThreshold < dataPerPage - dataMeta.pageSize) ||
-    //  (direction === "first" && dataMeta.pageSize !== dataPerPage) ||
-    //  (direction === "last" && dataMeta.pageSize !== dataPerPage);
-  
-    // if (isApiFetchNeeded) {
-    //   setDataPerPage(direction === "next" ? dataPerPage + dataMeta.pageSize : dataPerPage - dataMeta.pageSize );
-    //   pageNumber === 0 ? apiPageChange(direction) : apiPageChange(direction, pageNumber)
-    // }
-      setPageIndex(newPageIndex);
+    setPageIndex(newPageIndex);
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
@@ -271,9 +259,7 @@ export function DataTable<TData, TValue>({
 
           <div className="flex pt-4 items-center justify-between px-2">
             <div className="flex-1 text-sm text-muted-foreground">
-            {/* Showing 10(current page total rows) out of 50(total rows) rows */}
             Showing rows {pageIndex * pageSize + 1} - {Math.min((pageIndex + 1) * pageSize, dataMeta.total)} of {dataMeta.total} rows
-            {/* Showing {table.getState().pagination.pageSize} rows out of {dataMeta.total} rows */}
             </div>
             <div className="flex items-center space-x-6 lg:space-x-8">
               <div className="flex items-center space-x-2">
@@ -306,7 +292,6 @@ export function DataTable<TData, TValue>({
                 <Button
                   variant="outline"
                   className="hidden h-8 w-8 p-0 lg:flex"
-                  // onClick={() => setPageIndex(0)}
                   onClick={() =>  changePage("first")}
                   disabled={!table.getCanPreviousPage()}
                 >
@@ -316,10 +301,7 @@ export function DataTable<TData, TValue>({
                 <Button
                   variant="outline"
                   className="h-8 w-8 p-0"
-                  onClick={() => {
-                    changePage("previous")
-                    // table.previousPage()
-                  }}
+                  onClick={() => changePage("previous")}
                   disabled={!table.getCanPreviousPage()}
                 >
                   <span className="sr-only">Go to previous page</span>
@@ -328,10 +310,7 @@ export function DataTable<TData, TValue>({
                 <Button
                   variant="outline"
                   className="h-8 w-8 p-0"
-                  onClick={() => {
-                    changePage("next")
-                    // table.nextPage()
-                  }}
+                  onClick={() => changePage("next")}
                   disabled={!table.getCanNextPage()}
                 >
                   <span className="sr-only">Go to next page</span>
@@ -340,10 +319,7 @@ export function DataTable<TData, TValue>({
                 <Button
                   variant="outline"
                   className="hidden h-8 w-8 p-0 lg:flex"
-                  onClick={() => {
-                    changePage("last")
-                    // setPageIndex(table.getPageCount() - 1)
-                  }}
+                  onClick={() => changePage("last")}
                   disabled={!table.getCanNextPage()}
                 >
                   <span className="sr-only">Go to last page</span>
