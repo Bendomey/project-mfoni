@@ -22,7 +22,7 @@ export const loader: LoaderFunction = ({request}) => {
     cache: new DiskCache(),
     resolver: fetchImage,
     transformer: sharpTransformer,
-    verbose: true
+    verbose: true,
   }
   return imageLoader(config, request)
 }

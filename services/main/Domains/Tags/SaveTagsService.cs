@@ -2,16 +2,17 @@ using main.Configuratons;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using main.DTOs;
+using NanoidDotNet;
 
 namespace main.Domains;
 
-public class SaveTags
+public class SaveTagsService
 {
-    private readonly ILogger<SaveTags> _logger;
+    private readonly ILogger<SaveTagsService> _logger;
     private readonly IMongoCollection<Models.Tag> _tagsCollection;
-    private readonly SearchTag _searchTagService;
+    private readonly SearchTagService _searchTagService;
 
-    public SaveTags(ILogger<SaveTags> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTag searchTagService)
+    public SaveTagsService(ILogger<SaveTagsService> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTagService searchTagService)
     {
         _logger = logger;
 
@@ -35,6 +36,7 @@ public class SaveTags
         var tagToSave = new Models.Tag
         {
             Name = tag.Name,
+            Slug = $"{tag.Name.ToLower().Replace(" ", "_")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}",
             Description = tag.Description,
             CreatedByUserId = userInput.Id,
         };

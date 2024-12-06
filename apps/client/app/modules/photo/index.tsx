@@ -1,22 +1,22 @@
-import { Footer } from '@/components/footer/index.tsx'
-import { Header } from '@/components/layout/index.ts'
-import { ShareButton } from '@/components/share-button/index.tsx'
-import { Button } from '@/components/button/index.tsx'
+import {Footer} from '@/components/footer/index.tsx'
+import {Header} from '@/components/layout/index.ts'
+import {ShareButton} from '@/components/share-button/index.tsx'
+import {Button} from '@/components/button/index.tsx'
 
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import {Menu, MenuButton, MenuItem, MenuItems} from '@headlessui/react'
+import {ChevronDownIcon} from '@heroicons/react/20/solid'
 import {
   BookmarkIcon,
   CalendarDaysIcon,
   HeartIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline'
-import { Link } from '@remix-run/react'
-import { blurDataURL, PAGES } from '@/constants/index.ts'
+import {Link} from '@remix-run/react'
+import {blurDataURL, PAGES} from '@/constants/index.ts'
 import dayjs from 'dayjs'
-import { imageUrls } from '../landing-page/index.tsx'
-import { Image } from 'remix-image'
-import { RelatedContent } from './components/related-content.tsx'
+import {imageUrls} from '../landing-page/index.tsx'
+import {Image} from 'remix-image'
+import {RelatedContent} from './components/related-content.tsx'
 
 const tags = [
   'wallpaper',
@@ -69,7 +69,7 @@ export const PhotoModule = () => {
               className="object-cover"
               blurDataURL={blurDataURL}
               options={{
-                fit: "cover",
+                fit: 'cover',
               }}
             />
           </div>
@@ -105,7 +105,7 @@ export const PhotoModule = () => {
               <div className="flex flex-row items-center gap-2 mt-2">
                 <ShieldCheckIcon className="h-5 w-5 text-gray-500" />
                 <span className="text-sm text-gray-500 font-medium">
-                  Free to use under the Unsplash License
+                  Free to use under the mfoni License
                 </span>
               </div>
             </div>
@@ -133,9 +133,9 @@ export const PhotoModule = () => {
 }
 
 const items = [
-  { name: 'Small', size: '100 x 500', href: '#' },
-  { name: 'Medium', size: '600 x 1200', href: '#' },
-  { name: 'Large', size: '1000 x 5000', href: '#' },
+  {name: 'Small', size: '100 x 500', href: '#'},
+  {name: 'Medium', size: '600 x 1200', href: '#'},
+  {name: 'Large', size: '1000 x 5000', href: '#'},
 ]
 
 export default function DownloadButton() {

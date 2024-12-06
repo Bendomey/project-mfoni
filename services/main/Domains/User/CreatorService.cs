@@ -136,6 +136,20 @@ public class CreatorService
         return creator;
     }
 
+    public async Task<GetUserInfoResponse> GetUserInfo(string userId)
+    {
+        var user = await _userService.GetUserById(userId);
+        var creator = await GetCreatorByUserId(userId);
+        var creatorSubscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
+
+        return new GetUserInfoResponse
+        {
+            User = user,
+            Creator = creator,
+            CreatorSubscription = creatorSubscription
+        };
+    }
+
     private void SendNotification(Models.User user, string subject, string body)
     {
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)

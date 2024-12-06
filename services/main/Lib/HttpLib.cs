@@ -65,3 +65,9 @@ public class HttpLib
         return response;
     }
 }
+
+
+public class MongoAggregationGetCount
+{
+    public int Count;
+}

@@ -7,5 +7,13 @@ public class PopulateKeys
     public static readonly string WALLET = "wallet";
     public static readonly string PURCHASE = "purchase";
     public static readonly string SUBSCRIPTION = "subscription";
+    public static readonly string COLLECTION_CREATED_BY = "collection.createdBy";
+    public static readonly string COLLECTION = "collection";
+    public static readonly string CONTENT = "content";
+    public static readonly string TAG = "tag";
+    public static readonly string TAG_CREATED_BY_USER = "tag.createdByUser";
+    public static readonly string TAG_CREATED_BY_ADMIN = "tag.createdByAdmin";
+    public static readonly string CHILD_COLLECTION = "childCollection";
+    public static readonly string CONTENT_CREATED_BY = "content.createdBy";
 
 }

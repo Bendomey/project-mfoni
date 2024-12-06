@@ -2,10 +2,20 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace main.Models;
 
+public static class S3MetaDataOrientation
+{
+    public static readonly string LANDSCAPE = "LANDSCAPE";
+    public static readonly string PORTRAIT = "PORTRAIT";
+}
+
+
 public class S3MetaData
 {
     [BsonElement("location")]
     public required string Location { get; set; }
+
+    [BsonElement("orientation")]
+    public required string Orientation { get; set; }
 
     [BsonElement("eTag")]
     public required string ETag { get; set; }

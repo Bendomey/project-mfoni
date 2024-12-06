@@ -51,3 +51,10 @@ public class SubscribeToPackageInput
     public required string PricingPackage { get; set; }
     public required int Period { get; set; }
 }
+
+public class GetUserInfoResponse
+{
+    public required Models.User User { get; set; }
+    public required Models.Creator Creator { get; set; }
+    public required Models.CreatorSubscription CreatorSubscription { get; set; }
+}

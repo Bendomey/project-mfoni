@@ -17,6 +17,7 @@ public class IUploadToS3Input
     public required string BucketName { get; set; }
     public required Image Image { get; set; }
     public required string KeyName { get; set; }
+    public required string Orientation { get; set; }
 }
 
 public class ProcessImage
@@ -95,7 +96,8 @@ public class ProcessImage
                 Key = key,
                 Location = $"https://{input.BucketName}.s3.amazonaws.com/{key}",
                 ServerSideEncryption = ServerSideEncryptionMethod.AES256,
-                ETag = response.ETag
+                ETag = response.ETag,
+                Orientation = input.Orientation
             };
         }
     }

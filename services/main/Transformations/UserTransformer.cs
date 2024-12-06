@@ -54,4 +54,34 @@ public class UserTransformer
             UpdatedAt = user.UpdatedAt,
         };
     }
+
+    public async Task<OutputBasicCreator> TransformBasicCreator(User user)
+    {
+
+        var creator = await _creatorService.GetCreatorByUserId(user.Id);
+        var creatorTransformer = await _creatorTransformer.Transform(creator);
+
+        return new OutputBasicCreator
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Photo = user.Photo,
+            SocialMedia = creatorTransformer.SocialMedia,
+            Username = creatorTransformer.Username,
+        };
+    }
+
+    public OutputBasicUser TransformBasicUser(User user)
+    {
+
+        return new OutputBasicUser
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Photo = user.Photo,
+            Role = user.Role,
+        };
+    }
+
 }
+

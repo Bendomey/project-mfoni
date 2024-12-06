@@ -1,5 +1,5 @@
 import {cssBundleHref} from '@remix-run/css-bundle'
-import { type PropsWithChildren} from 'react'
+import {type PropsWithChildren} from 'react'
 import {
   json,
   type LoaderFunctionArgs,

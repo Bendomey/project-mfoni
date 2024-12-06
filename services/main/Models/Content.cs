@@ -29,8 +29,11 @@ public class Content
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
 
+    [BsonElement("slug")]
+    public required string Slug { get; set; }
+
     [BsonElement("title")]
-    public string? Title { get; set; }
+    public required string Title { get; set; }
 
     [BsonElement("type")]
     public string Type { get; set; } = ContentType.IMAGE;
@@ -45,14 +48,23 @@ public class Content
     public DateTime? DoneAt { get; set; }
 
     [BsonElement("visibility")]
-    public string Visibility { get; set; } = ContentVisibility.PUBLIC;
+    public string Visibility { get; set; } = ContentVisibility.PRIVATE;
 
-    [BsonIgnore]
-    [BsonElement("tags")]
-    public List<Tag>? Tags { get; set; }
+    // This is the visibility the user intended. Actual visibility will always be PRIVATE until the content is processed.
+    [BsonElement("intented_visibility")]
+    public string? IntendedVisibility { get; set; } = ContentVisibility.PRIVATE;
 
     [BsonElement("amount")]
     public Int64 Amount { get; set; } = 0; // Pesewas equivalent. 0 for free
+
+    [BsonElement("views")]
+    public Int64 Views { get; set; } = 0;
+
+    [BsonElement("downloads")]
+    public Int64 Downloads { get; set; } = 0;
+
+    [BsonElement("likes")]
+    public Int64 Likes { get; set; } = 0;
 
     [BsonElement("rekognition_metadata")]
     public RekognitionMetaData? RekognitionMetaData { get; set; }
@@ -69,9 +81,6 @@ public class Content
     [BsonElement("created_by_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public required string CreatedById { get; set; }
-
-    [BsonIgnore]
-    public User? CreatedBy { get; set; }
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
