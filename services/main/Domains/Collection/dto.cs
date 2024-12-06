@@ -10,6 +10,15 @@ public class SaveCollection
     public string? Visibility { get; set; }
 }
 
+public class UpdateCollection
+{
+    public required string Id { get; set; }
+    public string? UserId { get; set; }
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    public string? Visibility { get; set; }
+}
+
 public class GetCollectionContentsInput
 {
     public string? CollectionId { get; set; }

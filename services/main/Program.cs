@@ -10,6 +10,25 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseSentry(options =>
+{
+    // A DSN is required.  You can set it here, or in configuration, or in an environment variable.
+    options.Dsn = builder.Configuration["AppConstants:SentryDSN"]!;
+
+    // Set TracesSampleRate to 1.0 to capture 100%
+    // of transactions for tracing.
+    // We recommend adjusting this value in production
+    options.TracesSampleRate = 1.0;
+
+    options.Environment = builder.Configuration["AppConstants:Environment"];
+
+    #if DEBUG
+        // Log debug information about the Sentry SDK
+        options.Debug = true;
+    #endif
+});
+
+
 // Add services to the container.
 builder.Services.Configure<RabbitMQConnection>(
     builder.Configuration.GetSection("RabbitMQConnection")

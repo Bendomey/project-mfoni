@@ -60,6 +60,46 @@ public class CollectionService
         return collection;
     }
 
+    public Models.Collection UpdateCollection(Domains.UpdateCollection input)
+    {
+        var filter = Builders<Models.Collection>.Filter.Eq(r => r.Id, input.Id);
+        if (input.UserId is not null)
+        {
+            filter &= Builders<Models.Collection>.Filter.Eq(r => r.CreatedById, input.UserId);
+            filter &= Builders<Models.Collection>.Filter.Eq(r => r.CreatedByRole, CollectionCreatedByRole.USER);
+        }
+        else
+        {
+            filter &= Builders<Models.Collection>.Filter.Eq(r => r.CreatedByRole, CollectionCreatedByRole.SYSTEM);
+        }
+
+        var oldCollection = _collectionCollection.Find(filter).FirstOrDefault();
+        if (oldCollection is null)
+        {
+            throw new HttpRequestException("CollectionNotFound");
+        }
+
+        if (input.Name is not null)
+        {
+            oldCollection.Name = input.Name;
+        }
+
+        if (input.Description is not null)
+        {
+            oldCollection.Description = input.Description;
+        }
+
+        if (input.Visibility is not null)
+        {
+            oldCollection.Visibility = input.Visibility;
+        }
+
+        oldCollection.UpdatedAt = DateTime.UtcNow;
+        _collectionCollection.ReplaceOne(filter, oldCollection);
+
+        return oldCollection;
+    }
+
     public Models.Collection GetCollection(string collectionId)
     {
         var collection = _collectionCollection.Find(collection => collection.Id == collectionId).FirstOrDefault();

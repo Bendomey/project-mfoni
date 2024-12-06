@@ -6,3 +6,20 @@ public class CreateCollectionInput
     public string? Description { get; set; }
     public required string Visibility { get; set; }
 }
+
+public class UpdateCollectionInput
+{
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    public string? Visibility { get; set; }
+}
+
+public class AddContentsToCollectionInput
+{
+    public required string[] ContentIds { get; set; }
+}
+
+public class RemoveContentsFromCollectionInput
+{
+    public required string[] ContentIds { get; set; }
+}

@@ -2,7 +2,7 @@ using System.Net;
 
 namespace main.Lib;
 
-public class StringLib
+public static class StringLib
 {
     public static string Base64Encode(string plainText)
     {
@@ -19,5 +19,10 @@ public class StringLib
 
         var last9Digits = phoneNumber.Substring(phoneNumber.Length - 9);
         return "233" + last9Digits;
+    }
+
+    public static string SafeString(string? input)
+    {
+        return input ?? "";
     }
 }
