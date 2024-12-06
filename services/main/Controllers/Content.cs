@@ -33,12 +33,18 @@ public class ContentController : ControllerBase
         _contentTransformer = contentTransformer;
     }
 
+    /// <summary>
+    /// Upload contents
+    /// </summary>
+    /// <response code="200">Content Uploaded Successfully</response>
+    /// <response code="401">Unauthorize</response>
+    /// <response code="500">An unexpected error occured</response>
     [Authorize]
     [HttpPost]
-    [ProducesResponseType(typeof(OutputResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<List<Models.Content>>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public IActionResult Save(SaveMedia[] mediaInput)
+    public async Task<IActionResult> Save(SaveMedia[] mediaInput)
     {
         try
         {
@@ -47,10 +53,9 @@ public class ContentController : ControllerBase
                 HttpContext.User.Identity as ClaimsIdentity
             );
 
-            _indexContentService.Save(mediaInput, currentUser);
+            var contents = await _indexContentService.Save(mediaInput, currentUser);
 
-
-            return new ObjectResult(new GetEntityResponse<bool>(true, null).Result())
+            return new ObjectResult(new GetEntityResponse<List<Models.Content>>(contents, null).Result())
             {
                 StatusCode = StatusCodes.Status201Created
             };
@@ -73,6 +78,16 @@ public class ContentController : ControllerBase
         catch (Exception e)
         {
             this._logger.LogError($"Failed to save media. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Create Contents"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                    {"body", StringLib.SafeString(mediaInput.ToString())},
+                });
+                SentrySdk.CaptureException(e);
+            });
             return new StatusCodeResult(500);
         }
     }
@@ -126,6 +141,16 @@ public class ContentController : ControllerBase
         catch (Exception e)
         {
             this._logger.LogError($"Failed to get content. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                     {"action", "Get Content By Id"},
+                     {"contentId", id},
+                     {"populate", populate},
+               });
+               SentrySdk.CaptureException(e);
+           });
             return new StatusCodeResult(500);
         }
     }
@@ -179,6 +204,16 @@ public class ContentController : ControllerBase
         catch (Exception e)
         {
             this._logger.LogError($"Failed to get content. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                     {"action", "Get Content By Slug"},
+                     {"contentSlug", slug},
+                     {"populate", populate},
+               });
+               SentrySdk.CaptureException(e);
+           });
             return new StatusCodeResult(500);
         }
     }
@@ -207,10 +242,10 @@ public class ContentController : ControllerBase
     )]
     public async Task<IActionResult> VisualSearch(
         [FromForm] IFormFile media,
-        [FromQuery] string? populate,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
+        [FromQuery] string populate = "",
         [FromQuery] string sortBy = "created_at",
         [FromQuery] string license = "ALL",
         [FromQuery] string orientation = "ALL"
@@ -293,6 +328,22 @@ public class ContentController : ControllerBase
         catch (Exception e)
         {
             this._logger.LogError($"Failed to get contents. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                        {"action", "Visual Search"},
+                        {"userId", StringLib.SafeString(userId)},
+                        {"populate", populate},
+                        {"license", license},
+                        {"orientation", orientation},
+                        {"page", StringLib.SafeString(page.ToString())},
+                        {"pageSize", StringLib.SafeString(pageSize.ToString())},
+                        {"sort", StringLib.SafeString(sort)},
+                        {"sortBy", sortBy},
+               });
+               SentrySdk.CaptureException(e);
+           });
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
@@ -321,10 +372,10 @@ public class ContentController : ControllerBase
     )]
     public async Task<IActionResult> TextualSearch(
         [FromQuery] string? search,
-        [FromQuery] string? populate,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
+        [FromQuery] string populate = "",
         [FromQuery] string sortBy = "created_at",
         [FromQuery] string license = "ALL",
         [FromQuery] string orientation = "ALL"
@@ -390,6 +441,22 @@ public class ContentController : ControllerBase
         catch (Exception e)
         {
             this._logger.LogError($"Failed to get contents. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                        {"action", "Textual Search"},
+                        {"userId", StringLib.SafeString(userId)},
+                        {"populate", populate},
+                        {"license", license},
+                        {"orientation", orientation},
+                        {"page", StringLib.SafeString(page.ToString())},
+                        {"pageSize", StringLib.SafeString(pageSize.ToString())},
+                        {"sort", StringLib.SafeString(sort)},
+                        {"sortBy", sortBy},
+               });
+               SentrySdk.CaptureException(e);
+           });
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }

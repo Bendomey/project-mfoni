@@ -290,6 +290,15 @@ public class TagsController : ControllerBase
         [FromQuery] string orientation = "ALL"
     )
     {
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
+
         try
         {
             _logger.LogInformation("Getting tag contents");
@@ -309,7 +318,7 @@ public class TagsController : ControllerBase
             var outContent = new List<OutputContent>();
             foreach (var content in contents)
             {
-                outContent.Add(await _contentTransformer.Transform(content, populate: queryFilter.Populate));
+                outContent.Add(await _contentTransformer.Transform(content, populate: queryFilter.Populate, userId));
             }
             var response = HttpLib.GeneratePagination(
                 outContent,
@@ -342,6 +351,7 @@ public class TagsController : ControllerBase
                  scope.SetTags(new Dictionary<string, string>
                  {
                     {"action", "Get Contents from a Tag by slug"},
+                    {"userId", StringLib.SafeString(userId)},
                     {"tagSlug", slug},
                     {"page", StringLib.SafeString(page.ToString())},
                     {"pageSize", StringLib.SafeString(pageSize.ToString())},

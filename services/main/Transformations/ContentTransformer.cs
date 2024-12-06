@@ -61,8 +61,9 @@ public class ContentTransformer
 
         string media = content.Media.Location;
 
-        //  if content is free
-        if (content.Amount == 0 && content.BlurredMedia is not null)
+        //  always show the low quality version. we want to boost the speed of the app.
+        // Users will be able to download best quality when they request for it!
+        if (content.BlurredMedia is not null)
         {
             media = content.BlurredMedia.Location;
         }

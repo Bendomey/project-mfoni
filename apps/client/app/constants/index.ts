@@ -68,7 +68,7 @@ export const PAGES = {
     PHOTOS: '/:username',
     LIKES: '/:username/likes',
     COLLECTIONS: '/:username/collections',
-  }
+  },
 }
 
 // base64 1px png's generated from https://png-pixel.com/

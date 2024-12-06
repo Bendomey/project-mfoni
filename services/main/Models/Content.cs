@@ -48,7 +48,11 @@ public class Content
     public DateTime? DoneAt { get; set; }
 
     [BsonElement("visibility")]
-    public string Visibility { get; set; } = ContentVisibility.PUBLIC;
+    public string Visibility { get; set; } = ContentVisibility.PRIVATE;
+
+    // This is the visibility the user intended. Actual visibility will always be PRIVATE until the content is processed.
+    [BsonElement("intented_visibility")]
+    public string? IntendedVisibility { get; set; } = ContentVisibility.PRIVATE;
 
     [BsonElement("amount")]
     public Int64 Amount { get; set; } = 0; // Pesewas equivalent. 0 for free

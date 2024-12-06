@@ -7,6 +7,7 @@ using System.Text;
 using RabbitMQ.Client;
 using main.Lib;
 using NanoidDotNet;
+using System.Net;
 
 namespace main.Domains;
 
@@ -16,13 +17,17 @@ public class IndexContent
     private readonly ILogger<IndexContent> _logger;
     private readonly IMongoCollection<Content> _contentsCollection;
     private readonly IMongoCollection<Models.User> _userCollection;
+    private readonly IMongoCollection<Models.TagContent> _tagContentCollection;
     private readonly RabbitMQ.Client.IConnection _rabbitMqChannel;
+    private readonly CreatorService _creatorService;
     private readonly SaveTagsService _saveTagsService;
     private readonly CollectionService _collectionService;
     private readonly CollectionContentService _collectionContentService;
     private readonly AppConstants _appConstantsConfiguration;
 
-    public IndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants, SaveTagsService saveTagsService, CollectionService collectionService, CollectionContentService collectionContentService)
+    public IndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants, SaveTagsService saveTagsService, CollectionService collectionService, CollectionContentService collectionContentService,
+        CreatorService creatorService
+    )
     {
         _logger = logger;
 
@@ -30,6 +35,7 @@ public class IndexContent
 
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
         _userCollection = databaseConfig.Database.GetCollection<User>(appConstants.Value.UserCollection);
+        _tagContentCollection = databaseConfig.Database.GetCollection<TagContent>(appConstants.Value.TagContentCollection);
 
         _rabbitMqChannel = rabbitMQChannel.Channel;
 
@@ -40,33 +46,59 @@ public class IndexContent
         _collectionService = collectionService;
 
         _collectionContentService = collectionContentService;
+        _creatorService = creatorService;
 
         _logger.LogDebug("IndexContentService initialized");
     }
 
-    public List<Content> Save(SaveMedia[] mediaInput, CurrentUserOutput userInput)
+    public async Task<List<Content>> Save(SaveMedia[] mediaInput, CurrentUserOutput userInput)
     {
-        var user = _userCollection.Find(user => user.Id == userInput.Id).FirstOrDefault();
-        if (user is null)
+        var userInfo = await _creatorService.GetUserInfo(userInput.Id);
+
+        // =============== PERMISSIONS CHECK =============================
+        // check if user is a creator
+        if (userInfo.User.Role != UserRole.CREATOR || userInfo.CreatorSubscription is null)
         {
-            throw new HttpRequestException("UserNotFound");
+            throw new HttpRequestException("NotEnoughPermission", null, HttpStatusCode.Forbidden);
         }
 
-        // check if user is a creator
-        // TODO: work on enforcing in my next EPIC
-        // if (user.Role != UserRole.CREATOR)
-        // {
-        //     throw new HttpRequestException("NotEnoughPermission");
-        // }
+        var yourPermissions = PermissionsHelper.GetPermissionsForPackageType(userInfo.CreatorSubscription.PackageType);
+
+        if (!PermissionsHelper.Can(new CanInput
+        {
+            Action = Permissions.UploadContent,
+            Permissions = yourPermissions
+        }))
+        {
+            throw new HttpRequestException("NotEnoughPermission", null, HttpStatusCode.Forbidden);
+        }
+
+        var userUploadCollectionName = $"{userInfo.User.Id}::Uploads";
+        var userUploadCollectionSlug = $"{userInfo.User.Id}_uploads_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}";
+
+        var creatorUploadsCount = 0;
+        try
+        {
+            var uploadCollection = _collectionService.GetCollectionBySlug(userUploadCollectionSlug);
+            creatorUploadsCount = uploadCollection.ContentsCount;
+        }
+        catch (Exception) { }
+
+        if (creatorUploadsCount + mediaInput.Length > PermissionsHelper.GetNumberOfUploadsForPackageType(userInfo.CreatorSubscription.PackageType))
+        {
+            throw new HttpRequestException("UploadLimitReached", null, HttpStatusCode.Forbidden);
+        }
+
+        // =============== UPLOAD CONTENT =============================
 
         // resolve upload collection
         var collection = _collectionService.ResolveCollection(new SaveCollection
         {
-            Name = $"{user.Id}::Uploads",
-            Slug = $"{user.Name.ToLower().Replace(" ", "_")}_uploads_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}",
-            Description = $"{user.Name}'s collection for all their uploads",
+            Name = userUploadCollectionName,
+            Slug = userUploadCollectionSlug,
+            Description = $"{userInfo.User.Name}'s collection for all their uploads",
             CreatedByRole = CollectionCreatedByRole.USER,
-            CreatedById = user.Id
+            CreatedById = userInfo.User.Id,
         });
 
         if (collection is null)
@@ -78,30 +110,29 @@ public class IndexContent
 
         mediaInput.ToList().ForEach(media =>
         {
-            var tags = new List<string>();
+            // var tags = new List<string>();
             var dbTags = _saveTagsService.ResolveTags(media.Tags ?? [], userInput);
 
             var content = new Content
             {
                 Title = media.Title,
                 Slug = $"{media.Title.ToLower().Replace(" ", "_")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}",
-                Visibility = media.Visibility,
+                IntendedVisibility = media.Visibility,
                 Amount = MoneyLib.ConvertCedisToPesewas(Convert.ToInt64(media.Amount)),
                 Media = media.Content,
-                CreatedById = user.Id,
+                CreatedById = userInfo.User.Id,
             };
 
             _contentsCollection.InsertOne(content);
 
             // save tags
-            dbTags.ForEach(tag =>
+            var tagContents = dbTags.Select(tag => new Models.TagContent
             {
-                var tagContent = new Models.TagContent
-                {
-                    ContentId = content.Id,
-                    TagId = tag.Id
-                };
+                ContentId = content.Id,
+                TagId = tag.Id
             });
+
+            _tagContentCollection.InsertMany(tagContents);
 
             // create collection content
             _collectionContentService.SaveCollectionContent(new SaveCollectionContent
@@ -113,9 +144,6 @@ public class IndexContent
 
             contents.Add(content);
         });
-
-        // save count on collection
-        _collectionService.UpdateCollectionContentsCount(collection.Id, contents.Count);
 
         // push to queue for image processing
         using var channel = _rabbitMqChannel.CreateModel();

@@ -17,7 +17,7 @@ public class ProcessIndexContent
 
     private readonly ILogger<IndexContent> _logger;
     private readonly IMongoCollection<Content> _contentsCollection;
-    private readonly RabbitMQ.Client.IConnection _rabbitMqChannel;
+    private readonly IConnection _rabbitMqChannel;
     private readonly AppConstants _appConstantsConfiguration;
     private readonly IModel _model;
 
@@ -75,8 +75,16 @@ public class ProcessIndexContent
 
         if (content == null)
         {
-            // TODO  : send to sentry for triaging :)
             _logger.LogError($"Content with id:{contentId} not found");
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                    {"action", "Processing Content Failed"},
+                    {"contentId", contentId},
+               });
+               SentrySdk.CaptureException(new Exception($"Content with id:{contentId} not found"));
+           });
             return;
         }
 
@@ -85,16 +93,18 @@ public class ProcessIndexContent
             // get blurred image with watermark and save to s3 when its a premium content.
             if (content.Amount > 0)
             {
-                _logger.LogInformation("Creating blurred image with watermark...");
+                // TODO: reduce the quality of the image before saving to s3
                 await BlurImageAndSaveToS3(content);
-                _logger.LogInformation("Successfully created blurred image with watermark");
+            }
+            else
+            {
+                // TODO: reduce the quality of the image before saving to s3
             }
 
             // detect faces
             var detectFacesResponse = await DetectFaces(content);
 
             var faceDetailsLength = detectFacesResponse.FaceDetails.Count;
-            _logger.LogInformation($"facesDetected: {faceDetailsLength}");
 
             if (faceDetailsLength == 0)
             {
@@ -116,22 +126,38 @@ public class ProcessIndexContent
                     FaceId = faceRecord.Face.FaceId,
                 }).ToArray();
 
-                _logger.LogInformation($"FacesResolved: {faces}");
 
                 await SaveRekognitionContent(content.Id, faces);
                 return;
             }
         }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
         {
             _logger.LogError($"Error Occured: {ex.Message}");
             UpdateContentWithError(contentId, ex.Message);
-            // TODO: send to sentry for triaging :)
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error Occured: {ex.Message}");
+            UpdateContentWithError(contentId, "Something went wrong processing image. Please reach out to support");
+
+            // this is a critical error, send to sentry
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                    {"action", "Processing Content Failed"},
+                    {"contentId", contentId},
+               });
+               SentrySdk.CaptureException(ex);
+           });
         }
     }
 
     private async Task BlurImageAndSaveToS3(Content content)
     {
+
         try
         {
             // create watermark
@@ -200,12 +226,10 @@ public class ProcessIndexContent
                 var moderationLabels = response.ModerationLabels.Select(label => label.Name).ToArray();
                 var message = $"Nudity detected: {string.Join(",", moderationLabels)}";
                 _logger.LogInformation(message);
-                throw new Exception(message);
+                throw new HttpRequestException(message);
             }
-            else
-            {
-                _logger.LogInformation("No nudity detected, moving to next step");
-            }
+
+            _logger.LogInformation("No nudity detected, moving to next step");
         }
         catch (AmazonRekognitionException ex)
         {
@@ -278,8 +302,12 @@ public class ProcessIndexContent
 
     private async Task<bool> SaveRekognitionContent(string contentId, RekognitionMetaDataFaceData[] faceMetaData)
     {
+        var content = await _contentsCollection.Find(r => r.Id == contentId).FirstOrDefaultAsync();
+
         var filter = Builders<Content>.Filter.Eq(r => r.Id, contentId);
         var updates = Builders<Content>.Update
+            .Set(r => r.Visibility, content.IntendedVisibility)
+            .Unset(r => r.IntendedVisibility)
             .Set(r => r.Status, ContentStatus.DONE)
             .Set(r => r.DoneAt, DateTime.Now)
             .Set(r => r.UpdatedAt, DateTime.Now)
@@ -295,6 +323,8 @@ public class ProcessIndexContent
 
     private async Task<bool> UpdateContentWithNoProcess(string contentId, string message)
     {
+        var content = await _contentsCollection.Find(r => r.Id == contentId).FirstOrDefaultAsync();
+
         var filter = Builders<Content>.Filter.Eq(r => r.Id, contentId);
         var updates = Builders<Content>.Update
             .Set(r => r.RekognitionMetaData, new RekognitionMetaData
@@ -305,9 +335,12 @@ public class ProcessIndexContent
                     Message = message,
                 }
             })
+            .Set(r => r.Visibility, content.IntendedVisibility)
+            .Unset(r => r.IntendedVisibility)
             .Set(r => r.Status, ContentStatus.DONE)
             .Set(r => r.DoneAt, DateTime.Now)
             .Set(r => r.UpdatedAt, DateTime.Now);
+
         await _contentsCollection.UpdateOneAsync(filter, updates);
         return true;
     }
@@ -324,6 +357,7 @@ public class ProcessIndexContent
                     Message = message,
                 }
             })
+            .Unset(r => r.IntendedVisibility) // remove visibility and leave main visibility as private.
             .Set(r => r.Status, ContentStatus.REJECTED)
             .Set(r => r.RejectedAt, DateTime.Now)
             .Set(r => r.UpdatedAt, DateTime.Now);

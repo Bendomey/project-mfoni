@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react'
-
-
+import {useEffect, useState} from 'react'
 
 /**
  * This method validates a File (input) or an image URL
@@ -11,35 +9,35 @@ import { useEffect, useState } from 'react'
 export const validateImage = (
   src: string | File,
   config?: {
-    throw: boolean;
-  }
+    throw: boolean
+  },
 ): Promise<boolean | undefined> => {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     throw new Error(
-      "Cannot use this utility method in a non browser environment"
-    );
+      'Cannot use this utility method in a non browser environment',
+    )
   }
 
-  let url = "";
-  if (typeof src === "string") {
-    url = src;
+  let url = ''
+  if (typeof src === 'string') {
+    url = src
   } else {
-    url = URL.createObjectURL(src);
+    url = URL.createObjectURL(src)
   }
 
-  const image = new Image();
-  image.src = url;
+  const image = new Image()
+  image.src = url
 
   return new Promise((resolve, reject) => {
-    image.addEventListener("error", () =>
+    image.addEventListener('error', () =>
       config?.throw
-        ? reject("The media resource is either invalid, corrupt or unsuitable")
-        : resolve(false)
-    );
+        ? reject('The media resource is either invalid, corrupt or unsuitable')
+        : resolve(false),
+    )
 
-    image.addEventListener("load", () => resolve(true), false);
-  });
-};
+    image.addEventListener('load', () => resolve(true), false)
+  })
+}
 
 export const useValidateImage = (imageUrl: string) => {
   const [imageIsValid, setImageIsValid] = useState(false)
@@ -59,5 +57,5 @@ export const useValidateImage = (imageUrl: string) => {
     }
   }, [imageUrl])
 
-  return (imageIsValid)
+  return imageIsValid
 }
