@@ -56,6 +56,7 @@ export const CreatorApplication = () => {
         header: ({ column }) => {
           return (
             <Button
+            className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
@@ -75,6 +76,7 @@ export const CreatorApplication = () => {
         header: ({ column }) => {
           return (
             <Button
+            className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
@@ -94,6 +96,7 @@ export const CreatorApplication = () => {
         header: ({ column }) => {
           return (
             <Button
+            className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
@@ -147,7 +150,7 @@ export const CreatorApplication = () => {
                   setOpenRejectModal(true)
                 }}><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>  
                 </>
-   ): null }           
+              ): null }           
               </DropdownMenuContent>
             </DropdownMenu>
           )
@@ -167,7 +170,7 @@ export const CreatorApplication = () => {
             </p>
           </div>
         </div>
-
+{/* 
         <DataTable
           columns={columns}
           data={data?.rows ?? []}
@@ -176,7 +179,7 @@ export const CreatorApplication = () => {
             error ? new Error("Can't fetch Creator Applications") : undefined
           }
           refetch={refetch}
-        />
+        /> */}
       </div>
       <ViewApplicationModal opened={openViewModal} setOpened={setOpenViewModal} data={selectedApplication} refetch={refetch}/>
       <ApproveApplicationModal opened={openApproveModal} setOpened={setOpenApproveModal} data={selectedApplication} refetch={refetch}/>
