@@ -1,17 +1,17 @@
+/* eslint-disable no-negated-condition */
 import {
   ShareIcon,
   UserIcon,
   CheckIcon,
   ArchiveBoxIcon,
 } from '@heroicons/react/24/outline'
-import {Button} from '@/components/button/index.tsx'
-import {useAuth} from '@/providers/auth/index.tsx'
-import {useValidateImage} from '@/hooks/use-validate-image.tsx'
-import {useAccountContext} from '../context/index.tsx'
-import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
-import {classNames} from '@/lib/classNames.ts'
-import {MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
-import {Image} from 'remix-image'
+import { Button } from '@/components/button/index.tsx'
+import { useAuth } from '@/providers/auth/index.tsx'
+import { useValidateImage } from '@/hooks/use-validate-image.tsx'
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import { classNames } from '@/lib/classNames.ts'
+import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
+import { Image } from 'remix-image'
 
 export const profile = {
   name: 'Ricardo Cooper',
@@ -44,7 +44,7 @@ interface Props {
   application: CreatorApplication
 }
 
-function CreatorApplicationBanner({application}: Props) {
+function CreatorApplicationBanner({ application }: Props) {
   const color = application.status === 'SUBMITTED' ? 'yellow' : 'red'
   return (
     <div className={classNames(`rounded-md bg-${color}-50 p-4`)}>
@@ -84,13 +84,12 @@ function CreatorApplicationBanner({application}: Props) {
 }
 
 export const AccountCover = () => {
-  const {currentUser} = useAuth()
-  const {activeCreatorApplication} = useAccountContext()
+  const { currentUser, activeCreatorApplication } = useAuth()
   const isProfilePhotoValid = useValidateImage(currentUser?.photo ?? '')
   const initials = getNameInitials(currentUser?.name ?? '')
 
-  const isAccountNotVerified = Boolean(
-    !currentUser?.emailVerifiedAt || !currentUser.phoneNumberVerifiedAt,
+  const isAccountVerified = Boolean(
+    currentUser?.emailVerifiedAt && currentUser.phoneNumberVerifiedAt,
   )
 
   return (
@@ -159,9 +158,9 @@ export const AccountCover = () => {
               ) : null}
             </div>
             {activeCreatorApplication &&
-            ['SUBMITTED', 'REJECTED'].includes(
-              activeCreatorApplication.status,
-            ) ? (
+              ['SUBMITTED', 'REJECTED'].includes(
+                activeCreatorApplication.status,
+              ) ? (
               <div className="my-5">
                 <CreatorApplicationBanner
                   application={{
@@ -185,7 +184,7 @@ export const AccountCover = () => {
                 <ShareIcon className="mr-3 h-5 w-5 " aria-hidden="true" />
                 Share
               </Button>
-              {isAccountNotVerified ? (
+              {isAccountVerified ? null : (
                 <Button
                   isLink
                   href="/account/verify"
@@ -195,7 +194,9 @@ export const AccountCover = () => {
                 >
                   <CheckIcon className="h-5 w-auto mr-2" /> Verify Account
                 </Button>
-              ) : activeCreatorApplication &&
+              )}
+
+              {activeCreatorApplication &&
                 Boolean(activeCreatorApplication.status === 'PENDING') ? (
                 <Button
                   isLink
@@ -207,8 +208,9 @@ export const AccountCover = () => {
                   <CheckIcon className="h-5 w-auto mr-2" /> Complete Creator
                   Application
                 </Button>
-              ) : // eslint-disable-next-line no-negated-condition
-              !activeCreatorApplication ? (
+              ) : null}
+
+              {currentUser?.role === "CREATOR" || activeCreatorApplication ? null : (
                 <Button
                   isLink
                   href="/account?complete-creator-application=true"
@@ -218,7 +220,7 @@ export const AccountCover = () => {
                 >
                   Become a Creator
                 </Button>
-              ) : null}
+              )}
             </div>
           </div>
         </div>

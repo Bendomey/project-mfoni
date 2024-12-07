@@ -1,13 +1,9 @@
-import {useGetActiveCreatorApplication} from '@/api/creator-applications/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useMemo} from 'react'
 
 export function NoticeBanner() {
-  const {isLoggedIn, currentUser} = useAuth()
-  const {data: activeCreatorApplcation} = useGetActiveCreatorApplication({
-    enabled: isLoggedIn,
-  })
+  const {currentUser, activeCreatorApplication} = useAuth()
 
   const {showHeader, continueCreatorApplication, verifyAccount} =
     useMemo(() => {
@@ -23,8 +19,8 @@ export function NoticeBanner() {
         }
       }
 
-      if (activeCreatorApplcation) {
-        if (activeCreatorApplcation.status === 'PENDING') {
+      if (activeCreatorApplication) {
+        if (activeCreatorApplication.status === 'PENDING') {
           return {
             showHeader: true,
             continueCreatorApplication: true,
@@ -35,7 +31,7 @@ export function NoticeBanner() {
       return {
         showHeader: false,
       }
-    }, [activeCreatorApplcation, currentUser])
+    }, [activeCreatorApplication, currentUser])
 
   if (!showHeader) return null
 

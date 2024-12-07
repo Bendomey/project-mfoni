@@ -1,5 +1,6 @@
-import {USER_CIPHER} from '@/constants/index.ts'
-import {auth} from '@/lib/cookies.config.ts'
+import { useGetActiveCreatorApplication } from '@/api/creator-applications/index.ts'
+import { USER_CIPHER } from '@/constants/index.ts'
+import { auth } from '@/lib/cookies.config.ts'
 import {
   type PropsWithChildren,
   createContext,
@@ -14,20 +15,21 @@ interface AuthContextProps {
   currentUser: User | null
   getToken: () => Nullable<string>
   onUpdateUser: (user: User) => void
-  onSignin: (input: {user: User; token: string}) => void
+  onSignin: (input: { user: User; token: string }) => void
   onSignout: () => void
   isNotVerified: boolean
   activeSubcription?: CreatorSubscription
+  activeCreatorApplication?: CreatorApplication
 }
 
 export const AuthContext = createContext<AuthContextProps>({
   isLoading: false,
   isLoggedIn: false,
-  onSignin: () => {},
-  onSignout: () => {},
+  onSignin: () => { },
+  onSignout: () => { },
   getToken: () => null,
   currentUser: null,
-  onUpdateUser: () => {},
+  onUpdateUser: () => { },
   isNotVerified: false,
 })
 
@@ -40,11 +42,16 @@ export const AuthProvider = ({
   authData,
 }: PropsWithChildren<Props>) => {
   const authCipher = auth.getCipher(USER_CIPHER)
+  const isLoggedIn = Boolean(authCipher);
   const [currentUser, setCurrentUser] = useState<User | null>(() => authData)
+
+  const { data: activeCreatorApplication } = useGetActiveCreatorApplication({
+    enabled: isLoggedIn && currentUser?.role === "CLIENT",
+  })
 
   const authController = useMemo(
     () => ({
-      onSignin: ({user, token}: {user: User; token: string}) => {
+      onSignin: ({ user, token }: { user: User; token: string }) => {
         setCurrentUser(user)
         auth.setCipher(USER_CIPHER, token)
       },
@@ -78,6 +85,7 @@ export const AuthProvider = ({
         isNotVerified:
           !currentUser?.phoneNumberVerifiedAt || !currentUser.emailVerifiedAt,
         activeSubcription,
+        activeCreatorApplication,
       }}
     >
       {children}
