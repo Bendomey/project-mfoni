@@ -36,7 +36,7 @@ export function OtherCreators() {
       </h3>
       <ul className="grid grid-cols-1 gap-2 mt-3">
         {people.map(person => (
-          <li key={person.name} className="rounded-md border p-4 ">
+          <li key={person.name} className="rounded-md border p-4 bg-white">
             <div className="flex items-center gap-2 ">
               <Image
                 alt=""

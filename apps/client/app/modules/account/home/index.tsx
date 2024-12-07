@@ -6,11 +6,13 @@ import {UserTimeline} from './components/timeline.tsx'
 import {OtherCreators} from './components/other-creators.tsx'
 import {Contents} from './components/content.tsx'
 import {QuickActions} from './components/quick-actions.tsx'
-import {AccountProvider} from './context/index.tsx'
 import {CreatorApplicationModal} from './components/creator-application-modal/index.tsx'
 import {useSearchParams} from '@remix-run/react'
+import {CreatorAbout} from './components/about.tsx'
+import {useAuth} from '@/providers/auth/index.tsx'
 
-const AccountModuleComponent = () => {
+export const AccountModule = () => {
+  const {currentUser} = useAuth()
   const [searchParams] = useSearchParams()
 
   const completeCreatorApplicationParam = searchParams.get(
@@ -27,7 +29,13 @@ const AccountModuleComponent = () => {
       <div className="grid grid-cols-8 gap-3 px-4 lg:px-8 bg-gray-50 pt-4 pb-16">
         <div className="col-span-8 lg:col-span-6 flex flex-col gap-y-8">
           <AccountCover />
-          <CreatorAnalytics />
+
+          {currentUser?.role === 'CREATOR' ? (
+            <>
+              <CreatorAbout />
+              <CreatorAnalytics />
+            </>
+          ) : null}
           <Contents />
         </div>
         <div className="col-span-2 flex flex-col gap-y-10">
@@ -41,13 +49,5 @@ const AccountModuleComponent = () => {
         isOpened={isCompleteCreatorApplicationModalOpened}
       />
     </>
-  )
-}
-
-export const AccountModule = () => {
-  return (
-    <AccountProvider>
-      <AccountModuleComponent />
-    </AccountProvider>
   )
 }

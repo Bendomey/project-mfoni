@@ -42,7 +42,7 @@ public class Creator
 public class SocialMedia
 {
     [BsonElement("platform")]
-    public required string Platform { get; set; } // FACEBOOK | TWITTER | GOOGLE | INSTAGRAM | YOUTUBE
+    public required string Platform { get; set; } // FACEBOOK | TWITTER | GOOGLE | INSTAGRAM | YOUTUBE | WEBSITE
 
     [BsonElement("handle")]
     public required string Handle { get; set; }

@@ -21,7 +21,6 @@ import {
   useSubmitCreatorApplication,
   useUpdateCreatorApplication,
 } from '@/api/creator-applications/index.ts'
-import {useAccountContext} from '@/modules/account/home/context/index.tsx'
 import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {Loader} from '@/components/loader/index.tsx'
@@ -46,8 +45,7 @@ export interface IImageType {
 }
 
 export function CreatorApplicationModal({isOpened}: Props) {
-  const {isNotVerified, currentUser} = useAuth()
-  const {activeCreatorApplication} = useAccountContext()
+  const {isNotVerified, currentUser, activeCreatorApplication} = useAuth()
   const {
     mutateAsync: creatorCreatorApplication,
     isPending: isCreatingApplication,
