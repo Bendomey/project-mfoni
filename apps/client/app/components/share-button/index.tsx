@@ -3,15 +3,21 @@ import {ShareIcon} from '@heroicons/react/16/solid'
 import {EnvelopeIcon, LinkIcon} from '@heroicons/react/24/outline'
 import {Button} from '../button/index.tsx'
 
-export function ShareButton() {
+interface Props {
+  button?: any
+}
+
+export function ShareButton({button}: Props) {
   return (
     <Menu as="div" className="relative">
       <div>
         <MenuButton>
-          <Button variant="outlined">
-            <ShareIcon className="size-4 fill-current mr-2" />
-            Share
-          </Button>
+          {button ?? (
+            <Button variant="outlined">
+              <ShareIcon className="size-4 fill-current mr-2" />
+              Share
+            </Button>
+          )}
         </MenuButton>
       </div>
       <MenuItems

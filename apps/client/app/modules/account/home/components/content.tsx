@@ -40,7 +40,7 @@ const tabs = [
     current: false,
     icon: RectangleStackIcon,
   },
-  {name: 'Bookmarks', href: '#', count: '4', current: false, icon: HeartIcon},
+  {name: 'Likes', href: '#', count: '4', current: false, icon: HeartIcon},
 ]
 
 function Tabs() {
