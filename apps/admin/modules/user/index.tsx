@@ -23,6 +23,8 @@ import { useGetUsers } from "@/api";
 import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
 
+const USERS_PER_PAGE = 50;
+
 export const ListUsers = () => {
   const [openViewModal, setOpenViewModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User>();
@@ -33,12 +35,18 @@ export const ListUsers = () => {
   const search = searchParams.get("search");
   const userFilter = searchParams.get("status");
 
+  const currentPage = parseInt(page ? (page as string) : "1", 10);
+
   const {
     data,
     isPending: isDataLoading,
     refetch,
     error,
   } = useGetUsers({
+    pagination: {
+      page: currentPage,
+      per: USERS_PER_PAGE,
+    },
     search: {
       fields: ["name"],
       query: search || undefined,
@@ -70,6 +78,26 @@ export const ListUsers = () => {
           );
         },
         cell: ({ row }) => <div className="lowercase">{row.original.name}</div>,
+      },
+      {
+        accessorKey: "role",
+        header: ({ column }) => {
+          return (
+            <Button
+            className="pl-0"
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+            Role
+              <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+        cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("role")}</div>
+        ),
       },
       {
         accessorKey: "email",
@@ -138,10 +166,10 @@ export const ListUsers = () => {
         ),
       },
       {
-        accessorKey: "updatedAt",
-        header: "Updated At",
+        accessorKey: "createdAt",
+        header: "Created At",
         cell: ({ row }) => (
-          localizedDayjs(row.getValue("updatedAt")).format("DD/MM/YYYY hh:mm a")
+          localizedDayjs(row.getValue("createdAt")).format("DD/MM/YYYY")
         ),
       },
       {
@@ -186,11 +214,18 @@ export const ListUsers = () => {
         </div>
 
         <DataTable
+        boxHeight={75}
           columns={columns}
           data={data?.rows ?? []}
           isDataLoading={isDataLoading}
           error={error ? new Error("Can't fetch users") : undefined}
           refetch={refetch}
+          dataMeta={{
+            total: data?.total ?? 0,
+            page: currentPage,
+            pageSize: USERS_PER_PAGE,
+            totalPages: data?.totalPages ?? 1,
+          }}
         />
       </div>
     </>

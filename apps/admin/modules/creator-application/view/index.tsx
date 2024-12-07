@@ -114,6 +114,8 @@ export const ViewApplicationModal = ({
               Close
             </Button>
           </DialogClose>
+
+          {data?.status === "SUBMITTED" ? (
           <div className="flex  gap-3">
             <Button
               type="button"
@@ -130,6 +132,7 @@ export const ViewApplicationModal = ({
               Approve
             </Button>
           </div>
+          ): null}
         </DialogFooter>
       </DialogContent>
     </Dialog>

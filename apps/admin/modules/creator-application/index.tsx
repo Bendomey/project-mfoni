@@ -21,6 +21,7 @@ import { useSearchParams } from "next/navigation";
 import { ViewApplicationModal } from "./view";
 import { localizedDayjs } from "@/lib/date";
 
+const CREATOR_APPLICATION_PER_PAGE = 50;
 
 export const CreatorApplication = () => {
   const [openApproveModal, setOpenApproveModal] = useState(false)
@@ -34,8 +35,13 @@ export const CreatorApplication = () => {
   const search = searchParams.get('search');
   const creatorApplicationFilter = searchParams.get('status');
 
+  const currentPage = parseInt(page ? (page as string) : "1", 10);
 
   const {data, isPending: isDataLoading, refetch, error} = useGetCreatorApplications({
+    pagination: {
+      page: currentPage,
+      per: CREATOR_APPLICATION_PER_PAGE,
+    },
     search: {
       fields: ['firstName'],
       query:  search || undefined,
@@ -56,6 +62,7 @@ export const CreatorApplication = () => {
         header: ({ column }) => {
           return (
             <Button
+            className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
@@ -75,6 +82,7 @@ export const CreatorApplication = () => {
         header: ({ column }) => {
           return (
             <Button
+            className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
@@ -94,6 +102,7 @@ export const CreatorApplication = () => {
         header: ({ column }) => {
           return (
             <Button
+            className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
@@ -135,14 +144,19 @@ export const CreatorApplication = () => {
                       setSelectedApplication(row.original)
                       setOpenViewModal(true)
                     }}><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
+               {row.original.status === "SUBMITTED" ? (
+                <>
                 <DropdownMenuItem  onClick={() => {
-                      setSelectedApplication(row.original)
-                      setOpenApproveModal(true)
-                    }}><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
+                  setSelectedApplication(row.original)
+                  setOpenApproveModal(true)
+                }}><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
+                    
                 <DropdownMenuItem onClick={() => {
-                      setSelectedApplication(row.original)
-                      setOpenRejectModal(true)
-                    }}><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>             
+                  setSelectedApplication(row.original)
+                  setOpenRejectModal(true)
+                }}><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>  
+                </>
+              ): null }           
               </DropdownMenuContent>
             </DropdownMenu>
           )
@@ -171,6 +185,12 @@ export const CreatorApplication = () => {
             error ? new Error("Can't fetch Creator Applications") : undefined
           }
           refetch={refetch}
+          dataMeta={{
+            total: data?.total ?? 0,
+            page: currentPage,
+            pageSize: CREATOR_APPLICATION_PER_PAGE,
+            totalPages: data?.totalPages ?? 1,
+          }}
         />
       </div>
       <ViewApplicationModal opened={openViewModal} setOpened={setOpenViewModal} data={selectedApplication} refetch={refetch}/>

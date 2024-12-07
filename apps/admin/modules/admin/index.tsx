@@ -24,6 +24,8 @@ import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
 import _ from "lodash";
 
+const ADMINS_PER_PAGE = 50;
+
 export const ListAdmins = () => {
   const [openViewModal, setOpenViewModal] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<Admin>();
@@ -34,12 +36,18 @@ export const ListAdmins = () => {
   const search = searchParams.get("search");
   const adminFilter = searchParams.get("status");
 
+  const currentPage = parseInt(page ? (page as string) : "1", 10);
+
   const {
     data,
     isPending: isDataLoading,
     refetch,
     error,
   } = useGetAdmins({
+    pagination: {
+      page: currentPage,
+      per: ADMINS_PER_PAGE,
+    },
     search: {
       fields: ["name"],
       query: search || undefined,
@@ -163,6 +171,12 @@ export const ListAdmins = () => {
           isDataLoading={isDataLoading}
           error={error ? new Error("Can't fetch administrators") : undefined}
           refetch={refetch}
+          dataMeta={{
+            total: data?.total ?? 0,
+            page: currentPage,
+            pageSize: ADMINS_PER_PAGE,
+            totalPages: data?.totalPages ?? 1,
+          }}
         />
       </div>
     </>

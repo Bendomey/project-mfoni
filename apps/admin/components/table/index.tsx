@@ -35,14 +35,23 @@ import {
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { LoadingContainer } from "../LoadingContainer";
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
+  /** An array of data to be displayed. Should default to [] if no data is passed. */
   data: TData[];
   boxHeight?: number;
+  /** Tells whether data is being fetched or not. */
   isDataLoading?: boolean;
   error?: Error;
+  /**
+ * Function to trigger a refetch of data.
+ * When not passed, you won't see button to help trigger refetch.
+ */
   refetch?: () => void;
+  dataMeta: PaginationDataMeta;
+  /** React Table Columns array passed. */
 }
 
 export function DataTable<TData, TValue>({
@@ -51,12 +60,79 @@ export function DataTable<TData, TValue>({
   boxHeight = 65,
   isDataLoading = false,
   error,
+  dataMeta,
   refetch,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+
+  const [pageIndex, setPageIndex] = React.useState(0);
+  const [pageSize, setPageSize] = React.useState(10);
+  const [dataPerPage, setDataPerPage] = React.useState<number>(dataMeta.pageSize);
+
+  const totalPages = Math.ceil(dataMeta.total / pageSize);  
+
+  const router = useRouter()
+  const searchParams = useSearchParams();
+
+  const apiPageChange = (direction: "next" | "previous" | "first" | "last", page?: number) => {
+      const params = new URLSearchParams(searchParams);
+      const pageNumber = page !== undefined ? page : direction === "next" ? (dataMeta.page + 1) : dataMeta.page -1
+      params.set("page", (pageNumber.toString()));
+      router.push(`?${params.toString()}`);
+  }
+
+  const changePage = (direction: "next" | "previous" | "first" | "last") => {  
+    let newPageIndex, isApiFetchNeeded, pageThreshold;
+    let pageNumber = 0;
+    
+    // Calculate the new page index based on the direction
+    switch (direction) {
+      case "next":
+        newPageIndex = Math.min(pageIndex + 1, totalPages - 1);
+        pageThreshold = newPageIndex * pageSize;
+        isApiFetchNeeded = pageThreshold >= dataPerPage
+        if (isApiFetchNeeded){setDataPerPage(dataPerPage + dataMeta.pageSize); apiPageChange(direction)}
+        break;
+      case "previous":
+        newPageIndex = Math.max(pageIndex - 1, 0);
+        pageThreshold = newPageIndex * pageSize
+        isApiFetchNeeded = pageThreshold < dataPerPage - dataMeta.pageSize
+        if (isApiFetchNeeded){ setDataPerPage(dataPerPage - dataMeta.pageSize); apiPageChange(direction)}
+        break;
+      case "first":
+        newPageIndex = 0;
+        isApiFetchNeeded = dataMeta.pageSize !== dataPerPage
+        pageNumber = isApiFetchNeeded ? 1 : 0
+        if (isApiFetchNeeded) {setDataPerPage(dataMeta.pageSize); apiPageChange(direction, pageNumber)}
+        break;
+      case "last":
+        newPageIndex = totalPages - 1;
+        isApiFetchNeeded =  dataPerPage !==  (dataMeta.totalPages) * dataMeta.pageSize
+        pageNumber = isApiFetchNeeded 
+        ? Math.floor((newPageIndex * pageSize) / dataMeta.pageSize) + 1 
+        : 0;
+        if (isApiFetchNeeded){ setDataPerPage(dataMeta.totalPages === 1 ? 1 : (dataMeta.totalPages* dataMeta.pageSize)); apiPageChange(direction, pageNumber)}
+        break;
+      default:
+        newPageIndex = pageIndex;
+    }
+
+    // Prevent invalid page navigation (below first page or above max page count)
+    if (newPageIndex < 0 || newPageIndex >= totalPages) return;
+    
+    setPageIndex(newPageIndex);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    // Ensure pageIndex is within range
+    const adjustedPageIndex = Math.min(pageIndex, Math.ceil(dataMeta.total / newPageSize) - 1); 
+  
+    setPageSize(newPageSize); // Update the page size
+    setPageIndex(adjustedPageIndex); // Adjust pageIndex if needed
+  };
 
   const table = useReactTable({
     data,
@@ -67,11 +143,18 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    pageCount: totalPages,
     state: {
       sorting,
       columnFilters,
+      pagination: {
+        pageIndex, // Current page index
+        pageSize, // Rows per page
+      },
     },
   });
+
+
 
   return (
     <>
@@ -176,25 +259,24 @@ export function DataTable<TData, TValue>({
 
           <div className="flex pt-4 items-center justify-between px-2">
             <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
+            Showing rows {pageIndex * pageSize + 1} - {Math.min((pageIndex + 1) * pageSize, dataMeta.total)} of {dataMeta.total} rows
             </div>
             <div className="flex items-center space-x-6 lg:space-x-8">
               <div className="flex items-center space-x-2">
                 <p className="text-sm font-medium">Rows per page</p>
                 <Select
-                  value={`${table.getState().pagination.pageSize}`}
+                  value={`${pageSize}`}
                   onValueChange={(value) => {
-                    table.setPageSize(Number(value));
+                    handlePageSizeChange(Number(value))
                   }}
                 >
                   <SelectTrigger className="h-8 w-[70px]">
                     <SelectValue
-                      placeholder={table.getState().pagination.pageSize}
+                      placeholder={pageSize}
                     />
                   </SelectTrigger>
                   <SelectContent side="top">
-                    {[10, 20, 30, 40, 50].map((pageSize) => (
+                    {[10, 25,50].map((pageSize) => (
                       <SelectItem key={pageSize} value={`${pageSize}`}>
                         {pageSize}
                       </SelectItem>
@@ -203,14 +285,14 @@ export function DataTable<TData, TValue>({
                 </Select>
               </div>
               <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                Page {table.getState().pagination.pageIndex + 1} of{" "}
-                {table.getPageCount()}
+                Page {pageIndex + 1} of{" "}
+                {totalPages}
               </div>
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
                   className="hidden h-8 w-8 p-0 lg:flex"
-                  onClick={() => table.setPageIndex(0)}
+                  onClick={() =>  changePage("first")}
                   disabled={!table.getCanPreviousPage()}
                 >
                   <span className="sr-only">Go to first page</span>
@@ -219,7 +301,7 @@ export function DataTable<TData, TValue>({
                 <Button
                   variant="outline"
                   className="h-8 w-8 p-0"
-                  onClick={() => table.previousPage()}
+                  onClick={() => changePage("previous")}
                   disabled={!table.getCanPreviousPage()}
                 >
                   <span className="sr-only">Go to previous page</span>
@@ -228,7 +310,7 @@ export function DataTable<TData, TValue>({
                 <Button
                   variant="outline"
                   className="h-8 w-8 p-0"
-                  onClick={() => table.nextPage()}
+                  onClick={() => changePage("next")}
                   disabled={!table.getCanNextPage()}
                 >
                   <span className="sr-only">Go to next page</span>
@@ -237,7 +319,7 @@ export function DataTable<TData, TValue>({
                 <Button
                   variant="outline"
                   className="hidden h-8 w-8 p-0 lg:flex"
-                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  onClick={() => changePage("last")}
                   disabled={!table.getCanNextPage()}
                 >
                   <span className="sr-only">Go to last page</span>

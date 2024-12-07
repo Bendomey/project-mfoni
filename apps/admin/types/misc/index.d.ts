@@ -30,7 +30,7 @@ interface FetchMultipleDataInputParams<FilterT> {
   
 interface FetchMultipleDataResponse<T> {
     rows: T[]
-    count: number
+    total: number
     page: number
     pageSize: number
     totalPages: number
