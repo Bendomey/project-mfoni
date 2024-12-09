@@ -1,13 +1,16 @@
-import { classNames } from '@/lib/classNames.ts'
-import { Transition } from '@headlessui/react'
-import { useCallback, useMemo, useState } from 'react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import {classNames} from '@/lib/classNames.ts'
+import {Transition} from '@headlessui/react'
+import {useCallback, useMemo, useState} from 'react'
+import {MagnifyingGlassIcon} from '@heroicons/react/20/solid'
 import OutsideListener from '@/components/outside-listener/index.tsx'
-import { useGetTags } from '@/api/tags/index.ts'
-import { Loader } from '@/components/loader/index.tsx'
-import { InformationCircleIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
-import { getMatchingStrings } from '@/lib/strings.ts'
-import { useDebouncedState } from '@/hooks/use-debounce.ts'
+import {useGetTags} from '@/api/tags/index.ts'
+import {Loader} from '@/components/loader/index.tsx'
+import {
+  InformationCircleIcon,
+  PlusCircleIcon,
+} from '@heroicons/react/24/outline'
+import {getMatchingStrings} from '@/lib/strings.ts'
+import {useDebouncedState} from '@/hooks/use-debounce.ts'
 
 interface Props {
   tags: StringList
@@ -23,7 +26,7 @@ export function TagsPicker({
     delay: 500,
   })
 
-  const { data, isPending } = useGetTags({
+  const {data, isPending} = useGetTags({
     pagination: {
       per: 10,
       page: 0,
@@ -153,6 +156,7 @@ export function TagsPicker({
                     </div>
                   ))
                 ) : null
+              ) : (
                 // ) : (
                 //   <span className="mx-4 my-2 gap-2 inline-flex items-center rounded-md bg-yellow-50 px-2 py-2 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-700/10">
                 //     <InformationCircleIcon className="h-5 w-auto text-yellow-700" />
@@ -161,7 +165,6 @@ export function TagsPicker({
                 //     </span>
                 //   </span>
                 // )
-              ) : (
                 <span className="mx-4 my-2 gap-2 inline-flex items-center rounded-md bg-pink-50 px-2 py-2 text-xs font-medium text-pink-700 ring-1 ring-inset ring-pink-700/10">
                   <InformationCircleIcon className="h-5 w-auto text-red-700" />
                   <span className="text-sm text-gray-600">

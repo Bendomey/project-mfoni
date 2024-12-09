@@ -22,7 +22,7 @@ import {
   useIsSubscriptionPendingDowngrade,
 } from '@/api/subscriptions/index.ts'
 import {safeString} from '@/lib/strings.ts'
-import { errorToast } from '@/lib/custom-toast-functions.tsx'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
   isOpened: boolean

@@ -2,7 +2,7 @@ import {useCancelSubscription} from '@/api/subscriptions/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {Modal} from '@/components/modal/index.tsx'
 import {PAGES} from '@/constants/index.ts'
-import { errorToast } from '@/lib/custom-toast-functions.tsx'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
 import dayjs from 'dayjs'
 import {useState} from 'react'
 

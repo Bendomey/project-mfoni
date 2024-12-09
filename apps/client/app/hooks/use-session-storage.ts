@@ -7,7 +7,7 @@ import {
 } from 'react'
 import {useEventListener} from './use-event-listener.ts'
 import {useEventCallback} from './use-event-callback.ts'
-import { isSSR } from '@/lib/is-browser.ts'
+import {isSSR} from '@/lib/is-browser.ts'
 
 declare global {
   interface WindowEventMap {

@@ -4,11 +4,11 @@ import {
   MapPinIcon,
   GlobeAltIcon,
 } from '@heroicons/react/24/outline'
-import { Button } from '@/components/button/index.tsx'
-import { Image } from 'remix-image'
-import { Link } from '@remix-run/react'
-import { PAGES } from '@/constants/index.ts'
-import { useValidateImage } from '@/hooks/use-validate-image.tsx'
+import {Button} from '@/components/button/index.tsx'
+import {Image} from 'remix-image'
+import {Link} from '@remix-run/react'
+import {PAGES} from '@/constants/index.ts'
+import {useValidateImage} from '@/hooks/use-validate-image.tsx'
 
 const profile = {
   name: 'Ricardo Cooper',

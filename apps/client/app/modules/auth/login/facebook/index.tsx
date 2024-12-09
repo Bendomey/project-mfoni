@@ -7,7 +7,7 @@ import {useLoginAuth} from '../context/index.tsx'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useEnvContext} from '@/providers/env/index.tsx'
-import { successToast } from '@/lib/custom-toast-functions.tsx'
+import {successToast} from '@/lib/custom-toast-functions.tsx'
 
 declare global {
   interface Window {

@@ -6,7 +6,7 @@ import {
 } from '@remix-run/node'
 import styles from '@/modules/account/verify/components/verify-phone-step/pin-code.css'
 import {protectRouteLoader} from '@/lib/actions/protect-route-loader.ts'
-import { environmentVariables } from '@/lib/actions/env.server.ts'
+import {environmentVariables} from '@/lib/actions/env.server.ts'
 
 export const meta: MetaFunction = () => {
   return [

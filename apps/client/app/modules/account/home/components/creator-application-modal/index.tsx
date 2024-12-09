@@ -28,7 +28,7 @@ import {MFONI_PACKAGES, MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
 import {Image} from 'remix-image'
-import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
+import {errorToast, successToast} from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
   isOpened: boolean

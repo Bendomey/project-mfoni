@@ -9,7 +9,7 @@ import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useEffect} from 'react'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {Loader} from '@/components/loader/index.tsx'
-import { errorToast } from '@/lib/custom-toast-functions.tsx'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
 
 const schema = Yup.object().shape({
   emailAddress: Yup.string()

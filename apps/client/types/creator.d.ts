@@ -33,7 +33,6 @@ interface CreatorSocialMedia {
   handle: string
 }
 
-
 interface BasicCreator {
   id: string
   name: string

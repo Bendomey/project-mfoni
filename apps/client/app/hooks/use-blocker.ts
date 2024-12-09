@@ -13,9 +13,9 @@ export function useBlocker(isDirty: boolean) {
         event.preventDefault()
 
         /**
-         * Note: `returnValue` is a legacy feature, and best practice is to trigger the dialog 
-         * by invoking Event.preventDefault() on the BeforeUnloadEvent object, 
-         * while also setting `returnValue` to support legacy cases. See the beforeunload event 
+         * Note: `returnValue` is a legacy feature, and best practice is to trigger the dialog
+         * by invoking Event.preventDefault() on the BeforeUnloadEvent object,
+         * while also setting `returnValue` to support legacy cases. See the beforeunload event
          * reference for detailed up-to-date guidance.
          */
         event.returnValue =

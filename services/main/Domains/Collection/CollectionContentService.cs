@@ -69,7 +69,7 @@ public class CollectionContentService
         };
 
         _collectionContentCollection.InsertOne(collection);
-        
+
         _collectionService.UpdateCollectionContentsCount(input.CollectionId, 1);
 
         return collection;

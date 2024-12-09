@@ -1,20 +1,27 @@
 /* eslint-disable no-await-in-loop */
-import { useContext, createContext, useState, useCallback, useMemo, useEffect } from 'react'
-import { useDropzone, type FileRejection } from 'react-dropzone-esm'
-import { acceptFile, getErrorMessageForRejectedFiles } from './utils.ts'
-import { v4 } from 'uuid'
-import { getImageOrientation, megabytesToBytes } from '@/lib/image-fns.ts'
-import { Header } from '@/components/layout/index.ts'
-import { ContentManager } from './components/contents-manager.tsx'
-import { ContentUploader } from './components/content-uploader.tsx'
-import { BlockUploadDialog } from './components/block-upload-dialog.tsx'
-import { useGetCollectionBySlug } from '@/api/collections/index.ts'
-import { useAuth } from '@/providers/auth/index.tsx'
-import { getPackageUploadLimit } from '@/lib/pricing-lib.ts'
-import { errorToast } from '@/lib/custom-toast-functions.tsx'
-import { useActionData, useNavigation } from '@remix-run/react'
-import { BlockNavigationDialog } from '@/components/block-navigation-dialog.tsx'
-import { useBlocker } from '@/hooks/use-blocker.ts'
+import {
+  useContext,
+  createContext,
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+} from 'react'
+import {useDropzone, type FileRejection} from 'react-dropzone-esm'
+import {acceptFile, getErrorMessageForRejectedFiles} from './utils.ts'
+import {v4} from 'uuid'
+import {getImageOrientation, megabytesToBytes} from '@/lib/image-fns.ts'
+import {Header} from '@/components/layout/index.ts'
+import {ContentManager} from './components/contents-manager.tsx'
+import {ContentUploader} from './components/content-uploader.tsx'
+import {BlockUploadDialog} from './components/block-upload-dialog.tsx'
+import {useGetCollectionBySlug} from '@/api/collections/index.ts'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {getPackageUploadLimit} from '@/lib/pricing-lib.ts'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
+import {useActionData, useNavigation} from '@remix-run/react'
+import {BlockNavigationDialog} from '@/components/block-navigation-dialog.tsx'
+import {useBlocker} from '@/hooks/use-blocker.ts'
 
 const MAX_SIZE = 10 // in megabytes
 export const ACCEPTED_MAX_FILES = 10
@@ -59,30 +66,32 @@ export interface ContentUploadContext {
 
 const ContentUploadContext = createContext<ContentUploadContext>({
   contents: {},
-  setContents: () => { },
-  openFileSelector: () => { },
+  setContents: () => {},
+  openFileSelector: () => {},
   isSubmitting: false,
-  updateContent: () => { },
-  deleteContent: () => { },
+  updateContent: () => {},
+  deleteContent: () => {},
   maxFiles: 10,
 })
 
 export const ContentUploadProvider = () => {
-  const { currentUser, activeSubcription } = useAuth()
+  const {currentUser, activeSubcription} = useAuth()
   const [contents, setContents] = useState<ContentUploadContext['contents']>({})
 
-  const actionData = useActionData<{ error: string }>()
+  const actionData = useActionData<{error: string}>()
   const navigation = useNavigation()
-  const isSubmitting = navigation.state === "submitting";
+  const isSubmitting = navigation.state === 'submitting'
 
-  const { data: yourUploadCollection, isError: isErrorFetchingUploadCollection } = useGetCollectionBySlug({
-    slug: currentUser ? `${currentUser.id}_uploads` : undefined, query: {
-      filters: {
-        contentItemsLimit: 0
-      }
-    },
-    retryQuery: false
-  })
+  const {data: yourUploadCollection, isError: isErrorFetchingUploadCollection} =
+    useGetCollectionBySlug({
+      slug: currentUser ? `${currentUser.id}_uploads` : undefined,
+      query: {
+        filters: {
+          contentItemsLimit: 0,
+        },
+      },
+      retryQuery: false,
+    })
 
   // where there is an error in the action data, show an error toast
   useEffect(() => {
@@ -95,7 +104,7 @@ export const ContentUploadProvider = () => {
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      const newContents: { [id: string]: Content } = {}
+      const newContents: {[id: string]: Content} = {}
 
       for (let i = 0; i < acceptedFiles.length; i++) {
         const file = acceptedFiles[i]
@@ -118,7 +127,7 @@ export const ContentUploadProvider = () => {
           }
         }
       }
-      setContents(prevContents => ({ ...newContents, ...prevContents }))
+      setContents(prevContents => ({...newContents, ...prevContents}))
 
       if (fileRejections.length) {
         if (fileRejections[0]?.errors?.[0]?.code) {
@@ -143,19 +152,30 @@ export const ContentUploadProvider = () => {
     }
 
     return undefined
-  }, [isErrorFetchingUploadCollection, yourUploadCollection]);
-  
+  }, [isErrorFetchingUploadCollection, yourUploadCollection])
+
   const isCreatorAllowedToUpload = useMemo(() => {
-    if (currentUser?.role === 'CREATOR' && yourUploadCount !== undefined && activeSubcription) {
-      return getPackageUploadLimit(activeSubcription.packageType) > yourUploadCount
+    if (
+      currentUser?.role === 'CREATOR' &&
+      yourUploadCount !== undefined &&
+      activeSubcription
+    ) {
+      return (
+        getPackageUploadLimit(activeSubcription.packageType) > yourUploadCount
+      )
     }
 
     return false
-  }, [currentUser?.role, yourUploadCount, activeSubcription]);
+  }, [currentUser?.role, yourUploadCount, activeSubcription])
 
   const photosToUploadLeft = useMemo(() => {
-    if (currentUser?.role === 'CREATOR' && activeSubcription && yourUploadCount !== undefined) {
-      const whatsLeft = getPackageUploadLimit(activeSubcription.packageType) - yourUploadCount
+    if (
+      currentUser?.role === 'CREATOR' &&
+      activeSubcription &&
+      yourUploadCount !== undefined
+    ) {
+      const whatsLeft =
+        getPackageUploadLimit(activeSubcription.packageType) - yourUploadCount
       if (whatsLeft < 0) {
         return 0
       }
@@ -165,7 +185,7 @@ export const ContentUploadProvider = () => {
     }
 
     return 0
-  }, [currentUser?.role, activeSubcription, yourUploadCount]);
+  }, [currentUser?.role, activeSubcription, yourUploadCount])
 
   const maxFiles = useMemo(() => {
     return photosToUploadLeft - Object.keys(contents).length
@@ -193,10 +213,10 @@ export const ContentUploadProvider = () => {
   )
 
   const updateContent = (id: string, data: Partial<Content>) => {
-    const newContents: { [id: string]: Content } = { ...contents }
+    const newContents: {[id: string]: Content} = {...contents}
     const content = newContents[id]
     if (content) {
-      newContents[id] = { ...content, ...data }
+      newContents[id] = {...content, ...data}
     }
     setContents(newContents)
   }
@@ -212,7 +232,7 @@ export const ContentUploadProvider = () => {
   )
 
   // Block navigating elsewhere when data has been entered into the input
-  const blocker = useBlocker(Boolean(Object.keys(contents).length));
+  const blocker = useBlocker(Boolean(Object.keys(contents).length))
 
   return (
     <ContentUploadContext.Provider
@@ -231,11 +251,9 @@ export const ContentUploadProvider = () => {
         <input {...getInputProps()} />
 
         {areContentsAdded ? <ContentManager /> : <ContentUploader />}
-        {
-          currentUser?.role === "CLIENT" || yourUploadCount !== undefined ? (
-            <BlockUploadDialog isOpened={!isCreatorAllowedToUpload} />
-          ) : null
-        }
+        {currentUser?.role === 'CLIENT' || yourUploadCount !== undefined ? (
+          <BlockUploadDialog isOpened={!isCreatorAllowedToUpload} />
+        ) : null}
 
         <BlockNavigationDialog blocker={blocker} />
 

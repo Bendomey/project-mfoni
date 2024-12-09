@@ -6,7 +6,7 @@ import {useCallback, useEffect} from 'react'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useLoginAuth} from '../context/index.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
-import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
+import {errorToast, successToast} from '@/lib/custom-toast-functions.tsx'
 
 export const TwitterButton = () => {
   const {mutate} = useAuthenticate()

@@ -1,11 +1,11 @@
-import { Button } from '@/components/button/index.tsx'
-import { ArrowUpTrayIcon } from '@heroicons/react/24/outline'
-import { CheckBadgeIcon } from '@heroicons/react/24/solid'
-import { Link } from '@remix-run/react'
-import { ACCEPTED_MAX_FILES, useContentUpload } from '../context.tsx'
+import {Button} from '@/components/button/index.tsx'
+import {ArrowUpTrayIcon} from '@heroicons/react/24/outline'
+import {CheckBadgeIcon} from '@heroicons/react/24/solid'
+import {Link} from '@remix-run/react'
+import {ACCEPTED_MAX_FILES, useContentUpload} from '../context.tsx'
 
 export const ContentUploader = () => {
-  const { openFileSelector, maxFiles, contents } = useContentUpload()
+  const {openFileSelector, maxFiles, contents} = useContentUpload()
   return (
     <>
       <div className="flex justify-center">
@@ -24,24 +24,30 @@ export const ContentUploader = () => {
             <h1 className="font-bold text-xl md:text-4xl w-3/3 md:w-72 text-center mt-5">
               Drag and drop to upload, or
             </h1>
-            <Button onClick={openFileSelector} disabled={maxFiles === 0} size="lg" className="mt-7">
+            <Button
+              onClick={openFileSelector}
+              disabled={maxFiles === 0}
+              size="lg"
+              className="mt-7"
+            >
               Browse
             </Button>
             <div className="mt-5">
               <p className="font-bold text-zinc-400  md:text-lg">
-                {
-                  maxFiles < ACCEPTED_MAX_FILES && Object.keys(contents).length === 0 ? (
-                    <>
-                      (You have <span className="text-blue-600">{maxFiles} uploads</span>{' '}
-                      left)
-                    </>
-                  ) : (
-                    <>
-                      (You can upload <span className="text-blue-600">{maxFiles} photos</span> at a time)
-                    </>
-                  )
-                }
-
+                {maxFiles < ACCEPTED_MAX_FILES &&
+                Object.keys(contents).length === 0 ? (
+                  <>
+                    (You have{' '}
+                    <span className="text-blue-600">{maxFiles} uploads</span>{' '}
+                    left)
+                  </>
+                ) : (
+                  <>
+                    (You can upload{' '}
+                    <span className="text-blue-600">{maxFiles} photos</span> at
+                    a time)
+                  </>
+                )}
               </p>
             </div>
           </div>

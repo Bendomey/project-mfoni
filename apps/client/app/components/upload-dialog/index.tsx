@@ -10,7 +10,7 @@ import {useMemo, useState} from 'react'
 import {type FileRejection, useDropzone} from 'react-dropzone-esm'
 import {Loader} from '../loader/index.tsx'
 import {Image} from 'remix-image'
-import { errorToast } from '@/lib/custom-toast-functions.tsx'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
   onClose: () => void

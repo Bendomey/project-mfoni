@@ -1,5 +1,5 @@
-import { cssBundleHref } from '@remix-run/css-bundle'
-import { type PropsWithChildren } from 'react'
+import {cssBundleHref} from '@remix-run/css-bundle'
+import {type PropsWithChildren} from 'react'
 import {
   json,
   type LoaderFunctionArgs,
@@ -17,21 +17,21 @@ import {
   isRouteErrorResponse,
   useLoaderData,
 } from '@remix-run/react'
-import { NODE_ENV, PAGES } from './constants/index.ts'
+import {NODE_ENV, PAGES} from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
 import remixImageStyles from 'remix-image/remix-image.css'
 import globalStyles from '@/styles/global.css'
-import { Toaster } from 'react-hot-toast'
-import { Providers } from './providers/index.tsx'
-import { RouteLoader } from './components/loader/route-loader.tsx'
-import { EnvContext } from './providers/env/index.tsx'
-import { extractAuthCookie } from './lib/actions/extract-auth-cookie.ts'
-import { getCurrentUser } from './api/auth/index.ts'
-import { getFullUrlPath } from './lib/url-helpers.ts'
+import {Toaster} from 'react-hot-toast'
+import {Providers} from './providers/index.tsx'
+import {RouteLoader} from './components/loader/route-loader.tsx'
+import {EnvContext} from './providers/env/index.tsx'
+import {extractAuthCookie} from './lib/actions/extract-auth-cookie.ts'
+import {getCurrentUser} from './api/auth/index.ts'
+import {getFullUrlPath} from './lib/url-helpers.ts'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat.js'
 import 'dayjs/locale/en-gb.js'
-import { environmentVariables } from './lib/actions/env.server.ts'
+import {environmentVariables} from './lib/actions/env.server.ts'
 
 dayjs.locale('en-gb')
 dayjs.extend(localizedFormat)
@@ -56,11 +56,11 @@ export const links: LinksFunction = () => {
     //   sizes: '16x16',
     //   href: '/favicons/favicon-16x16.png',
     // },
-    { rel: 'icon', href: '/favicon.ico' },
-    { rel: 'stylesheet', href: tailwindStyles },
-    { rel: 'stylesheet', href: remixImageStyles },
-    { rel: 'stylesheet', href: globalStyles },
-    ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
+    {rel: 'icon', href: '/favicon.ico'},
+    {rel: 'stylesheet', href: tailwindStyles},
+    {rel: 'stylesheet', href: remixImageStyles},
+    {rel: 'stylesheet', href: globalStyles},
+    ...(cssBundleHref ? [{rel: 'stylesheet', href: cssBundleHref}] : []),
   ]
 }
 
@@ -84,7 +84,8 @@ export async function loader(args: LoaderFunctionArgs) {
             url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
           ) {
             return redirect(
-              `${PAGES.AUTHENTICATED_PAGES.ONBOARDING
+              `${
+                PAGES.AUTHENTICATED_PAGES.ONBOARDING
               }?return_to=${getFullUrlPath(url)}`,
             )
           }
@@ -99,7 +100,8 @@ export async function loader(args: LoaderFunctionArgs) {
     ENV: {
       API_ADDRESS: `${environmentVariables().API_ADDRESS}/api`,
       BUCKET: environmentVariables().S3_BUCKET,
-      MFONI_GOOGLE_AUTH_CLIENT_ID: environmentVariables().MFONI_GOOGLE_AUTH_CLIENT_ID,
+      MFONI_GOOGLE_AUTH_CLIENT_ID:
+        environmentVariables().MFONI_GOOGLE_AUTH_CLIENT_ID,
       FACEBOOK_APP_ID: environmentVariables().FACEBOOK_APP_ID,
     },
     authUser: user,
@@ -133,7 +135,7 @@ interface DocumentProps {
   }
 }
 
-function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
+function Document({children, ENV}: PropsWithChildren<DocumentProps>) {
   return (
     <html lang="en">
       <head>
@@ -150,9 +152,12 @@ function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
           }}
         >
           {children}
-          <Toaster position="bottom-center" toastOptions={{
-            duration: 5000
-          }} />
+          <Toaster
+            position="bottom-center"
+            toastOptions={{
+              duration: 5000,
+            }}
+          />
           <ScrollRestoration />
           <script
             suppressHydrationWarning

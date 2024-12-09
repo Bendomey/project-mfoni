@@ -26,7 +26,9 @@ export function CreatorAbout() {
         </div>
 
         <div className="">
-          <span className='italic text-gray-500 text-sm'>Set your about here. This will help people know more about you.</span>
+          <span className="italic text-gray-500 text-sm">
+            Set your about here. This will help people know more about you.
+          </span>
           {/* <p className="text-sm text-gray-600">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Recusandae dolorem cupiditate, nobis natus voluptatum porro est soluta, voluptatibus animi expedita magni molestiae hic. Ut, cumque distinctio dolorum deleniti incidunt quasi!</p> */}
         </div>
 

@@ -1,4 +1,4 @@
-import { isSSR } from '@/lib/is-browser.ts'
+import {isSSR} from '@/lib/is-browser.ts'
 import {useEffect, useState} from 'react'
 
 /**

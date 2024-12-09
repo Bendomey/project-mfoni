@@ -2,7 +2,7 @@ import {useActiveSubscription} from '@/api/subscriptions/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {Modal} from '@/components/modal/index.tsx'
 import {PAGES} from '@/constants/index.ts'
-import { errorToast } from '@/lib/custom-toast-functions.tsx'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useState} from 'react'
 

@@ -6,7 +6,7 @@ import {useUpdateEmail, useVerifyEmail} from '@/api/users/index.ts'
 import {Loader} from '@/components/loader/index.tsx'
 import {useVerifyCreator} from '../../context.tsx'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
-import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
+import {errorToast, successToast} from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
   setPage: React.Dispatch<React.SetStateAction<'SendOTP' | 'VerifyOTP'>>

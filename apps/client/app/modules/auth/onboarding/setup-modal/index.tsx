@@ -14,7 +14,7 @@ import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useSearchParams} from '@remix-run/react'
 import {useValidateImage} from '@/hooks/use-validate-image.tsx'
 import {Image} from 'remix-image'
-import { errorToast } from '@/lib/custom-toast-functions.tsx'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
   open: boolean
