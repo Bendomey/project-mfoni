@@ -23,7 +23,7 @@ export function Contents() {
       <div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8 ">
         {imageUrls.map((url, index) => (
           <Fragment key={index}>
-            <Content content={{media: url} as any} />
+            <Content content={{media: {url}} as any} />
           </Fragment>
         ))}
       </div>
