@@ -3,10 +3,10 @@ import {Button} from '@/components/button/index.tsx'
 import {TWITTER_BASE_URL} from '@/constants/index.ts'
 import {useSearchParams, useLocation, useNavigate} from '@remix-run/react'
 import {useCallback, useEffect} from 'react'
-import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useLoginAuth} from '../context/index.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
+import {errorToast, successToast} from '@/lib/custom-toast-functions.tsx'
 
 export const TwitterButton = () => {
   const {mutate} = useAuthenticate()
@@ -50,12 +50,12 @@ export const TwitterButton = () => {
               const returnTo = params.get('return_to')
               if (successRes.user.role) {
                 navigate(returnTo ?? '/')
-                toast.success(`Welcome ${successRes.user.name}`)
+                successToast(`Welcome ${successRes.user.name}`)
               } else {
                 navigate(
                   `/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''}`,
                 )
-                toast.success('Setup account')
+                successToast('Setup account')
               }
             }
           },
@@ -90,7 +90,7 @@ export const TwitterButton = () => {
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
-        toast.error(error.message)
+        errorToast(error.message)
       }
     } finally {
       setIsLoading(false)

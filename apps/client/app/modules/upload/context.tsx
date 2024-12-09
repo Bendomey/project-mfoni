@@ -1,24 +1,30 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-import {useContext, createContext, useState, useCallback, useMemo} from 'react'
+/* eslint-disable no-await-in-loop */
+import {
+  useContext,
+  createContext,
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+} from 'react'
 import {useDropzone, type FileRejection} from 'react-dropzone-esm'
 import {acceptFile, getErrorMessageForRejectedFiles} from './utils.ts'
 import {v4} from 'uuid'
-import {megabytesToBytes} from '@/lib/image-fns.ts'
-import {toast} from 'react-hot-toast'
+import {getImageOrientation, megabytesToBytes} from '@/lib/image-fns.ts'
 import {Header} from '@/components/layout/index.ts'
 import {ContentManager} from './components/contents-manager.tsx'
 import {ContentUploader} from './components/content-uploader.tsx'
-import {
-  type CreateContentInput,
-  useCreateContent,
-} from '@/api/contents/index.ts'
-import {useNavigate} from '@remix-run/react'
-import {safeString} from '@/lib/strings.ts'
-import {useEnvContext} from '@/providers/env/index.tsx'
+import {BlockUploadDialog} from './components/block-upload-dialog.tsx'
+import {useGetCollectionBySlug} from '@/api/collections/index.ts'
+import {useAuth} from '@/providers/auth/index.tsx'
+import {getPackageUploadLimit} from '@/lib/pricing-lib.ts'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
+import {useActionData, useNavigation} from '@remix-run/react'
+import {BlockNavigationDialog} from '@/components/block-navigation-dialog.tsx'
+import {useBlocker} from '@/hooks/use-blocker.ts'
 
-// 30 MB
-const MAX_SIZE = 30
-const MAX_FILES = 10
+const MAX_SIZE = 10 // in megabytes
+export const ACCEPTED_MAX_FILES = 10
 
 export interface Content {
   // image related fields
@@ -36,6 +42,8 @@ export interface Content {
   amount?: string
   title?: string
   visibility: IContentVisibility
+  orientation: IContentOrientation
+  size: number
 }
 
 interface Contents {
@@ -51,9 +59,9 @@ export interface ContentUploadContext {
   >
   openFileSelector: VoidFunction
   isSubmitting: boolean
-  submit: VoidFunction
   updateContent: (contentId: string, data: Partial<Content>) => void
   deleteContent: (contentId: string) => void
+  maxFiles: number
 }
 
 const ContentUploadContext = createContext<ContentUploadContext>({
@@ -61,16 +69,38 @@ const ContentUploadContext = createContext<ContentUploadContext>({
   setContents: () => {},
   openFileSelector: () => {},
   isSubmitting: false,
-  submit: () => {},
   updateContent: () => {},
   deleteContent: () => {},
+  maxFiles: 10,
 })
 
 export const ContentUploadProvider = () => {
-  const navigate = useNavigate()
+  const {currentUser, activeSubcription} = useAuth()
   const [contents, setContents] = useState<ContentUploadContext['contents']>({})
-  const {mutate, isPending} = useCreateContent()
-  const env = useEnvContext()
+
+  const actionData = useActionData<{error: string}>()
+  const navigation = useNavigation()
+  const isSubmitting = navigation.state === 'submitting'
+
+  const {data: yourUploadCollection, isError: isErrorFetchingUploadCollection} =
+    useGetCollectionBySlug({
+      slug: currentUser ? `${currentUser.id}_uploads` : undefined,
+      query: {
+        filters: {
+          contentItemsLimit: 0,
+        },
+      },
+      retryQuery: false,
+    })
+
+  // where there is an error in the action data, show an error toast
+  useEffect(() => {
+    if (actionData?.error) {
+      errorToast('Upload failed. Try again later.', {
+        id: 'error-content-upload',
+      })
+    }
+  }, [actionData])
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -86,22 +116,24 @@ export const ContentUploadProvider = () => {
             continue
           }
 
-          // eslint-disable-next-line no-await-in-loop
           const validationResponse = await acceptFile(file)
+          const orientation = await getImageOrientation(file)
           const contentId = v4()
           newContents[contentId] = {
             ...(validationResponse as Content),
             visibility: 'PUBLIC',
+            orientation,
+            size: file.size,
           }
         }
       }
       setContents(prevContents => ({...newContents, ...prevContents}))
 
       if (fileRejections.length) {
-        if (fileRejections?.[0]?.errors?.[0]?.code) {
-          toast.error(
+        if (fileRejections[0]?.errors?.[0]?.code) {
+          errorToast(
             getErrorMessageForRejectedFiles(
-              fileRejections?.[0]?.errors?.[0]?.code,
+              fileRejections[0]?.errors?.[0]?.code,
             ),
           )
         }
@@ -110,18 +142,68 @@ export const ContentUploadProvider = () => {
     [contents, setContents],
   )
 
+  const yourUploadCount = useMemo(() => {
+    if (!yourUploadCollection && isErrorFetchingUploadCollection) {
+      return 0
+    }
+
+    if (yourUploadCollection) {
+      return yourUploadCollection.contentsCount
+    }
+
+    return undefined
+  }, [isErrorFetchingUploadCollection, yourUploadCollection])
+
+  const isCreatorAllowedToUpload = useMemo(() => {
+    if (
+      currentUser?.role === 'CREATOR' &&
+      yourUploadCount !== undefined &&
+      activeSubcription
+    ) {
+      return (
+        getPackageUploadLimit(activeSubcription.packageType) > yourUploadCount
+      )
+    }
+
+    return false
+  }, [currentUser?.role, yourUploadCount, activeSubcription])
+
+  const photosToUploadLeft = useMemo(() => {
+    if (
+      currentUser?.role === 'CREATOR' &&
+      activeSubcription &&
+      yourUploadCount !== undefined
+    ) {
+      const whatsLeft =
+        getPackageUploadLimit(activeSubcription.packageType) - yourUploadCount
+      if (whatsLeft < 0) {
+        return 0
+      }
+
+      // we always want users to upload only 10 images at a time
+      return whatsLeft > ACCEPTED_MAX_FILES ? ACCEPTED_MAX_FILES : whatsLeft
+    }
+
+    return 0
+  }, [currentUser?.role, activeSubcription, yourUploadCount])
+
+  const maxFiles = useMemo(() => {
+    return photosToUploadLeft - Object.keys(contents).length
+  }, [contents, photosToUploadLeft])
+
   const {
     getRootProps,
     getInputProps,
     isDragActive,
     open: openFileSelector,
   } = useDropzone({
+    disabled: !isCreatorAllowedToUpload,
     onDrop,
     noClick: true,
     accept: {
       'image/png': ['.png', '.jpg', '.jpeg'],
     },
-    maxFiles: MAX_FILES - Object.keys(contents).length,
+    maxFiles,
     maxSize: megabytesToBytes(MAX_SIZE),
   })
 
@@ -149,41 +231,8 @@ export const ContentUploadProvider = () => {
     [setContents],
   )
 
-  const handleSubmit = () => {
-    const submittableData: CreateContentInput = Object.values(contents).map(
-      content => {
-        const fileUrl = content.filUploadedUrl ?? ''
-        const fileKey = fileUrl.split('/').pop() ?? ''
-        return {
-          title: Boolean(safeString(content.title))
-            ? safeString(content.title)
-            : undefined,
-          tags: content.tags?.filter(tag => Boolean(safeString(tag))),
-          visibility: content.visibility,
-          amount: Boolean(content.amount) ? Number(content.amount) : 0,
-          content: {
-            key: fileKey,
-            location: safeString(content.filUploadedUrl),
-            bucket: env.BUCKET,
-            eTag: safeString(content.eTag),
-            serverSideEncryption: 'AES256',
-          },
-        }
-      },
-    )
-
-    mutate(submittableData, {
-      onSuccess: () => {
-        toast.success('Upload was successful', {id: 'success-content-upload'})
-        navigate('/account')
-      },
-      onError: () => {
-        toast.error('Upload failed. Try again later.', {
-          id: 'error-content-upload',
-        })
-      },
-    })
-  }
+  // Block navigating elsewhere when data has been entered into the input
+  const blocker = useBlocker(Boolean(Object.keys(contents).length))
 
   return (
     <ContentUploadContext.Provider
@@ -193,8 +242,8 @@ export const ContentUploadProvider = () => {
         updateContent,
         deleteContent,
         openFileSelector,
-        isSubmitting: isPending,
-        submit: handleSubmit,
+        isSubmitting,
+        maxFiles,
       }}
     >
       <div {...getRootProps()} className="relative">
@@ -202,10 +251,15 @@ export const ContentUploadProvider = () => {
         <input {...getInputProps()} />
 
         {areContentsAdded ? <ContentManager /> : <ContentUploader />}
+        {currentUser?.role === 'CLIENT' || yourUploadCount !== undefined ? (
+          <BlockUploadDialog isOpened={!isCreatorAllowedToUpload} />
+        ) : null}
+
+        <BlockNavigationDialog blocker={blocker} />
 
         {isDragActive ? (
           <div className="fixed h-screen w-screen overflow-hidden top-0 z-50 bg-black bg-opacity-70   backdrop-blur flex justify-center items-center">
-            <h1 className="font-extrabold text-white text-6xl">
+            <h1 className="font-extrabold text-white text-2xl md:text-4xl lg:text-6xl">
               Drop your images here.
             </h1>
           </div>

@@ -2,9 +2,9 @@ import {useActiveSubscription} from '@/api/subscriptions/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {Modal} from '@/components/modal/index.tsx'
 import {PAGES} from '@/constants/index.ts'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useState} from 'react'
-import {toast} from 'react-hot-toast'
 
 interface Props {
   onClose: () => void
@@ -26,7 +26,7 @@ export function ReactivateSubscriptionDialog({onClose, isOpened}: Props) {
         },
         {
           onError: () => {
-            toast.error('Failed to re-activate subscription, try again later.')
+            errorToast('Failed to re-activate subscription, try again later.')
             setIsLoading(false)
           },
           onSuccess: () => {

@@ -10,11 +10,11 @@ import * as Yup from 'yup'
 import {yupResolver} from '@hookform/resolvers/yup'
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline'
 import {classNames} from '@/lib/classNames.ts'
-import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useSearchParams} from '@remix-run/react'
 import {useValidateImage} from '@/hooks/use-validate-image.tsx'
 import {Image} from 'remix-image'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
   open: boolean
@@ -72,7 +72,7 @@ export const SetupAccountModal = ({onClose, open, selectedType}: Props) => {
           window.location.href = searchParams.get('return_to') ?? '/'
         },
         onError: error => {
-          toast.error(errorMessagesWrapper(error.message), {
+          errorToast(errorMessagesWrapper(error.message), {
             id: 'account-setup-error',
           })
         },

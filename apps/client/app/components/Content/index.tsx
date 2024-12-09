@@ -13,17 +13,17 @@ interface Props {
 }
 
 export const Content = ({content, showFlyout = false}: Props) => {
-  const {pending} = useAsyncImage(content.media)
+  const {pending} = useAsyncImage(content.media.url)
 
   return (
     <Link to="/photos/hello-world" state={{modal: true}}>
       <div className="cursor-zoom-in mb-5 relative ">
         <Image
-          src={content.media}
+          src={content.media.url}
           className="h-auto max-w-full rounded-lg"
           placeholder="blur"
           blurDataURL={blurDataURL}
-          alt={content.media}
+          alt={content.media.url}
         />
         {pending ? (
           <div className="bg-black/20 animate-pulse w-full h-[30vh] z-10 rounded-lg mb-5" />

@@ -72,7 +72,7 @@ public class CollectionTransformer
             Slug = collection.Slug,
             Description = collection.Description,
             CreatedById = collection.CreatedById,
-            Count = collection.ContentsCount,
+            ContentsCount = collection.ContentsCount,
             CreatedByRole = collection.CreatedByRole,
             ContentItems = outputcollectionContents,
             CreatedBy = outputCreatedByUser,

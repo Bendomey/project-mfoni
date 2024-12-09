@@ -5,9 +5,10 @@ import {useNavigate, useSearchParams} from '@remix-run/react'
 import {useCallback, useEffect, useRef} from 'react'
 import {useLoginAuth} from '../context/index.tsx'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
-import {toast} from 'react-hot-toast'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useEnvContext} from '@/providers/env/index.tsx'
+import {successToast} from '@/lib/custom-toast-functions.tsx'
+import {classNames} from '@/lib/classNames.ts'
 
 declare global {
   interface Window {
@@ -51,14 +52,14 @@ export const GoogleButton = () => {
                 const returnTo = params.get('return_to')
                 if (successRes.user.role) {
                   navigate(returnTo ?? '/')
-                  toast.success(`Welcome ${successRes.user.name}`)
+                  successToast(`Welcome ${successRes.user.name}`)
                 } else {
                   navigate(
                     `/auth/onboarding${
                       returnTo ? `?return_to=${returnTo}` : ''
                     }`,
                   )
-                  toast.success('Setup account')
+                  successToast('Setup account')
                 }
               }
             },
@@ -87,6 +88,7 @@ export const GoogleButton = () => {
         logo_alignment: 'left',
         type: 'standard',
         width: isMobileBreakPoint ? '355' : '385',
+        locale: 'en-GB',
       })
     }
   }, [env.MFONI_GOOGLE_AUTH_CLIENT_ID, isMobileBreakPoint, onLoginWithGoogle])
@@ -97,5 +99,5 @@ export const GoogleButton = () => {
     }
   }, [init])
 
-  return <div ref={signInRef} className="w-full h-full" />
+  return <div ref={signInRef} className={classNames('w-full h-full')} />
 }

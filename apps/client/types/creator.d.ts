@@ -32,3 +32,11 @@ interface CreatorSocialMedia {
   platform: 'FACEBOOK' | 'TWITTER' | 'GOOGLE' | 'INSTAGRAM' | 'YOUTUBE'
   handle: string
 }
+
+interface BasicCreator {
+  id: string
+  name: string
+  username: string
+  photo: string
+  socialMedia: Array<CreatorSocialMedia>
+}

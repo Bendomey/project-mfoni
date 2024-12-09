@@ -7,6 +7,7 @@ import {
 } from 'react'
 import {useEventListener} from './use-event-listener.ts'
 import {useEventCallback} from './use-event-callback.ts'
+import {isSSR} from '@/lib/is-browser.ts'
 
 declare global {
   interface WindowEventMap {
@@ -24,7 +25,7 @@ export function useSessionStorage<T>(
   // parse stored json or return initialValue
   const readValue = useCallback((): T => {
     // Prevent build error "window is undefined" but keep keep working
-    if (typeof window === 'undefined') {
+    if (isSSR) {
       return initialValue
     }
 

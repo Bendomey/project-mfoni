@@ -5,6 +5,7 @@ import {dehydrate, QueryClient} from '@tanstack/react-query'
 import {QUERY_KEYS} from '@/constants/index.ts'
 import {getWalletTransactions} from '@/api/wallet-transactions/index.ts'
 import {extractAuthCookie} from '@/lib/actions/extract-auth-cookie.ts'
+import {jsonWithCache} from '@/lib/actions/json-with-cache.server.ts'
 
 export const meta: MetaFunction = () => {
   return [
@@ -23,12 +24,12 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
     const queryClient = new QueryClient()
     const searchParams = new URL(loaderArgs.request.url).searchParams
     const page = searchParams.get('page') ?? '0'
-    const authToken = await extractAuthCookie(
+    const authCookie = await extractAuthCookie(
       loaderArgs.request.headers.get('cookie'),
     )
     const baseUrl = `${process.env.API_ADDRESS}/api`
 
-    if (authToken) {
+    if (authCookie) {
       await queryClient.prefetchQuery({
         queryKey: [
           QUERY_KEYS.WALLET_TRANSACTIONS,
@@ -38,7 +39,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
           getWalletTransactions(
             {pagination: {page: Number(page), per: 50}},
             {
-              authToken,
+              authToken: authCookie.token,
               baseUrl,
             },
           ),
@@ -46,9 +47,10 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
     }
 
     const dehydratedState = dehydrate(queryClient)
-    return {
+
+    return jsonWithCache({
       dehydratedState,
-    }
+    })
   }
 
   return res

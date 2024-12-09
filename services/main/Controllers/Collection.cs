@@ -262,6 +262,64 @@ public class CollectionsController : ControllerBase
         }
     }
 
+
+    /// <summary>
+    /// Retrieves single collection by name
+    /// </summary>
+    /// <param name="name">slug of collection</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
+    /// <param name="contentItemsLimit">Number of content items to populate on collection</param>
+    /// <response code="200">Collections Retrieved Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [HttpGet("{name}/name")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCollection>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetByName(
+        string name,
+        [FromQuery] string populate = "",
+        [FromQuery] int contentItemsLimit = 4
+    )
+    {
+        try
+        {
+            _logger.LogInformation("Getting collection: " + name);
+            var collection = _collectionService.GetCollectionByName(name);
+
+            var outputCOllection = await _collectionTransformer.Transform(collection, populate: populate.Split(","), contentItemsLimit);
+            return new ObjectResult(
+                new GetEntityResponse<OutputCollection>(outputCOllection, null).Result()
+            )
+            { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get collection. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                    {"action", "Get Collection By name"},
+                    {"collectionName", name},
+                    {"populate", populate},
+                    {"contentItemsLimit", contentItemsLimit.ToString()},
+               });
+               SentrySdk.CaptureException(e);
+           });
+            return new StatusCodeResult(500);
+        }
+    }
+
     /// <summary>
     /// Retrieves all collections on the platform
     /// </summary>
@@ -572,7 +630,7 @@ public class CollectionsController : ControllerBase
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Retrieved contents from a collection Successfully</response>
     /// <response code="500">An unexpected error occured</response>
-    [HttpGet("{slug}/contents/slug")]
+    [HttpGet("{slug}/slug/contents")]
     [ProducesResponseType(typeof(OutputResponse<List<OutputCollectionContent>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -649,6 +707,96 @@ public class CollectionsController : ControllerBase
             return new StatusCodeResult(500);
         }
     }
+
+    /// <summary>
+    /// Get contents in a collection by name
+    /// </summary>
+    /// <param name="name">name of collection</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
+    /// <param name="page">The page to be navigated to</param>
+    /// <param name="pageSize">The number of items on a page</param>
+    /// <param name="sort">To sort response data either by `asc` or `desc`</param>
+    /// <param name="sortBy">What field to sort by.</param>
+    /// <response code="200">Retrieved contents from a collection Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [HttpGet("{name}/name/contents")]
+    [ProducesResponseType(typeof(OutputResponse<List<OutputCollectionContent>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetContentsFromCollectionByName(
+        string name,
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] string? sort,
+        [FromQuery] string populate = "",
+        [FromQuery] string sortBy = "created_at"
+    )
+    {
+        try
+        {
+            _logger.LogInformation("Getting collection contents");
+            var collection = _collectionService.GetCollectionByName(name);
+
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.CollectionContent>(page, pageSize, sort, sortBy, populate);
+
+            var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+            {
+                CollectionId = collection.Id,
+            });
+            long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
+            {
+                CollectionId = collection.Id,
+            });
+
+            var outContent = new List<OutputCollectionContent>();
+            foreach (var content in contents)
+            {
+                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate));
+            }
+            var response = HttpLib.GeneratePagination(
+                outContent,
+                count,
+                queryFilter
+            );
+
+            return new ObjectResult(
+                new GetEntityResponse<EntityWithPagination<OutputCollectionContent>>(response, null).Result()
+            )
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+
+            this._logger.LogError($"Failed to get contents from collection by name. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+             {
+                 scope.SetTags(new Dictionary<string, string>
+                 {
+                    {"action", "Get Contents from a Collection by name"},
+                    {"collectionName", name},
+                    {"page", StringLib.SafeString(page.ToString())},
+                    {"pageSize", StringLib.SafeString(pageSize.ToString())},
+                    {"sort", StringLib.SafeString(sort)},
+                    {"sortBy", sortBy}
+                });
+                 SentrySdk.CaptureException(e);
+             });
+            return new StatusCodeResult(500);
+        }
+    }
+
 
     /// <summary>
     /// Get all contents in a collection by id
@@ -730,6 +878,72 @@ public class CollectionsController : ControllerBase
                     {"pageSize", StringLib.SafeString(pageSize.ToString())},
                     {"sort", StringLib.SafeString(sort)},
                     {"sortBy", sortBy},
+                });
+                 SentrySdk.CaptureException(e);
+             });
+            return new StatusCodeResult(500);
+        }
+    }
+
+    /// <summary>
+    /// Get all content count in a collection by name
+    /// </summary>
+    /// <param name="name">name of collection</param>
+    /// <response code="200">Retrieved contents from a collection Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [HttpGet("{name}/name/contents/count")]
+    [ProducesResponseType(typeof(OutputResponse<long>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetContentsCountFromCollection(
+        string name
+    )
+    {
+        try
+        {
+            _logger.LogInformation("Getting collection contents count");
+            string? id = null;
+            long count = 0;
+
+            try
+            {
+                var collection = _collectionService.GetCollectionByName(name);
+                id = collection.Id;
+            }
+            catch (Exception) { }
+
+            count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
+            {
+                CollectionId = id,
+            });
+
+            return new ObjectResult(
+                new GetEntityResponse<long>(count, null).Result()
+            )
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get contents count from collection by name. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+             {
+                 scope.SetTags(new Dictionary<string, string>
+                 {
+                    {"action", "Get Contents Count from a Collection by  name"},
+                    {"collectionName", name},
+
                 });
                  SentrySdk.CaptureException(e);
              });

@@ -7,8 +7,8 @@ export const protectRouteLoader: LoaderFunction = async ({request}) => {
   const cookieString = request.headers.get('cookie')
 
   if (cookieString) {
-    const token = await extractAuthCookie(cookieString)
-    if (token) {
+    const authCookie = await extractAuthCookie(cookieString)
+    if (authCookie) {
       return null
     }
   }

@@ -266,7 +266,7 @@ public class TagsController : ControllerBase
     /// Get contents in a tag by slug
     /// </summary>
     /// <param name="license">Can be `ALL` or `FREE` or `PREMIUM`</param>
-    /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT`</param>
+    /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT` or `SQUARE`</param>
     /// <param name="slug">slug of tag</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
@@ -370,7 +370,7 @@ public class TagsController : ControllerBase
     /// </summary>
     /// <param name="id">id of tag</param>
     /// <param name="license">Can be `ALL` or `FREE` or `PREMIUM`</param>
-    /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT`</param>
+    /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT` or `SQUARE`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>

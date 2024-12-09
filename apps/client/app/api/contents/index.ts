@@ -34,26 +34,32 @@ export const useSignS3UploadUrl = () =>
   })
 
 export type CreateContentInput = Array<{
-  title?: string
+  title: string
   content: {
     location: string
     eTag: string
     key: string
     serverSideEncryption: string
     bucket: string
+    orientation: IContentOrientation
+    size: number
   }
   tags?: string[]
   visibility: IContentVisibility
   amount?: number
 }>
 
-const createContent = async (props: CreateContentInput) => {
+export const createContent = async (
+  props: CreateContentInput,
+  apiConfig?: ApiConfigForServerConfig,
+) => {
   try {
     const response = await fetchClient<ApiResponse<Array<Content>>>(
       `/v1/contents`,
       {
         method: 'POST',
         body: JSON.stringify(props),
+        ...(apiConfig ? apiConfig : {}),
       },
     )
 
@@ -70,8 +76,3 @@ const createContent = async (props: CreateContentInput) => {
     }
   }
 }
-
-export const useCreateContent = () =>
-  useMutation({
-    mutationFn: createContent,
-  })

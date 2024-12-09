@@ -5,7 +5,10 @@ import {MagnifyingGlassIcon} from '@heroicons/react/20/solid'
 import OutsideListener from '@/components/outside-listener/index.tsx'
 import {useGetTags} from '@/api/tags/index.ts'
 import {Loader} from '@/components/loader/index.tsx'
-import {InformationCircleIcon} from '@heroicons/react/24/outline'
+import {
+  InformationCircleIcon,
+  PlusCircleIcon,
+} from '@heroicons/react/24/outline'
 import {getMatchingStrings} from '@/lib/strings.ts'
 import {useDebouncedState} from '@/hooks/use-debounce.ts'
 
@@ -116,11 +119,23 @@ export function TagsPicker({
                     : 'text-gray-700',
                 )}
               >
-                <MagnifyingGlassIcon
-                  className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                  aria-hidden="true"
-                />
-                {query.trim().length ? query : 'Search for tags'}
+                {query.trim().length ? (
+                  <>
+                    <PlusCircleIcon
+                      className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                      aria-hidden="true"
+                    />
+                    {query}
+                  </>
+                ) : (
+                  <>
+                    <MagnifyingGlassIcon
+                      className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                      aria-hidden="true"
+                    />
+                    Search for tags
+                  </>
+                )}
               </div>
               {isPending ? (
                 <div className="flex justify-center my-2">
@@ -140,15 +155,16 @@ export function TagsPicker({
                       {tag.name}
                     </div>
                   ))
-                ) : (
-                  <span className="mx-4 my-2 gap-2 inline-flex items-center rounded-md bg-yellow-50 px-2 py-2 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-700/10">
-                    <InformationCircleIcon className="h-5 w-auto text-yellow-700" />
-                    <span className="text-sm text-gray-600">
-                      No tags available
-                    </span>
-                  </span>
-                )
+                ) : null
               ) : (
+                // ) : (
+                //   <span className="mx-4 my-2 gap-2 inline-flex items-center rounded-md bg-yellow-50 px-2 py-2 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-700/10">
+                //     <InformationCircleIcon className="h-5 w-auto text-yellow-700" />
+                //     <span className="text-sm text-gray-600">
+                //       No tags available
+                //     </span>
+                //   </span>
+                // )
                 <span className="mx-4 my-2 gap-2 inline-flex items-center rounded-md bg-pink-50 px-2 py-2 text-xs font-medium text-pink-700 ring-1 ring-inset ring-pink-700/10">
                   <InformationCircleIcon className="h-5 w-auto text-red-700" />
                   <span className="text-sm text-gray-600">

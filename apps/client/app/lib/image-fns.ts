@@ -49,3 +49,25 @@ export function validateImageDimensions({
     img.src = imageUrl
   })
 }
+
+/**
+ * Retrieves the orientation of an image. LANDSCAPE, PORTRAIT, or SQUARE.
+ *
+ * @returns {Promise<string>} - The orientation of the image.
+ */
+export function getImageOrientation(file: File): Promise<IContentOrientation> {
+  return new Promise(accept => {
+    const img = new Image()
+
+    img.onload = () => {
+      if (img.width > img.height) {
+        return accept('LANDSCAPE')
+      } else if (img.width < img.height) {
+        return accept('PORTRAIT')
+      } else {
+        return accept('SQUARE')
+      }
+    }
+    img.src = URL.createObjectURL(file)
+  })
+}

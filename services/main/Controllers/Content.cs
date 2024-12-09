@@ -223,7 +223,7 @@ public class ContentController : ControllerBase
     /// </summary>
     /// <param name="media">Should be an image</param>
     /// <param name="license">Can be `ALL` or `FREE` or `PREMIUM`</param>
-    /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT`</param>
+    /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT` or `SQUARE`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
@@ -353,7 +353,7 @@ public class ContentController : ControllerBase
     /// </summary>
     /// <param name="search">Should be a string</param>
     /// <param name="license">Can be `ALL` or `FREE` or `PREMIUM`</param>
-    /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT`</param>
+    /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT` or `SQUARE`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>

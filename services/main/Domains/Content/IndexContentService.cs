@@ -59,6 +59,7 @@ public class IndexContent
         // check if user is a creator
         if (userInfo.User.Role != UserRole.CREATOR || userInfo.CreatorSubscription is null)
         {
+            _logger.LogError("Error here 1");
             throw new HttpRequestException("NotEnoughPermission", null, HttpStatusCode.Forbidden);
         }
 
@@ -70,11 +71,12 @@ public class IndexContent
             Permissions = yourPermissions
         }))
         {
+            _logger.LogError("Error here 2");
             throw new HttpRequestException("NotEnoughPermission", null, HttpStatusCode.Forbidden);
         }
 
         var userUploadCollectionName = $"{userInfo.User.Id}::Uploads";
-        var userUploadCollectionSlug = $"{userInfo.User.Id}_uploads_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}";
+        var userUploadCollectionSlug = $"{userInfo.User.Id}_uploads";
 
         var creatorUploadsCount = 0;
         try
@@ -96,7 +98,7 @@ public class IndexContent
         {
             Name = userUploadCollectionName,
             Slug = userUploadCollectionSlug,
-            Description = $"{userInfo.User.Name}'s collection for all their uploads",
+            Description = $"{userInfo.User.Name}'s collection for all uploads",
             CreatedByRole = CollectionCreatedByRole.USER,
             CreatedById = userInfo.User.Id,
         });
@@ -110,7 +112,6 @@ public class IndexContent
 
         mediaInput.ToList().ForEach(media =>
         {
-            // var tags = new List<string>();
             var dbTags = _saveTagsService.ResolveTags(media.Tags ?? [], userInput);
 
             var content = new Content
@@ -125,14 +126,17 @@ public class IndexContent
 
             _contentsCollection.InsertOne(content);
 
-            // save tags
+            // save tag contents
             var tagContents = dbTags.Select(tag => new Models.TagContent
             {
                 ContentId = content.Id,
                 TagId = tag.Id
             });
 
-            _tagContentCollection.InsertMany(tagContents);
+            if (tagContents is not null && tagContents.ToList().Count > 0)
+            {
+                _tagContentCollection.InsertMany(tagContents);
+            }
 
             // create collection content
             _collectionContentService.SaveCollectionContent(new SaveCollectionContent

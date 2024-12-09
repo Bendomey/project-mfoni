@@ -21,8 +21,6 @@ import {
   useSubmitCreatorApplication,
   useUpdateCreatorApplication,
 } from '@/api/creator-applications/index.ts'
-import {useAccountContext} from '@/modules/account/home/context/index.tsx'
-import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {Loader} from '@/components/loader/index.tsx'
 import creatorSvg from '@/assets/creator-svg.png'
@@ -30,6 +28,7 @@ import {MFONI_PACKAGES, MFONI_PACKAGES_DETAILED} from '@/constants/index.ts'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
 import {Image} from 'remix-image'
+import {errorToast, successToast} from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
   isOpened: boolean
@@ -46,8 +45,7 @@ export interface IImageType {
 }
 
 export function CreatorApplicationModal({isOpened}: Props) {
-  const {isNotVerified, currentUser} = useAuth()
-  const {activeCreatorApplication} = useAccountContext()
+  const {isNotVerified, currentUser, activeCreatorApplication} = useAuth()
   const {
     mutateAsync: creatorCreatorApplication,
     isPending: isCreatingApplication,
@@ -177,16 +175,16 @@ export function CreatorApplicationModal({isOpened}: Props) {
       }
 
       if (!creatorApplicationId) {
-        return toast.error('Creator Application is Required')
+        return errorToast('Creator Application is Required')
       }
 
       await submitCreatorApplication(creatorApplicationId)
-      toast.success('Creator Application submitted.')
+      successToast('Creator Application submitted.')
 
       window.location.href = '/account'
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
-        toast.error(errorMessagesWrapper(error.message), {
+        errorToast(errorMessagesWrapper(error.message), {
           id: 'submit-creator-application',
         })
       }

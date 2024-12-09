@@ -9,8 +9,8 @@ import {PhotoIcon, XMarkIcon} from '@heroicons/react/24/outline'
 import {useMemo, useState} from 'react'
 import {type FileRejection, useDropzone} from 'react-dropzone-esm'
 import {Loader} from '../loader/index.tsx'
-import {toast} from 'react-hot-toast'
 import {Image} from 'remix-image'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
   onClose: () => void
@@ -31,7 +31,7 @@ export const UploadDialog = ({isOpened, onClose, onSave}: Props) => {
 
   const onDrop = (acceptedFiles: File[], fileRejections: FileRejection[]) => {
     if (fileRejections.length > 0) {
-      toast.error(
+      errorToast(
         fileRejections[0]?.errors[0]?.message ??
           'Something happened, try again later.',
       )

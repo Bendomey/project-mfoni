@@ -3,8 +3,10 @@ import {Transition, Dialog} from '@headlessui/react'
 import {Button} from '@/components/button/index.tsx'
 import {XCircleIcon} from '@heroicons/react/20/solid'
 import {useSubmitErrors} from './use-submit-errors.ts'
-import {Loader} from '@/components/loader/index.tsx'
 import {useContentUpload} from '../context.tsx'
+import {Form} from '@remix-run/react'
+import {type CreateContentInput} from '@/api/contents/index.ts'
+import {safeString} from '@/lib/strings.ts'
 
 interface Props {
   isOpen: boolean
@@ -12,11 +14,36 @@ interface Props {
 }
 export const SubmitModal = ({isOpen, onToggle}: Props) => {
   const {errorMessages, isSubmittable} = useSubmitErrors()
-  const {isSubmitting, submit} = useContentUpload()
+  const {contents, isSubmitting} = useContentUpload()
 
   const isSubmitButtonDisabled = useMemo(
     () => !isSubmittable || isSubmitting,
     [isSubmittable, isSubmitting],
+  )
+
+  // Request to be sent for processing.
+  const submittableData: CreateContentInput = useMemo(
+    () =>
+      Object.values(contents).map(content => {
+        const fileUrl = content.filUploadedUrl ?? ''
+        const fileKey = fileUrl.split('/').pop() ?? ''
+        return {
+          title: safeString(content.title),
+          tags: content.tags?.filter(tag => Boolean(safeString(tag))),
+          visibility: content.visibility,
+          amount: Boolean(content.amount) ? Number(content.amount) : 0,
+          content: {
+            key: fileKey,
+            location: safeString(content.filUploadedUrl),
+            bucket: '', // Don't want to expose the bucket name so I'll pass that on the server side
+            eTag: safeString(content.eTag),
+            serverSideEncryption: 'AES256',
+            orientation: content.orientation,
+            size: content.size,
+          },
+        }
+      }),
+    [contents],
   )
 
   return (
@@ -92,24 +119,27 @@ export const SubmitModal = ({isOpen, onToggle}: Props) => {
                   </div>
                 )}
 
-                <div className="flex justify-end gap-3 mt-5">
-                  {isSubmitting ? null : (
-                    <Button onClick={onToggle} size="lg" variant="outlined">
-                      Close
-                    </Button>
-                  )}
-                  <Button
-                    disabled={isSubmitButtonDisabled}
-                    onClick={submit}
-                    size="lg"
-                  >
-                    {isSubmitting ? (
-                      <Loader color="fill-white" size="5" />
-                    ) : (
-                      'Submit'
+                <Form method="post" encType="multipart/form-data">
+                  <input
+                    type="hidden"
+                    name="contents"
+                    defaultValue={JSON.stringify(submittableData)}
+                  />
+                  <div className="flex justify-end gap-3 mt-5">
+                    {isSubmitting ? null : (
+                      <Button onClick={onToggle} size="lg" variant="outlined">
+                        Close
+                      </Button>
                     )}
-                  </Button>
-                </div>
+                    <Button
+                      disabled={isSubmitButtonDisabled}
+                      type="submit"
+                      size="lg"
+                    >
+                      Submit
+                    </Button>
+                  </div>
+                </Form>
               </Dialog.Panel>
             </Transition.Child>
           </div>

@@ -1,3 +1,4 @@
+import {useGetActiveCreatorApplication} from '@/api/creator-applications/index.ts'
 import {USER_CIPHER} from '@/constants/index.ts'
 import {auth} from '@/lib/cookies.config.ts'
 import {
@@ -18,6 +19,7 @@ interface AuthContextProps {
   onSignout: () => void
   isNotVerified: boolean
   activeSubcription?: CreatorSubscription
+  activeCreatorApplication?: CreatorApplication
 }
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -40,13 +42,19 @@ export const AuthProvider = ({
   authData,
 }: PropsWithChildren<Props>) => {
   const authCipher = auth.getCipher(USER_CIPHER)
+  const isLoggedIn = Boolean(authCipher)
   const [currentUser, setCurrentUser] = useState<User | null>(() => authData)
+
+  const {data: activeCreatorApplication} = useGetActiveCreatorApplication({
+    enabled: isLoggedIn && currentUser?.role === 'CLIENT',
+  })
 
   const authController = useMemo(
     () => ({
       onSignin: ({user, token}: {user: User; token: string}) => {
         setCurrentUser(user)
-        auth.setCipher(USER_CIPHER, token)
+        const cookieData = JSON.stringify({token, id: user.id})
+        auth.setCipher(USER_CIPHER, cookieData)
       },
       onSignout: async () => {
         auth.clearCipher(USER_CIPHER)
@@ -55,8 +63,8 @@ export const AuthProvider = ({
         setCurrentUser(user)
       },
       getToken: () => {
-        const token = auth.getCipher(USER_CIPHER)
-        return token ?? null
+        const cookiesData = auth.getCipher(USER_CIPHER)
+        return cookiesData ? cookiesData.token : null
       },
     }),
     [],
@@ -78,6 +86,7 @@ export const AuthProvider = ({
         isNotVerified:
           !currentUser?.phoneNumberVerifiedAt || !currentUser.emailVerifiedAt,
         activeSubcription,
+        activeCreatorApplication,
       }}
     >
       {children}

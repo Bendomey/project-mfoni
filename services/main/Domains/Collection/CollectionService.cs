@@ -111,6 +111,18 @@ public class CollectionService
         return collection;
     }
 
+    public Models.Collection GetCollectionByName(string collectionName)
+    {
+        var collection = _collectionCollection.Find(collection => collection.Name == collectionName).FirstOrDefault();
+        if (collection is null)
+        {
+            throw new HttpRequestException("CollectionNotFound");
+        }
+
+        return collection;
+    }
+
+
     public Models.Collection GetCollectionBySlug(string slug)
     {
         var collection = _collectionCollection.Find(collection => collection.Slug == slug).FirstOrDefault();

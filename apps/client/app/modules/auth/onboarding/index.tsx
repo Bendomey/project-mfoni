@@ -121,12 +121,12 @@ export const OnboardingModule = () => {
                 <Image
                   className="hidden md:block rounded-lg max-w-full h-auto"
                   src={creatorImage}
-                  alt="I'm here to share my photos and videos with the world"
+                  alt="I'm here to share my photos with the world"
                 />
                 <div className="mt-0 md:mt-4">
                   <h3 className="font-bold text-2xl text-start">Creator</h3>
                   <h3 className="text-zinc-500 text-start">
-                    I&apos;m here to share my photos and videos with the world.
+                    I&apos;m here to share my photos with the world.
                   </h3>
                 </div>
               </button>
@@ -146,8 +146,8 @@ export const OnboardingModule = () => {
           <div className="w-5/6 md:w-3/6">
             <p className="text-center font-medium text-zinc-500">
               We’ll use this info to personalize your experience. You’ll always
-              be able to both download and upload photos and videos, no matter
-              which option you choose.
+              be able to both download and upload photos, no matter which option
+              you choose.
             </p>
           </div>
         </div>

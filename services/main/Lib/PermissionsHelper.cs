@@ -26,7 +26,7 @@ public static class PermissionsHelper
                 return new string[]{
                     Permissions.UploadContent
                 };
-            case "PREMIUM":
+            case "ADVANCED":
                 return new string[]{
                     Permissions.UploadContent
                 };

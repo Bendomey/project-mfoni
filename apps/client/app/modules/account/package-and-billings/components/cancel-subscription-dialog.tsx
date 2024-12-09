@@ -2,9 +2,9 @@ import {useCancelSubscription} from '@/api/subscriptions/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {Modal} from '@/components/modal/index.tsx'
 import {PAGES} from '@/constants/index.ts'
+import {errorToast} from '@/lib/custom-toast-functions.tsx'
 import dayjs from 'dayjs'
 import {useState} from 'react'
-import {toast} from 'react-hot-toast'
 
 interface Props {
   onClose: () => void
@@ -19,7 +19,7 @@ export function CancelSubscriptionDialog({onClose, isOpened}: Props) {
     setIsLoading(true)
     mutate(undefined, {
       onError: () => {
-        toast.error('Failed to cancel subscription, try again later.')
+        errorToast('Failed to cancel subscription, try again later.')
         setIsLoading(false)
       },
       onSuccess: () => {

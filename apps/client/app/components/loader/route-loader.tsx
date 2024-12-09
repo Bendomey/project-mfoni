@@ -18,13 +18,10 @@ export const RouteLoader = () => {
   useEffect(() => {
     if (firstRender) return
     if (transition.state === 'idle') return
-    if (transition.state === 'submitting') {
-      setMessage('Submitting...')
-      setPendingPath(null)
-    } else {
-      setPendingPath(transition.location.pathname)
-      setMessage(null)
-    }
+    if (transition.state === 'submitting') return
+
+    setPendingPath(transition.location.pathname)
+    setMessage(null)
   }, [transition])
 
   useEffect(() => {
@@ -39,7 +36,7 @@ export const RouteLoader = () => {
           animate={{y: 0, opacity: 1, transition: {delay: 0}}}
           exit={{y: 50, opacity: 0}}
           transition={{ease: 'easeInOut', duration: 0.3}}
-          className="pointer-events-none fixed left-0 right-0 z-50 px-5vw bottom-8"
+          className="pointer-events-none fixed left-0 right-0 z-[100] px-5vw bottom-8"
         >
           <div className="mx-auto flex w-11/12 max-w-8xl justify-end">
             <div className="bg-blue-600 text-inverse pointer-events-auto relative max-w-xl rounded-lg p-8 pr-14 shadow-md">

@@ -5,9 +5,9 @@ import {useNavigate, useSearchParams} from '@remix-run/react'
 import {useEffect} from 'react'
 import {useLoginAuth} from '../context/index.tsx'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
-import {toast} from 'react-hot-toast'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useEnvContext} from '@/providers/env/index.tsx'
+import {successToast} from '@/lib/custom-toast-functions.tsx'
 
 declare global {
   interface Window {
@@ -68,12 +68,12 @@ export const FacebookButton = () => {
             const returnTo = params.get('return_to')
             if (successRes.user.role) {
               navigate(returnTo ?? '/')
-              toast.success(`Welcome ${successRes.user.name}`)
+              successToast(`Welcome ${successRes.user.name}`)
             } else {
               navigate(
                 `/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''}`,
               )
-              toast.success('Setup account')
+              successToast('Setup account')
             }
           }
         },

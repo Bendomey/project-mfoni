@@ -6,6 +6,7 @@ public static class S3MetaDataOrientation
 {
     public static readonly string LANDSCAPE = "LANDSCAPE";
     public static readonly string PORTRAIT = "PORTRAIT";
+    public static readonly string SQUARE = "SQUARE";
 }
 
 
@@ -16,6 +17,9 @@ public class S3MetaData
 
     [BsonElement("orientation")]
     public required string Orientation { get; set; }
+
+    [BsonElement("size")]
+    public required Int64 Size { get; set; }
 
     [BsonElement("eTag")]
     public required string ETag { get; set; }

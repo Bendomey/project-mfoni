@@ -10,9 +10,9 @@ import * as Yup from 'yup'
 import {useForm} from 'react-hook-form'
 import {yupResolver} from '@hookform/resolvers/yup'
 import {classNames} from '@/lib/classNames.ts'
-import {toast} from 'react-hot-toast'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useVerifyCreator} from '../../context.tsx'
+import {errorToast, successToast} from '@/lib/custom-toast-functions.tsx'
 
 type MetricVerify = (type: string, payload: any, callback: any) => void
 
@@ -88,11 +88,11 @@ export const VerifyIdStep = () => {
 
   const onSubmit = (data: FormValues) => {
     if (data.type === 'DRIVER_LICENCE' && !data.dob) {
-      return toast.error('Date of Birth is required', {id: 'dob-required'})
+      return errorToast('Date of Birth is required', {id: 'dob-required'})
     }
 
     if (!currentUser?.phoneNumber) {
-      return toast.error('Kindly verify your phone number to proceed', {
+      return errorToast('Kindly verify your phone number to proceed', {
         id: 'phone-number-required',
       })
     }
@@ -111,11 +111,11 @@ export const VerifyIdStep = () => {
         (results: {status: 'FAILED' | 'SUCCESSFUL'}) => {
           if (results.status === 'SUCCESSFUL') {
             setActiveStep('welcome')
-            return toast.success('Your identity was verified successfully', {
+            return successToast('Your identity was verified successfully', {
               id: 'identity-verification-success',
             })
           } else {
-            return toast.error(
+            return errorToast(
               'Failed to verify your account. Please try again.',
               {
                 id: 'identity-verification-failed',
@@ -126,7 +126,7 @@ export const VerifyIdStep = () => {
       )
     } else {
       // throw error to sentry
-      return toast.error('An error occurred. Please try again later', {
+      return errorToast('An error occurred. Please try again later', {
         id: 'metric-error',
       })
     }

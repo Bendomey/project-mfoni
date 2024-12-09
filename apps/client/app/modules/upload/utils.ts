@@ -6,13 +6,13 @@ export const getErrorMessageForRejectedFiles = (
 ) => {
   switch (errorCode) {
     case ErrorCode.FileInvalidType:
-      return 'Some media are of unsupported types'
+      return 'Some media files are of unsupported types'
     case ErrorCode.FileTooLarge:
-      return 'Some media are too large'
+      return 'Some media files are too large'
     case ErrorCode.FileTooSmall:
-      return 'Some media ares too small'
+      return 'Some media files are too small'
     case ErrorCode.TooManyFiles:
-      return 'There are many media selected'
+      return 'There are too many media files selected'
     default:
       return 'An error occured'
   }
