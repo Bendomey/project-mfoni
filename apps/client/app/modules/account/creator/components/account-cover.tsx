@@ -4,11 +4,11 @@ import {
   MapPinIcon,
   GlobeAltIcon,
 } from '@heroicons/react/24/outline'
-import {Button} from '@/components/button/index.tsx'
-import {Image} from 'remix-image'
-import {Link} from '@remix-run/react'
-import {PAGES} from '@/constants/index.ts'
-import {useValidateImage} from '@/hooks/use-validate-image.tsx'
+import { Button } from '@/components/button/index.tsx'
+import { Image } from 'remix-image'
+import { Link } from '@remix-run/react'
+import { PAGES } from '@/constants/index.ts'
+import { useValidateImage } from '@/hooks/use-validate-image.tsx'
 
 const profile = {
   name: 'Ricardo Cooper',
@@ -38,6 +38,8 @@ const getNameInitials = (name: string) =>
 export const AccountCover = () => {
   const isProfilePhotoValid = useValidateImage(profile.imageUrl)
 
+  const isYourOwnAccount = false
+
   return (
     <div className="border border-gray-200 bg-white pb-5 rounded-md">
       <div>
@@ -66,10 +68,16 @@ export const AccountCover = () => {
           </div>
           <div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
             <div className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-              <Button className="w-full md:w-auto">
-                <UserIcon className="mr-3 h-4 w-4" aria-hidden="true" />
-                Follow
-              </Button>
+              {
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                isYourOwnAccount ? null : (
+                  <Button className="w-full md:w-auto">
+                    <UserIcon className="mr-3 h-4 w-4" aria-hidden="true" />
+                    Follow
+                  </Button>
+                )
+              }
+
               <Button
                 variant="solid"
                 color="secondaryGhost"

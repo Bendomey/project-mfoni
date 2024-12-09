@@ -61,7 +61,7 @@ export function UploadDocuments({
                 htmlFor="type"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Front Side
+                Front
               </label>
               <UploadItem image={frontId} setImage={setFrontId} />
             </div>
@@ -71,7 +71,7 @@ export function UploadDocuments({
                 htmlFor="type"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Back Side
+                Back
               </label>
               <UploadItem image={backId} setImage={setBackId} />
             </div>

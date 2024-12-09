@@ -50,22 +50,29 @@ public class ContentTransformer
             }
         }
 
-        var outputTags = new List<OutputTag>();
+        List<OutputTag>? outputTags = null;
         var tags = await _searchTagService.GetTagsForContent(content.Id);
 
-        foreach (var tag in tags)
+        var tagsId = tags.Select(t => t.Id).ToList();
+        if (populate.Any(p => p.Contains(PopulateKeys.CONTENT_TAGS)))
         {
-            var outputTag = await _tagTransformer.Transform(tag);
-            outputTags.Add(outputTag);
+            outputTags = new List<OutputTag>();
+            foreach (var tag in tags)
+            {
+                var outputTag = await _tagTransformer.Transform(tag);
+                outputTags.Add(outputTag);
+            }
         }
 
         string media = content.Media.Location;
 
-        //  always show the low quality version. we want to boost the speed of the app.
-        // Users will be able to download best quality when they request for it!
-        if (content.BlurredMedia is not null)
+        if (content.Amount > 0 && content.BlurredMedia is not null)
         {
             media = content.BlurredMedia.Location;
+        }
+        else if (content.LargeMedia is not null)
+        {
+            media = content.LargeMedia.Location;
         }
 
         OutputContentLike? outputContentLike = null;
@@ -91,15 +98,30 @@ public class ContentTransformer
             Title = content.Title,
             Slug = content.Slug,
             Type = content.Type,
+            Visibility = content.Visibility,
             Status = content.Status,
+            TagsId = tagsId,
             Tags = outputTags,
-            Media = media,
-            MediaOrientation = content.Media.Orientation,
+            Meta = new OutputContentMeta
+            {
+                Views = content.Views,
+                Downloads = content.Downloads,
+                Likes = content.Likes
+            },
+            Media = new OutputContentMedia
+            {
+                Url = media,
+                Orientation = content.Media.Orientation,
+                Sizes = new OutputContentMediaSizes
+                {
+                    Small = content.SmallMedia is not null ? content.SmallMedia.Size : 0,
+                    Medium = content.MediumMedia is not null ? content.MediumMedia.Size : 0,
+                    Large = content.LargeMedia is not null ? content.LargeMedia.Size : 0,
+                    Original = content.Media.Size
+                }
+            },
             Amount = content.Amount,
-            Views = content.Views,
-            Likes = content.Likes,
             CurrentUserLike = outputContentLike,
-            Downloads = content.Downloads,
             DoneAt = content.DoneAt,
             CreatedById = content.CreatedById!,
             CreatedBy = outputBasicCreator,

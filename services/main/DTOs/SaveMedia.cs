@@ -9,5 +9,4 @@ public class SaveMedia
     public string[]? Tags { get; set; }
     public required string Visibility { get; set; }
     public double Amount { get; set; } = 0.0;
-    public required string Orientation { get; set; }
 }

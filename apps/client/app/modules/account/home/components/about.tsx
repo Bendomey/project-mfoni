@@ -25,9 +25,8 @@ export function CreatorAbout() {
           </Button>
         </div>
 
-        <div className="mt-2">
-          <div className="bg-gray-100 rounded w-full h-14 " />
-          {/* <div className="bg-gray-100 rounded mt-1 w-2/3 h-5" /> */}
+        <div className="">
+          <span className='italic text-gray-500 text-sm'>Set your about here. This will help people know more about you.</span>
           {/* <p className="text-sm text-gray-600">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Recusandae dolorem cupiditate, nobis natus voluptatum porro est soluta, voluptatibus animi expedita magni molestiae hic. Ut, cumque distinctio dolorum deleniti incidunt quasi!</p> */}
         </div>
 

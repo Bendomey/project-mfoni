@@ -17,8 +17,8 @@ public class RekognitionMetaData
     [BsonElement("status")]
     public string Status { get; set; } = RekognitionMetaDataStatus.PENDING; // PENDING, INDEXED, NOT_INDEXED, FAILED
 
-    [BsonElement("error_details")]
-    public RekognitionMetaDataErrorDetails? ErrorDetails { get; set; }
+    [BsonElement("details")]
+    public RekognitionMetaDataDetails? Details { get; set; }
 
     [BsonElement("face_data")]
     public RekognitionMetaDataFaceData[]? FaceData { get; set; }
@@ -33,7 +33,7 @@ public class RekognitionMetaDataFaceData
     public string? FaceId { get; set; }
 }
 
-public class RekognitionMetaDataErrorDetails
+public class RekognitionMetaDataDetails
 {
     [BsonElement("message")]
     public string? Message { get; set; }

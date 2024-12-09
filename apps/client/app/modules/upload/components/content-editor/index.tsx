@@ -60,7 +60,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
   return (
     <div className="flex flex-row items-center gap-4 mx-5 md:mx-0">
       <div className="w-full">
-        <div className="md:hidden">
+        <div className="flex justify-center md:hidden">
           <Image
             src={imageUrl}
             alt={content?.file.name}
@@ -70,9 +70,8 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
         <div className="flex md:hidden justify-center mb-5">
           <Button
             onClick={handleDelete}
-            className={`${
-              isRejected ? 'bg-red-600 text-white' : 'bg-zinc-200 text-zinc-600'
-            }  font-bold mt-5`}
+            color={isRejected ? 'danger' : 'secondaryGhost'}
+            className={`  font-bold mt-5`}
             size="xl"
           >
             Delete this Photo
@@ -81,7 +80,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
         <div
           className={`${
             isRejected ? 'bg-red-50' : 'bg-zinc-100'
-          } rounded-3xl py-10 px-10 md:px-16`}
+          } rounded-3xl py-10 px-10 md:px-16 mb-20 md:mb-0`}
         >
           <div className="grid grid-cols-2 gap-10 items-center ">
             <div className="relative w-full col-span-1  hidden md:block">
@@ -105,7 +104,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
                   </p>
                   <Button
                     onClick={handleDelete}
-                    className="bg-red-600 hover:bg-red-700 mt-5"
+                    className="bg-red-600 hover:bg-red-700 mt-5 hidden md:block"
                     size="xl"
                   >
                     Remove
@@ -118,7 +117,7 @@ export const ContentEditor = ({contentId}: {contentId: string}) => {
                       htmlFor="title"
                       className="block font-semibold text-lg leading-6 text-gray-500"
                     >
-                      Title <span className="text-gray-300">(optional)</span>
+                      Title <span className="text-gray-300">(Required)</span>
                     </label>
                     <div className="mt-2">
                       <input

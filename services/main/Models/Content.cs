@@ -75,6 +75,15 @@ public class Content
     [BsonElement("blurred_media")]
     public S3MetaData? BlurredMedia { get; set; }
 
+    [BsonElement("small_media")]
+    public S3MetaData? SmallMedia { get; set; }
+
+    [BsonElement("medium_media")]
+    public S3MetaData? MediumMedia { get; set; }
+
+    [BsonElement("large_media")]
+    public S3MetaData? LargeMedia { get; set; }
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

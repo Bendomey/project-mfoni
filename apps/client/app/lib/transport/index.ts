@@ -84,7 +84,8 @@ export function fetchClient<T>(
         if (config?.authToken) {
           userToken = config.authToken
         } else {
-          userToken = auth.getCipher(USER_CIPHER)
+          const cookieData = auth.getCipher(USER_CIPHER)
+          userToken = cookieData.token
         }
 
         if (userToken) {

@@ -33,6 +33,13 @@ export const useSubmitErrors = () => {
       messages.push('Some uploads are still pending. Please wait.')
     }
 
+    // no accepted empty titles
+    contents.forEach((content, contentIdx) => {
+      if (content.status === 'accepted' && !content.title) {
+        messages.push(`Title is required for content ${contentIdx + 1}`)
+      }
+    })
+
     return messages
   }, [contents])
 

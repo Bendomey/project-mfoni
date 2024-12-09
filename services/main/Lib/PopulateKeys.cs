@@ -10,6 +10,7 @@ public class PopulateKeys
     public static readonly string COLLECTION_CREATED_BY = "collection.createdBy";
     public static readonly string COLLECTION = "collection";
     public static readonly string CONTENT = "content";
+    public static readonly string CONTENT_TAGS = "content.tags";
     public static readonly string TAG = "tag";
     public static readonly string TAG_CREATED_BY_USER = "tag.createdByUser";
     public static readonly string TAG_CREATED_BY_ADMIN = "tag.createdByAdmin";

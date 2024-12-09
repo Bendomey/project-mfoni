@@ -13,7 +13,9 @@ export const QUERY_KEYS = {
   TAGS: 'tags',
   WALLET_TRANSACTIONS: 'wallet-transactions',
   CREATOR_SUBSCRIPTIONS: 'creator-subscriptions',
-  CREATOR_APPLICATIONS: 'creatorApplications',
+  CREATOR_APPLICATIONS: 'creator-applications',
+  CONTENTS: 'contents',
+  COLLECTIONS: 'contents',
 } as const
 
 export const MFONI_PACKAGES: Array<PackageType> = ['FREE', 'BASIC', 'ADVANCED']
@@ -21,6 +23,7 @@ export interface IMfoniPackageDetail {
   name: string
   id: string
   amount: number
+  uploadLimit: number
 }
 export const MFONI_PACKAGES_DETAILED: Record<PackageType, IMfoniPackageDetail> =
   {
@@ -28,20 +31,24 @@ export const MFONI_PACKAGES_DETAILED: Record<PackageType, IMfoniPackageDetail> =
       name: 'Snap & Share (Free tier)',
       amount: 0,
       id: 'FREE',
+      uploadLimit: 50,
     },
     BASIC: {
       name: 'Pro Lens (Basic Premium Tier)',
       amount: 5000,
       id: 'BASIC',
+      uploadLimit: 200,
     },
     ADVANCED: {
       name: 'Master Shot (Premium Tier)',
       amount: 10000,
       id: 'ADVANCED',
+      uploadLimit: Number.POSITIVE_INFINITY, // inifinity
     },
   }
 
 export const PAGES = {
+  NOT_FOUND: '/page/not-found',
   LOGIN: '/auth',
   HOME: '/',
   EXPLORE: '/explore',
@@ -49,7 +56,7 @@ export const PAGES = {
   TERMS: '/terms',
   AUTHENTICATED_PAGES: {
     ONBOARDING: '/auth/onboarding',
-    UPLOAD: '/upload',
+    UPLOAD: '/account/upload',
     ACCOUNT: '/account',
     WALLET: '/account/wallet',
     PACKAGE_AND_BILLINGS: '/account/package-and-billings',

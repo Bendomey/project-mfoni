@@ -73,3 +73,5 @@ interface ApiConfigForServerConfig {
   authToken: string
   baseUrl: string
 }
+
+type IVisibility = 'PUBLIC' | 'PRIVATE'

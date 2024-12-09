@@ -6,6 +6,7 @@ import {
 } from '@remix-run/node'
 import styles from '@/modules/account/verify/components/verify-phone-step/pin-code.css'
 import {protectRouteLoader} from '@/lib/actions/protect-route-loader.ts'
+import { environmentVariables } from '@/lib/actions/env.server.ts'
 
 export const meta: MetaFunction = () => {
   return [
@@ -21,8 +22,8 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
   const res = await protectRouteLoader(loaderArgs)
   if (!res) {
     return {
-      METRIC_CLIENT_ID: process.env.METRIC_CLIENT_ID,
-      METRIC_CLIENT_SECRET: process.env.METRIC_CLIENT_SECRET,
+      METRIC_CLIENT_ID: environmentVariables().METRIC_CLIENT_ID,
+      METRIC_CLIENT_SECRET: environmentVariables().METRIC_CLIENT_SECRET,
     }
   }
 

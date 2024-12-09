@@ -90,6 +90,7 @@ export const useSetupAccount = () =>
     mutationFn: setupAccount,
   })
 
+// TODO: cache this on remix somehow.
 export const getCurrentUser = async (token: string) => {
   try {
     const res = await transport(`${process.env.API_ADDRESS}/api/v1/auth/me`, {

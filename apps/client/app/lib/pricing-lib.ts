@@ -39,3 +39,9 @@ export const getPriceForPackagePerDay = (packageType: PackageType) => {
 
   return selectedPackage.amount / 30
 }
+
+export const getPackageUploadLimit = (packageType: PackageType) => {
+  const selectedPackage = MFONI_PACKAGES_DETAILED[packageType]
+
+  return selectedPackage.uploadLimit
+}

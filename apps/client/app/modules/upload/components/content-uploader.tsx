@@ -1,11 +1,11 @@
-import {Button} from '@/components/button/index.tsx'
-import {ArrowUpTrayIcon} from '@heroicons/react/24/outline'
-import {CheckBadgeIcon} from '@heroicons/react/24/solid'
-import {Link} from '@remix-run/react'
-import {useContentUpload} from '../context.tsx'
+import { Button } from '@/components/button/index.tsx'
+import { ArrowUpTrayIcon } from '@heroicons/react/24/outline'
+import { CheckBadgeIcon } from '@heroicons/react/24/solid'
+import { Link } from '@remix-run/react'
+import { ACCEPTED_MAX_FILES, useContentUpload } from '../context.tsx'
 
 export const ContentUploader = () => {
-  const {openFileSelector} = useContentUpload()
+  const { openFileSelector, maxFiles, contents } = useContentUpload()
   return (
     <>
       <div className="flex justify-center">
@@ -24,13 +24,24 @@ export const ContentUploader = () => {
             <h1 className="font-bold text-xl md:text-4xl w-3/3 md:w-72 text-center mt-5">
               Drag and drop to upload, or
             </h1>
-            <Button onClick={openFileSelector} size="lg" className="mt-7">
+            <Button onClick={openFileSelector} disabled={maxFiles === 0} size="lg" className="mt-7">
               Browse
             </Button>
             <div className="mt-5">
               <p className="font-bold text-zinc-400  md:text-lg">
-                (You have <span className="text-blue-600">10 uploads</span>{' '}
-                left)
+                {
+                  maxFiles < ACCEPTED_MAX_FILES && Object.keys(contents).length === 0 ? (
+                    <>
+                      (You have <span className="text-blue-600">{maxFiles} uploads</span>{' '}
+                      left)
+                    </>
+                  ) : (
+                    <>
+                      (You can upload <span className="text-blue-600">{maxFiles} photos</span> at a time)
+                    </>
+                  )
+                }
+
               </p>
             </div>
           </div>
@@ -45,7 +56,7 @@ export const ContentUploader = () => {
             </div>
             <div className="flex flex-row items-center gap-1 font-medium">
               <CheckBadgeIcon className="text-blue-600 h-5 w-auto" />
-              <b>High quality</b> photos and videos
+              <b>High quality</b> photos
             </div>
             <div className="flex flex-row  flex-wrap gap-1 font-medium">
               <CheckBadgeIcon className="text-blue-600 h-5 w-auto" />

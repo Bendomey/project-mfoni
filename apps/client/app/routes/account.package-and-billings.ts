@@ -1,10 +1,12 @@
 import {PackageAndBillingsModule} from '@/modules/index.ts'
-import {type MetaFunction, type LoaderFunctionArgs, json} from '@remix-run/node'
+import {type MetaFunction, type LoaderFunctionArgs} from '@remix-run/node'
 import {protectCreatorRouteLoader} from '@/lib/actions/protect-creator-route-loader.ts'
 import {dehydrate, QueryClient} from '@tanstack/react-query'
 import {extractAuthCookie} from '@/lib/actions/extract-auth-cookie.ts'
 import {QUERY_KEYS} from '@/constants/index.ts'
 import {getCreatorSubscriptions} from '@/api/subscriptions/index.ts'
+import {jsonWithCache} from '@/lib/actions/json-with-cache.server.ts'
+import {environmentVariables} from '@/lib/actions/env.server.ts'
 
 export const meta: MetaFunction = () => {
   return [
@@ -20,12 +22,12 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
     const queryClient = new QueryClient()
     const searchParams = new URL(loaderArgs.request.url).searchParams
     const page = searchParams.get('page') ?? '0'
-    const authToken = await extractAuthCookie(
+    const authCookie = await extractAuthCookie(
       loaderArgs.request.headers.get('cookie'),
     )
-    const baseUrl = `${process.env.API_ADDRESS}/api`
+    const baseUrl = `${environmentVariables().API_ADDRESS}/api`
 
-    if (authToken) {
+    if (authCookie) {
       const query = {
         pagination: {page: Number(page), per: 50},
         populate: ['purchase', 'wallet'],
@@ -34,24 +36,16 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
         queryKey: [QUERY_KEYS.CREATOR_SUBSCRIPTIONS, query],
         queryFn: () =>
           getCreatorSubscriptions(query, {
-            authToken,
+            authToken: authCookie.token,
             baseUrl,
           }),
-        staleTime: 5000,
       })
     }
 
     const dehydratedState = dehydrate(queryClient)
-    return json(
-      {
-        dehydratedState,
-      },
-      {
-        headers: {
-          'Cache-Control': 'public, max-age=3600',
-        },
-      },
-    )
+    return jsonWithCache({
+      dehydratedState,
+    })
   }
 
   return res

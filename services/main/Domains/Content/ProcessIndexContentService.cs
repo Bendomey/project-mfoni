@@ -5,9 +5,12 @@ using MongoDB.Driver;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Amazon.Rekognition;
-using Amazon.Rekognition.Model;
 using Amazon.Runtime;
 using main.Lib;
+using Amazon.Rekognition.Model;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.Fonts;
+using SixLabors.ImageSharp.Drawing.Processing;
 
 namespace main.Domains;
 
@@ -15,7 +18,7 @@ namespace main.Domains;
 public class ProcessIndexContent
 {
 
-    private readonly ILogger<IndexContent> _logger;
+    private readonly ILogger<ProcessIndexContent> _logger;
     private readonly IMongoCollection<Content> _contentsCollection;
     private readonly IConnection _rabbitMqChannel;
     private readonly AppConstants _appConstantsConfiguration;
@@ -23,7 +26,7 @@ public class ProcessIndexContent
 
     private readonly AmazonRekognitionClient _rekognitionClient;
 
-    public ProcessIndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants)
+    public ProcessIndexContent(ILogger<ProcessIndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants)
     {
         _logger = logger;
 
@@ -90,16 +93,14 @@ public class ProcessIndexContent
 
         try
         {
-            // get blurred image with watermark and save to s3 when its a premium content.
-            if (content.Amount > 0)
+            // resolve all image sizes
+            var image = await ProcessImage.DownloadImage(content.Media.Location);
+
+            if (image is not null)
             {
-                // TODO: reduce the quality of the image before saving to s3
-                await BlurImageAndSaveToS3(content);
+                await ResolveAllImages(content, image);
             }
-            else
-            {
-                // TODO: reduce the quality of the image before saving to s3
-            }
+
 
             // detect faces
             var detectFacesResponse = await DetectFaces(content);
@@ -133,13 +134,13 @@ public class ProcessIndexContent
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError($"Error Occured: {ex.Message}");
+            _logger.LogError($"HttpRequestException Occured: {ex.Message}");
             UpdateContentWithError(contentId, ex.Message);
 
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error Occured: {ex.Message}");
+            _logger.LogError($"Exception Occured: {ex.Message}");
             UpdateContentWithError(contentId, "Something went wrong processing image. Please reach out to support");
 
             // this is a critical error, send to sentry
@@ -155,50 +156,89 @@ public class ProcessIndexContent
         }
     }
 
-    private async Task BlurImageAndSaveToS3(Content content)
+    private async Task SaveToDb(Content content, S3MetaData imageResponse, string field)
     {
-
-        try
-        {
-            // create watermark
-            var newImage = await ProcessImage.AddTextWatermark(content.Media.Location);
-
-            if (newImage is not null)
+        var filter = Builders<Content>.Filter.Eq(r => r.Id, content.Id);
+        var updates = Builders<Content>.Update
+            .Set(field, new S3MetaData
             {
-                // reduce quantity && save to s3
-                var imageResponse = await ProcessImage.UploadToS3(new IUploadToS3Input
-                {
-                    AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
-                    AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
-                    BucketName = _appConstantsConfiguration.BucketName,
-                    Image = newImage,
-                    KeyName = content.Media.Key,
-                    Orientation = content.Media.Orientation,
-                });
+                Bucket = imageResponse.Bucket,
+                ETag = imageResponse.ETag,
+                Key = imageResponse.Key,
+                Location = imageResponse.Location,
+                ServerSideEncryption = imageResponse.ServerSideEncryption,
+                Orientation = imageResponse.Orientation,
+                Size = imageResponse.Size,
+            })
+            .Set(r => r.UpdatedAt, DateTime.Now);
 
-                // save to db
-                var filter = Builders<Content>.Filter.Eq(r => r.Id, content.Id);
-                var updates = Builders<Content>.Update
-                    .Set(r => r.BlurredMedia, new S3MetaData
-                    {
-                        Bucket = imageResponse.Bucket,
-                        ETag = imageResponse.ETag,
-                        Key = imageResponse.Key,
-                        Location = imageResponse.Location,
-                        ServerSideEncryption = imageResponse.ServerSideEncryption,
-                        Orientation = imageResponse.Orientation
-                    })
-                    .Set(r => r.UpdatedAt, DateTime.Now);
+        await _contentsCollection.UpdateOneAsync(filter, updates);
+    }
 
-                await _contentsCollection.UpdateOneAsync(filter, updates);
-            }
+    private async Task ResolveAllImages(Content content, SixLabors.ImageSharp.Image image)
+    {
+        // NOTE: cloning for different sizees because I don't want to download the image everytime.
 
-        }
-        catch (System.Exception)
+        if (content.Amount > 0)
         {
-            throw;
+            var clonedImageForBlur = image;
+            var blurredImage = ProcessImage.AddTextWatermark(clonedImageForBlur);
+            var imageResponse = await ProcessImage.UploadToS3(new IUploadToS3Input
+            {
+                AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
+                AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
+                BucketName = _appConstantsConfiguration.BucketName,
+                Image = blurredImage,
+                KeyName = $"blurred_{content.Media.Key}",
+                Orientation = content.Media.Orientation,
+                ImageQuality = 85,
+            });
+
+            await SaveToDb(content, imageResponse, "blurred_media");
         }
 
+
+        // save for small
+        var clonedImageForSmall = image;
+        var imageResponseForSmall = await ProcessImage.UploadToS3(new IUploadToS3Input
+        {
+            AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
+            AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
+            BucketName = _appConstantsConfiguration.BucketName,
+            Image = clonedImageForSmall,
+            KeyName = $"small_{content.Media.Key}",
+            Orientation = content.Media.Orientation,
+            ImageQuality = 65,
+        });
+        await SaveToDb(content, imageResponseForSmall, "small_media");
+
+        // save for medium
+        var clonedImageForMedium = image;
+        var imageResponseForMedium = await ProcessImage.UploadToS3(new IUploadToS3Input
+        {
+            AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
+            AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
+            BucketName = _appConstantsConfiguration.BucketName,
+            Image = clonedImageForMedium,
+            KeyName = $"medium_{content.Media.Key}",
+            Orientation = content.Media.Orientation,
+            ImageQuality = 75,
+        });
+        await SaveToDb(content, imageResponseForMedium, "medium_media");
+
+        // save for large
+        var clonedImageForLarge = image;
+        var imageResponseForLarge = await ProcessImage.UploadToS3(new IUploadToS3Input
+        {
+            AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
+            AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
+            BucketName = _appConstantsConfiguration.BucketName,
+            Image = clonedImageForLarge,
+            KeyName = $"large_{content.Media.Key}",
+            Orientation = content.Media.Orientation,
+            ImageQuality = 85,
+        });
+        await SaveToDb(content, imageResponseForLarge, "large_media");
     }
 
     public async Task CheckForNudity(Content content)
@@ -330,7 +370,7 @@ public class ProcessIndexContent
             .Set(r => r.RekognitionMetaData, new RekognitionMetaData
             {
                 Status = RekognitionMetaDataStatus.NOT_INDEXED,
-                ErrorDetails = new RekognitionMetaDataErrorDetails
+                Details = new RekognitionMetaDataDetails
                 {
                     Message = message,
                 }
@@ -352,7 +392,7 @@ public class ProcessIndexContent
             .Set(r => r.RekognitionMetaData, new RekognitionMetaData
             {
                 Status = RekognitionMetaDataStatus.FAILED,
-                ErrorDetails = new RekognitionMetaDataErrorDetails
+                Details = new RekognitionMetaDataDetails
                 {
                     Message = message,
                 }

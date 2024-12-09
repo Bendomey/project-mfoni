@@ -21,9 +21,7 @@ export function VisibilityPicker({
         >
           Visibility
         </label>
-        <small>
-          Users will still find it by visual search if it&apos;s private.
-        </small>
+        <small>Determine how users can view your content.</small>
       </div>
 
       <RadioGroup value={visibility} onChange={setVisibility} className="mt-2">

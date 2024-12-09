@@ -71,8 +71,8 @@ export const Footer = ({contents}: {contents: Array<Content>}) => {
                   Content uploaded
                 </h1>
                 <h1 className="font-semibold text-emerald-500  mt-1">
-                  {acceptedContentsLength} of {contentLength} photos and videos
-                  are uploaded
+                  {acceptedContentsLength} of {contentLength} photos are
+                  uploaded
                 </h1>
               </div>
             </div>
@@ -91,8 +91,8 @@ export const Footer = ({contents}: {contents: Array<Content>}) => {
                     Content failed
                   </h1>
                   <h1 className="font-semibold text-red-400 mt-1">
-                    {rejectedContentLength} of {contentLength} photos are
-                    uploaded
+                    {rejectedContentLength} of {contentLength} photos failed to
+                    upload
                   </h1>
                 </div>
               </div>

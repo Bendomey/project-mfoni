@@ -2,7 +2,7 @@ import {Fragment, useState} from 'react'
 import {Dialog} from '@headlessui/react'
 import {Bars3Icon, XMarkIcon} from '@heroicons/react/24/outline'
 import {Link} from '@remix-run/react'
-import {APP_NAME} from '@/constants/index.ts'
+import {APP_NAME, PAGES} from '@/constants/index.ts'
 import {Button} from '@/components/button/index.tsx'
 import {SearchPhotos} from './search/index.tsx'
 import {SearchPhotosForMobile} from './search-for-mobile/index.tsx'
@@ -12,9 +12,14 @@ import useScroll from '@/hooks/use-scroll.ts'
 import {NoticeBanner} from './notice-banner/index.tsx'
 
 const navigation = (isLoggedIn: boolean) => [
-  {name: 'Explore', href: '/explore', routeType: 'link'},
+  {name: 'Explore', href: PAGES.EXPLORE, routeType: 'link'},
+  {name: 'Upload', href: PAGES.AUTHENTICATED_PAGES.UPLOAD, routeType: 'link'},
   isLoggedIn
-    ? {name: 'My Account', href: '/account', routeType: 'link'}
+    ? {
+        name: 'My Account',
+        href: PAGES.AUTHENTICATED_PAGES.ACCOUNT,
+        routeType: 'link',
+      }
     : undefined,
 ]
 
@@ -69,24 +74,17 @@ export const Header = ({
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
-        <div className="hidden lg:flex lg:justify-center lg:items-center lg:gap-x-12">
+        <div className="hidden lg:flex lg:justify-center lg:items-center lg:gap-x-8">
           {navigation(isLoggedIn).map((item, idx) => {
             return (
               <Fragment key={idx}>
-                {item && item.routeType === 'link' ? (
+                {item ? (
                   <Link
                     to={item.href}
                     className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-900"
                   >
                     {item.name}
                   </Link>
-                ) : item && item.routeType === 'href' ? (
-                  <a
-                    href={item.href}
-                    className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-900"
-                  >
-                    {item.name}
-                  </a>
                 ) : null}
               </Fragment>
             )

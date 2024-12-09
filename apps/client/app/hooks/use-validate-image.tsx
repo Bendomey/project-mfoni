@@ -1,3 +1,4 @@
+import { isSSR } from '@/lib/is-browser.ts'
 import {useEffect, useState} from 'react'
 
 /**
@@ -12,7 +13,7 @@ export const validateImage = (
     throw: boolean
   },
 ): Promise<boolean | undefined> => {
-  if (typeof window === 'undefined') {
+  if (isSSR) {
     throw new Error(
       'Cannot use this utility method in a non browser environment',
     )

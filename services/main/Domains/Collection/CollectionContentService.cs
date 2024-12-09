@@ -69,7 +69,8 @@ public class CollectionContentService
         };
 
         _collectionContentCollection.InsertOne(collection);
-        _collectionService.UpdateCollectionContentsCount(collection.Id, 1);
+        
+        _collectionService.UpdateCollectionContentsCount(input.CollectionId, 1);
 
         return collection;
     }

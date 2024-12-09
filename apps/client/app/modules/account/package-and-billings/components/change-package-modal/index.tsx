@@ -21,8 +21,8 @@ import {
   useDeleteSubscription,
   useIsSubscriptionPendingDowngrade,
 } from '@/api/subscriptions/index.ts'
-import {toast} from 'react-hot-toast'
 import {safeString} from '@/lib/strings.ts'
+import { errorToast } from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
   isOpened: boolean
@@ -104,7 +104,7 @@ export function ChangePackageModal({isOpened}: Props) {
           window.location.href = PAGES.AUTHENTICATED_PAGES.PACKAGE_AND_BILLINGS
         },
         onError: () => {
-          toast.error('Failed to activate FREE subscription, try again later.')
+          errorToast('Failed to activate FREE subscription, try again later.')
           setSubmittedForm(false)
         },
       })
@@ -123,7 +123,7 @@ export function ChangePackageModal({isOpened}: Props) {
           window.location.href = PAGES.AUTHENTICATED_PAGES.PACKAGE_AND_BILLINGS
         },
         onError: () => {
-          toast.error('Failed to activate subscription, try again later.')
+          errorToast('Failed to activate subscription, try again later.')
           setSubmittedForm(false)
         },
       },
@@ -143,7 +143,7 @@ export function ChangePackageModal({isOpened}: Props) {
           window.location.href = PAGES.AUTHENTICATED_PAGES.PACKAGE_AND_BILLINGS
         },
         onError: () => {
-          toast.error('Failed to cancel subscription, try again later.')
+          errorToast('Failed to cancel subscription, try again later.')
         },
       })
     }

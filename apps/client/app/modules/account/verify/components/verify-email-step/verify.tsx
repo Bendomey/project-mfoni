@@ -5,8 +5,8 @@ import {useAuth} from '@/providers/auth/index.tsx'
 import {useUpdateEmail, useVerifyEmail} from '@/api/users/index.ts'
 import {Loader} from '@/components/loader/index.tsx'
 import {useVerifyCreator} from '../../context.tsx'
-import {toast} from 'react-hot-toast'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
+import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
   setPage: React.Dispatch<React.SetStateAction<'SendOTP' | 'VerifyOTP'>>
@@ -33,14 +33,14 @@ export const VerifyOtp = ({setPage}: Props) => {
               emailVerifiedAt: new Date(),
             })
           }
-          toast.success('Email Address verified successfully', {
+          successToast('Email Address verified successfully', {
             id: 'email-verified',
           })
           setActiveStep('welcome')
         },
         onError(error) {
           if (error.message) {
-            toast.error(errorMessagesWrapper(error.message), {
+            errorToast(errorMessagesWrapper(error.message), {
               id: 'email-verify-error',
             })
           }
@@ -58,13 +58,13 @@ export const VerifyOtp = ({setPage}: Props) => {
         {
           onSuccess() {
             setCountdown(59)
-            toast.success('Verification code sent successfully', {
+            successToast('Verification code sent successfully', {
               id: 'email-resend-successful',
             })
           },
           onError(error) {
             if (error.message) {
-              toast.error(errorMessagesWrapper(error.message), {
+              errorToast(errorMessagesWrapper(error.message), {
                 id: 'email-resend-error',
               })
             }

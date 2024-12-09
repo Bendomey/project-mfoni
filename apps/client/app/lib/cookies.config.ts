@@ -7,7 +7,7 @@ class Auth {
   }
 
   setCipher(key: string, data: string) {
-    Cookies.set(key, JSON.stringify(data))
+    Cookies.set(key, data)
   }
 
   clearCipher(key: string) {

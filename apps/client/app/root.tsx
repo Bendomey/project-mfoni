@@ -1,5 +1,5 @@
-import {cssBundleHref} from '@remix-run/css-bundle'
-import {type PropsWithChildren} from 'react'
+import { cssBundleHref } from '@remix-run/css-bundle'
+import { type PropsWithChildren } from 'react'
 import {
   json,
   type LoaderFunctionArgs,
@@ -17,20 +17,21 @@ import {
   isRouteErrorResponse,
   useLoaderData,
 } from '@remix-run/react'
-import {NODE_ENV, PAGES} from './constants/index.ts'
+import { NODE_ENV, PAGES } from './constants/index.ts'
 import tailwindStyles from '@/styles/tailwind.css'
 import remixImageStyles from 'remix-image/remix-image.css'
 import globalStyles from '@/styles/global.css'
-import {Toaster} from 'react-hot-toast'
-import {Providers} from './providers/index.tsx'
-import {RouteLoader} from './components/loader/route-loader.tsx'
-import {EnvContext} from './providers/env/index.tsx'
-import {extractAuthCookie} from './lib/actions/extract-auth-cookie.ts'
-import {getCurrentUser} from './api/auth/index.ts'
-import {getFullUrlPath} from './lib/url-helpers.ts'
+import { Toaster } from 'react-hot-toast'
+import { Providers } from './providers/index.tsx'
+import { RouteLoader } from './components/loader/route-loader.tsx'
+import { EnvContext } from './providers/env/index.tsx'
+import { extractAuthCookie } from './lib/actions/extract-auth-cookie.ts'
+import { getCurrentUser } from './api/auth/index.ts'
+import { getFullUrlPath } from './lib/url-helpers.ts'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat.js'
 import 'dayjs/locale/en-gb.js'
+import { environmentVariables } from './lib/actions/env.server.ts'
 
 dayjs.locale('en-gb')
 dayjs.extend(localizedFormat)
@@ -55,11 +56,11 @@ export const links: LinksFunction = () => {
     //   sizes: '16x16',
     //   href: '/favicons/favicon-16x16.png',
     // },
-    {rel: 'icon', href: '/favicon.ico'},
-    {rel: 'stylesheet', href: tailwindStyles},
-    {rel: 'stylesheet', href: remixImageStyles},
-    {rel: 'stylesheet', href: globalStyles},
-    ...(cssBundleHref ? [{rel: 'stylesheet', href: cssBundleHref}] : []),
+    { rel: 'icon', href: '/favicon.ico' },
+    { rel: 'stylesheet', href: tailwindStyles },
+    { rel: 'stylesheet', href: remixImageStyles },
+    { rel: 'stylesheet', href: globalStyles },
+    ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
   ]
 }
 
@@ -69,10 +70,10 @@ export async function loader(args: LoaderFunctionArgs) {
 
   const cookieString = args.request.headers.get('cookie')
   if (cookieString) {
-    const token = await extractAuthCookie(cookieString)
-    if (token) {
+    const authCookie = await extractAuthCookie(cookieString)
+    if (authCookie) {
       try {
-        const res = await getCurrentUser(token)
+        const res = await getCurrentUser(authCookie.token)
 
         if (res?.data) {
           user = res.data
@@ -83,8 +84,7 @@ export async function loader(args: LoaderFunctionArgs) {
             url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
           ) {
             return redirect(
-              `${
-                PAGES.AUTHENTICATED_PAGES.ONBOARDING
+              `${PAGES.AUTHENTICATED_PAGES.ONBOARDING
               }?return_to=${getFullUrlPath(url)}`,
             )
           }
@@ -97,10 +97,10 @@ export async function loader(args: LoaderFunctionArgs) {
 
   return json({
     ENV: {
-      API_ADDRESS: `${process.env.API_ADDRESS}/api`,
-      BUCKET: process.env.S3_BUCKET,
-      MFONI_GOOGLE_AUTH_CLIENT_ID: process.env.MFONI_GOOGLE_AUTH_CLIENT_ID,
-      FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID,
+      API_ADDRESS: `${environmentVariables().API_ADDRESS}/api`,
+      BUCKET: environmentVariables().S3_BUCKET,
+      MFONI_GOOGLE_AUTH_CLIENT_ID: environmentVariables().MFONI_GOOGLE_AUTH_CLIENT_ID,
+      FACEBOOK_APP_ID: environmentVariables().FACEBOOK_APP_ID,
     },
     authUser: user,
   })
@@ -112,9 +112,8 @@ export default function App() {
   return (
     <Document
       ENV={{
-        BUCKET: data.ENV.BUCKET!,
-        FACEBOOK_APP_ID: data.ENV.FACEBOOK_APP_ID!,
-        MFONI_GOOGLE_AUTH_CLIENT_ID: data.ENV.MFONI_GOOGLE_AUTH_CLIENT_ID!,
+        FACEBOOK_APP_ID: data.ENV.FACEBOOK_APP_ID,
+        MFONI_GOOGLE_AUTH_CLIENT_ID: data.ENV.MFONI_GOOGLE_AUTH_CLIENT_ID,
         API_ADDRESS: data.ENV.API_ADDRESS,
       }}
     >
@@ -128,41 +127,42 @@ export default function App() {
 
 interface DocumentProps {
   ENV: {
-    BUCKET: string
     MFONI_GOOGLE_AUTH_CLIENT_ID: string
     FACEBOOK_APP_ID: string
     API_ADDRESS: string
   }
 }
 
-function Document({children, ENV}: PropsWithChildren<DocumentProps>) {
+function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
         <Meta />
         <Links />
       </head>
       <body>
         <EnvContext.Provider
           value={{
-            BUCKET: ENV.BUCKET,
             MFONI_GOOGLE_AUTH_CLIENT_ID: ENV.MFONI_GOOGLE_AUTH_CLIENT_ID,
             FACEBOOK_APP_ID: ENV.FACEBOOK_APP_ID,
           }}
         >
           {children}
-          <Toaster position="bottom-center" />
+          <Toaster position="bottom-center" toastOptions={{
+            duration: 5000
+          }} />
           <ScrollRestoration />
           <script
+            suppressHydrationWarning
             src="https://accounts.google.com/gsi/client"
             async
             defer
             data-nscript="afterInteractive"
           />
           <script
+            suppressHydrationWarning
             dangerouslySetInnerHTML={{
               __html: `window.ENV = ${JSON.stringify({
                 API_ADDRESS: ENV.API_ADDRESS,
