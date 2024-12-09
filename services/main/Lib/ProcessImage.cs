@@ -49,10 +49,14 @@ public class ProcessImage
         //create a image object containing the photograph to watermark
         float[] alignments = [1.5f, 2.5f, 6.5f];
 
-        image.Mutate(x => x.GaussianBlur(2)); // Adjust the blur radius as needed
+        var fontPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Fonts", "PlusJakartaSans.ttf");
+        FontCollection collection = new();
+        FontFamily family = collection.Add(fontPath);
+
+        Font font = family.CreateFont(100, FontStyle.Bold);
+
         alignments.ToList().ForEach(align =>
         {
-            Font font = SystemFonts.CreateFont("Arial", 100, FontStyle.Bold);
             RichTextOptions options = new(font)
             {
                 Origin = new PointF(image.Width / align, image.Height / align), // Set the rendering origin.
