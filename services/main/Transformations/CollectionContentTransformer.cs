@@ -45,7 +45,7 @@ public class CollectionContentTransformer
         }
 
         OutputContent? outputContent = null;
-        if (collectionContent.ContentId is not null && populate.Any(p => p.Contains(PopulateKeys.TAG)))
+        if (collectionContent.ContentId is not null && populate.Any(p => p.Contains(PopulateKeys.CONTENT)))
         {
             var content = await _contentService.GetContentById(collectionContent.ContentId);
             if (content is not null)
