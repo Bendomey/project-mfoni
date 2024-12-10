@@ -15,7 +15,7 @@ export const QUERY_KEYS = {
   CREATOR_SUBSCRIPTIONS: 'creator-subscriptions',
   CREATOR_APPLICATIONS: 'creator-applications',
   CONTENTS: 'contents',
-  COLLECTIONS: 'contents',
+  COLLECTIONS: 'collections',
 } as const
 
 export const MFONI_PACKAGES: Array<PackageType> = ['FREE', 'BASIC', 'ADVANCED']
@@ -58,6 +58,8 @@ export const PAGES = {
     ONBOARDING: '/auth/onboarding',
     UPLOAD: '/account/upload',
     ACCOUNT: '/account',
+    ACCOUNT_COLLECTIONS: '/account/collections',
+    ACCOUNT_LIKES: '/account/likes',
     WALLET: '/account/wallet',
     PACKAGE_AND_BILLINGS: '/account/package-and-billings',
   },

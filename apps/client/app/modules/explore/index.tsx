@@ -8,7 +8,7 @@ import {Content} from '@/components/Content/index.tsx'
 import {MobileTabComponent} from './components/tabs/mobile.tsx'
 import {imageUrls} from '../landing-page/index.tsx'
 import {Footer} from '@/components/footer/index.tsx'
-import {EmptyState} from './components/empty-state/index.tsx'
+import { EmptyState } from '@/components/empty-state/index.tsx'
 
 export const ExploreModule = () => {
   const {ref: heroRef, inView} = useInView({
@@ -44,7 +44,7 @@ export const ExploreModule = () => {
                 {imageUrls.map((url, index) => (
                   <Fragment key={index}>
                     <FadeIn>
-                      <Content content={{media: {url}} as any} showFlyout />
+                      <Content content={{media: {url}} as any} />
                     </FadeIn>
                   </Fragment>
                 ))}

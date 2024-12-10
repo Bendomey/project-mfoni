@@ -1,5 +1,5 @@
+import { EmptyState } from '@/components/empty-state/index.tsx'
 import {NoSearchResultLottie} from '@/components/lotties/no-search-results.tsx'
-import {EmptyState} from '@/modules/explore/components/empty-state/index.tsx'
 import {useParams} from '@remix-run/react'
 
 export function SearchCreatorsModule() {
