@@ -1,6 +1,6 @@
+import { EmptyState } from '@/components/empty-state/index.tsx'
 import {Footer} from '@/components/footer/index.tsx'
 import {Header} from '@/components/layout/index.ts'
-import {EmptyState} from '@/modules/explore/components/empty-state/index.tsx'
 
 export function TagsModule() {
   return (

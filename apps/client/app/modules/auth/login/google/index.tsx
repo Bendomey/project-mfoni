@@ -7,7 +7,6 @@ import {useLoginAuth} from '../context/index.tsx'
 import {errorMessagesWrapper} from '@/constants/error-messages.ts'
 import {useAuth} from '@/providers/auth/index.tsx'
 import {useEnvContext} from '@/providers/env/index.tsx'
-import {successToast} from '@/lib/custom-toast-functions.tsx'
 import {classNames} from '@/lib/classNames.ts'
 
 declare global {
@@ -52,14 +51,12 @@ export const GoogleButton = () => {
                 const returnTo = params.get('return_to')
                 if (successRes.user.role) {
                   navigate(returnTo ?? '/')
-                  successToast(`Welcome ${successRes.user.name}`)
                 } else {
                   navigate(
                     `/auth/onboarding${
                       returnTo ? `?return_to=${returnTo}` : ''
                     }`,
                   )
-                  successToast('Setup account')
                 }
               }
             },

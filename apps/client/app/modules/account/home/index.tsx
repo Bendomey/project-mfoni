@@ -1,18 +1,18 @@
-import {Header} from '@/components/layout/index.ts'
-import {AccountCover} from './components/cover.tsx'
-import {Footer} from '@/components/footer/index.tsx'
-import {CreatorAnalytics} from './components/creator-analytics.tsx'
-import {UserTimeline} from './components/timeline.tsx'
-import {OtherCreators} from './components/other-creators.tsx'
-import {Contents} from './components/content.tsx'
-import {QuickActions} from './components/quick-actions.tsx'
-import {CreatorApplicationModal} from './components/creator-application-modal/index.tsx'
-import {useSearchParams} from '@remix-run/react'
-import {CreatorAbout} from './components/about.tsx'
-import {useAuth} from '@/providers/auth/index.tsx'
+import { Header } from '@/components/layout/index.ts'
+import { AccountCover } from './components/cover.tsx'
+import { Footer } from '@/components/footer/index.tsx'
+import { CreatorAnalytics } from './components/creator-analytics.tsx'
+import { UserTimeline } from './components/timeline.tsx'
+import { OtherCreators } from './components/other-creators.tsx'
+import { Tabs } from './components/tabs.tsx'
+import { QuickActions } from './components/quick-actions.tsx'
+import { CreatorApplicationModal } from './components/creator-application-modal/index.tsx'
+import { Outlet, useSearchParams } from '@remix-run/react'
+import { CreatorAbout } from './components/about.tsx'
+import { useAuth } from '@/providers/auth/index.tsx'
 
 export const AccountModule = () => {
-  const {currentUser} = useAuth()
+  const { currentUser } = useAuth()
   const [searchParams] = useSearchParams()
 
   const completeCreatorApplicationParam = searchParams.get(
@@ -20,7 +20,7 @@ export const AccountModule = () => {
   )
   const isCompleteCreatorApplicationModalOpened = Boolean(
     completeCreatorApplicationParam &&
-      completeCreatorApplicationParam !== 'false',
+    completeCreatorApplicationParam !== 'false',
   )
 
   return (
@@ -36,7 +36,17 @@ export const AccountModule = () => {
               <CreatorAnalytics />
             </>
           ) : null}
-          <Contents />
+          <div>
+            <div className="mb-5">
+              <h3 className="text-base font-semibold leading-6 text-gray-900">
+                Your Contents
+              </h3>
+              <div className="mt-1">
+                <Tabs />
+              </div>
+            </div>
+            <Outlet />
+          </div>
         </div>
         <div className="col-span-2 flex flex-col gap-y-10">
           <QuickActions />
