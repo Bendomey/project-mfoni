@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-
 import {APP_NAME} from '@/constants/index.ts'
 import {Link} from '@remix-run/react'
 import {Image} from 'remix-image'

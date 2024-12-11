@@ -1,34 +1,90 @@
 /* eslint-disable no-inner-declarations */
-// @ts-expect-error - Available only when app is run!
-import * as build from '../build/index.js'
 import {router} from './routes/index.js'
 
 import {createRequestHandler} from '@remix-run/express'
-import {broadcastDevReady} from '@remix-run/node'
+import { type ServerBuild} from '@remix-run/node'
 import express from 'express'
 import getPort, {portNumbers} from 'get-port'
 import closeWithGrace from 'close-with-grace'
 import address from 'address'
 import chalk from 'chalk'
 import path from 'path'
-import chokidar from 'chokidar'
-import {fileURLToPath} from 'url'
+import compression from 'compression'
+import morgan from 'morgan'
+import { fileURLToPath } from 'url'
 
 const MODE = process.env.NODE_ENV
-const BUILD_PATH = '../build/index.js'
 
-let devBuild = build
+const viteDevServer =
+  process.env.NODE_ENV === 'production'
+    ? undefined
+    : await import('vite').then(vite =>
+        vite.createServer({
+          server: {middlewareMode: true},
+        }),
+      )
+
+const getBuild = async (): Promise<ServerBuild> => {
+  if (viteDevServer) {
+    return viteDevServer.ssrLoadModule('virtual:remix/server-build') as any
+  }
+
+  // @ts-expect-error - this file may or may not exist yet
+  return import('../build/server/index.js') as Promise<ServerBuild>
+}
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const here = (...d: Array<string>) => path.join(__dirname, ...d)
 
 const app = express()
+
+app.use(compression())
+
+// http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
+app.disable('x-powered-by')
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.use(express.static('public'))
+const publicAbsolutePath = here('../build/client')
+
+if (viteDevServer) {
+  app.use(viteDevServer.middlewares)
+} else {
+  app.use(
+    express.static(publicAbsolutePath, {
+      maxAge: '1w',
+      setHeaders(res, resourcePath) {
+        const relativePath = resourcePath.replace(`${publicAbsolutePath}/`, '')
+        if (relativePath.startsWith('build/info.json')) {
+          res.setHeader('cache-control', 'no-cache')
+          return
+        }
+        // If we ever change our font (which we quite possibly never will)
+        // then we'll just want to change the filename or something...
+        // Remix fingerprints its assets so we can cache forever
+        if (
+          relativePath.startsWith('fonts') ||
+          relativePath.startsWith('build')
+        ) {
+          res.setHeader('cache-control', 'public, max-age=31536000, immutable')
+        }
+      },
+    }),
+  )
+}
+
+app.use(morgan('tiny'))
 
 app.use('/api', router)
 
-app.all('*', createRequestHandler({build: devBuild as any, mode: MODE}))
+app.all(
+  '*',
+  createRequestHandler({
+    build: MODE === 'development' ? getBuild : await getBuild(),
+    mode: MODE,
+  }),
+)
 
 const desiredPort = Number(process.env.PORT ?? 3000)
 const portToUse = await getPort({
@@ -68,10 +124,6 @@ const server = app.listen(portToUse, () => {
   ${chalk.bold('Press Ctrl+C to stop')}
   		`.trim(),
   )
-
-  if (MODE === 'development') {
-    void broadcastDevReady(build as any)
-  }
 })
 
 closeWithGrace(() => {
@@ -81,16 +133,3 @@ closeWithGrace(() => {
     }),
   ])
 })
-
-// during dev, we'll keep the build module up to date with the changes
-if (process.env.NODE_ENV === 'development') {
-  async function reloadBuild() {
-    devBuild = await import(`${BUILD_PATH}?update=${Date.now()}`)
-    void broadcastDevReady(devBuild as any)
-  }
-
-  const dirname = path.dirname(fileURLToPath(import.meta.url))
-  const watchPath = path.join(dirname, BUILD_PATH).replace(/\\/g, '/')
-  const watcher = chokidar.watch(watchPath, {ignoreInitial: true})
-  watcher.on('all', reloadBuild)
-}

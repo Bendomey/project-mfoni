@@ -1,10 +1,10 @@
 import {Button} from '@/components/button/index.tsx'
 import {Modal} from '@/components/modal/index.tsx'
 import {ExclamationTriangleIcon} from '@heroicons/react/24/solid'
-import {type unstable_Blocker} from '@remix-run/react'
+import {type Blocker} from '@remix-run/react'
 
 interface Props {
-  blocker: unstable_Blocker
+  blocker: Blocker
 }
 
 export function BlockNavigationDialog({blocker}: Props) {

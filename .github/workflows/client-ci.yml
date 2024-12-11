@@ -31,7 +31,7 @@ jobs:
             working-directory: apps/client
   
         - name: 🔬 Lint
-          run: yarn lint
+          run: yarn lint:ci
           working-directory: apps/client
 
         - name: 🔎 Type check
