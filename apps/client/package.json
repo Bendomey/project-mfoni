@@ -115,7 +115,8 @@
     "vite": "5.1.0",
     "vite-tsconfig-paths": "4.2.1",
     "postcss": "8.4.38",
-    "autoprefixer": "10.4.19"
+    "autoprefixer": "10.4.19",
+    "cssnano": "7.0.1"
   },
   "resolutions": {
     "@types/react": "18.2.45",
