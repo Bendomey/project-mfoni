@@ -19,3 +19,5 @@ tsconfig.tsbuildinfo
 /playwright/.cache/
 
 yarn-error.log
+
+vite.config.ts.timestamp*

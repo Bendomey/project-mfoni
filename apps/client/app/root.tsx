@@ -1,7 +1,6 @@
 import {cssBundleHref} from '@remix-run/css-bundle'
 import {type PropsWithChildren} from 'react'
 import {
-  json,
   type LoaderFunctionArgs,
   type LinksFunction,
   redirect,
@@ -18,9 +17,9 @@ import {
   useLoaderData,
 } from '@remix-run/react'
 import {NODE_ENV, PAGES} from './constants/index.ts'
-import tailwindStyles from '@/styles/tailwind.css'
-import remixImageStyles from 'remix-image/remix-image.css'
-import globalStyles from '@/styles/global.css'
+import tailwindStyles from '@/styles/tailwind.css?url'
+import remixImageStyles from 'remix-image/remix-image.css?url'
+import globalStyles from '@/styles/global.css?url'
 import {Toaster} from 'react-hot-toast'
 import {Providers} from './providers/index.tsx'
 import {RouteLoader} from './components/loader/route-loader.tsx'
@@ -32,6 +31,7 @@ import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat.js'
 import 'dayjs/locale/en-gb.js'
 import {environmentVariables} from './lib/actions/env.server.ts'
+import { jsonWithCache } from './lib/actions/json-with-cache.server.ts'
 
 dayjs.locale('en-gb')
 dayjs.extend(localizedFormat)
@@ -96,7 +96,7 @@ export async function loader(args: LoaderFunctionArgs) {
     }
   }
 
-  return json({
+  return jsonWithCache({
     ENV: {
       API_ADDRESS: `${environmentVariables().API_ADDRESS}/api`,
       BUCKET: environmentVariables().S3_BUCKET,

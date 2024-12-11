@@ -4,7 +4,7 @@ import {
   type LinksFunction,
   type LoaderFunctionArgs,
 } from '@remix-run/node'
-import styles from '@/modules/account/verify/components/verify-phone-step/pin-code.css'
+import styles from '@/modules/account/verify/components/verify-phone-step/pin-code.css?url'
 import {protectRouteLoader} from '@/lib/actions/protect-route-loader.ts'
 import {environmentVariables} from '@/lib/actions/env.server.ts'
 
