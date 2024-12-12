@@ -17,7 +17,7 @@ export function AccountContentsModule() {
 		slug: `${safeString(currentUser?.id)}_uploads`,
 		query: {
 			pagination: { page: 0, per: 50 },
-			populate: ['content'],
+			populate: ['content', 'content.tags'],
 		},
 	})
 
@@ -70,10 +70,26 @@ export function AccountContentsModule() {
 				{data.rows.map((collectionContent, index) => (
 					<Fragment key={index}>
 						{collectionContent.content ? (
-							<Content
-								content={collectionContent.content}
-								showCreator={false}
-							/>
+							<div className="mb-5 break-inside-avoid">
+								<Content
+									content={collectionContent.content}
+									showCreator={false}
+								/>
+								<div className="mt-1 flex items-center gap-2">
+									{collectionContent.content.tags?.slice(0, 4)?.map((tag) => (
+										<Button
+											key={tag.id}
+											size="sm"
+											isLink
+											href={PAGES.TAG.replace(':tag', tag.slug)}
+											variant="outlined"
+											className="rounded"
+										>
+											{tag.name}
+										</Button>
+									))}
+								</div>
+							</div>
 						) : null}
 					</Fragment>
 				))}

@@ -36,6 +36,13 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 				authToken: authCookie?.token,
 			},
 		)
+
+		// if content is private and user is not logged in, return 404
+		if (content?.visibility === 'PRIVATE') {
+			if (!authCookie?.token || authCookie?.id !== content?.createdById) {
+				return redirect(PAGES.NOT_FOUND)
+			}
+		}
 	} catch (error) {
 		// if collection is not found, return 404
 		return redirect(PAGES.NOT_FOUND)

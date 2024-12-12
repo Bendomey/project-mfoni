@@ -14,6 +14,7 @@ interface Content {
 	amount: number
 	currentUserLike: Nullable<ContentLike>
 	createdById: string
+	imageProcessingResponse: ImageProcessingResponse
 	createdBy: Nullable<BasicCreator>
 	createdAt: Date
 	updatedAt: Date
@@ -37,6 +38,17 @@ interface ContentMediaSizes {
 	large: number
 	original: number
 }
+
+interface ImageProcessingResponse {
+	status: IRekognitionMetaDataStatus
+	message?: string
+}
+
+type IRekognitionMetaDataStatus =
+	| 'PENDING'
+	| 'INDEXED'
+	| 'NOT_INDEXED'
+	| 'FAILED'
 
 type IContentVisibility = 'PUBLIC' | 'PRIVATE'
 type IContentOrientation = 'PORTRAIT' | 'LANDSCAPE' | 'SQUARE'

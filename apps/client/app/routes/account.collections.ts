@@ -31,14 +31,14 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 			const query = {
 				pagination: { page: 0, per: 50 },
 				filters: {
-					created_by: authCookie.userId,
+					created_by: authCookie.id,
 					visibility: 'ALL',
 				},
 			}
 			await queryClient.prefetchQuery({
 				queryKey: [
 					QUERY_KEYS.COLLECTIONS,
-					authCookie.userId,
+					authCookie.id,
 					JSON.stringify(query),
 				],
 				queryFn: () =>

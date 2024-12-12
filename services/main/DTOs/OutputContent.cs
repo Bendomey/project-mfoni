@@ -22,6 +22,7 @@ public class OutputContent
     public OutputBasicCreator? CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public required ImageProcessingOutput ImageProcessingResponse { get; set; }
 }
 
 public class OutputContentMedia
@@ -39,11 +40,15 @@ public class OutputContentMediaSizes
     public required Int64 Original { get; set; }
 }
 
-
-
 public class OutputContentMeta
 {
     public Int64 Views { get; set; } = 0;
     public Int64 Downloads { get; set; } = 0;
     public Int64 Likes { get; set; } = 0;
+}
+
+public class ImageProcessingOutput
+{
+    public string Status { get; set; } = "PENDING";
+    public string? Message { get; set; }
 }

@@ -1,4 +1,3 @@
- 
 import { useMediaQuery } from '@uidotdev/usehooks'
 import { useEffect, useRef, useState } from 'react'
 import { useContentUpload } from '../context.tsx'

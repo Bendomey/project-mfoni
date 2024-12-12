@@ -159,7 +159,9 @@ export function CollectionModule() {
 						</div>
 						<div className="flex flex-row items-center justify-end gap-2">
 							{isCollectionMine ? <Button>Add Contents</Button> : null}
-							<ShareButton />
+							<ShareButton
+								text={`Check out this collection "${name}" on mfoni`}
+							/>
 							<Button color="dangerGhost">Report</Button>
 						</div>
 					</div>

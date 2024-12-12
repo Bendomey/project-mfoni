@@ -1,4 +1,3 @@
- 
 const fs = require('fs')
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3')
 
