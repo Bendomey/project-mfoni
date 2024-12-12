@@ -27,9 +27,9 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 	if (authCookie) {
 		const query = {
 			pagination: { page: 0, per: 50 },
-			populate: ['content'],
+			populate: ['content', 'content.tags'],
 		}
-		const slug = `${authCookie.userId}_uploads`
+		const slug = `${authCookie.id}_uploads`
 		await queryClient.prefetchQuery({
 			queryKey: [
 				QUERY_KEYS.COLLECTIONS,

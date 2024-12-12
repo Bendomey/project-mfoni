@@ -1,9 +1,9 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import {
-	ArchiveBoxArrowDownIcon,
+	InformationCircleIcon,
 	LockClosedIcon,
 } from '@heroicons/react/16/solid'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { ChevronDownIcon, XCircleIcon } from '@heroicons/react/20/solid'
 import {
 	CalendarDaysIcon,
 	HeartIcon,
@@ -12,7 +12,6 @@ import {
 import { Link, useLoaderData } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { Image } from 'remix-image'
-import { imageUrls } from '../landing-page/index.tsx'
 import { RelatedContent } from './components/related-content.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
@@ -26,17 +25,7 @@ import { getSizeStringForContent } from '@/lib/image-fns.ts'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { type loader } from '@/routes/photos.$slug.ts'
-
-const tags = [
-	'wallpaper',
-	'nature',
-	'background',
-	'love',
-	'business',
-	'money',
-	'office',
-	'people',
-]
+import { Fragment } from 'react'
 
 export const PhotoModule = () => {
 	const { currentUser } = useAuth()
@@ -108,6 +97,46 @@ export const PhotoModule = () => {
 						</div>
 					</div>
 
+					{isContentMine ? (
+						content.status === 'REJECTED' ? (
+							<div className="rounded-md bg-red-50 p-4">
+								<div className="flex">
+									<div className="shrink-0">
+										<XCircleIcon
+											aria-hidden="true"
+											className="size-5 text-red-400"
+										/>
+									</div>
+									<div className="ml-3">
+										<h3 className="text-sm font-medium text-red-800">
+											Image failed processing
+										</h3>
+										<p className="mt-1 text-xs text-red-600">
+											{content.imageProcessingResponse?.message ??
+												'Something happened while processing your image.'}
+										</p>
+									</div>
+								</div>
+							</div>
+						) : content.status === 'PROCESSING' ? (
+							<div className="rounded-md bg-yellow-50 p-4">
+								<div className="flex">
+									<div className="shrink-0">
+										<InformationCircleIcon
+											aria-hidden="true"
+											className="size-5 text-yellow-400"
+										/>
+									</div>
+									<div className="ml-3">
+										<h3 className="text-sm font-medium text-yellow-800">
+											Image is processing. Come back later.
+										</h3>
+									</div>
+								</div>
+							</div>
+						) : null
+					) : null}
+
 					<div className="my-10 flex justify-center md:mx-40 lg:mx-64">
 						<Image
 							src={content.media.url}
@@ -136,7 +165,9 @@ export const PhotoModule = () => {
 							</div>
 						</div>
 						<div className="flex flex-row items-center gap-2">
-							<ShareButton />
+							<ShareButton
+								text={`Check out this photo by ${content.createdBy?.name} on mfoni`}
+							/>
 							<Button color="dangerGhost">Report</Button>
 						</div>
 					</div>
@@ -195,9 +226,21 @@ interface Props {
 
 export default function DownloadButton({ sizes }: Props) {
 	const items = [
-		{ name: 'Small', size: getSizeStringForContent(sizes.small) },
-		{ name: 'Medium', size: getSizeStringForContent(sizes.medium) },
-		{ name: 'Large', size: getSizeStringForContent(sizes.large) },
+		{
+			name: 'Small',
+			size: getSizeStringForContent(sizes.small),
+			disabled: Boolean(sizes.small),
+		},
+		{
+			name: 'Medium',
+			size: getSizeStringForContent(sizes.medium),
+			disabled: Boolean(sizes.medium),
+		},
+		{
+			name: 'Large',
+			size: getSizeStringForContent(sizes.large),
+			disabled: Boolean(sizes.large),
+		},
 	]
 
 	return (
@@ -219,18 +262,22 @@ export default function DownloadButton({ sizes }: Props) {
 				>
 					<div className="py-1">
 						{items.map((item) => (
-							<MenuItem key={item.name}>
-								<button className="flex w-full px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none">
-									{item.name}{' '}
-									<span className="ml-1 text-xs text-gray-400">
-										({item.size})
-									</span>
-								</button>
-							</MenuItem>
+							<Fragment key={item.name}>
+								{item.disabled ? (
+									<MenuItem>
+										<button className="flex w-full px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none">
+											{item.name}{' '}
+											<span className="ml-1 text-xs text-gray-400">
+												({item.size})
+											</span>
+										</button>
+									</MenuItem>
+								) : null}
+							</Fragment>
 						))}
 
 						<MenuItem>
-							<button className="flex w-full px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none">
+							<button className="flex w-full items-center px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none">
 								Original{' '}
 								<span className="ml-1 text-xs text-gray-400">
 									({getSizeStringForContent(sizes.original)})

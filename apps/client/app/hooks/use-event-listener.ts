@@ -1,4 +1,3 @@
- 
 import { type RefObject, useEffect, useRef } from 'react'
 import { useIsomorphicLayoutEffect } from './use-isomorphic-layoutEffect.ts'
 

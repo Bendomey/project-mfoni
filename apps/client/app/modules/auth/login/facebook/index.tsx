@@ -1,4 +1,3 @@
- 
 import { useNavigate, useSearchParams } from '@remix-run/react'
 import { useEffect } from 'react'
 import { useLoginAuth } from '../context/index.tsx'

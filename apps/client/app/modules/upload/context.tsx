@@ -1,4 +1,3 @@
- 
 import { useActionData, useNavigation } from '@remix-run/react'
 import {
 	useContext,
@@ -273,7 +272,7 @@ export const ContentUploadProvider = () => {
 
 export const useContentUpload = () => {
 	const context = useContext(ContentUploadContext)
-	 
+
 	if (!context) {
 		throw new Error(
 			'useContextUpload must be used within a ContentUploadProvider',

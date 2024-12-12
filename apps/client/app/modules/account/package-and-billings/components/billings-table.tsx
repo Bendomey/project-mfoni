@@ -18,7 +18,6 @@ import { classNames } from '@/lib/classNames.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
-
 export function BillingsTable() {
 	const { activeSubcription } = useAuth()
 	const [selectedSub, setSelectedSub] = useState<string | null>(null)

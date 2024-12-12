@@ -78,7 +78,6 @@ export async function loader(args: LoaderFunctionArgs) {
 				if (res?.data) {
 					user = res.data
 
-					 
 					if (
 						!res.data.role &&
 						url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
@@ -155,7 +154,7 @@ function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
 					<Toaster
 						position="bottom-center"
 						toastOptions={{
-							duration: 5000,
+							duration: 500,
 						}}
 					/>
 					<ScrollRestoration />

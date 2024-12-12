@@ -1,5 +1,3 @@
- 
-
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { createRequestHandler } from '@remix-run/express'

@@ -1,4 +1,3 @@
- 
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import {
 	ShareIcon,

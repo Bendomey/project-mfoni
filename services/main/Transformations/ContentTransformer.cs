@@ -131,6 +131,11 @@ public class ContentTransformer
             Amount = content.Amount,
             CurrentUserLike = outputContentLike,
             DoneAt = content.DoneAt,
+            ImageProcessingResponse = new ImageProcessingOutput
+            {
+                Status = content.RekognitionMetaData?.Status ?? "PENDING",
+                Message = content.RekognitionMetaData?.Details?.Message
+            },
             CreatedById = content.CreatedById!,
             CreatedBy = outputBasicCreator,
             RejectedAt = content.RejectedAt,

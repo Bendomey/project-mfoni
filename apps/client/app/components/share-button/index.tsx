@@ -1,13 +1,27 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ShareIcon } from '@heroicons/react/16/solid'
-import { EnvelopeIcon, LinkIcon } from '@heroicons/react/24/outline'
+import { LinkIcon } from '@heroicons/react/24/outline'
+import { useMemo } from 'react'
 import { Button } from '../button/index.tsx'
+import { successToast } from '@/lib/custom-toast-functions.tsx'
+import { isBrowser } from '@/lib/is-browser.ts'
 
 interface Props {
 	button?: any
+	text?: string
+	link?: string
 }
 
-export function ShareButton({ button }: Props) {
+export function ShareButton({ button, link, text }: Props) {
+	const resolvedText = text ?? 'Check this out'
+	const resolvedLink = useMemo(() => {
+		if(isBrowser){
+			return link ?? window.location.href
+		}
+
+		return link ?? ''
+	}, [link])
+
 	return (
 		<Menu as="div" className="relative">
 			<div>
@@ -27,6 +41,12 @@ export function ShareButton({ button }: Props) {
 				<div className="py-1">
 					<MenuItem>
 						<Button
+							onClick={() => {
+								window.open(
+									`https://www.facebook.com/sharer/sharer.php?u=${resolvedLink}&t=${resolvedText}`,
+									'_blank',
+								)
+							}}
 							variant="unstyled"
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>
@@ -46,6 +66,12 @@ export function ShareButton({ button }: Props) {
 					</MenuItem>
 					<MenuItem>
 						<Button
+							onClick={() => {
+								window.open(
+									`https://twitter.com/intent/tweet?url=${resolvedLink}&text=${resolvedText}`,
+									'_blank',
+								)
+							}}
 							variant="unstyled"
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>
@@ -63,22 +89,15 @@ export function ShareButton({ button }: Props) {
 							Twitter
 						</Button>
 					</MenuItem>
-				</div>
-				<div className="py-1">
 					<MenuItem>
 						<Button
-							variant="unstyled"
-							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-						>
-							<EnvelopeIcon
-								aria-hidden="true"
-								className="mr-2 size-4 text-gray-400 group-data-[focus]:text-gray-500"
-							/>
-							Email
-						</Button>
-					</MenuItem>
-					<MenuItem>
-						<Button
+							onClick={() => {
+								navigator.share({
+									title: 'mfoni',
+									text: text,
+									url: resolvedLink,
+								})
+							}}
 							variant="unstyled"
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>
@@ -93,6 +112,12 @@ export function ShareButton({ button }: Props) {
 				<div className="py-1">
 					<MenuItem>
 						<Button
+							onClick={async () => {
+								await navigator.clipboard.writeText(
+									`${resolvedText}: ${resolvedLink}`,
+								)
+								successToast('Link copied to clipboard')
+							}}
 							variant="unstyled"
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>

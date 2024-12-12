@@ -68,15 +68,12 @@ export const AccountCover = () => {
 					</div>
 					<div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
 						<div className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-							{
-								 
-								isYourOwnAccount ? null : (
-									<Button className="w-full md:w-auto">
-										<UserIcon className="mr-3 h-4 w-4" aria-hidden="true" />
-										Follow
-									</Button>
-								)
-							}
+							{isYourOwnAccount ? null : (
+								<Button className="w-full md:w-auto">
+									<UserIcon className="mr-3 h-4 w-4" aria-hidden="true" />
+									Follow
+								</Button>
+							)}
 
 							<Button
 								variant="solid"

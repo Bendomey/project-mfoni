@@ -67,7 +67,6 @@ export const VerifyCreatorProvider = ({ children }: PropsWithChildren) => {
 export const useVerifyCreator = () => {
 	const context = useContext(VerifyCreatorContext)
 
-	 
 	if (!context) {
 		throw new Error('useVerifyCreator must be used within VerifyCreatorContext')
 	}

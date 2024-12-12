@@ -33,7 +33,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 			queryKey: [
 				QUERY_KEYS.CONTENT_LIKES,
 				'user',
-				authCookie.userId,
+				authCookie.id,
 				JSON.stringify(query),
 			],
 			queryFn: () =>

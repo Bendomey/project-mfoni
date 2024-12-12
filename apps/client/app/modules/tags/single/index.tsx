@@ -127,7 +127,11 @@ export function TagModule() {
 							</p>
 						</div>
 						<div className="flex flex-row items-center justify-end gap-2">
-							{data?.total ? <ShareButton /> : null}
+							{data?.total ? (
+								<ShareButton
+									text={`Browse through the carefully curated contents around "${name}"`}
+								/>
+							) : null}
 							<Button color="dangerGhost">Report</Button>
 						</div>
 					</div>
