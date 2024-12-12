@@ -30,16 +30,31 @@ public class SmsConfiguration
 
     public static async Task Send(string jsonBody)
     {
-        using (HttpClient client = new HttpClient())
+        try
         {
-            client.BaseAddress = new Uri("https://api.wittyflow.com");
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://api.wittyflow.com");
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "/v1/messages/send");
-            request.Content = new StringContent(jsonBody, null, "application/json");
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "/v1/messages/send");
+                request.Content = new StringContent(jsonBody, null, "application/json");
 
-            var response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            Console.WriteLine("Response: {0}", await response.Content.ReadAsStringAsync());
+                var response = await client.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+                Console.WriteLine("Response: {0}", await response.Content.ReadAsStringAsync());
+            }
+        }
+        catch (System.Exception e)
+        {
+
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                        {"action", "Send SMS with Wittyflow"},
+                });
+                SentrySdk.CaptureException(e);
+            });
         }
     }
 }

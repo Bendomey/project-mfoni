@@ -1,4 +1,5 @@
 using main.Transformations;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 
 namespace main.Lib;
@@ -69,5 +70,6 @@ public class HttpLib
 
 public class MongoAggregationGetCount
 {
-    public int Count;
+    [BsonElement("totalCount")]
+    public int TotalCount;
 }

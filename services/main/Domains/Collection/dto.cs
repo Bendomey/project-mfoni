@@ -19,6 +19,13 @@ public class UpdateCollection
     public string? Visibility { get; set; }
 }
 
+public class GetCollectionsInput
+{
+    public required string Visibility { get; set; }
+    public string? CreatedById { get; set; }
+    public string? Query { get; set; }
+}
+
 
 public class CollectionContentInput
 {

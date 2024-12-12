@@ -16,21 +16,27 @@ namespace main.Controllers;
 public class ContentController : ControllerBase
 {
     private readonly ILogger<ContentController> _logger;
+    private readonly ContentLikeService _contentLikeService;
     private readonly IndexContent _indexContentService;
     private readonly SearchContentService _searchContentService;
     private readonly ContentTransformer _contentTransformer;
+    private readonly ContentLikeTransformer _contentLikeTransformer;
 
     public ContentController(
         ILogger<ContentController> logger,
+        ContentLikeService contentLikeService,
         IndexContent indexContentService,
         SearchContentService searchContentService,
-        ContentTransformer contentTransformer
+        ContentTransformer contentTransformer,
+        ContentLikeTransformer contentLikeTransformer
     )
     {
         _logger = logger;
+        _contentLikeService = contentLikeService;
         _indexContentService = indexContentService;
         _searchContentService = searchContentService;
         _contentTransformer = contentTransformer;
+        _contentLikeTransformer = contentLikeTransformer;
     }
 
     /// <summary>
@@ -457,6 +463,200 @@ public class ContentController : ControllerBase
                });
                SentrySdk.CaptureException(e);
            });
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+
+    /// <summary>
+    /// Likes a content
+    /// </summary>
+    /// <response code="200">Content Liked Successfully</response>
+    /// <response code="401">Unauthorize</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize]
+    [HttpPost("{id}/likes")]
+    [ProducesResponseType(typeof(OutputResponse<Models.ContentLike>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> LikeContent(string id)
+    {
+        try
+        {
+            _logger.LogInformation("Like content: " + id);
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var contentLike = await _contentLikeService.Create(new Domains.ContentLikeInput
+            {
+                ContentId = id,
+                UserId = currentUser.Id
+            });
+
+            return new ObjectResult(new GetEntityResponse<Models.ContentLike>(contentLike, null).Result()) { StatusCode = StatusCodes.Status201Created };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to like content. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Like Content"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                    {"contentId", id},
+                });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
+    /// <summary>
+    /// Unlike a content
+    /// </summary>
+    /// <response code="200">Content Unlike Successfully</response>
+    /// <response code="401">Unauthorize</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize]
+    [HttpDelete("{id}/likes")]
+    [ProducesResponseType(typeof(OutputResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UnlikeContent(string id)
+    {
+        try
+        {
+            _logger.LogInformation("Like content: " + id);
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var contentLike = await _contentLikeService.Delete(new Domains.ContentLikeInput
+            {
+                ContentId = id,
+                UserId = currentUser.Id
+            });
+
+            return new ObjectResult(new GetEntityResponse<bool>(true, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to unlike content. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Unlike Content"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                    {"contentId", id},
+                });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
+
+    /// <summary>
+    /// Retrieves all contents's likes on the platform
+    /// </summary>
+    /// <param name="id">Id of content</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
+    /// <param name="search">Search by name</param>
+    /// <param name="page">The page to be navigated to</param>
+    /// <param name="pageSize">The number of items on a page</param>
+    /// <param name="sort">To sort response data either by `asc` or `desc`</param>
+    /// <param name="sortBy">What field to sort by.</param>
+    /// <response code="200">Content Likes Retrieved Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [HttpGet("{id}/likes")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<EntityWithPagination<OutputContentLike>>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> GetUserContentLikes(
+        string id,
+        [FromQuery] string? search,
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] string? sort,
+        [FromQuery] string populate = "",
+        [FromQuery] string sortBy = "created_at"
+    )
+    {
+        try
+        {
+            _logger.LogInformation("Getting all user's content likes");
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.ContentLike>(page, pageSize, sort, sortBy, populate);
+            var contents = await _contentLikeService.GetContentLikes(queryFilter, id);
+            long count = await _contentLikeService.CountContentLikes(id);
+
+            var outContent = new List<OutputContentLike>();
+            foreach (var content in contents)
+            {
+                outContent.Add(await _contentLikeTransformer.Transform(content, populate: queryFilter.Populate));
+            }
+            var response = HttpLib.GeneratePagination(
+                outContent,
+                count,
+                queryFilter
+            );
+
+            return new ObjectResult(
+                new GetEntityResponse<EntityWithPagination<OutputContentLike>>(response, null).Result()
+            )
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get user's content likes. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+          {
+              scope.SetTags(new Dictionary<string, string>
+              {
+                    {"action", "Get user's content likes"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                    {"populate", StringLib.SafeString(populate)},
+                    {"search", StringLib.SafeString(search)},
+                    {"page", StringLib.SafeString(page.ToString())},
+                    {"pageSize", StringLib.SafeString(pageSize.ToString())},
+                    {"sort", StringLib.SafeString(sort)},
+                    {"sortBy", sortBy},
+              });
+              SentrySdk.CaptureException(e);
+          });
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }

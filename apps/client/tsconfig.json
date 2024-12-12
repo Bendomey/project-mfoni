@@ -1,18 +1,18 @@
 {
-  "include": ["**/*.ts", "**/*.tsx"],
-  "extends": ["@epic-web/config/typescript"],
-  "compilerOptions": {
-    "module": "nodenext",
-    "target": "ES2022",
-    "moduleResolution": "nodenext",
-    "resolveJsonModule": true,
-    "noUncheckedIndexedAccess": true,
-    "allowJs": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./app/*"],
-      "@/styles": ["./app/styles/*"]
-    },
-    "typeRoots": ["./types", "./node_modules/@types"],
-  },
+	"include": ["**/*.ts", "**/*.tsx"],
+	"extends": ["@epic-web/config/typescript"],
+	"compilerOptions": {
+		"module": "nodenext",
+		"target": "ES2022",
+		"moduleResolution": "nodenext",
+		"resolveJsonModule": true,
+		"noUncheckedIndexedAccess": true,
+		"allowJs": true,
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./app/*"],
+			"@/styles": ["./app/styles/*"]
+		},
+		"typeRoots": ["./types", "./node_modules/@types"]
+	}
 }

@@ -130,28 +130,29 @@ public class SearchTagService
         return tags;
     }
 
-    public async Task<List<Models.Content>> GetTagContents(
-           FilterQuery<Models.Content> queryFilter,
+    public async Task<List<Models.TagContent>> GetTagContents(
+           FilterQuery<Models.TagContent> queryFilter,
            GetContentsForTagInput input
        )
     {
         var pipeline = new[]
         {
+            new BsonDocument("$match",  new BsonDocument
+            {
+                { "tag_id",new BsonDocument("$eq", new ObjectId(input.TagId)) },
+            }),
             new BsonDocument("$lookup", new BsonDocument
             {
-                { "from", "tag_contents" },
-                { "localField", "_id" },
-                { "foreignField", "content_id" },
-                { "as", "tag_contents" }
+                { "from", "contents" },
+                { "localField", "content_id" },
+                { "foreignField", "_id" },
+                { "as", "contents" }
             }),
-            new BsonDocument("$unwind", "$tag_contents"),
+            new BsonDocument("$unwind", "$contents"),
+
             new BsonDocument("$match",  new BsonDocument
             {
-                { "tag_contents.tag_id",new BsonDocument("$eq", new ObjectId(input.TagId)) },
-            }),
-            new BsonDocument("$match",  new BsonDocument
-            {
-                { "visibility",new BsonDocument("$eq", ContentVisibility.PUBLIC) },
+                { "contents.visibility",new BsonDocument("$eq", ContentVisibility.PUBLIC) },
             }),
         };
 
@@ -159,7 +160,7 @@ public class SearchTagService
         {
             pipeline = pipeline.Append(new BsonDocument("$match", new BsonDocument
             {
-                { "orientation",  new BsonDocument("$eq", input.Orientation) }
+                { "contents.orientation",  new BsonDocument("$eq", input.Orientation) }
             })).ToArray();
         }
 
@@ -174,41 +175,42 @@ public class SearchTagService
 
             pipeline = pipeline.Append(new BsonDocument("$match", new BsonDocument
             {
-                { "amount",  licenseDoc }
+                { "contents.amount",  licenseDoc }
             })).ToArray();
         }
 
-        pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("tag_contents", 0))).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("contents", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$limit", queryFilter.Limit)).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$skip", queryFilter.Skip)).ToArray();
 
         // TODO: figure out how to sort dynamically
         pipeline = pipeline.Append(new BsonDocument("$sort", new BsonDocument("created_at", -1))).ToArray();
 
-        return await _contentCollection
-           .Aggregate<Models.Content>(pipeline)
+        return await _contentTagsCollection
+           .Aggregate<Models.TagContent>(pipeline)
            .ToListAsync();
     }
 
     public async Task<long> CountTagContents(GetContentsForTagInput input)
     {
         var pipeline = new[]
-                {
+        {
+             new BsonDocument("$match",  new BsonDocument
+            {
+                { "tag_id",new BsonDocument("$eq", new ObjectId(input.TagId)) },
+            }),
             new BsonDocument("$lookup", new BsonDocument
             {
-                { "from", "tag_contents" },
-                { "localField", "_id" },
-                { "foreignField", "content_id" },
-                { "as", "tag_contents" }
+                { "from", "contents" },
+                { "localField", "content_id" },
+                { "foreignField", "_id" },
+                { "as", "contents" }
             }),
-            new BsonDocument("$unwind", "$tag_contents"),
+            new BsonDocument("$unwind", "$contents"),
+
             new BsonDocument("$match",  new BsonDocument
             {
-                { "tag_contents.tag_id",new BsonDocument("$eq", new ObjectId(input.TagId)) },
-            }),
-            new BsonDocument("$match",  new BsonDocument
-            {
-                { "visibility",new BsonDocument("$eq", ContentVisibility.PUBLIC) },
+                { "contents.visibility",new BsonDocument("$eq", ContentVisibility.PUBLIC) },
             }),
         };
 
@@ -216,7 +218,7 @@ public class SearchTagService
         {
             pipeline = pipeline.Append(new BsonDocument("$match", new BsonDocument
             {
-                { "orientation",  new BsonDocument("$eq", input.Orientation) }
+                { "contents.orientation",  new BsonDocument("$eq", input.Orientation) }
             })).ToArray();
         }
 
@@ -231,23 +233,20 @@ public class SearchTagService
 
             pipeline = pipeline.Append(new BsonDocument("$match", new BsonDocument
             {
-                { "amount",  licenseDoc }
+                { "contents.amount",  licenseDoc }
             })).ToArray();
         }
 
-        pipeline = pipeline.Append(new BsonDocument("$count", "count")).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$count", "totalCount")).ToArray();
 
-        var result = await _contentCollection.AggregateAsync<MongoAggregationGetCount>(pipeline);
+        var result = await _contentTagsCollection.AggregateAsync<MongoAggregationGetCount>(pipeline);
 
         var count = 0;
-        if (await result.MoveNextAsync())
+        await result.ForEachAsync(doc =>
         {
-            foreach (var doc in result.Current)
-            {
-                count = doc.Count;
-                break;
-            }
-        }
+            count = doc.TotalCount;
+        });
+
         return count;
     }
 }

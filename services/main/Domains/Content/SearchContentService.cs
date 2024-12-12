@@ -237,13 +237,6 @@ public class SearchContentService
         return contents;
     }
 
-    public async Task<ContentLike?> GetContentLike(string contentId, string userId)
-    {
-        var filter = Builders<ContentLike>.Filter.Eq(r => r.ContentId, contentId) & Builders<ContentLike>.Filter.Eq(r => r.UserId, userId);
-        var contentLike = await _contentLikesCollection.Find(filter).FirstOrDefaultAsync();
-        return contentLike;
-    }
-
     public async Task<Models.Content> GetContentById(string contentId)
     {
         var content = await _contentsCollection.Find(c => c.Id == contentId).FirstOrDefaultAsync();

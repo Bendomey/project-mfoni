@@ -10,6 +10,7 @@ namespace main.Transformations;
 public class ContentTransformer
 {
     private readonly SearchContentService _searchContentService;
+    private readonly ContentLikeService _contentLikeService;
     private readonly UserService _userService;
     private readonly SearchTagService _searchTagService;
     private readonly UserTransformer _userTransformer;
@@ -18,6 +19,7 @@ public class ContentTransformer
     private readonly AdminTransformer _adminTransformer;
     public ContentTransformer(
         UserService userService,
+        ContentLikeService contentLikeService,
         AdminService adminService,
         AdminTransformer adminTransformer,
         UserTransformer userTransformer,
@@ -27,6 +29,7 @@ public class ContentTransformer
     )
     {
         _userService = userService;
+        _contentLikeService = contentLikeService;
         _adminService = adminService;
         _adminTransformer = adminTransformer;
         _userTransformer = userTransformer;
@@ -78,7 +81,12 @@ public class ContentTransformer
         OutputContentLike? outputContentLike = null;
         if (userId is not null)
         {
-            var contentLike = await _searchContentService.GetContentLike(content.Id, userId);
+            var contentLike = await _contentLikeService.GetContentLike(new ContentLikeInput
+            {
+                ContentId = content.Id,
+                UserId = userId
+            });
+
             if (contentLike is not null)
             {
                 outputContentLike = new OutputContentLike

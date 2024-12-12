@@ -1,5 +1,5 @@
-import {isSSR} from '@/lib/is-browser.ts'
-import {useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
+import { isSSR } from '@/lib/is-browser.ts'
 
 /**
  * This method validates a File (input) or an image URL
@@ -8,55 +8,55 @@ import {useEffect, useState} from 'react'
  * @returns - Returns true for valid images, throws or returns false for invalid images
  */
 export const validateImage = (
-  src: string | File,
-  config?: {
-    throw: boolean
-  },
+	src: string | File,
+	config?: {
+		throw: boolean
+	},
 ): Promise<boolean | undefined> => {
-  if (isSSR) {
-    throw new Error(
-      'Cannot use this utility method in a non browser environment',
-    )
-  }
+	if (isSSR) {
+		throw new Error(
+			'Cannot use this utility method in a non browser environment',
+		)
+	}
 
-  let url = ''
-  if (typeof src === 'string') {
-    url = src
-  } else {
-    url = URL.createObjectURL(src)
-  }
+	let url = ''
+	if (typeof src === 'string') {
+		url = src
+	} else {
+		url = URL.createObjectURL(src)
+	}
 
-  const image = new Image()
-  image.src = url
+	const image = new Image()
+	image.src = url
 
-  return new Promise((resolve, reject) => {
-    image.addEventListener('error', () =>
-      config?.throw
-        ? reject('The media resource is either invalid, corrupt or unsuitable')
-        : resolve(false),
-    )
+	return new Promise((resolve, reject) => {
+		image.addEventListener('error', () =>
+			config?.throw
+				? reject('The media resource is either invalid, corrupt or unsuitable')
+				: resolve(false),
+		)
 
-    image.addEventListener('load', () => resolve(true), false)
-  })
+		image.addEventListener('load', () => resolve(true), false)
+	})
 }
 
 export const useValidateImage = (imageUrl: string) => {
-  const [imageIsValid, setImageIsValid] = useState(false)
+	const [imageIsValid, setImageIsValid] = useState(false)
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      void (async () => {
-        try {
-          const res = await validateImage(imageUrl)
-          if (res) {
-            setImageIsValid(res)
-          }
-        } catch (error: unknown) {
-          setImageIsValid(false)
-        }
-      })()
-    }
-  }, [imageUrl])
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			void (async () => {
+				try {
+					const res = await validateImage(imageUrl)
+					if (res) {
+						setImageIsValid(res)
+					}
+				} catch (error: unknown) {
+					setImageIsValid(false)
+				}
+			})()
+		}
+	}, [imageUrl])
 
-  return imageIsValid
+	return imageIsValid
 }

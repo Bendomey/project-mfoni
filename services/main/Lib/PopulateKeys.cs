@@ -8,6 +8,7 @@ public class PopulateKeys
     public static readonly string PURCHASE = "purchase";
     public static readonly string SUBSCRIPTION = "subscription";
     public static readonly string COLLECTION_CREATED_BY = "collection.createdBy";
+    public static readonly string CONTENT_LIKE_CREATED_BY = "contentLike.createdBy";
     public static readonly string COLLECTION = "collection";
     public static readonly string CONTENT = "content";
     public static readonly string CONTENT_TAGS = "content.tags";

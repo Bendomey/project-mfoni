@@ -1,55 +1,141 @@
-import {Button} from '@/components/button/index.tsx'
-import {Footer} from '@/components/footer/index.tsx'
-import {Header} from '@/components/layout/index.ts'
-import {ShareButton} from '@/components/share-button/index.tsx'
-import {PAGES} from '@/constants/index.ts'
-import {EmptyState} from '@/modules/explore/components/empty-state/index.tsx'
-import {ChevronLeftIcon} from '@heroicons/react/24/outline'
-import {useParams} from '@remix-run/react'
+import { ArrowPathIcon, ChevronLeftIcon } from '@heroicons/react/24/outline'
+import { useLoaderData, useNavigate, useParams } from '@remix-run/react'
+import dayjs from 'dayjs'
+import { Fragment } from 'react'
+import { useGetTagContentsBySlug } from '@/api/tags/index.ts'
+import { FadeIn } from '@/components/animation/FadeIn.tsx'
+import { Button } from '@/components/button/index.tsx'
+import { Content } from '@/components/Content/index.tsx'
+import { EmptyState } from '@/components/empty-state/index.tsx'
+import { ErrorState } from '@/components/error-state/index.tsx'
+import { Footer } from '@/components/footer/index.tsx'
+import { Header } from '@/components/layout/index.ts'
+import { Loader } from '@/components/loader/index.tsx'
+import { ShareButton } from '@/components/share-button/index.tsx'
+import { PAGES } from '@/constants/index.ts'
+import { safeString } from '@/lib/strings.ts'
+import { type loader } from '@/routes/tags.$tag.ts'
 
 export function TagModule() {
-  const {tag: tagParam} = useParams()
+	const navigate = useNavigate()
+	const { tag } = useLoaderData<typeof loader>()
+	const { tag: tagParam } = useParams()
+	const { isPending, data, isError } = useGetTagContentsBySlug(
+		safeString(tagParam),
+		{
+			pagination: { page: 0, per: 50 },
+			filters: {},
+			populate: ['content'],
+		},
+	)
 
-  return (
-    <>
-      <Header isHeroSearchInVisible={false} />
-      <div className="mx-auto max-w-8xl py-4 px-4 lg:px-8">
-        <div className="mt-10">
-          <Button
-            isLink
-            href={PAGES.TAGS}
-            variant="unstyled"
-            className="mb-1 hover:underline"
-          >
-            <ChevronLeftIcon className="h-4 w-auto" />
-            Tags
-          </Button>
-          <h1 className="font-black text-4xl">{tagParam}</h1>
-          <div className="mt-2">
-            <span className="font-medium text-gray-500">Curated by mfoni</span>
-          </div>
-          <div className="mt-5 flex flex-col md:flex-row justify-between gap-5">
-            <div>
-              <p className="text-sm font-medium w-full md:w-2/3">
-                Browse through the carefully curated contents around "{tagParam}
-                " — you could also submit your best work.
-              </p>
-            </div>
-            <div className="flex flex-row items-center justify-end gap-2">
-              <ShareButton />
-              <Button color="dangerGhost">Report</Button>
-            </div>
-          </div>
-        </div>
+	const name = tag ? tag.name : tagParam
 
-        <div className="flex flex-1 justify-center items-center h-[50vh]">
-          <EmptyState
-            message={`There are no content found under "${tagParam}". Come back later.`}
-            title="No content found"
-          />
-        </div>
-      </div>
-      <Footer />
-    </>
-  )
+	let content = <></>
+
+	if (isPending) {
+		content = (
+			<div className="flex h-[50vh] flex-1 items-center justify-center">
+				<Loader />
+			</div>
+		)
+	}
+
+	if (isError) {
+		content = (
+			<div className="flex h-[50vh] flex-1 items-center justify-center">
+				<ErrorState
+					message="An error occurred fetching tag's contents."
+					title="Something happened."
+				>
+					<Button
+						isLink
+						variant="outlined"
+						href={PAGES.COLLECTION.replace(':tag', safeString(tagParam))}
+						linkProps={{
+							reloadDocument: true,
+						}}
+					>
+						<ArrowPathIcon
+							aria-hidden="true"
+							className="-ml-0.5 mr-1.5 size-5"
+						/>
+						Reload
+					</Button>
+				</ErrorState>
+			</div>
+		)
+	}
+
+	if (data && !data?.total) {
+		content = (
+			<div className="flex h-[50vh] flex-1 items-center justify-center">
+				<EmptyState
+					message={`There are no content found under "${name}". Come back later.`}
+					title="No content found"
+				/>
+			</div>
+		)
+	}
+
+	if (data?.total) {
+		content = (
+			<FadeIn>
+				<div className="mt-8 columns-1 gap-2 sm:columns-2 sm:gap-3 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
+					{data.rows.map((tagContent) => (
+						<Fragment key={tagContent.id}>
+							{tagContent.content ? (
+								<Content
+									key={tagContent.content.id}
+									content={tagContent.content}
+								/>
+							) : null}
+						</Fragment>
+					))}
+				</div>
+			</FadeIn>
+		)
+	}
+
+	return (
+		<>
+			<Header isHeroSearchInVisible={false} />
+			<div className="max-w-8xl mx-auto px-4 py-4 lg:px-8">
+				<div className="mt-10">
+					<Button
+						onClick={() => navigate(-1)}
+						variant="unstyled"
+						className="mb-1 hover:underline"
+					>
+						<ChevronLeftIcon className="h-4 w-auto" />
+						Go Back
+					</Button>
+					<h1 className="text-4xl font-black">{name}</h1>
+					<div className="mt-2 flex flex-col">
+						<span className="font-medium text-gray-500">
+							Curated by <span className="text-blue-600">mfoni</span>
+						</span>
+						<span className="text-xs font-light text-gray-500">
+							Published on {dayjs(tag?.createdAt).format('L')}
+						</span>
+					</div>
+					<div className="mt-5 flex flex-col justify-between gap-5 md:flex-row">
+						<div>
+							<p className="w-full text-sm font-medium md:w-2/3">
+								Browse through the carefully curated contents around "{name}" —
+								you could also submit your best work.
+							</p>
+						</div>
+						<div className="flex flex-row items-center justify-end gap-2">
+							{data?.total ? <ShareButton /> : null}
+							<Button color="dangerGhost">Report</Button>
+						</div>
+					</div>
+				</div>
+
+				{content}
+			</div>
+			<Footer />
+		</>
+	)
 }

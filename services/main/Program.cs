@@ -127,6 +127,7 @@ builder.Services.AddSingleton<SaveTagsService>();
 
 builder.Services.AddSingleton<CollectionService>();
 builder.Services.AddSingleton<CollectionContentService>();
+builder.Services.AddSingleton<ContentLikeService>();
 
 // indexing content services
 builder.Services.AddSingleton<IndexContent>();
@@ -146,6 +147,8 @@ builder.Services.AddSingleton<CreatorSubscriptionPurchaseTransformer>();
 builder.Services.AddSingleton<CollectionTransformer>();
 builder.Services.AddSingleton<CollectionContentTransformer>();
 builder.Services.AddSingleton<TagTransformer>();
+builder.Services.AddSingleton<ContentLikeTransformer>();
+builder.Services.AddSingleton<TagContentTransformer>();
 
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();
