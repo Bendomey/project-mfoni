@@ -11,7 +11,7 @@ export default function WalletTransactions() {
   return (
     <>
       <Header />
-      <div className="mt-12">
+      <div className="mt-10">
         <WalletTransaction />
       </div>
     </>

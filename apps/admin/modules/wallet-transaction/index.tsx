@@ -17,6 +17,18 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { useGetCreatorApplications } from "@/api";
 import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
+import * as React from "react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+
 
 const CREATOR_APPLICATION_PER_PAGE = 50;
 
@@ -167,11 +179,33 @@ export const WalletTransaction = () => {
       <div className="px-7 mx-auto">
         <div className="flex flex-row justify-start pb-8">
           <div>
-            <h2 className="text-4xl font-bold">Creator Applications</h2>
+            <h2 className="text-4xl font-bold">Wallet Transactions</h2>
             <p className="text-lg text-gray-500">
-              Here’s a list of applications that needs attention!
+              Here’s a list of wallets and transactions!
             </p>
           </div>
+        </div>
+
+        <div>
+    <Card className="w-[650px]">
+      <CardContent className="flex flex-row justify-between gap-12 pt-4">
+        <div>
+          <div className="flex flex-row justify-start gap-4 pb-3">
+        <Button variant="outline">MFONI</Button>
+        <Button>My Wallet</Button>
+          </div>
+        <p>This wallet is your default payment method for all purchases on this website.</p>
+        </div>
+
+        <div className="w-2/6">
+          <h1 className="text-lg">GHC 150.00</h1>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-end gap-4 p-4">
+        <Button variant="outline">Deposit</Button>
+        <Button>Withdraw</Button>
+      </CardFooter>
+    </Card>
         </div>
 
         <DataTable
