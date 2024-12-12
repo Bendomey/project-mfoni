@@ -42,7 +42,8 @@ public class CollectionService
             Name = input.Name,
             Slug = input.Slug,
             Description = input.Description,
-            CreatedById = input.CreatedById
+            CreatedById = input.CreatedById,
+            IsCustom = true
         };
 
         if (input.Visibility is not null)
@@ -136,21 +137,25 @@ public class CollectionService
 
     public async Task<List<Models.Collection>> GetCollections(
         FilterQuery<Models.Collection> queryFilter,
-        string? query,
-        string visibility
+        GetCollectionsInput input
     )
     {
         FilterDefinitionBuilder<Models.Collection> builder = Builders<Models.Collection>.Filter;
-        var filter = builder.Empty;
+        var filter = builder.Eq(r => r.IsCustom, true);
 
-        if (visibility != "ALL")
+        if (input.Visibility != "ALL")
         {
-            filter &= builder.Eq(r => r.Visibility, visibility);
+            filter &= builder.Eq(r => r.Visibility, input.Visibility);
         }
 
-        if (!string.IsNullOrEmpty(query))
+        if (!string.IsNullOrEmpty(input.CreatedById))
         {
-            filter &= builder.Regex(r => r.Name, new MongoDB.Bson.BsonRegularExpression(query, "i"));
+            filter &= builder.Eq(r => r.CreatedById, input.CreatedById);
+        }
+
+        if (!string.IsNullOrEmpty(input.Query))
+        {
+            filter &= builder.Regex(r => r.Name, new MongoDB.Bson.BsonRegularExpression(input.Query, "i"));
         }
 
         var users = await _collectionCollection
@@ -163,19 +168,24 @@ public class CollectionService
         return users ?? [];
     }
 
-    public async Task<long> CountCollections(string? query, string visibility)
+    public async Task<long> CountCollections(GetCollectionsInput input)
     {
         FilterDefinitionBuilder<Models.Collection> builder = Builders<Models.Collection>.Filter;
-        var filter = builder.Empty;
+        var filter = builder.Eq(r => r.IsCustom, true);
 
-        if (visibility != "ALL")
+        if (input.Visibility != "ALL")
         {
-            filter &= builder.Eq(r => r.Visibility, visibility);
+            filter &= builder.Eq(r => r.Visibility, input.Visibility);
         }
 
-        if (!string.IsNullOrEmpty(query))
+        if (!string.IsNullOrEmpty(input.CreatedById))
         {
-            filter &= builder.Regex(r => r.Name, new MongoDB.Bson.BsonRegularExpression(query, "i"));
+            filter &= builder.Eq(r => r.CreatedById, input.CreatedById);
+        }
+
+        if (!string.IsNullOrEmpty(input.Query))
+        {
+            filter &= builder.Regex(r => r.Name, new MongoDB.Bson.BsonRegularExpression(input.Query, "i"));
         }
 
         var count = await _collectionCollection.CountDocumentsAsync(filter);

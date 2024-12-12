@@ -20,9 +20,11 @@ public class TagsController : ControllerBase
     private readonly SearchTagService _searchTagsService;
     private readonly TagTransformer _tagTransformer;
     private readonly ContentTransformer _contentTransformer;
+    private readonly TagContentTransformer _tagContentTransformer;
 
     public TagsController(ILogger<TagsController> logger, SaveTagsService saveTagsService, SearchTagService searchTagService, TagTransformer tagTransformer,
-        ContentTransformer contentTransformer
+        ContentTransformer contentTransformer,
+        TagContentTransformer tagContentTransformer
     )
     {
         _logger = logger;
@@ -30,6 +32,7 @@ public class TagsController : ControllerBase
         _searchTagsService = searchTagService;
         _tagTransformer = tagTransformer;
         _contentTransformer = contentTransformer;
+        _tagContentTransformer = tagContentTransformer;
     }
 
     /// <summary>
@@ -275,8 +278,8 @@ public class TagsController : ControllerBase
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Retrieved contents from a tag Successfully</response>
     /// <response code="500">An unexpected error occured</response>
-    [HttpGet("{slug}/contents/slug")]
-    [ProducesResponseType(typeof(OutputResponse<List<OutputContent>>), StatusCodes.Status200OK)]
+    [HttpGet("{slug}/slug/contents")]
+    [ProducesResponseType(typeof(OutputResponse<List<OutputTagContent>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetContentsFromTagBySlug(
@@ -304,7 +307,7 @@ public class TagsController : ControllerBase
             _logger.LogInformation("Getting tag contents");
             var tag = _searchTagsService.GetBySlug(slug);
 
-            var queryFilter = HttpLib.GenerateFilterQuery<Models.Content>(page, pageSize, sort, sortBy, populate);
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.TagContent>(page, pageSize, sort, sortBy, populate);
 
             var input = new Domains.GetContentsForTagInput
             {
@@ -315,10 +318,10 @@ public class TagsController : ControllerBase
             var contents = await _searchTagsService.GetTagContents(queryFilter, input);
             long count = await _searchTagsService.CountTagContents(input);
 
-            var outContent = new List<OutputContent>();
+            var outContent = new List<OutputTagContent>();
             foreach (var content in contents)
             {
-                outContent.Add(await _contentTransformer.Transform(content, populate: queryFilter.Populate, userId));
+                outContent.Add(await _tagContentTransformer.Transform(content, populate: queryFilter.Populate));
             }
             var response = HttpLib.GeneratePagination(
                 outContent,
@@ -327,7 +330,7 @@ public class TagsController : ControllerBase
             );
 
             return new ObjectResult(
-                new GetEntityResponse<EntityWithPagination<OutputContent>>(response, null).Result()
+                new GetEntityResponse<EntityWithPagination<OutputTagContent>>(response, null).Result()
             )
             {
                 StatusCode = (int)HttpStatusCode.OK
@@ -379,7 +382,7 @@ public class TagsController : ControllerBase
     /// <response code="200">Retrieved contents from a tag Successfully</response>
     /// <response code="500">An unexpected error occured</response>
     [HttpGet("{id}/contents")]
-    [ProducesResponseType(typeof(OutputResponse<List<OutputContent>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<List<OutputTagContent>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetContentsFromTag(
@@ -397,7 +400,7 @@ public class TagsController : ControllerBase
         {
             _logger.LogInformation("Getting tag contents");
 
-            var queryFilter = HttpLib.GenerateFilterQuery<Models.Content>(page, pageSize, sort, sortBy, populate);
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.TagContent>(page, pageSize, sort, sortBy, populate);
 
             var input = new Domains.GetContentsForTagInput
             {
@@ -408,10 +411,10 @@ public class TagsController : ControllerBase
             var contents = await _searchTagsService.GetTagContents(queryFilter, input);
             long count = await _searchTagsService.CountTagContents(input);
 
-            var outContent = new List<OutputContent>();
+            var outContent = new List<OutputTagContent>();
             foreach (var content in contents)
             {
-                outContent.Add(await _contentTransformer.Transform(content, populate: queryFilter.Populate));
+                outContent.Add(await _tagContentTransformer.Transform(content, populate: queryFilter.Populate));
             }
             var response = HttpLib.GeneratePagination(
                 outContent,
@@ -420,7 +423,7 @@ public class TagsController : ControllerBase
             );
 
             return new ObjectResult(
-                new GetEntityResponse<EntityWithPagination<OutputContent>>(response, null).Result()
+                new GetEntityResponse<EntityWithPagination<OutputTagContent>>(response, null).Result()
             )
             {
                 StatusCode = (int)HttpStatusCode.OK

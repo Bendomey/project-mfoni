@@ -1,16 +1,82 @@
-import {PhotoModule} from '@/modules/index.ts'
-import {type MetaFunction} from '@remix-run/node'
+import {
+	type LoaderFunctionArgs,
+	redirect,
+	type MetaFunction,
+} from '@remix-run/node'
+import { dehydrate, QueryClient } from '@tanstack/react-query'
+import { getContentBySlug } from '@/api/contents/index.ts'
+import { PAGES } from '@/constants/index.ts'
+import { environmentVariables } from '@/lib/actions/env.server.ts'
+import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
+import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
+import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
+import { getSocialMetas } from '@/lib/seo.ts'
+import { safeString } from '@/lib/strings.ts'
+import { PhotoModule } from '@/modules/index.ts'
 
-export const meta: MetaFunction = () => {
-  return [
-    {title: 'Content | mfoni'},
-    {
-      name: 'description',
-      content:
-        'Description of the content. Maybe put in some tags of the content',
-    },
-    {name: 'keywords', content: 'mfoni, Mfoni'},
-  ]
+export async function loader(loaderArgs: LoaderFunctionArgs) {
+	const queryClient = new QueryClient()
+
+	const authCookie = await extractAuthCookie(
+		loaderArgs.request.headers.get('cookie'),
+	)
+
+	const baseUrl = `${environmentVariables().API_ADDRESS}/api`
+
+	let content: Content | undefined = undefined
+	try {
+		content = await getContentBySlug(
+			safeString(loaderArgs.params.slug),
+			{
+				filters: {},
+				populate: ['content.createdBy', 'content.tags'],
+			},
+			{
+				baseUrl,
+				authToken: authCookie?.token,
+			},
+		)
+	} catch (error) {
+		// if collection is not found, return 404
+		return redirect(PAGES.NOT_FOUND)
+	}
+
+	// await queryClient.prefetchQuery({
+	// 	queryKey: [
+	// 		QUERY_KEYS.CONTENTS,
+	// 		slug,
+	// 		'slug',
+	// 		query,
+	// 	],
+	// 	queryFn: () =>
+	// 		getCollectionContentsBySlug(slug, query, {
+	// 			authToken: authCookie?.token,
+	// 			baseUrl,
+	// 		}),
+	// })
+
+	const dehydratedState = dehydrate(queryClient)
+
+	return jsonWithCache({
+		dehydratedState,
+		content,
+		origin: getDomainUrl(loaderArgs.request),
+	})
+}
+
+export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
+	return getSocialMetas({
+		title: data?.content
+			? `${data?.content?.title} | mfoni`
+			: '404: Content Not Found',
+		description: '',
+		images: data?.content?.media?.url ? [data?.content?.media?.url] : [],
+		url: getDisplayUrl({
+			origin: data?.origin ?? 'https://mfoni.app',
+			path: location.pathname,
+		}),
+		keywords: data?.content?.tags?.map((tag) => tag.name).join(', '),
+	})
 }
 
 export default PhotoModule

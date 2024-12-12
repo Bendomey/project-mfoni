@@ -39,6 +39,9 @@ public class Collection
     [BsonElement("visibility")]
     public string Visibility { get; set; } = CollectionVisibility.PRIVATE;
 
+    [BsonElement("is_custom")]
+    public bool IsCustom { get; set; } = false;
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

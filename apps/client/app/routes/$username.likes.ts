@@ -1,3 +1,3 @@
-import {CreatorLikesModule} from '@/modules/index.ts'
+import { CreatorLikesModule } from '@/modules/index.ts'
 
 export default CreatorLikesModule

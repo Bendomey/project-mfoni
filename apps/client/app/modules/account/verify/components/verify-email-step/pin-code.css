@@ -6,73 +6,73 @@ $red: #dc3545;
 $white: #ffffff; */
 
 code {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
+	display: inline-block;
+	padding: 0.25rem 0.5rem;
 }
 
 .pin-field {
-  border: 1px solid #d3d3d3;
-  border-right: none;
-  font-size: 2rem;
-  height: 4rem;
-  outline: none;
-  text-align: center;
-  transition-duration: 250ms;
-  transition-property: color, border, box-shadow, transform;
-  width: 4rem;
+	border: 1px solid #d3d3d3;
+	border-right: none;
+	font-size: 2rem;
+	height: 4rem;
+	outline: none;
+	text-align: center;
+	transition-duration: 250ms;
+	transition-property: color, border, box-shadow, transform;
+	width: 4rem;
 
-  &:first-of-type {
-    border-radius: 0.5rem 0 0 0.5rem;
-  }
+	&:first-of-type {
+		border-radius: 0.5rem 0 0 0.5rem;
+	}
 
-  &:last-of-type {
-    border-radius: 0 0.5rem 0.5rem 0;
-    border-right: 1px solid #d3d3d3;
-  }
+	&:last-of-type {
+		border-radius: 0 0.5rem 0.5rem 0;
+		border-right: 1px solid #d3d3d3;
+	}
 
-  &:focus {
-    border-color: #686de0;
-    box-shadow: 0 0 0.25rem rgba(#686de0, 0.5);
-    outline: none;
+	&:focus {
+		border-color: #686de0;
+		box-shadow: 0 0 0.25rem rgba(#686de0, 0.5);
+		outline: none;
 
-    & + .pin-field {
-      border-left-color: #686de0;
-    }
-  }
+		& + .pin-field {
+			border-left-color: #686de0;
+		}
+	}
 
-  &:invalid {
-    animation: shake 5 linear 75ms;
-    border-color: #dc3545;
-    box-shadow: 0 0 0.25rem rgba(#dc3545, 0.5);
+	&:invalid {
+		animation: shake 5 linear 75ms;
+		border-color: #dc3545;
+		box-shadow: 0 0 0.25rem rgba(#dc3545, 0.5);
 
-    & + .pin-field {
-      border-left-color: #dc3545;
-    }
-  }
+		& + .pin-field {
+			border-left-color: #dc3545;
+		}
+	}
 
-  &.complete {
-    border-color: #6ab04c;
-    color: #6ab04c;
+	&.complete {
+		border-color: #6ab04c;
+		color: #6ab04c;
 
-    &[disabled] {
-      background: rgba(#6ab04c, 0.1);
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
+		&[disabled] {
+			background: rgba(#6ab04c, 0.1);
+			cursor: not-allowed;
+			opacity: 0.5;
+		}
 
-    & + .pin-field {
-      border-left-color: #6ab04c;
-    }
-  }
+		& + .pin-field {
+			border-left-color: #6ab04c;
+		}
+	}
 }
 
 @keyframes shake {
-  from {
-    transform: translateY(-5%);
-  }
-  to {
-    transform: translateY(5%);
-  }
+	from {
+		transform: translateY(-5%);
+	}
+	to {
+		transform: translateY(5%);
+	}
 }
 
 /* 
@@ -81,17 +81,17 @@ code {
 */
 
 @media (min-width: 481px) and (max-width: 767px) {
-  .pin-field {
-    border: 1px solid #d3d3d3;
-    border-right: none;
-    font-size: 1rem;
-    height: 4rem;
-    outline: none;
-    text-align: center;
-    transition-duration: 250ms;
-    transition-property: color, border, box-shadow, transform;
-    width: 2rem;
-  }
+	.pin-field {
+		border: 1px solid #d3d3d3;
+		border-right: none;
+		font-size: 1rem;
+		height: 4rem;
+		outline: none;
+		text-align: center;
+		transition-duration: 250ms;
+		transition-property: color, border, box-shadow, transform;
+		width: 2rem;
+	}
 }
 
 /* 
@@ -100,15 +100,15 @@ code {
 */
 
 @media (min-width: 320px) and (max-width: 480px) {
-  .pin-field {
-    border: 1px solid #d3d3d3;
-    border-right: none;
-    font-size: 1.5rem;
-    height: 4rem;
-    outline: none;
-    text-align: center;
-    transition-duration: 250ms;
-    transition-property: color, border, box-shadow, transform;
-    width: 3.5rem;
-  }
+	.pin-field {
+		border: 1px solid #d3d3d3;
+		border-right: none;
+		font-size: 1.5rem;
+		height: 4rem;
+		outline: none;
+		text-align: center;
+		transition-duration: 250ms;
+		transition-property: color, border, box-shadow, transform;
+		width: 3.5rem;
+	}
 }

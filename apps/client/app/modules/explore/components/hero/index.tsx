@@ -1,9 +1,9 @@
-import {Header} from '@/components/layout/index.ts'
-import {SearchPhotosForMobile} from '@/components/layout/header/search-for-mobile/index.tsx'
-import {SearchPhotos} from '@/components/layout/header/search/index.tsx'
-import {FadeIn} from '@/components/animation/FadeIn.tsx'
-// import {motion} from 'framer-motion'
 import heroBg from '@/assets/hero-bg.jpeg'
+import { FadeIn } from '@/components/animation/FadeIn.tsx'
+import { SearchPhotos } from '@/components/layout/header/search/index.tsx'
+import { SearchPhotosForMobile } from '@/components/layout/header/search-for-mobile/index.tsx'
+import { Header } from '@/components/layout/index.ts'
+// import {motion} from 'framer-motion'
 // import noise from '@/assets/noise.png'
 
 /**
@@ -36,33 +36,33 @@ const FuzzyOverlay = () => {
 **/
 
 export const ExploreHeroSection = () => {
-  return (
-    <div
-      style={{
-        backgroundImage: `url(${heroBg})`,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundPosition: 'left',
-      }}
-      className="h-[50vh]  bg-gradient-to-r from-sky-500 to-indigo-500"
-    >
-      <Header isHeroSearchInVisible={true} />
-      <FadeIn className="relative  px-6 pt-14 lg:px-8">
-        <div className="mx-auto max-w-2xl">
-          <div className="text">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-              Photo gallery for creators & photographers.
-            </h1>
-            <div className="block md:hidden mt-5">
-              <SearchPhotosForMobile />
-            </div>
-            <div className="hidden md:block mt-5">
-              <SearchPhotos isSittingOnADarkBackground />
-            </div>
-          </div>
-        </div>
-      </FadeIn>
-      {/* <FuzzyOverlay /> */}
-    </div>
-  )
+	return (
+		<div
+			style={{
+				backgroundImage: `url(${heroBg})`,
+				backgroundRepeat: 'no-repeat',
+				backgroundSize: 'cover',
+				backgroundPosition: 'left',
+			}}
+			className="h-[50vh] bg-gradient-to-r from-sky-500 to-indigo-500"
+		>
+			<Header isHeroSearchInVisible={true} />
+			<FadeIn className="relative px-6 pt-14 lg:px-8">
+				<div className="mx-auto max-w-2xl">
+					<div className="text">
+						<h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+							Photo gallery for creators & photographers.
+						</h1>
+						<div className="mt-5 block md:hidden">
+							<SearchPhotosForMobile />
+						</div>
+						<div className="mt-5 hidden md:block">
+							<SearchPhotos isSittingOnADarkBackground />
+						</div>
+					</div>
+				</div>
+			</FadeIn>
+			{/* <FuzzyOverlay /> */}
+		</div>
+	)
 }

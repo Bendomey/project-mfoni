@@ -1,3 +1,3 @@
-import {CreatorPhotosModule} from '@/modules/index.ts'
+import { CreatorPhotosModule } from '@/modules/index.ts'
 
 export default CreatorPhotosModule

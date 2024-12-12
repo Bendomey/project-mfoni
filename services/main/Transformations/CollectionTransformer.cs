@@ -70,6 +70,7 @@ public class CollectionTransformer
             Id = collection.Id,
             Name = collection.Name,
             Slug = collection.Slug,
+            Visibility = collection.Visibility,
             Description = collection.Description,
             CreatedById = collection.CreatedById,
             ContentsCount = collection.ContentsCount,

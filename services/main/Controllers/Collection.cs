@@ -323,6 +323,7 @@ public class CollectionsController : ControllerBase
     /// <summary>
     /// Retrieves all collections on the platform
     /// </summary>
+    /// <param name="created_by">could be an id of a user</param>
     /// <param name="visibility">could be `ALL` or `PUBLIC` or `PRIVATE`</param>
     /// <param name="contentItemsLimit">Number of content items to populate on collection</param>
     /// <param name="populate">Comma separated values to populate fields</param>
@@ -343,6 +344,7 @@ public class CollectionsController : ControllerBase
         Type = typeof(StatusCodeResult)
     )]
     public async Task<IActionResult> GetAll(
+        [FromQuery] string? created_by,
         [FromQuery] string? search,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
@@ -358,8 +360,14 @@ public class CollectionsController : ControllerBase
             _logger.LogInformation("Getting all collections");
             var queryFilter = HttpLib.GenerateFilterQuery<Models.Collection>(page, pageSize, sort, sortBy, populate);
 
-            var contents = await _collectionService.GetCollections(queryFilter, search, visibility);
-            long count = await _collectionService.CountCollections(search, visibility);
+            var input = new GetCollectionsInput
+            {
+                Visibility = visibility,
+                Query = search,
+                CreatedById = created_by
+            };
+            var contents = await _collectionService.GetCollections(queryFilter, input);
+            long count = await _collectionService.CountCollections(input);
 
             var outContent = new List<OutputCollection>();
             foreach (var content in contents)

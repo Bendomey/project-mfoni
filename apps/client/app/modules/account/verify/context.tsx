@@ -1,76 +1,76 @@
+import { useNavigate } from '@remix-run/react'
 import {
-  type Dispatch,
-  type PropsWithChildren,
-  type SetStateAction,
-  createContext,
-  useContext,
-  useState,
-  useEffect,
+	type Dispatch,
+	type PropsWithChildren,
+	type SetStateAction,
+	createContext,
+	useContext,
+	useState,
+	useEffect,
 } from 'react'
-import {type Step} from './components/steps.tsx'
-import {useAuth} from '@/providers/auth/index.tsx'
-import {useNavigate} from '@remix-run/react'
-import {Loader} from '@/components/loader/index.tsx'
+import { type Step } from './components/steps.tsx'
+import { Loader } from '@/components/loader/index.tsx'
+import { useAuth } from '@/providers/auth/index.tsx'
 
 interface VerifyCreatorContextProps {
-  activeStep: Step
-  setActiveStep: Dispatch<SetStateAction<Step>>
+	activeStep: Step
+	setActiveStep: Dispatch<SetStateAction<Step>>
 }
 
 const VerifyCreatorContext = createContext<VerifyCreatorContextProps>({
-  activeStep: 'phone',
-  setActiveStep: () => {},
+	activeStep: 'phone',
+	setActiveStep: () => {},
 })
 
-export const VerifyCreatorProvider = ({children}: PropsWithChildren) => {
-  const navigate = useNavigate()
-  const [activeStep, setActiveStep] = useState<Step>('phone')
+export const VerifyCreatorProvider = ({ children }: PropsWithChildren) => {
+	const navigate = useNavigate()
+	const [activeStep, setActiveStep] = useState<Step>('phone')
 
-  const {getToken, currentUser, isLoading} = useAuth()
+	const { getToken, currentUser, isLoading } = useAuth()
 
-  useEffect(() => {
-    if (currentUser?.emailVerifiedAt && currentUser.phoneNumberVerifiedAt) {
-      setActiveStep('welcome')
-    } else if (
-      currentUser?.emailVerifiedAt &&
-      !currentUser.phoneNumberVerifiedAt
-    ) {
-      setActiveStep('phone')
-    } else if (
-      !currentUser?.emailVerifiedAt &&
-      currentUser?.phoneNumberVerifiedAt
-    ) {
-      setActiveStep('email')
-    }
-  }, [currentUser, getToken, navigate])
+	useEffect(() => {
+		if (currentUser?.emailVerifiedAt && currentUser.phoneNumberVerifiedAt) {
+			setActiveStep('welcome')
+		} else if (
+			currentUser?.emailVerifiedAt &&
+			!currentUser.phoneNumberVerifiedAt
+		) {
+			setActiveStep('phone')
+		} else if (
+			!currentUser?.emailVerifiedAt &&
+			currentUser?.phoneNumberVerifiedAt
+		) {
+			setActiveStep('email')
+		}
+	}, [currentUser, getToken, navigate])
 
-  if (isLoading && currentUser) {
-    return (
-      <div className="h-screen w-screen flex justify-center items-center">
-        <Loader />
-      </div>
-    )
-  }
+	if (isLoading && currentUser) {
+		return (
+			<div className="flex h-screen w-screen items-center justify-center">
+				<Loader />
+			</div>
+		)
+	}
 
-  return (
-    <VerifyCreatorContext.Provider
-      value={{
-        activeStep,
-        setActiveStep,
-      }}
-    >
-      {children}
-    </VerifyCreatorContext.Provider>
-  )
+	return (
+		<VerifyCreatorContext.Provider
+			value={{
+				activeStep,
+				setActiveStep,
+			}}
+		>
+			{children}
+		</VerifyCreatorContext.Provider>
+	)
 }
 
 export const useVerifyCreator = () => {
-  const context = useContext(VerifyCreatorContext)
+	const context = useContext(VerifyCreatorContext)
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (!context) {
-    throw new Error('useVerifyCreator must be used within VerifyCreatorContext')
-  }
+	 
+	if (!context) {
+		throw new Error('useVerifyCreator must be used within VerifyCreatorContext')
+	}
 
-  return context
+	return context
 }

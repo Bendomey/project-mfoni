@@ -16,34 +16,42 @@ public class EmailConfiguration
 {
     public static async Task Send(SendEmailInput input)
     {
-        using (HttpClient client = new HttpClient())
+        try
         {
-            string apiKey = input.ApiKey;
-
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-
-            var emailData = new
+            using (HttpClient client = new HttpClient())
             {
-                from = input.From,
-                to = new[] { input.Email },
-                subject = input.Subject,
-                text = input.Message
-            };
+                string apiKey = input.ApiKey;
 
-            var jsonContent = JsonConvert.SerializeObject(emailData);
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
 
-            var response = await client.PostAsync("https://api.resend.com/emails", content);
+                var emailData = new
+                {
+                    from = input.From,
+                    to = new[] { input.Email },
+                    subject = input.Subject,
+                    text = input.Message
+                };
 
-            if (response.IsSuccessStatusCode)
-            {
+                var jsonContent = JsonConvert.SerializeObject(emailData);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync("https://api.resend.com/emails", content);
+                response.EnsureSuccessStatusCode();
                 Console.WriteLine("Email sent successfully: " + await response.Content.ReadAsStringAsync());
             }
-            else
-            {
-                Console.WriteLine($"Failed to send email. Status code: {response.StatusCode}");
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
-            }
+
+        }
+        catch (System.Exception e)
+        {
+
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                    {"action", "Send Email with Resend"},
+               });
+               SentrySdk.CaptureException(e);
+           });
         }
     }
 }

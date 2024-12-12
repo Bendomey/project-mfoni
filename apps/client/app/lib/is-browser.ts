@@ -1,4 +1,4 @@
-import {useEffect, useLayoutEffect} from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 
 export const isSSR = typeof window === 'undefined' || !window.navigator
 
