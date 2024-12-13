@@ -4,7 +4,11 @@ import {
 	LockClosedIcon,
 } from '@heroicons/react/16/solid'
 import { ChevronDownIcon, XCircleIcon } from '@heroicons/react/20/solid'
-import { CalendarDaysIcon, ShieldCheckIcon , HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline'
+import {
+	CalendarDaysIcon,
+	ShieldCheckIcon,
+	HeartIcon as HeartIconOutline,
+} from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import { Link, useLoaderData } from '@remix-run/react'
 import dayjs from 'dayjs'
@@ -24,7 +28,6 @@ import { getSizeStringForContent } from '@/lib/image-fns.ts'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { type loader } from '@/routes/photos.$slug.ts'
-
 
 export const PhotoModule = () => {
 	const { currentUser } = useAuth()

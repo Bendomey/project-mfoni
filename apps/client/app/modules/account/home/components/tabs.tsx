@@ -1,5 +1,6 @@
 import { PlusIcon } from '@heroicons/react/24/outline'
 import {
+	ArrowUpTrayIcon,
 	HeartIcon,
 	PhotoIcon,
 	RectangleStackIcon,
@@ -22,14 +23,22 @@ export function Tabs() {
 	const tabs = useMemo(() => {
 		const initTabs = [
 			{
-				name: 'Photos',
+				name: 'Your Photos',
 				href: PAGES.AUTHENTICATED_PAGES.ACCOUNT,
 				current: PAGES.AUTHENTICATED_PAGES.ACCOUNT === location.pathname,
 				icon: PhotoIcon,
 			},
 		]
 
-		if (currentUser?.role) {
+		if (currentUser?.role === 'CREATOR') {
+			initTabs.push({
+				name: 'Uploads',
+				href: PAGES.AUTHENTICATED_PAGES.ACCOUNT_UPLOADS,
+				current:
+					PAGES.AUTHENTICATED_PAGES.ACCOUNT_UPLOADS === location.pathname,
+				icon: ArrowUpTrayIcon,
+			})
+
 			initTabs.push({
 				name: 'Collections',
 				href: PAGES.AUTHENTICATED_PAGES.ACCOUNT_COLLECTIONS,

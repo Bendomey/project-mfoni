@@ -61,6 +61,7 @@ export const PAGES = {
 		ACCOUNT: '/account',
 		ACCOUNT_COLLECTIONS: '/account/collections',
 		ACCOUNT_LIKES: '/account/likes',
+		ACCOUNT_UPLOADS: '/account/uploads',
 		WALLET: '/account/wallet',
 		PACKAGE_AND_BILLINGS: '/account/package-and-billings',
 	},

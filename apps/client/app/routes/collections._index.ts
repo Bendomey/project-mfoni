@@ -35,7 +35,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		populate: ['collection.createdBy'],
 	}
 	await queryClient.prefetchQuery({
-		queryKey: [QUERY_KEYS.COLLECTIONS, JSON.stringify(query)],
+		queryKey: [QUERY_KEYS.COLLECTIONS, query],
 		queryFn: () =>
 			getCollections(query, {
 				authToken: authCookie?.token,
