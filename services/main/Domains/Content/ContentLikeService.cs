@@ -42,6 +42,14 @@ public class ContentLikeService
         // confirm that content exists
         await _searchContentService.GetContentById(input.ContentId);
 
+        // does like already exist?
+        var existingLike = await GetContentLike(input);
+
+        if (existingLike is not null)
+        {
+            throw new HttpRequestException("ContentAlreadyLiked");
+        }
+
         var contentLike = new Models.ContentLike
         {
             ContentId = input.ContentId,

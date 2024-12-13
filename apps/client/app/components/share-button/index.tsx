@@ -15,7 +15,7 @@ interface Props {
 export function ShareButton({ button, link, text }: Props) {
 	const resolvedText = text ?? 'Check this out'
 	const resolvedLink = useMemo(() => {
-		if(isBrowser){
+		if (isBrowser) {
 			return link ?? window.location.href
 		}
 

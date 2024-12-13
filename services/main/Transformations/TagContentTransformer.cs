@@ -24,7 +24,7 @@ public class TagContentTransformer
         _tagTransformer = tagTransformer;
     }
 
-    public async Task<OutputTagContent> Transform(TagContent tagContent, string[]? populate = null)
+    public async Task<OutputTagContent> Transform(TagContent tagContent, string[]? populate = null, string? userId = null)
     {
         populate ??= Array.Empty<string>();
 
@@ -44,7 +44,7 @@ public class TagContentTransformer
             var content = await _contentService.GetContentById(tagContent.ContentId);
             if (content is not null)
             {
-                outputContent = await _contentTransformer.Transform(content, populate: populate);
+                outputContent = await _contentTransformer.Transform(content, populate: populate, userId: userId);
             }
         }
 

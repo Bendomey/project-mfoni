@@ -1,15 +1,19 @@
 import { ClockIcon } from '@heroicons/react/20/solid'
 import {
 	LockClosedIcon,
-	HeartIcon,
+	HeartIcon as HeartIconOutline,
 	ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline'
-import { XCircleIcon } from '@heroicons/react/24/solid'
+import {
+	HeartIcon as HeartIconSolid,
+	XCircleIcon,
+} from '@heroicons/react/24/solid'
 import { Link } from '@remix-run/react'
 import { Image } from 'remix-image'
 import { Button } from '../button/index.tsx'
 import { PhotographerCreatorCard } from '../creator-card/index.tsx'
 import { FlyoutContainer } from '../flyout/flyout-container.tsx'
+import { LikeButton } from '@/components/like-button.tsx'
 import { blurDataURL, PAGES } from '@/constants/index.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
@@ -60,16 +64,30 @@ export const Content = ({ content, showCreator = true }: Props) => {
 								) : null}
 							</div>
 							<div className="hidden group-hover:block">
-								{isContentMine || content.status !== 'DONE' ? null : (
-									<Button
-										onClick={(e) => {
-											e.preventDefault()
-										}}
-										variant="outlined"
-										size="sm"
-									>
-										<HeartIcon className="h-6 w-6 text-zinc-700" />
-									</Button>
+								{isContentMine ||
+								content.visibility === 'PRIVATE' ||
+								content.status !== 'DONE' ? null : (
+									<LikeButton content={content}>
+										{({ isDisabled, isLiked, onClick }) => (
+											<Button
+												title={isLiked ? 'Remove Like' : 'Like Image'}
+												onClick={(e) => {
+													e.preventDefault()
+													onClick()
+												}}
+												variant="outlined"
+												size="sm"
+												className="px-2"
+												disabled={isDisabled}
+											>
+												{isLiked ? (
+													<HeartIconSolid className="h-6 w-6 text-blue-700" />
+												) : (
+													<HeartIconOutline className="h-6 w-6 text-zinc-700" />
+												)}
+											</Button>
+										)}
+									</LikeButton>
 								)}
 							</div>
 						</div>
@@ -77,7 +95,12 @@ export const Content = ({ content, showCreator = true }: Props) => {
 							{showCreator && content.createdBy ? (
 								<FlyoutContainer
 									intendedPosition="y"
-									FlyoutContent={PhotographerCreatorCard}
+									FlyoutContent={
+										<PhotographerCreatorCard
+											name={content.createdBy.name}
+											socialMedia={content.createdBy.socialMedia}
+										/>
+									}
 								>
 									<div className="flex items-center">
 										<Image

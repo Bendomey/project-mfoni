@@ -4,6 +4,7 @@ using main.Configuratons;
 using main.Domains;
 using main.HostedServices;
 using main.Transformations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -44,7 +45,28 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 
 builder
-    .Services.AddAuthentication()
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(
+        options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(builder.Configuration["AppConstants:UserJwtSecret"]!)
+                ),
+                ValidIssuer = builder.Configuration["AppConstants:JwtIssuer"],
+                ValidAudience = builder.Configuration["AppConstants:JwtIssuer"],
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = false,
+                ValidateIssuerSigningKey = true
+            };
+        }
+    )
     .AddJwtBearer(
         "USER",
         options =>

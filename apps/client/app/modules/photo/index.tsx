@@ -4,18 +4,17 @@ import {
 	LockClosedIcon,
 } from '@heroicons/react/16/solid'
 import { ChevronDownIcon, XCircleIcon } from '@heroicons/react/20/solid'
-import {
-	CalendarDaysIcon,
-	HeartIcon,
-	ShieldCheckIcon,
-} from '@heroicons/react/24/outline'
+import { CalendarDaysIcon, ShieldCheckIcon , HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline'
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import { Link, useLoaderData } from '@remix-run/react'
 import dayjs from 'dayjs'
+import { Fragment } from 'react'
 import { Image } from 'remix-image'
 import { RelatedContent } from './components/related-content.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
+import { LikeButton } from '@/components/like-button.tsx'
 import { ShareButton } from '@/components/share-button/index.tsx'
 
 import { UserImage } from '@/components/user-image.tsx'
@@ -25,7 +24,7 @@ import { getSizeStringForContent } from '@/lib/image-fns.ts'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { type loader } from '@/routes/photos.$slug.ts'
-import { Fragment } from 'react'
+
 
 export const PhotoModule = () => {
 	const { currentUser } = useAuth()
@@ -76,14 +75,24 @@ export const PhotoModule = () => {
                   Save
                 </Button> */}
 								{isContentMine ? null : (
-									<Button
-										disabled={Boolean(content.currentUserLike)}
-										variant="outlined"
-										size="sm"
-									>
-										<HeartIcon className="mr-1 h-6 w-4 text-zinc-700" />
-										Like
-									</Button>
+									<LikeButton content={content as unknown as Content}>
+										{({ isDisabled, isLiked, onClick }) => (
+											<Button
+												onClick={onClick}
+												title={isLiked ? 'Remove Like' : 'Like Image'}
+												variant="outlined"
+												size="sm"
+												disabled={isDisabled}
+											>
+												{isLiked ? (
+													<HeartIconSolid className="mr-1 h-6 w-4 text-blue-700" />
+												) : (
+													<HeartIconOutline className="mr-1 h-6 w-4 text-zinc-700" />
+												)}
+												Like{isLiked ? 'd' : ''}
+											</Button>
+										)}
+									</LikeButton>
 								)}
 							</div>
 							{isContentMine || content.amount === 0 ? (

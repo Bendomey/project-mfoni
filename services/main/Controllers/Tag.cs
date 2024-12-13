@@ -278,6 +278,7 @@ public class TagsController : ControllerBase
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Retrieved contents from a tag Successfully</response>
     /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
     [HttpGet("{slug}/slug/contents")]
     [ProducesResponseType(typeof(OutputResponse<List<OutputTagContent>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
@@ -321,7 +322,7 @@ public class TagsController : ControllerBase
             var outContent = new List<OutputTagContent>();
             foreach (var content in contents)
             {
-                outContent.Add(await _tagContentTransformer.Transform(content, populate: queryFilter.Populate));
+                outContent.Add(await _tagContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
             }
             var response = HttpLib.GeneratePagination(
                 outContent,
@@ -381,6 +382,7 @@ public class TagsController : ControllerBase
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Retrieved contents from a tag Successfully</response>
     /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
     [HttpGet("{id}/contents")]
     [ProducesResponseType(typeof(OutputResponse<List<OutputTagContent>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
@@ -396,6 +398,15 @@ public class TagsController : ControllerBase
         [FromQuery] string orientation = "ALL"
     )
     {
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
+
         try
         {
             _logger.LogInformation("Getting tag contents");
@@ -414,7 +425,7 @@ public class TagsController : ControllerBase
             var outContent = new List<OutputTagContent>();
             foreach (var content in contents)
             {
-                outContent.Add(await _tagContentTransformer.Transform(content, populate: queryFilter.Populate));
+                outContent.Add(await _tagContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
             }
             var response = HttpLib.GeneratePagination(
                 outContent,

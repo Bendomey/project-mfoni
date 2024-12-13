@@ -637,7 +637,8 @@ public class CollectionsController : ControllerBase
     /// <param name="sort">To sort response data either by `asc` or `desc`</param>
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Retrieved contents from a collection Successfully</response>
-    /// <response code="500">An unexpected error occured</response>
+    /// <response code="500">An unexpected error occured</response>]
+    [AllowAnonymous]
     [HttpGet("{slug}/slug/contents")]
     [ProducesResponseType(typeof(OutputResponse<List<OutputCollectionContent>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
@@ -651,6 +652,16 @@ public class CollectionsController : ControllerBase
         [FromQuery] string sortBy = "created_at"
     )
     {
+
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
+
         try
         {
             _logger.LogInformation("Getting collection contents");
@@ -670,7 +681,7 @@ public class CollectionsController : ControllerBase
             var outContent = new List<OutputCollectionContent>();
             foreach (var content in contents)
             {
-                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate));
+                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
             }
             var response = HttpLib.GeneratePagination(
                 outContent,
@@ -727,6 +738,7 @@ public class CollectionsController : ControllerBase
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Retrieved contents from a collection Successfully</response>
     /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
     [HttpGet("{name}/name/contents")]
     [ProducesResponseType(typeof(OutputResponse<List<OutputCollectionContent>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
@@ -740,6 +752,15 @@ public class CollectionsController : ControllerBase
         [FromQuery] string sortBy = "created_at"
     )
     {
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
+
         try
         {
             _logger.LogInformation("Getting collection contents");
@@ -759,7 +780,7 @@ public class CollectionsController : ControllerBase
             var outContent = new List<OutputCollectionContent>();
             foreach (var content in contents)
             {
-                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate));
+                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
             }
             var response = HttpLib.GeneratePagination(
                 outContent,
@@ -817,6 +838,7 @@ public class CollectionsController : ControllerBase
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Retrieved contents from a collection Successfully</response>
     /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
     [HttpGet("{id}/contents")]
     [ProducesResponseType(typeof(OutputResponse<List<Models.CollectionContent>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
@@ -830,6 +852,15 @@ public class CollectionsController : ControllerBase
         [FromQuery] string sortBy = "created_at"
     )
     {
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
+
         try
         {
             _logger.LogInformation("Getting collection contents");
@@ -848,7 +879,7 @@ public class CollectionsController : ControllerBase
             var outContent = new List<OutputCollectionContent>();
             foreach (var content in contents)
             {
-                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate));
+                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
             }
             var response = HttpLib.GeneratePagination(
                 outContent,
