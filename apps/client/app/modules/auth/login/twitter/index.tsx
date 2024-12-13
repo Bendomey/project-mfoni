@@ -5,7 +5,7 @@ import { initiateTwitterAuth, useAuthenticate } from '@/api/auth/index.ts'
 import { Button } from '@/components/button/index.tsx'
 import { errorMessagesWrapper } from '@/constants/error-messages.ts'
 import { TWITTER_BASE_URL } from '@/constants/index.ts'
-import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
+import { errorToast } from '@/lib/custom-toast-functions.tsx'
 import { useAuth } from '@/providers/auth/index.tsx'
 
 export const TwitterButton = () => {
@@ -50,12 +50,10 @@ export const TwitterButton = () => {
 							const returnTo = params.get('return_to')
 							if (successRes.user.role) {
 								navigate(returnTo ?? '/')
-								successToast(`Welcome ${successRes.user.name}`)
 							} else {
 								navigate(
 									`/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''}`,
 								)
-								successToast('Setup account')
 							}
 						}
 					},

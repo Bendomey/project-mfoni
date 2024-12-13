@@ -40,7 +40,6 @@ public class ContentTransformer
 
     public async Task<OutputContent> Transform(Content content, string[]? populate = null, string? userId = null)
     {
-
         populate ??= Array.Empty<string>();
 
         OutputBasicCreator? outputBasicCreator = null;

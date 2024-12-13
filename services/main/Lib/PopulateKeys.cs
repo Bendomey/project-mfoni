@@ -17,5 +17,4 @@ public class PopulateKeys
     public static readonly string TAG_CREATED_BY_ADMIN = "tag.createdByAdmin";
     public static readonly string CHILD_COLLECTION = "childCollection";
     public static readonly string CONTENT_CREATED_BY = "content.createdBy";
-
 }

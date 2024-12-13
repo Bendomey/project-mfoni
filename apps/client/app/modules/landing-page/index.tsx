@@ -1,4 +1,3 @@
-import { Fragment } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { HeroSection } from './components/hero-section/index.tsx'
 import { Pricing } from './components/pricing/index.tsx'
@@ -37,11 +36,11 @@ export const LandingPageModule = () => {
 				<FadeInStagger faster>
 					<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
 						{imageUrls.map((url, index) => (
-							<Fragment key={index}>
+							<div className="mb-5" key={index}>
 								<FadeIn>
 									<Content content={{ media: { url } } as any} />
 								</FadeIn>
-							</Fragment>
+							</div>
 						))}
 					</div>
 				</FadeInStagger>

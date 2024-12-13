@@ -4,7 +4,6 @@ import { useLoginAuth } from '../context/index.tsx'
 import { useAuthenticate } from '@/api/auth/index.ts'
 import { Button } from '@/components/button/index.tsx'
 import { errorMessagesWrapper } from '@/constants/error-messages.ts'
-import { successToast } from '@/lib/custom-toast-functions.tsx'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { useEnvContext } from '@/providers/env/index.tsx'
 
@@ -42,7 +41,7 @@ export const FacebookButton = () => {
 			js.src = 'https://connect.facebook.net/en_US/sdk.js'
 			fjs.parentNode.insertBefore(js, fjs)
 		})(document, 'script', 'facebook-jssdk')
-	}, [])
+	}, [env.FACEBOOK_APP_ID])
 
 	const handleLogin = (res: any) => {
 		setIsLoading(true)
@@ -67,12 +66,10 @@ export const FacebookButton = () => {
 						const returnTo = params.get('return_to')
 						if (successRes.user.role) {
 							navigate(returnTo ?? '/')
-							successToast(`Welcome ${successRes.user.name}`)
 						} else {
 							navigate(
 								`/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''}`,
 							)
-							successToast('Setup account')
 						}
 					}
 				},

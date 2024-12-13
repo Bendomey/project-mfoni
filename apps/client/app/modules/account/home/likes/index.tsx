@@ -1,5 +1,4 @@
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
-import { Fragment } from 'react'
 import { useGetUserContentLikes } from '@/api/contents/index.ts'
 import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
@@ -63,11 +62,11 @@ export function AccountLikesModule() {
 		<FadeIn>
 			<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8">
 				{data.rows.map((contentLike, index) => (
-					<Fragment key={index}>
+					<div className="mb-5" key={index}>
 						{contentLike.content ? (
 							<Content content={contentLike.content} showCreator={false} />
 						) : null}
-					</Fragment>
+					</div>
 				))}
 			</div>
 		</FadeIn>

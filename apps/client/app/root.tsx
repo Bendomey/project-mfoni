@@ -6,7 +6,6 @@ import {
 } from '@remix-run/node'
 import {
 	Links,
-	LiveReload,
 	Meta,
 	Outlet,
 	Scripts,
@@ -15,19 +14,19 @@ import {
 	isRouteErrorResponse,
 	useLoaderData,
 } from '@remix-run/react'
-import { getCurrentUser } from './api/auth/index.ts'
-import { getFullUrlPath } from './lib/url-helpers.ts'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat.js'
 import { type PropsWithChildren } from 'react'
 import { Toaster } from 'react-hot-toast'
 import remixImageStyles from 'remix-image/remix-image.css?url'
+import { getCurrentUser } from './api/auth/index.ts'
 import { RouteLoader } from './components/loader/route-loader.tsx'
-import { NODE_ENV, PAGES } from './constants/index.ts'
+import { PAGES } from './constants/index.ts'
 import 'dayjs/locale/en-gb.js'
 import { environmentVariables } from './lib/actions/env.server.ts'
 import { extractAuthCookie } from './lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from './lib/actions/json-with-cache.server.ts'
+import { getFullUrlPath } from './lib/url-helpers.ts'
 import { EnvContext } from './providers/env/index.tsx'
 import { Providers } from './providers/index.tsx'
 import globalStyles from '@/styles/global.css?url'
@@ -174,7 +173,6 @@ function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
 						}}
 					/>
 					<Scripts />
-					{NODE_ENV === 'development' ? <LiveReload /> : null}
 				</EnvContext.Provider>
 			</body>
 		</html>
