@@ -78,11 +78,7 @@ export const useGetCollections = (
 	query: FetchMultipleDataInputParams<FetchCollectionFilter>,
 ) =>
 	useQuery({
-		queryKey: [
-			QUERY_KEYS.COLLECTIONS,
-			query.filters?.created_by,
-			JSON.stringify(query),
-		],
+		queryKey: [QUERY_KEYS.COLLECTIONS, query.filters?.created_by, query],
 		queryFn: () => getCollections(query),
 	})
 
@@ -264,12 +260,7 @@ export const useGetCollectionContentsBySlug = ({
 	retryQuery?: boolean
 }) =>
 	useQuery({
-		queryKey: [
-			QUERY_KEYS.COLLECTIONS,
-			slug,
-			'slug-contents',
-			JSON.stringify(query),
-		],
+		queryKey: [QUERY_KEYS.COLLECTIONS, slug, 'slug-contents', query],
 		queryFn: () => getCollectionContentsBySlug(safeString(slug), query),
 		enabled: Boolean(slug),
 		retry: retryQuery,

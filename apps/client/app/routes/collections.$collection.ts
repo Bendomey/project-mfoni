@@ -63,12 +63,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		},
 	}
 	await queryClient.prefetchQuery({
-		queryKey: [
-			QUERY_KEYS.COLLECTIONS,
-			slug,
-			'slug-contents',
-			JSON.stringify(query),
-		],
+		queryKey: [QUERY_KEYS.COLLECTIONS, slug, 'slug-contents', query],
 		queryFn: () =>
 			getCollectionContentsBySlug(slug, query, {
 				authToken: authCookie?.token,

@@ -48,7 +48,7 @@ export function LikeButton({ content, children }: Props) {
 
 		if (currentUser) {
 			queryClient.invalidateQueries({
-				queryKey: [QUERY_KEYS.CONTENT_LIKES, 'user', currentUser.id]
+				queryKey: [QUERY_KEYS.CONTENT_LIKES, 'user', currentUser.id],
 			})
 		}
 	}

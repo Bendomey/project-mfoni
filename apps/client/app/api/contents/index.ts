@@ -178,7 +178,7 @@ export const useGetUserContentLikes = (
 	userId: string,
 ) =>
 	useQuery({
-		queryKey: [QUERY_KEYS.CONTENT_LIKES, 'user', userId, JSON.stringify(query)],
+		queryKey: [QUERY_KEYS.CONTENT_LIKES, 'user', userId, query],
 		queryFn: () => getUserContentLikes(query),
 		enabled: !!userId,
 	})
@@ -220,7 +220,7 @@ export const useGetContentLikes = (
 	contentId: string,
 ) =>
 	useQuery({
-		queryKey: [QUERY_KEYS.CONTENT_LIKES, contentId, JSON.stringify(query)],
+		queryKey: [QUERY_KEYS.CONTENT_LIKES, contentId, query],
 		queryFn: () => getContentLikes(query, contentId),
 	})
 
