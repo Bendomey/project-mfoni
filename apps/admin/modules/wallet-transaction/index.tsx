@@ -30,7 +30,7 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 
-const CREATOR_APPLICATION_PER_PAGE = 50;
+const WALLET_TRANSACTION_PER_PAGE = 50;
 
 export const WalletTransaction = () => {
   const [openApproveModal, setOpenApproveModal] = useState(false)
@@ -42,29 +42,27 @@ export const WalletTransaction = () => {
   // Retrieve query parameters
   const page = searchParams.get('page');
   const search = searchParams.get('search');
-  const creatorApplicationFilter = searchParams.get('status');
+  const walletTransactionFilter = searchParams.get('type');
 
   const currentPage = parseInt(page ? (page as string) : "1", 10);
 
   const {data, isPending: isDataLoading, refetch, error} = useGetCreatorApplications({
     pagination: {
       page: currentPage,
-      per: CREATOR_APPLICATION_PER_PAGE,
+      per: WALLET_TRANSACTION_PER_PAGE,
     },
-    search: {
-      fields: ['firstName'],
-      query:  search || undefined,
-    },
+    search: {},
     sorter: {
       sort: 'asc',
       sortBy: 'createdAt',
     },
     populate: [],
     filters: {
+      type: walletTransactionFilter
     },
   })
 
-  const columns = useMemo((): ColumnDef<CreatorApplication>[] => {
+  const columns = useMemo((): ColumnDef<WalletTransaction>[] => {
     return [
       {
         accessorKey: "name",
@@ -77,13 +75,13 @@ export const WalletTransaction = () => {
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              Name
+              Transaction
               <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
             </Button>
           );
         },
-        cell: ({ row }) => (row.original.user ?
-          <div className="lowercase">{row.original.user.email}</div> : 'N/A'
+        cell: ({ row }) => (row.original.type ?
+          <div className="lowercase">{row.original.type}</div> : 'N/A'
         ),
       },
       {
@@ -97,80 +95,60 @@ export const WalletTransaction = () => {
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              Email
+              Amount
               <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
             </Button>
           );
         },
-        cell: ({ row }) => ( row.original.user ?
-          <div className="lowercase">{row.original.user.email}</div> : 'N/A'
+        cell: ({ row }) => ( row.original.amount ?
+          <div className="lowercase">{row.original.amount}</div> : 'N/A'
         ),
       },
       {
-        accessorKey: "status",
-        header: ({ column }) => {
-          return (
-            <Button
-            className="pl-0"
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-            Status
-              <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+        accessorKey: "createdAt",
+        header: "Created On",
         cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("status")}</div>
+          localizedDayjs(row.getValue("createdAt")).format("DD/MM/YYYY")
         ),
       },
-      {
-        accessorKey: "updatedAt",
-        header: "Updated At",
-        cell: ({ row }) => (
-          localizedDayjs(row.getValue("updatedAt")).format("DD/MM/YYYY hh:mm a")
-        ),
-      },
-      {
-        id: "actions",
-        enableHiding: false,
-        cell: ({ row }) => {
-          const payment = row.original
+      // {
+      //   id: "actions",
+      //   enableHiding: false,
+      //   cell: ({ row }) => {
+      //     const payment = row.original
      
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <DotsHorizontalIcon className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Options</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => {
-                      setSelectedApplication(row.original)
-                      setOpenViewModal(true)
-                    }}><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
-               {row.original.status === "SUBMITTED" ? (
-                <>
-                <DropdownMenuItem  onClick={() => {
-                  setSelectedApplication(row.original)
-                  setOpenApproveModal(true)
-                }}><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
+      //     return (
+      //       <DropdownMenu>
+      //         <DropdownMenuTrigger asChild>
+      //           <Button variant="ghost" className="h-8 w-8 p-0">
+      //             <span className="sr-only">Open menu</span>
+      //             <DotsHorizontalIcon className="h-4 w-4" />
+      //           </Button>
+      //         </DropdownMenuTrigger>
+      //         <DropdownMenuContent align="end">
+      //           <DropdownMenuLabel>Options</DropdownMenuLabel>
+      //           <DropdownMenuItem onClick={() => {
+      //                 setSelectedApplication(row.original)
+      //                 setOpenViewModal(true)
+      //               }}><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
+      //          {row.original.status === "SUBMITTED" ? (
+      //           <>
+      //           <DropdownMenuItem  onClick={() => {
+      //             setSelectedApplication(row.original)
+      //             setOpenApproveModal(true)
+      //           }}><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
                     
-                <DropdownMenuItem onClick={() => {
-                  setSelectedApplication(row.original)
-                  setOpenRejectModal(true)
-                }}><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>  
-                </>
-              ): null }           
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )
-        },
-      },
+      //           <DropdownMenuItem onClick={() => {
+      //             setSelectedApplication(row.original)
+      //             setOpenRejectModal(true)
+      //           }}><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>  
+      //           </>
+      //         ): null }           
+      //         </DropdownMenuContent>
+      //       </DropdownMenu>
+      //     )
+      //   },
+      // },
     ];
   }, []);
 
@@ -213,13 +191,13 @@ export const WalletTransaction = () => {
           data={data?.rows ?? []}
           isDataLoading={isDataLoading}
           error={
-            error ? new Error("Can't fetch Creator Applications") : undefined
+            error ? new Error("Can't fetch Wallet Transactions") : undefined
           }
           refetch={refetch}
           dataMeta={{
             total: data?.total ?? 0,
             page: currentPage,
-            pageSize: CREATOR_APPLICATION_PER_PAGE,
+            pageSize: WALLET_TRANSACTION_PER_PAGE,
             totalPages: data?.totalPages ?? 1,
           }}
         />
