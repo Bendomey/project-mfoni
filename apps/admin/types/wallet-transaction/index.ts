@@ -1,6 +1,6 @@
 interface WalletTransaction  {
   id: string;
-  type: "DEPOSIT" | "WITHDRAW"
+  type: TransactionType
   amount: number;
   reasonForTransfer: string
   createdAt: Date
@@ -8,5 +8,7 @@ interface WalletTransaction  {
 };
 
 interface FetchWalletTransactionFilter {
-  type?: "DEPOSIT" | "WITHDRAW"
+  type?: TransactionType
 }
+
+type TransactionType = "DEPOSIT" | "WITHDRAW"
