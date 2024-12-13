@@ -64,9 +64,7 @@ export const Content = ({ content, showCreator = true }: Props) => {
 								) : null}
 							</div>
 							<div className="hidden group-hover:block">
-								{isContentMine ||
-								content.visibility === 'PRIVATE' ||
-								content.status !== 'DONE' ? null : (
+								{content.status !== 'DONE' ? null : (
 									<LikeButton content={content}>
 										{({ isDisabled, isLiked, onClick }) => (
 											<Button

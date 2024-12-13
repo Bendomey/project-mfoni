@@ -74,7 +74,7 @@ export const PhotoModule = () => {
                   <BookmarkIcon className="h-6 w-4 text-zinc-700 mr-1" />
                   Save
                 </Button> */}
-								{isContentMine ? null : (
+								{content.status !== 'DONE' ? null : (
 									<LikeButton content={content as unknown as Content}>
 										{({ isDisabled, isLiked, onClick }) => (
 											<Button
