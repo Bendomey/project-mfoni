@@ -56,15 +56,10 @@ export const useGetWalletTransactions = (
  * @returns {Promise<object>} - The wallet data.
  */
 
-const getWallet = async (
-  props: FetchMultipleDataInputParams<FetchWalletFilter>,
-) => {
+const getWallet = async () => {
   try {
-    const removeAllNullableValues = getQueryParams<FetchWalletFilter>(props)
-    const params = new URLSearchParams(removeAllNullableValues)
-
-    const response: APIResponse<Wallet> = await fetchClient(
-      `/v1/admins/wallet?${params.toString()}`,
+    const response = await fetchClient<ApiResponse<Wallet>>(
+      `/v1/admins/wallet`,
     )
 
     return response.parsedBody.data
@@ -81,10 +76,9 @@ const getWallet = async (
   }
 }
 
-export const useGetWallet = (
-  query: FetchMultipleDataInputParams<FetchWalletFilter>,
-) =>
+export const useGetWallet = () =>
   useQuery({
-    queryKey: [QUERY_KEYS.WALLET,JSON.stringify(query)],
-    queryFn: () => getWallet(query),
+    queryKey: [QUERY_KEYS.WALLET],
+    queryFn: () => getWallet(),
   })
+

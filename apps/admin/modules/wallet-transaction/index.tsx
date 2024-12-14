@@ -8,15 +8,8 @@ import { useGetWalletTransactions } from "@/api";
 import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
 import * as React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Wallet } from "./components/wallet";
 
 const WALLET_TRANSACTION_PER_PAGE = 50;
 
@@ -133,35 +126,8 @@ export const WalletTransaction = () => {
           </div>
         </div>
 
-        <div className="pb-2">
-          <Card className="w-[650px] dark:border-gray-600">
-            <CardContent className="flex flex-col items-center justify-between gap-2 md:flex-row pt-4">
-              <div>
-                <div className="flex flex-row justify-start items-center gap-4 pb-3">
-                  <div className="rounded-md border border-gray-200 dark:border-gray-500 px-2">
-                    <span className="text-xs font-bold text-blue-600 dark:text-blue-500">
-                      MFONI
-                    </span>
-                  </div>
-                  <h1 className="text-sm font-bold">My Wallet</h1>
-                </div>
-                <p className="text-sm text-gray-500 dark:text-gray-300">
-                  This wallet is your default payment method for all purchases
-                  on this website.
-                </p>
-              </div>
-
-              <div className="flex items-end gap-1">
-                <h1 className="text-3xl font-bold">GH₵&nbsp;150.00</h1>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-end gap-4 py-2 px-3 border-t border-gray-200 dark:border-gray-600">
-              <Button variant="outline">Deposit</Button>
-              <Button className="bg-blue-600 hover:bg-blue-800 dark:bg-blue-500 dark:hover:bg-blue-600">
-                Withdraw
-              </Button>
-            </CardFooter>
-          </Card>
+        <div className="pb-2 w-[650px]">
+          <Wallet />
         </div>
 
         <DataTable
