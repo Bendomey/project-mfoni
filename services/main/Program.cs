@@ -42,7 +42,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = builder
         .Configuration.GetSection("AppConstants:RedisConnectionString")
         .Get<string>();
-    options.InstanceName = "mfoni:";
+    options.InstanceName = "mfoni_";
 });
 
 builder
