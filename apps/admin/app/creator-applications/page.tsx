@@ -10,7 +10,7 @@ export default function CreatorApplications() {
   return (
     <>
       <Header />
-      <div className="mt-12">
+      <div className="mt-10">
         <CreatorApplication />
       </div>
     </>
