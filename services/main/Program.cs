@@ -43,6 +43,10 @@ builder.Services.AddStackExchangeRedisCache(options =>
         .Configuration.GetSection("AppConstants:RedisConnectionString")
         .Get<string>();
     options.InstanceName = "mfoni:";
+    options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
+    {
+        Ssl = false,
+    };
 });
 
 builder
