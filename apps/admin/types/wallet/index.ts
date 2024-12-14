@@ -1,14 +1,10 @@
-interface WalletTransaction  {
+interface Wallet  {
   id: string;
-  type: TransactionType
-  amount: number;
-  reasonForTransfer: string
+  wallet: number;
+  bookWallet: number;
   createdAt: Date
   updatedAt: NullableDate
 };
 
-interface FetchWalletTransactionFilter {
-  type?: TransactionType
+interface FetchWalletFilter {
 }
-
-type TransactionType = "DEPOSIT" | "WITHDRAW"
