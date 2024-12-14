@@ -13,6 +13,9 @@ import { PAGES } from '@/constants/index.ts'
 export function TagsModule() {
 	const { data, isPending, isError } = useGetTags({
 		pagination: { page: 0, per: 50 },
+		filters: {
+			visibility: 'PUBLIC',
+		},
 	})
 
 	let content = <></>
@@ -104,3 +107,4 @@ export function TagsModule() {
 		</>
 	)
 }
+
