@@ -30,7 +30,7 @@ public class CollectionContentTransformer
         _contentTransformer = contentTransformer;
     }
 
-    public async Task<OutputCollectionContent> Transform(CollectionContent collectionContent, string[]? populate = null)
+    public async Task<OutputCollectionContent> Transform(CollectionContent collectionContent, string[]? populate = null, string? userId = null)
     {
         populate ??= Array.Empty<string>();
 
@@ -50,7 +50,7 @@ public class CollectionContentTransformer
             var content = await _contentService.GetContentById(collectionContent.ContentId);
             if (content is not null)
             {
-                outputContent = await _contentTransformer.Transform(content, populate: populate);
+                outputContent = await _contentTransformer.Transform(content, populate: populate, userId: userId);
             }
         }
 

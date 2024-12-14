@@ -1,4 +1,3 @@
- 
 interface WalletTransaction {
 	id: string
 	userId: string

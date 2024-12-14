@@ -73,7 +73,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		const baseUrl = `${environmentVariables().API_ADDRESS}/api`
 
 		if (authCookie) {
-			const slug = `${authCookie.userId}_uploads`
+			const slug = `${authCookie.id}_uploads`
 			await queryClient.prefetchQuery({
 				queryKey: [QUERY_KEYS.COLLECTIONS, slug, 'slug'],
 				queryFn: () =>

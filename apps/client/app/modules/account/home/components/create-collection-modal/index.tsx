@@ -1,4 +1,3 @@
-import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { useQueryClient } from '@tanstack/react-query'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { useCreateCollection } from '@/api/collections/index.ts'

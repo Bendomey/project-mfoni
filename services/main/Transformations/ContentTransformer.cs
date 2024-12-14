@@ -40,7 +40,6 @@ public class ContentTransformer
 
     public async Task<OutputContent> Transform(Content content, string[]? populate = null, string? userId = null)
     {
-
         populate ??= Array.Empty<string>();
 
         OutputBasicCreator? outputBasicCreator = null;
@@ -131,6 +130,11 @@ public class ContentTransformer
             Amount = content.Amount,
             CurrentUserLike = outputContentLike,
             DoneAt = content.DoneAt,
+            ImageProcessingResponse = new ImageProcessingOutput
+            {
+                Status = content.RekognitionMetaData?.Status ?? "PENDING",
+                Message = content.RekognitionMetaData?.Details?.Message
+            },
             CreatedById = content.CreatedById!,
             CreatedBy = outputBasicCreator,
             RejectedAt = content.RejectedAt,

@@ -42,12 +42,19 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 				authToken: authCookie?.token,
 			},
 		)
+
+		// if content is private and user is not logged in, return 404
+		if (collection?.visibility === 'PRIVATE') {
+			if (!authCookie?.token || authCookie?.id !== collection?.createdById) {
+				return redirect(PAGES.NOT_FOUND)
+			}
+		}
 	} catch (error) {
 		// if collection is not found, return 404
 		return redirect(PAGES.NOT_FOUND)
 	}
 
-	const isCollectionMine = collection?.createdBy?.id === authCookie?.userId
+	const isCollectionMine = collection?.createdBy?.id === authCookie?.id
 	const slug = safeString(collection?.slug)
 	const query = {
 		pagination: { page: 0, per: 50 },
@@ -56,12 +63,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		},
 	}
 	await queryClient.prefetchQuery({
-		queryKey: [
-			QUERY_KEYS.COLLECTIONS,
-			slug,
-			'slug-contents',
-			JSON.stringify(query),
-		],
+		queryKey: [QUERY_KEYS.COLLECTIONS, slug, 'slug-contents', query],
 		queryFn: () =>
 			getCollectionContentsBySlug(slug, query, {
 				authToken: authCookie?.token,

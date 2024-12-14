@@ -1,16 +1,16 @@
 import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
-import { getCollections } from '@/api/collections/index.ts'
+import { getCollectionContentsBySlug } from '@/api/collections/index.ts'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
 import { protectCreatorRouteLoader } from '@/lib/actions/protect-creator-route-loader.ts'
-import { AccountCollectionsModule } from '@/modules/index.ts'
+import { AccountUploadsModule } from '@/modules/index.ts'
 
 export const meta: MetaFunction = () => {
 	return [
-		{ title: 'My Collections | mfoni' },
+		{ title: 'My Uploads | mfoni' },
 		{ name: 'description', content: 'Welcome to mfoni!' },
 		{ name: 'keywords', content: 'mfoni' },
 	]
@@ -20,7 +20,6 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 	const creatorRes = await protectCreatorRouteLoader(loaderArgs)
 	if (!creatorRes) {
 		const queryClient = new QueryClient()
-
 		const authCookie = await extractAuthCookie(
 			loaderArgs.request.headers.get('cookie'),
 		)
@@ -30,15 +29,13 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		if (authCookie) {
 			const query = {
 				pagination: { page: 0, per: 50 },
-				filters: {
-					created_by: authCookie.id,
-					visibility: 'ALL',
-				},
+				populate: ['content', 'content.tags'],
 			}
+			const slug = `${authCookie.id}_uploads`
 			await queryClient.prefetchQuery({
-				queryKey: [QUERY_KEYS.COLLECTIONS, authCookie.id, query],
+				queryKey: [QUERY_KEYS.COLLECTIONS, slug, 'slug-contents', query],
 				queryFn: () =>
-					getCollections(query, {
+					getCollectionContentsBySlug(slug, query, {
 						authToken: authCookie.token,
 						baseUrl,
 					}),
@@ -50,8 +47,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 			})
 		}
 	}
-
 	return creatorRes
 }
 
-export default AccountCollectionsModule
+export default AccountUploadsModule

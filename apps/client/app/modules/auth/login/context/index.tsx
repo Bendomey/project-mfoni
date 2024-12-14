@@ -42,7 +42,6 @@ export const LoginAuthProvider = ({ children }: PropsWithChildren) => {
 export const useLoginAuth = () => {
 	const context = useContext(LoginAuthContext)
 
-	 
 	if (!context) {
 		throw new Error('useLoginAuth must be used within LoginAuthProvider')
 	}

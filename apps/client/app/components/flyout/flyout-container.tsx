@@ -38,7 +38,7 @@ export const FlyoutContainer = ({
 		}
 	}, [])
 
-	const showFlyout = FlyoutContent && open
+	const showFlyout = Boolean(FlyoutContent) && open
 
 	const handleMouseEnter = React.useCallback(
 		(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -170,7 +170,7 @@ export const FlyoutContainer = ({
 							<div
 								className={`h-4 w-4 ${arrowPosition} rotate-45 ${arrowColor}`}
 							/>
-							<FlyoutContent />
+							{FlyoutContent}
 						</div>
 					</motion.div>
 				) : null}

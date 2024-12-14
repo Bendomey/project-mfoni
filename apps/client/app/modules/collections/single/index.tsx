@@ -1,7 +1,6 @@
 import { ArrowPathIcon, ChevronLeftIcon } from '@heroicons/react/24/outline'
 import { useLoaderData, useNavigate, useParams } from '@remix-run/react'
 import dayjs from 'dayjs'
-import { Fragment } from 'react'
 import { useGetCollectionContentsBySlug } from '@/api/collections/index.ts'
 import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
@@ -95,11 +94,11 @@ export function CollectionModule() {
 			<FadeIn>
 				<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
 					{data.rows.map((collectionContent) => (
-						<Fragment key={collectionContent.id}>
+						<div className="mb-5" key={collectionContent.id}>
 							{collectionContent.content ? (
 								<Content content={collectionContent.content} />
 							) : null}
-						</Fragment>
+						</div>
 					))}
 				</div>
 			</FadeIn>
@@ -159,7 +158,9 @@ export function CollectionModule() {
 						</div>
 						<div className="flex flex-row items-center justify-end gap-2">
 							{isCollectionMine ? <Button>Add Contents</Button> : null}
-							<ShareButton />
+							<ShareButton
+								text={`Check out this collection "${name}" on mfoni`}
+							/>
 							<Button color="dangerGhost">Report</Button>
 						</div>
 					</div>

@@ -1,4 +1,3 @@
- 
 import { Transition, Popover } from '@headlessui/react'
 import {
 	MagnifyingGlassIcon,

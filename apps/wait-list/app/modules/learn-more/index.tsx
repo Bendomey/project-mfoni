@@ -32,7 +32,7 @@ const faqs = [
     id: 4,
     question: 'When will v0.1.0 launch?',
     answer:
-      "We're aiming to launch v0.1.0 by Q1 2024, if not sooner. However, we'll keep you updated on our progress.",
+      "We're aiming to launch v0.1.0 by Q1 2025, if not sooner. However, we'll keep you updated on our progress.",
   },
 ]
 

@@ -35,7 +35,7 @@ public class ContentLikeTransformer
         _contentTransformer = contentTransformer;
     }
 
-    public async Task<OutputContentLike> Transform(ContentLike contentLike, string[]? populate = null)
+    public async Task<OutputContentLike> Transform(ContentLike contentLike, string[]? populate = null, string? userId = null)
     {
         populate ??= Array.Empty<string>();
 
@@ -55,7 +55,7 @@ public class ContentLikeTransformer
             var content = await _contentService.GetContentById(contentLike.ContentId);
             if (content is not null)
             {
-                outputContent = await _contentTransformer.Transform(content, populate: populate);
+                outputContent = await _contentTransformer.Transform(content, populate: populate, userId: userId);
             }
         }
 

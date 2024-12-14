@@ -39,7 +39,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 	const query = {
 		pagination: { page: 0, per: 50 },
 		filters: {},
-		populate: ['content'],
+		populate: ['content', 'content.createdBy'],
 	}
 
 	await queryClient.prefetchQuery({

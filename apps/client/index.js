@@ -18,7 +18,7 @@ closeWithGrace(async ({ err }) => {
 if (process.env.NODE_ENV === 'production') {
 	// this file may not exist if you haven't built yet, but it will
 	// definitely exist by the time the prod server actually runs.
-	 
+
 	await import('./server-build/index.js')
 } else {
 	await import('./server/index.ts')

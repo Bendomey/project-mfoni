@@ -103,6 +103,7 @@ public class ContentController : ControllerBase
     /// </summary>
     /// <param name="id">Id of content</param>
     /// <param name="populate">Comma separated values to populate fields</param>
+    [AllowAnonymous]
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(OutputResponse<OutputContent>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
@@ -125,7 +126,7 @@ public class ContentController : ControllerBase
             var res = await _searchContentService.GetContentById(id);
 
             return new ObjectResult(
-                new GetEntityResponse<OutputContent>(await _contentTransformer.Transform(res!, populate: populate.Split(",")), userId).Result()
+                new GetEntityResponse<OutputContent>(await _contentTransformer.Transform(res!, populate: populate.Split(","), userId), null).Result()
             )
             {
                 StatusCode = StatusCodes.Status200OK
@@ -166,6 +167,7 @@ public class ContentController : ControllerBase
     /// </summary>
     /// <param name="slug">Slug of content</param>
     /// <param name="populate">Comma separated values to populate fields</param>
+    [AllowAnonymous]
     [HttpGet("{slug}/slug")]
     [ProducesResponseType(typeof(OutputResponse<OutputContent>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
@@ -181,14 +183,14 @@ public class ContentController : ControllerBase
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             userId = currentUser.Id;
         }
-        catch (Exception) { }
+        catch (Exception e) { }
 
         try
         {
             var res = await _searchContentService.GetContentBySlug(slug);
 
             return new ObjectResult(
-                new GetEntityResponse<OutputContent>(await _contentTransformer.Transform(res!, populate: populate.Split(",")), userId).Result()
+                new GetEntityResponse<OutputContent>(await _contentTransformer.Transform(res!, populate: populate.Split(","), userId), null).Result()
             )
             {
                 StatusCode = StatusCodes.Status200OK
@@ -237,6 +239,7 @@ public class ContentController : ControllerBase
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Contents Retrieved Successfully</response>
     /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
     [HttpGet("search/visual")]
     [ProducesResponseType(
         StatusCodes.Status200OK,
@@ -367,6 +370,7 @@ public class ContentController : ControllerBase
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Contents Retrieved Successfully</response>
     /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
     [HttpGet("search/textual")]
     [ProducesResponseType(
         StatusCodes.Status200OK,
@@ -585,6 +589,7 @@ public class ContentController : ControllerBase
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Content Likes Retrieved Successfully</response>
     /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
     [HttpGet("{id}/likes")]
     [ProducesResponseType(
         StatusCodes.Status200OK,
@@ -604,6 +609,14 @@ public class ContentController : ControllerBase
         [FromQuery] string sortBy = "created_at"
     )
     {
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
         try
         {
             _logger.LogInformation("Getting all user's content likes");
@@ -614,7 +627,7 @@ public class ContentController : ControllerBase
             var outContent = new List<OutputContentLike>();
             foreach (var content in contents)
             {
-                outContent.Add(await _contentLikeTransformer.Transform(content, populate: queryFilter.Populate));
+                outContent.Add(await _contentLikeTransformer.Transform(content, populate: queryFilter.Populate, userId));
             }
             var response = HttpLib.GeneratePagination(
                 outContent,

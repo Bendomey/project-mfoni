@@ -80,12 +80,16 @@ export const createContent = async (
 	}
 }
 
-export const likeContent = async (contentId: string) => {
+export const likeContent = async (
+	contentId: string,
+	apiConfig: ApiConfigForServerConfig,
+) => {
 	try {
 		const response = await fetchClient<ApiResponse<ContentLike>>(
 			`/v1/contents/${contentId}/likes`,
 			{
 				method: 'POST',
+				...apiConfig,
 			},
 		)
 
@@ -107,17 +111,16 @@ export const likeContent = async (contentId: string) => {
 	}
 }
 
-export const useLikeContent = () =>
-	useMutation({
-		mutationFn: likeContent,
-	})
-
-export const unlikeContent = async (contentId: string) => {
+export const unlikeContent = async (
+	contentId: string,
+	apiConfig: ApiConfigForServerConfig,
+) => {
 	try {
 		const response = await fetchClient<ApiResponse<boolean>>(
 			`/v1/contents/${contentId}/likes`,
 			{
 				method: 'DELETE',
+				...apiConfig,
 			},
 		)
 
@@ -138,11 +141,6 @@ export const unlikeContent = async (contentId: string) => {
 		}
 	}
 }
-
-export const useUnlLikeContent = () =>
-	useMutation({
-		mutationFn: unlikeContent,
-	})
 
 export const getUserContentLikes = async (
 	query: FetchMultipleDataInputParams<unknown>,
@@ -180,7 +178,7 @@ export const useGetUserContentLikes = (
 	userId: string,
 ) =>
 	useQuery({
-		queryKey: [QUERY_KEYS.CONTENT_LIKES, 'user', userId, JSON.stringify(query)],
+		queryKey: [QUERY_KEYS.CONTENT_LIKES, 'user', userId, query],
 		queryFn: () => getUserContentLikes(query),
 		enabled: !!userId,
 	})
@@ -222,7 +220,7 @@ export const useGetContentLikes = (
 	contentId: string,
 ) =>
 	useQuery({
-		queryKey: [QUERY_KEYS.CONTENT_LIKES, contentId, JSON.stringify(query)],
+		queryKey: [QUERY_KEYS.CONTENT_LIKES, contentId, query],
 		queryFn: () => getContentLikes(query, contentId),
 	})
 

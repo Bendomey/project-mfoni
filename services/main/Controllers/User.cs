@@ -702,6 +702,7 @@ public class UserController : ControllerBase
     /// <param name="sortBy">What field to sort by.</param>
     /// <response code="200">Content Likes Retrieved Successfully</response>
     /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
     [HttpGet("users/contents/likes")]
     [Authorize]
     [ProducesResponseType(
@@ -721,6 +722,15 @@ public class UserController : ControllerBase
         [FromQuery] string sortBy = "created_at"
     )
     {
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
+
         try
         {
             logger.LogInformation("Getting all user's content likes");
@@ -732,7 +742,7 @@ public class UserController : ControllerBase
             var outContent = new List<OutputContentLike>();
             foreach (var content in contents)
             {
-                outContent.Add(await _contentLikeTransformer.Transform(content, populate: queryFilter.Populate));
+                outContent.Add(await _contentLikeTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
             }
             var response = HttpLib.GeneratePagination(
                 outContent,

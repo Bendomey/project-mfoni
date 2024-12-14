@@ -1,7 +1,6 @@
 import { ArrowPathIcon, ChevronLeftIcon } from '@heroicons/react/24/outline'
 import { useLoaderData, useNavigate, useParams } from '@remix-run/react'
 import dayjs from 'dayjs'
-import { Fragment } from 'react'
 import { useGetTagContentsBySlug } from '@/api/tags/index.ts'
 import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
@@ -25,7 +24,7 @@ export function TagModule() {
 		{
 			pagination: { page: 0, per: 50 },
 			filters: {},
-			populate: ['content'],
+			populate: ['content', 'content.createdBy'],
 		},
 	)
 
@@ -83,14 +82,14 @@ export function TagModule() {
 			<FadeIn>
 				<div className="mt-8 columns-1 gap-2 sm:columns-2 sm:gap-3 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
 					{data.rows.map((tagContent) => (
-						<Fragment key={tagContent.id}>
+						<div className="mb-5" key={tagContent.id}>
 							{tagContent.content ? (
 								<Content
 									key={tagContent.content.id}
 									content={tagContent.content}
 								/>
 							) : null}
-						</Fragment>
+						</div>
 					))}
 				</div>
 			</FadeIn>
@@ -127,7 +126,11 @@ export function TagModule() {
 							</p>
 						</div>
 						<div className="flex flex-row items-center justify-end gap-2">
-							{data?.total ? <ShareButton /> : null}
+							{data?.total ? (
+								<ShareButton
+									text={`Browse through the carefully curated contents around "${name}"`}
+								/>
+							) : null}
 							<Button color="dangerGhost">Report</Button>
 						</div>
 					</div>

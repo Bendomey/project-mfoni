@@ -9,7 +9,7 @@ import { AccountContentsModule } from '@/modules/index.ts'
 
 export const meta: MetaFunction = () => {
 	return [
-		{ title: 'My Contents | mfoni' },
+		{ title: 'My Images | mfoni' },
 		{ name: 'description', content: 'Welcome to mfoni!' },
 		{ name: 'keywords', content: 'mfoni' },
 	]
@@ -24,31 +24,31 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 
 	const baseUrl = `${environmentVariables().API_ADDRESS}/api`
 
-	if (authCookie) {
-		const query = {
-			pagination: { page: 0, per: 50 },
-			populate: ['content'],
-		}
-		const slug = `${authCookie.userId}_uploads`
-		await queryClient.prefetchQuery({
-			queryKey: [
-				QUERY_KEYS.COLLECTIONS,
-				slug,
-				'slug-contents',
-				JSON.stringify(query),
-			],
-			queryFn: () =>
-				getCollectionContentsBySlug(slug, query, {
-					authToken: authCookie.token,
-					baseUrl,
-				}),
-		})
+	// if (authCookie) {
+	// 	const query = {
+	// 		pagination: { page: 0, per: 50 },
+	// 		populate: ['content', 'content.tags'],
+	// 	}
+	// 	const slug = `${authCookie.id}_personal`
+	// 	await queryClient.prefetchQuery({
+	// 		queryKey: [
+	// 			QUERY_KEYS.COLLECTIONS,
+	// 			slug,
+	// 			'slug-contents',
+	// 			query,
+	// 		],
+	// 		queryFn: () =>
+	// 			getCollectionContentsBySlug(slug, query, {
+	// 				authToken: authCookie.token,
+	// 				baseUrl,
+	// 			}),
+	// 	})
 
-		const dehydratedState = dehydrate(queryClient)
-		return jsonWithCache({
-			dehydratedState,
-		})
-	}
+	// 	const dehydratedState = dehydrate(queryClient)
+	// 	return jsonWithCache({
+	// 		dehydratedState,
+	// 	})
+	// }
 
 	// this should never happen but just in case
 	return null
