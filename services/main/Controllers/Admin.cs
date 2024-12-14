@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Claims;
+using main.Configuratons;
 using main.Domains;
 using main.DTOs;
 using main.Lib;
@@ -10,6 +11,7 @@ using main.Models;
 using main.Transformations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.OpenApi.Any;
 
 namespace main.Controllers;
@@ -27,6 +29,7 @@ public class AdminController : ControllerBase
     private readonly AdminTransformer _adminTransformer;
     private readonly UserTransformer _userTransformer;
     private readonly CreatorApplicationTransformer _creatorApplicationTransformer;
+    private readonly CacheProvider _cacheProvider;
 
     public AdminController(
         ILogger<WaitlistController> logger,
@@ -37,7 +40,8 @@ public class AdminController : ControllerBase
         UserService userService,
         AdminTransformer adminTransformer,
         UserTransformer userTransformer,
-        CreatorApplicationTransformer creatorApplicationTransformer
+        CreatorApplicationTransformer creatorApplicationTransformer,
+        CacheProvider cacheProvider
     )
     {
         this.logger = logger;
@@ -48,6 +52,42 @@ public class AdminController : ControllerBase
         this._adminTransformer = adminTransformer;
         this._userTransformer = userTransformer;
         this._creatorApplicationTransformer = creatorApplicationTransformer;
+        this._cacheProvider = cacheProvider;
+    }
+
+    [HttpPost("save-cache")]
+    public async Task<ActionResult> SaveCache()
+    {
+
+        await _cacheProvider.SetCache("test", new { test = "test" }, new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+        });
+        return new ObjectResult(
+                               new GetEntityResponse<bool>(
+                                   true,
+                                   null
+                               ).Result()
+                           )
+        {
+            StatusCode = StatusCodes.Status201Created
+        };
+    }
+
+    [HttpPost("clear-cache")]
+    public async Task<ActionResult> ClearCache()
+    {
+        await _cacheProvider.ClearCache("test");
+
+        return new ObjectResult(
+                        new GetEntityResponse<bool>(
+                            true,
+                            null
+                        ).Result()
+                    )
+        {
+            StatusCode = StatusCodes.Status201Created
+        };
     }
 
     [Authorize(Policy = "Admin")]

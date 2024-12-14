@@ -12,13 +12,13 @@ public class CacheProvider
         _cache = cache;
     }
 
-    public async Task<T> GetFromCache<T>(string key) where T : class
+    public async Task<T> GetFromCache<T>(string key)
     {
         var cachedUsers = await _cache.GetStringAsync(key);
-        return cachedUsers == null ? null : JsonSerializer.Deserialize<T>(cachedUsers);
+        return cachedUsers == null ? default(T) : JsonSerializer.Deserialize<T>(cachedUsers);
     }
 
-    public async Task SetCache<T>(string key, T value, DistributedCacheEntryOptions options) where T : class
+    public async Task SetCache<T>(string key, T value, DistributedCacheEntryOptions options)
     {
         var users = JsonSerializer.Serialize(value);
         await _cache.SetStringAsync(key, users, options);
