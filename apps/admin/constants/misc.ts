@@ -9,4 +9,5 @@ export const QUERY_KEYS = {
   CREATOR_APPLICATIONS: 'creator-applications',
   USERS: 'users',
   WALLET_TRANSACTIONS: 'wallet-transactions',
+  WALLET: 'wallet',
 } as const
