@@ -34,6 +34,10 @@ const links = [
         href: "/administrators"
     },
     {
+        name: "Wallet Transactions",
+        href: "/wallet-transactions"
+    },
+    {
         name: "Settings",
         href: "/settings"
     }
