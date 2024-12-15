@@ -5,7 +5,6 @@ import Domey from '@/images/ben.jpeg'
 import Fiifi from '@/images/fiifi.jpeg'
 import Ronnie from '@/images/ronnie.jpeg'
 import Audrey from '@/images/audrey.jpeg'
-import Nkay from '@/images/nkay.jpg'
 import Edward from '@/images/Edward.png'
 
 const faqs = [
@@ -52,7 +51,7 @@ const people = [
   {
     id: 3,
     name: 'Edward',
-    designation: 'Software Engineer',
+    designation: 'Technical PM',
     image: Edward,
   },
   {
@@ -67,19 +66,6 @@ const people = [
     designation: 'Product Manager',
     image: Audrey,
   },
-  {
-    id: 6,
-    name: 'Nana Anikuabe',
-    designation: 'Software Engineer',
-    image: Nkay,
-  },
-  // {
-  //   id: 7,
-  //   name: 'Noah',
-  //   designation: 'Software Engineer',
-  //   image:
-  //     'https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3387&q=80',
-  // },
 ]
 
 export const LearnMoreModule = () => {
