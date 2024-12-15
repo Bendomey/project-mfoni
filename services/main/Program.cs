@@ -240,7 +240,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseMiddleware<E2ECacheLayer>();
+if (CacheProvider.CacheEnabled)
+{
+    app.UseMiddleware<E2ECacheLayer>();
+}
 
 app.MapGet("/", () => "All Green!");
 

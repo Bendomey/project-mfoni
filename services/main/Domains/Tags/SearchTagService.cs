@@ -38,7 +38,7 @@ public class SearchTagService
         var tag = _tagsCollection.Find(tag => tag.Slug == slug).FirstOrDefault();
         if (tag is null)
         {
-            throw new Exception("TagNotFound");
+            throw new HttpRequestException("TagNotFound");
         }
 
         return tag;

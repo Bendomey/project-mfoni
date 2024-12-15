@@ -40,7 +40,7 @@ public class ContentLikeService
     public async Task<Models.ContentLike> Create(ContentLikeInput input)
     {
         // confirm that content exists
-        await _searchContentService.GetContentById(input.ContentId);
+        var content = await _searchContentService.GetContentById(input.ContentId);
 
         // does like already exist?
         var existingLike = await GetContentLike(input);
@@ -64,6 +64,14 @@ public class ContentLikeService
 
         await _contentCollection.UpdateOneAsync(filter, updates);
 
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["collections"]}*contents*",
+            $"{CacheProvider.CacheEntities["contents"]}.find*",
+            $"{CacheProvider.CacheEntities["contents"]}.likes*",
+            $"{CacheProvider.CacheEntities["contents"]}*${input.ContentId}*",
+            $"{CacheProvider.CacheEntities["contents"]}*${content.Slug}*",
+        });
+
         return contentLike;
     }
 
@@ -82,6 +90,15 @@ public class ContentLikeService
 
             await _contentCollection.UpdateOneAsync(contentFilter, updates);
         }
+
+        var content = await _searchContentService.GetContentById(input.ContentId);
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["collections"]}*contents*",
+            $"{CacheProvider.CacheEntities["contents"]}.find*",
+            $"{CacheProvider.CacheEntities["contents"]}.likes*",
+            $"{CacheProvider.CacheEntities["contents"]}*${input.ContentId}*",
+            $"{CacheProvider.CacheEntities["contents"]}*${content.Slug}*",
+        });
 
         return true;
     }

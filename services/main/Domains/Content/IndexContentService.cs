@@ -23,10 +23,12 @@ public class IndexContent
     private readonly SaveTagsService _saveTagsService;
     private readonly CollectionService _collectionService;
     private readonly CollectionContentService _collectionContentService;
+    private readonly CacheProvider _cacheProvider;
     private readonly AppConstants _appConstantsConfiguration;
 
     public IndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants, SaveTagsService saveTagsService, CollectionService collectionService, CollectionContentService collectionContentService,
-        CreatorService creatorService
+        CreatorService creatorService,
+        CacheProvider cacheProvider
     )
     {
         _logger = logger;
@@ -47,6 +49,7 @@ public class IndexContent
 
         _collectionContentService = collectionContentService;
         _creatorService = creatorService;
+        _cacheProvider = cacheProvider;
 
         _logger.LogDebug("IndexContentService initialized");
     }
@@ -146,7 +149,26 @@ public class IndexContent
                 Type = CollectionContentType.CONTENT
             });
 
+            dbTags.ForEach(tag =>
+            {
+                _ = _cacheProvider.EntityChanged(new[] {
+                    $"{CacheProvider.CacheEntities["tags"]}*${tag.Id}",
+                    $"{CacheProvider.CacheEntities["tags"]}*${tag.Slug}",
+                     $"{CacheProvider.CacheEntities["tags"]}*${tag.Id}*contents*",
+                    $"{CacheProvider.CacheEntities["tags"]}*${tag.Slug}*contents*",
+                });
+            });
+
             contents.Add(content);
+        });
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["contents"]}.find*",
+            $"{CacheProvider.CacheEntities["collections"]}.find*",
+            $"{CacheProvider.CacheEntities["tags"]}.find*",
+            $"{CacheProvider.CacheEntities["collections"]}*${collection.Id}*",
+            $"{CacheProvider.CacheEntities["collections"]}*${collection.Slug}*",
+            $"{CacheProvider.CacheEntities["collections"]}*${collection.Name}*",
         });
 
         // push to queue for image processing

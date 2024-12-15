@@ -45,7 +45,6 @@ public class E2ECacheLayer
                     if (context.Request.Path.Value is not null)
                     {
                         var urlEntity = context.Request.Path.Value.Split("/")[3];
-                        var entity = CacheProvider.CacheEntities[urlEntity];
 
                         var action = "find";
                         if (context.Request.Path.Value.Split("/").Length > 3)
@@ -58,8 +57,10 @@ public class E2ECacheLayer
                         }
 
                         // we only cache entities we are interested in.
-                        if (entity is not null)
+                        if (CacheProvider.CacheEntities.ContainsKey(urlEntity))
                         {
+                            var entity = CacheProvider.CacheEntities[urlEntity];
+
                             // build the cache key from the request with structure like mfoni-entity.action:queryParameters
                             cacheKey = $"{entity}.{action}:{strigifiedQueryParameters}";
                             var cacheHitData = await _cacheProvider.GetFromCache<object>(cacheKey);
