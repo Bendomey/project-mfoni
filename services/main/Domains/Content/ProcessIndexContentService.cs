@@ -93,6 +93,9 @@ public class ProcessIndexContent
 
         try
         {
+            // check for nudity
+            await CheckForNudity(content);
+
             // resolve all image sizes
             var image = await ProcessImage.DownloadImage(content.Media.Location);
 
@@ -100,7 +103,6 @@ public class ProcessIndexContent
             {
                 await ResolveAllImages(content, image);
             }
-
 
             // detect faces
             var detectFacesResponse = await DetectFaces(content);
@@ -113,9 +115,6 @@ public class ProcessIndexContent
             }
             else
             {
-                // check for nudity
-                await CheckForNudity(content);
-
                 // index face
                 var indexFaceResponse = await IndexFace(content);
 
@@ -128,13 +127,6 @@ public class ProcessIndexContent
 
                 await SaveRekognitionContent(content.Id, faces);
             }
-
-            _ = _cacheProvider.EntityChanged(new[] {
-                $"{CacheProvider.CacheEntities["contents"]}.find*",
-                $"{CacheProvider.CacheEntities["contents"]}*${content.Id}*",
-                $"{CacheProvider.CacheEntities["contents"]}*${content.Slug}*",
-            });
-
         }
         catch (HttpRequestException ex)
         {
@@ -157,6 +149,15 @@ public class ProcessIndexContent
                });
                SentrySdk.CaptureException(ex);
            });
+        }
+        finally
+        {
+            _ = _cacheProvider.EntityChanged(new[] {
+                $"{CacheProvider.CacheEntities["contents"]}.find*",
+                $"{CacheProvider.CacheEntities["collections"]}*contents*",
+                $"{CacheProvider.CacheEntities["contents"]}*{content.Id}*",
+                $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+            });
         }
     }
 

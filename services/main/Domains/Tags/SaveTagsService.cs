@@ -47,7 +47,7 @@ public class SaveTagsService
 
         _tagsCollection.InsertOne(tagToSave);
 
-        _ = _cacheProvider.EntityChanged(new[] { 
+        _ = _cacheProvider.EntityChanged(new[] {
             $"{CacheProvider.CacheEntities["tags"]}.find*",
         });
 

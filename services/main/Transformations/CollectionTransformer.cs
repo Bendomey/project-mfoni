@@ -1,5 +1,6 @@
 
 
+using main.Configuratons;
 using main.Domains;
 using main.DTOs;
 using main.Lib;
@@ -14,13 +15,15 @@ public class CollectionTransformer
     private readonly CollectionContentService _collectionContentService;
     private readonly CollectionContentTransformer _collectionContentTransformer;
     private readonly UserTransformer _userTransformer;
+    private readonly CacheProvider _cacheProvider;
 
     public CollectionTransformer(
        UserService userService,
        CollectionService collectionService,
        CollectionContentService collectionContentService,
        UserTransformer userTransformer,
-         CollectionContentTransformer collectionContentTransformer
+        CollectionContentTransformer collectionContentTransformer,
+        CacheProvider cacheProvider
     )
     {
         _userService = userService;
@@ -28,6 +31,7 @@ public class CollectionTransformer
         _collectionService = collectionService;
         _collectionContentService = collectionContentService;
         _collectionContentTransformer = collectionContentTransformer;
+        _cacheProvider = cacheProvider;
     }
 
     public async Task<OutputCollection> Transform(Collection collection, string[]? populate = null, int contentItemsLimit = 0)
@@ -37,7 +41,7 @@ public class CollectionTransformer
         OutputBasicUser? outputCreatedByUser = null;
         if (collection.CreatedById is not null && populate.Any(p => p.Contains(PopulateKeys.COLLECTION_CREATED_BY)))
         {
-            var createdBy = await _userService.GetUserById(collection.CreatedById);
+            var createdBy = await _cacheProvider.ResolveCache($"{CacheProvider.CacheEntities["collections"]}.{collection.CreatedById}", () => _userService.GetUserById(collection.CreatedById));
             if (createdBy is not null)
             {
                 outputCreatedByUser = _userTransformer.TransformBasicUser(createdBy);
@@ -47,16 +51,19 @@ public class CollectionTransformer
         List<OutputCollectionContent>? outputcollectionContents = null;
         if (contentItemsLimit > 0)
         {
-            List<CollectionContent> collectionContents = await _collectionContentService.GetCollectionContents(
-                new FilterQuery<Models.CollectionContent>
-                {
-                    Limit = contentItemsLimit,
-                    Skip = 0,
-                    Populate = populate,
-                }, new GetCollectionContentsInput
-                {
-                    CollectionId = collection.Id
-                });
+            List<CollectionContent> collectionContents = await _cacheProvider.ResolveCache(
+                $"{CacheProvider.CacheEntities["collections"]}.{collection.Id}.contents",
+                () => _collectionContentService.GetCollectionContents(
+                    new FilterQuery<Models.CollectionContent>
+                    {
+                        Limit = contentItemsLimit,
+                        Skip = 0,
+                        Populate = populate,
+                    }, new GetCollectionContentsInput
+                    {
+                        CollectionId = collection.Id
+                    })
+            );
 
             outputcollectionContents = new List<OutputCollectionContent>();
             foreach (var collectionContent in collectionContents)

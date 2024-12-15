@@ -70,7 +70,7 @@ public class E2ECacheLayer
                                 _logger.LogInformation("E2ECacheLayer Middleware::Cache Hit: {CacheKey}", cacheKey);
                                 if (CacheProvider.CacheTTL is not null)
                                 {
-                                    _ = _cacheProvider.SetCache(cacheKey, cacheHitData, CacheProvider.CacheTTL);
+                                    _ = _cacheProvider.UpdateCacheExpiry(cacheKey, (TimeSpan)CacheProvider.CacheTTL);
                                 }
 
                                 // if we have a cache hit, we return the cached data

@@ -67,9 +67,9 @@ public class ContentLikeService
         _ = _cacheProvider.EntityChanged(new[] {
             $"{CacheProvider.CacheEntities["collections"]}*contents*",
             $"{CacheProvider.CacheEntities["contents"]}.find*",
-            $"{CacheProvider.CacheEntities["contents"]}.likes*",
-            $"{CacheProvider.CacheEntities["contents"]}*${input.ContentId}*",
-            $"{CacheProvider.CacheEntities["contents"]}*${content.Slug}*",
+            $"{CacheProvider.CacheEntities["contents"]}*likes*",
+            $"{CacheProvider.CacheEntities["contents"]}*{input.ContentId}*",
+            $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
         });
 
         return contentLike;
@@ -95,9 +95,9 @@ public class ContentLikeService
         _ = _cacheProvider.EntityChanged(new[] {
             $"{CacheProvider.CacheEntities["collections"]}*contents*",
             $"{CacheProvider.CacheEntities["contents"]}.find*",
-            $"{CacheProvider.CacheEntities["contents"]}.likes*",
-            $"{CacheProvider.CacheEntities["contents"]}*${input.ContentId}*",
-            $"{CacheProvider.CacheEntities["contents"]}*${content.Slug}*",
+            $"{CacheProvider.CacheEntities["contents"]}*likes*",
+            $"{CacheProvider.CacheEntities["contents"]}*{input.ContentId}*",
+            $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
         });
 
         return true;

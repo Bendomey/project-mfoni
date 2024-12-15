@@ -59,12 +59,44 @@ public class CacheProvider
         await _redis.KeyDeleteAsync(key);
     }
 
+    public async Task UpdateCacheExpiry(RedisKey key, TimeSpan timeSpan)
+    {
+        await _redis.KeyExpireAsync($"{CachePrefix}{key}", timeSpan);
+    }
+
     public async Task EntityChanged(string[] Queries)
     {
-        foreach (var query in Queries)
+        if (CacheEnabled)
         {
-            var result = _redisServer.Keys(pattern: $"{CachePrefix}*{query}");
-            await _redis.KeyDeleteAsync(result.ToArray());
+            foreach (var query in Queries)
+            {
+                var result = _redisServer.Keys(pattern: $"{CachePrefix}*{query}");
+                await _redis.KeyDeleteAsync(result.ToArray());
+            }
         }
+    }
+
+    public async Task<T> ResolveCache<T>(string key, Func<Task<T>> resolver)
+    {
+        if (CacheEnabled)
+        {
+            var cached = await GetFromCache<T>(key);
+            if (cached != null)
+            {
+
+                if (CacheTTL != null)
+                {
+                    await UpdateCacheExpiry(key, (TimeSpan)CacheTTL);
+                }
+
+                return cached;
+            }
+
+            var result = await resolver();
+            await SetCache(key, result, CacheTTL);
+            return result;
+        }
+
+        return await resolver();
     }
 }

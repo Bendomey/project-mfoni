@@ -106,9 +106,9 @@ public class CollectionService
 
         _ = _cacheProvider.EntityChanged(new[] {
             $"{CacheProvider.CacheEntities["collections"]}.find*",
-            $"{CacheProvider.CacheEntities["collections"]}*${input.Id}*",
-            $"{CacheProvider.CacheEntities["collections"]}*${oldCollection.Slug}*",
-            $"{CacheProvider.CacheEntities["collections"]}*${oldName}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{input.Id}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{oldCollection.Slug}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{oldName}*",
         });
 
         return oldCollection;

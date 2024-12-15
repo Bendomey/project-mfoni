@@ -1,5 +1,6 @@
 
 
+using main.Configuratons;
 using main.Domains;
 using main.DTOs;
 using main.Models;
@@ -17,6 +18,7 @@ public class ContentTransformer
     private readonly TagTransformer _tagTransformer;
     private readonly AdminService _adminService;
     private readonly AdminTransformer _adminTransformer;
+    private readonly CacheProvider _cacheProvider;
     public ContentTransformer(
         UserService userService,
         ContentLikeService contentLikeService,
@@ -25,7 +27,8 @@ public class ContentTransformer
         UserTransformer userTransformer,
         SearchTagService searchTagService,
         TagTransformer tagTransformer,
-        SearchContentService searchContentService
+        SearchContentService searchContentService,
+        CacheProvider cacheProvider
     )
     {
         _userService = userService;
@@ -36,6 +39,7 @@ public class ContentTransformer
         _searchTagService = searchTagService;
         _tagTransformer = tagTransformer;
         _searchContentService = searchContentService;
+        _cacheProvider = cacheProvider;
     }
 
     public async Task<OutputContent> Transform(Content content, string[]? populate = null, string? userId = null)
@@ -45,7 +49,7 @@ public class ContentTransformer
         OutputBasicCreator? outputBasicCreator = null;
         if (content.CreatedById is not null && populate.Any(p => p.Contains(PopulateKeys.CONTENT_CREATED_BY)))
         {
-            var createdBy = await _userService.GetUserById(content.CreatedById);
+            var createdBy = await _cacheProvider.ResolveCache($"users.{content.CreatedById}", () => _userService.GetUserById(content.CreatedById));
             if (createdBy is not null)
             {
                 outputBasicCreator = await _userTransformer.TransformBasicCreator(createdBy);
@@ -53,7 +57,7 @@ public class ContentTransformer
         }
 
         List<OutputTag>? outputTags = null;
-        var tags = await _searchTagService.GetTagsForContent(content.Id);
+        var tags = await _cacheProvider.ResolveCache($"{CacheProvider.CacheEntities["contents"]}.{content.Id}.tags", () => _searchTagService.GetTagsForContent(content.Id));
 
         var tagsId = tags.Select(t => t.Id).ToList();
         if (populate.Any(p => p.Contains(PopulateKeys.CONTENT_TAGS)))
@@ -80,11 +84,11 @@ public class ContentTransformer
         OutputContentLike? outputContentLike = null;
         if (userId is not null)
         {
-            var contentLike = await _contentLikeService.GetContentLike(new ContentLikeInput
+            var contentLike = await _cacheProvider.ResolveCache($"{CacheProvider.CacheEntities["contents"]}.{content.Id}.users.{userId}.likes", () => _contentLikeService.GetContentLike(new ContentLikeInput
             {
                 ContentId = content.Id,
                 UserId = userId
-            });
+            }));
 
             if (contentLike is not null)
             {

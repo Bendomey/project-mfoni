@@ -152,10 +152,11 @@ public class IndexContent
             dbTags.ForEach(tag =>
             {
                 _ = _cacheProvider.EntityChanged(new[] {
-                    $"{CacheProvider.CacheEntities["tags"]}*${tag.Id}",
-                    $"{CacheProvider.CacheEntities["tags"]}*${tag.Slug}",
-                     $"{CacheProvider.CacheEntities["tags"]}*${tag.Id}*contents*",
-                    $"{CacheProvider.CacheEntities["tags"]}*${tag.Slug}*contents*",
+                    $"{CacheProvider.CacheEntities["tags"]}*{tag.Id}",
+                    $"{CacheProvider.CacheEntities["tags"]}*{tag.Slug}",
+                    $"{CacheProvider.CacheEntities["tags"]}*{tag.Id}*contents*",
+                    $"{CacheProvider.CacheEntities["tags"]}*{tag.Slug}*contents*",
+                    $"{CacheProvider.CacheEntities["contents"]}*{content.Id}*tags*",
                 });
             });
 
@@ -166,9 +167,9 @@ public class IndexContent
             $"{CacheProvider.CacheEntities["contents"]}.find*",
             $"{CacheProvider.CacheEntities["collections"]}.find*",
             $"{CacheProvider.CacheEntities["tags"]}.find*",
-            $"{CacheProvider.CacheEntities["collections"]}*${collection.Id}*",
-            $"{CacheProvider.CacheEntities["collections"]}*${collection.Slug}*",
-            $"{CacheProvider.CacheEntities["collections"]}*${collection.Name}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Id}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Slug}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Name}*",
         });
 
         // push to queue for image processing
