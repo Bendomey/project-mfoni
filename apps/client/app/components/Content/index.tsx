@@ -44,23 +44,68 @@ export const Content = ({ content, showCreator = true }: Props) => {
 						<div className="flex flex-row items-center justify-between p-2">
 							<div className="flex items-center gap-1">
 								{content.amount > 0 ? (
-									<div className="rounded-full bg-black px-3 py-1 text-sm font-semibold text-white">
-										mfoni+
-									</div>
+									<FlyoutContainer
+										intendedPosition="y"
+										FlyoutContent={
+											<div className="z-50 flex w-48 flex-col items-center justify-center rounded-2xl bg-black px-3 py-4 shadow-xl">
+												<h3 className="text-center text-sm font-bold text-white">
+													This is a premium image
+												</h3>
+											</div>
+										}
+									>
+										<div className="rounded-full bg-black px-3 py-1 text-sm font-semibold text-white">
+											mfoni+
+										</div>
+									</FlyoutContainer>
 								) : null}
 								{content.status === 'REJECTED' ? (
-									<div className="gap-.5 flex items-center rounded-full bg-red-600 px-2 py-1 text-xs font-semibold text-white">
-										<XCircleIcon className="size-5" />
-										Rejected
-									</div>
+									<FlyoutContainer
+										intendedPosition="y"
+										FlyoutContent={
+											<div className="z-50 flex w-48 flex-col items-center justify-center rounded-2xl bg-black px-3 py-4 shadow-xl">
+												<h3 className="text-center text-sm font-bold text-white">
+													{content.imageProcessingResponse?.message ??
+														'Something happened while processing your image.'}
+												</h3>
+											</div>
+										}
+									>
+										<div className="gap-.5 flex items-center rounded-full bg-red-600 px-2 py-1 text-xs font-semibold text-white">
+											<XCircleIcon className="size-5" />
+											Rejected
+										</div>
+									</FlyoutContainer>
 								) : content.status === 'PROCESSING' ? (
-									<div className="rounded-full bg-blue-600 px-1 py-1 text-sm font-semibold text-white">
-										<ClockIcon className="size-5" />
-									</div>
+									<FlyoutContainer
+										intendedPosition="y"
+										FlyoutContent={
+											<div className="z-50 flex w-48 flex-col items-center justify-center rounded-2xl bg-black px-3 py-4 shadow-xl">
+												<h3 className="text-center text-sm font-bold text-white">
+													Processing image
+												</h3>
+											</div>
+										}
+									>
+										<div className="rounded-full bg-blue-600 px-1 py-1 text-sm font-semibold text-white">
+											<ClockIcon className="size-5" />
+										</div>
+									</FlyoutContainer>
 								) : content.visibility === 'PRIVATE' ? (
-									<div className="rounded-full bg-black px-3 py-1 text-sm font-semibold text-white">
-										Hidden
-									</div>
+									<FlyoutContainer
+										intendedPosition="y"
+										FlyoutContent={
+											<div className="z-50 flex w-48 flex-col items-center justify-center rounded-2xl bg-black px-3 py-4 shadow-xl">
+												<h3 className="text-center text-sm font-bold text-white">
+													This is image is hidden from the public
+												</h3>
+											</div>
+										}
+									>
+										<div className="rounded-full bg-black px-3 py-1 text-sm font-semibold text-white">
+											Hidden
+										</div>
+									</FlyoutContainer>
 								) : null}
 							</div>
 							<div className="hidden group-hover:block">
