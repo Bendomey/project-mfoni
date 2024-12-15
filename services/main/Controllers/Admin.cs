@@ -59,10 +59,7 @@ public class AdminController : ControllerBase
     public async Task<ActionResult> SaveCache()
     {
 
-        await _cacheProvider.SetCache("test", new { test = "test" }, new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-        });
+        await _cacheProvider.SetCache("test", new { test = "test" }, TimeSpan.FromMinutes(5));
         return new ObjectResult(
                                new GetEntityResponse<bool>(
                                    true,

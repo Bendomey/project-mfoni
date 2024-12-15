@@ -3,11 +3,13 @@ using System.Text;
 using main.Configuratons;
 using main.Domains;
 using main.HostedServices;
+using main.Middlewares;
 using main.Transformations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,13 +39,13 @@ builder.Services.Configure<RabbitMQConnection>(
 
 builder.Services.Configure<AppConstants>(builder.Configuration.GetSection("AppConstants"));
 
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(
+        builder
         .Configuration.GetSection("AppConstants:RedisConnectionString")
-        .Get<string>();
-    options.InstanceName = "mfoni_";
-});
+        .Get<string>()!
+    )
+);
 
 builder
     .Services.AddAuthentication(options =>
@@ -237,6 +239,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+if (CacheProvider.CacheEnabled)
+{
+    app.UseMiddleware<E2ECacheLayer>();
+}
 
 app.MapGet("/", () => "All Green!");
 

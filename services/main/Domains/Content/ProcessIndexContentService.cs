@@ -8,9 +8,6 @@ using Amazon.Rekognition;
 using Amazon.Runtime;
 using main.Lib;
 using Amazon.Rekognition.Model;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.Fonts;
-using SixLabors.ImageSharp.Drawing.Processing;
 
 namespace main.Domains;
 
@@ -23,10 +20,12 @@ public class ProcessIndexContent
     private readonly IConnection _rabbitMqChannel;
     private readonly AppConstants _appConstantsConfiguration;
     private readonly IModel _model;
+    private readonly CacheProvider _cacheProvider;
 
     private readonly AmazonRekognitionClient _rekognitionClient;
 
-    public ProcessIndexContent(ILogger<ProcessIndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants)
+    public ProcessIndexContent(ILogger<ProcessIndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants,
+        CacheProvider cacheProvider)
     {
         _logger = logger;
 
@@ -50,6 +49,7 @@ public class ProcessIndexContent
         var credentials = new BasicAWSCredentials(_appConstantsConfiguration.AWSAccessKey, _appConstantsConfiguration.AWSSecretKey);
         var region = Amazon.RegionEndpoint.USEast1;
         _rekognitionClient = new AmazonRekognitionClient(credentials, region);
+        _cacheProvider = cacheProvider;
 
         _logger.LogDebug("ProcessIndexContentService initialized");
     }
@@ -93,6 +93,9 @@ public class ProcessIndexContent
 
         try
         {
+            // check for nudity
+            await CheckForNudity(content);
+
             // resolve all image sizes
             var image = await ProcessImage.DownloadImage(content.Media.Location);
 
@@ -100,7 +103,6 @@ public class ProcessIndexContent
             {
                 await ResolveAllImages(content, image);
             }
-
 
             // detect faces
             var detectFacesResponse = await DetectFaces(content);
@@ -110,14 +112,9 @@ public class ProcessIndexContent
             if (faceDetailsLength == 0)
             {
                 await UpdateContentWithNoProcess(content.Id, "No faces detected");
-
-                return;
             }
             else
             {
-                // check for nudity
-                await CheckForNudity(content);
-
                 // index face
                 var indexFaceResponse = await IndexFace(content);
 
@@ -129,7 +126,6 @@ public class ProcessIndexContent
 
 
                 await SaveRekognitionContent(content.Id, faces);
-                return;
             }
         }
         catch (HttpRequestException ex)
@@ -153,6 +149,15 @@ public class ProcessIndexContent
                });
                SentrySdk.CaptureException(ex);
            });
+        }
+        finally
+        {
+            _ = _cacheProvider.EntityChanged(new[] {
+                $"{CacheProvider.CacheEntities["contents"]}.find*",
+                $"{CacheProvider.CacheEntities["collections"]}*contents*",
+                $"{CacheProvider.CacheEntities["contents"]}*{content.Id}*",
+                $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+            });
         }
     }
 

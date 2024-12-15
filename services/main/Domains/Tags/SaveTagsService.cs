@@ -11,8 +11,10 @@ public class SaveTagsService
     private readonly ILogger<SaveTagsService> _logger;
     private readonly IMongoCollection<Models.Tag> _tagsCollection;
     private readonly SearchTagService _searchTagService;
+    private readonly CacheProvider _cacheProvider;
 
-    public SaveTagsService(ILogger<SaveTagsService> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTagService searchTagService)
+    public SaveTagsService(ILogger<SaveTagsService> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTagService searchTagService,
+        CacheProvider cacheProvider)
     {
         _logger = logger;
 
@@ -21,6 +23,8 @@ public class SaveTagsService
         _tagsCollection = database.GetCollection<Models.Tag>(appConstants.Value.TagCollection);
 
         _searchTagService = searchTagService;
+
+        _cacheProvider = cacheProvider;
 
         _logger.LogDebug("SaveTagsService initialized");
     }
@@ -40,7 +44,12 @@ public class SaveTagsService
             Description = tag.Description,
             CreatedByUserId = userInput.Id,
         };
+
         _tagsCollection.InsertOne(tagToSave);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["tags"]}.find*",
+        });
 
         return tagToSave;
     }

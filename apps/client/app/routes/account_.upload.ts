@@ -51,7 +51,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			})
 
 			// Let them see their contents.
-			return redirect('/account')
+			return redirect('/account/uploads')
 		} catch (error: unknown) {
 			if (error instanceof Error) {
 				return { error: error.message }

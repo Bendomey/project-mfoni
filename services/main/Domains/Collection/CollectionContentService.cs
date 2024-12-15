@@ -15,6 +15,7 @@ public class CollectionContentService
     private readonly IMongoCollection<Models.CollectionContent> _collectionContentCollection;
     private readonly IMongoCollection<Models.Collection> _collectionCollection;
     private readonly IMongoCollection<Models.Content> _contentCollection;
+    private readonly IMongoCollection<Models.Tag> _tagCollection;
     private readonly CacheProvider _cacheProvider;
     private readonly AppConstants _appConstantsConfiguration;
 
@@ -30,6 +31,7 @@ public class CollectionContentService
         _collectionContentCollection = databaseConfig.Database.GetCollection<Models.CollectionContent>(appConstants.Value.CollectionContentCollection);
         _collectionCollection = databaseConfig.Database.GetCollection<Models.Collection>(appConstants.Value.CollectionCollection);
         _contentCollection = databaseConfig.Database.GetCollection<Models.Content>(appConstants.Value.ContentCollection);
+        _tagCollection = databaseConfig.Database.GetCollection<Models.Tag>(appConstants.Value.TagCollection);
         _cacheProvider = cacheProvider;
         _appConstantsConfiguration = appConstants.Value;
         _collectionService = collectionService;
@@ -39,18 +41,41 @@ public class CollectionContentService
 
     public Models.CollectionContent SaveCollectionContent(SaveCollectionContent input)
     {
+        var collection = _collectionService.GetCollection(input.CollectionId);
+
         var filter = Builders<Models.CollectionContent>.Filter.Eq(r => r.CollectionId, input.CollectionId);
 
         if (input.TagId is not null)
         {
+            var tag = _tagCollection.Find(Builders<Models.Tag>.Filter.Eq(r => r.Id, input.TagId)).FirstOrDefault();
+
+            if (tag is null)
+            {
+                throw new HttpRequestException("TagNotFound");
+            }
+
             filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.TagId, input.TagId);
         }
         else if (input.ChildCollectionId is not null)
         {
+            var childCollection = _collectionCollection.Find(Builders<Collection>.Filter.Eq(r => r.Id, input.ChildCollectionId)).FirstOrDefault();
+
+            if (childCollection is null)
+            {
+                throw new HttpRequestException("ChildCollectionNotFound");
+            }
+
             filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ChildCollectionId, input.ChildCollectionId);
         }
         else if (input.ContentId is not null)
         {
+            var content = _contentCollection.Find(Builders<Content>.Filter.Eq(r => r.Id, input.ContentId)).FirstOrDefault();
+
+            if (content is null)
+            {
+                throw new HttpRequestException("ContentNotFound");
+            }
+
             filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ContentId, input.ContentId);
         }
 
@@ -61,18 +86,28 @@ public class CollectionContentService
             throw new HttpRequestException("CollectionContentAlreadyExists");
         }
 
-        var collection = new Models.CollectionContent
+        var collectionContent = new Models.CollectionContent
         {
             CollectionId = input.CollectionId,
             Type = input.Type,
             ContentId = input.ContentId,
+            TagId = input.TagId,
+            ChildCollectionId = input.ChildCollectionId
         };
 
-        _collectionContentCollection.InsertOne(collection);
+        _collectionContentCollection.InsertOne(collectionContent);
 
         _collectionService.UpdateCollectionContentsCount(input.CollectionId, 1);
 
-        return collection;
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["collections"]}.find*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Id}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Slug}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Name}*",
+            $"{CacheProvider.CacheEntities["collections"]}*contents*",
+        });
+
+        return collectionContent;
     }
 
     public Models.CollectionContent GetCollection(string collectionId)
@@ -177,37 +212,24 @@ public class CollectionContentService
 
         foreach (var contentId in input.ContentIds)
         {
-            // if content is available
-            var oldContent = _contentCollection.Find(Builders<Content>.Filter.Eq(r => r.Id, contentId.Id)).FirstOrDefault();
 
-            if (oldContent is null)
+            try
+            {
+                var collectionContent = SaveCollectionContent(new SaveCollectionContent
+                {
+                    CollectionId = input.Id,
+                    ContentId = contentId.Type == CollectionContentType.CONTENT ? contentId.Id : null,
+                    Type = contentId.Type,
+                    TagId = contentId.Type == CollectionContentType.TAG ? contentId.Id : null,
+                    ChildCollectionId = contentId.Type == CollectionContentType.COLLECTION ? contentId.Id : null
+                });
+                collectionContents.Add(collectionContent);
+            }
+            catch (System.Exception)
             {
                 continue;
             }
-
-            // if collectionContent already available
-            var collectionContentFilter = Builders<CollectionContent>.Filter.Eq(r => r.CollectionId, input.Id);
-            collectionContentFilter &= Builders<CollectionContent>.Filter.Eq(r => r.ContentId, contentId.Id);
-
-            var oldCollectionContent = _collectionContentCollection.Find(collectionContentFilter).FirstOrDefault();
-
-            if (oldCollectionContent is not null)
-            {
-                continue;
-            }
-
-            var collectionContent = new CollectionContent
-            {
-                CollectionId = input.Id,
-                ContentId = contentId.Id,
-                Type = contentId.Type
-            };
-
-            _collectionContentCollection.InsertOne(collectionContent);
-            collectionContents.Add(collectionContent);
         }
-
-        _collectionService.UpdateCollectionContentsCount(input.Id, collectionContents.Count);
 
         return collectionContents;
     }
@@ -246,12 +268,24 @@ public class CollectionContentService
             {
                 continue;
             }
-
             _collectionContentCollection.DeleteOne(collectionContentFilter);
+            var collection = _collectionCollection.Find(Builders<Models.Collection>.Filter.Eq(r => r.Id, oldCollectionContent.CollectionId)).FirstOrDefault();
+
+            _ = _cacheProvider.EntityChanged(new[] {
+                $"{CacheProvider.CacheEntities["collections"]}*{collection.Id}*",
+                $"{CacheProvider.CacheEntities["collections"]}*{collection.Slug}*",
+                $"{CacheProvider.CacheEntities["collections"]}*{collection.Name}*",
+            });
+
             collectionContents.Add(oldCollectionContent);
         }
 
         _collectionService.UpdateCollectionContentsCount(input.Id, -collectionContents.Count);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["collections"]}.find*",
+            $"{CacheProvider.CacheEntities["collections"]}*contents*",
+        });
         return true;
     }
 

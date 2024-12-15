@@ -58,6 +58,10 @@ public class CollectionService
 
         _collectionCollection.InsertOne(collection);
 
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["collections"]}.find*",
+        });
+
         return collection;
     }
 
@@ -80,6 +84,8 @@ public class CollectionService
             throw new HttpRequestException("CollectionNotFound");
         }
 
+        var oldName = oldCollection.Name;
+
         if (input.Name is not null)
         {
             oldCollection.Name = input.Name;
@@ -97,6 +103,13 @@ public class CollectionService
 
         oldCollection.UpdatedAt = DateTime.UtcNow;
         _collectionCollection.ReplaceOne(filter, oldCollection);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["collections"]}.find*",
+            $"{CacheProvider.CacheEntities["collections"]}*{input.Id}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{oldCollection.Slug}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{oldName}*",
+        });
 
         return oldCollection;
     }

@@ -1,5 +1,6 @@
 
 
+using main.Configuratons;
 using main.Domains;
 using main.DTOs;
 using main.Models;
@@ -11,23 +12,23 @@ public class CollectionContentTransformer
 
     private readonly SearchTagService _tagService;
     private readonly TagTransformer _tagTransformer;
-    private readonly CollectionContentService _collectionContentService;
     private readonly SearchContentService _contentService;
     private readonly ContentTransformer _contentTransformer;
+    private readonly CacheProvider _cacheProvider;
 
     public CollectionContentTransformer(
        SearchTagService tagService,
-       CollectionContentService collectionContentService,
         TagTransformer tagTransformer,
         SearchContentService contentService,
-        ContentTransformer contentTransformer
+        ContentTransformer contentTransformer,
+        CacheProvider cacheProvider
     )
     {
         _tagService = tagService;
         _tagTransformer = tagTransformer;
-        _collectionContentService = collectionContentService;
         _contentService = contentService;
         _contentTransformer = contentTransformer;
+        _cacheProvider = cacheProvider;
     }
 
     public async Task<OutputCollectionContent> Transform(CollectionContent collectionContent, string[]? populate = null, string? userId = null)
@@ -37,7 +38,7 @@ public class CollectionContentTransformer
         OutputTag? outputTag = null;
         if (collectionContent.TagId is not null && populate.Any(p => p.Contains(PopulateKeys.TAG)))
         {
-            var tag = await _tagService.Get(collectionContent.TagId);
+            var tag = await _cacheProvider.ResolveCache($"{CacheProvider.CacheEntities["tags"]}.{collectionContent.TagId}", () => _tagService.Get(collectionContent.TagId));
             if (tag is not null)
             {
                 outputTag = await _tagTransformer.Transform(tag, populate: populate);
@@ -47,7 +48,7 @@ public class CollectionContentTransformer
         OutputContent? outputContent = null;
         if (collectionContent.ContentId is not null && populate.Any(p => p.Contains(PopulateKeys.CONTENT)))
         {
-            var content = await _contentService.GetContentById(collectionContent.ContentId);
+            var content = await _cacheProvider.ResolveCache($"{CacheProvider.CacheEntities["contents"]}.{collectionContent.ContentId}", () => _contentService.GetContentById(collectionContent.ContentId));
             if (content is not null)
             {
                 outputContent = await _contentTransformer.Transform(content, populate: populate, userId: userId);
