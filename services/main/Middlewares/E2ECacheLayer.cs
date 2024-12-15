@@ -42,7 +42,7 @@ public class E2ECacheLayer
                     var strigifiedQueryParameters = string.Join("|", queryParameters);
 
                     // with url structure like /api/v1/entity/action?queryParameters
-                    if (context.Request.Path.Value is not null)
+                    if (context.Request.Path.Value is not null && context.Request.Path.Value.Split("/").Count() > 2)
                     {
                         var urlEntity = context.Request.Path.Value.Split("/")[3];
 
