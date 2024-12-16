@@ -23,3 +23,10 @@ public class RemoveContentsFromCollectionInput
 {
     public required string[] ContentIds { get; set; }
 }
+
+public class EditContentBasicDetailsInput
+{
+    public string? Title { get; set; }
+    public string? Visibility { get; set; }
+    public double? Amount { get; set; }
+}

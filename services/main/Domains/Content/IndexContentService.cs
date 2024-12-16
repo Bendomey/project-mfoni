@@ -19,16 +19,16 @@ public class IndexContent
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.TagContent> _tagContentCollection;
     private readonly RabbitMQ.Client.IConnection _rabbitMqChannel;
-    private readonly CreatorService _creatorService;
     private readonly SaveTagsService _saveTagsService;
     private readonly CollectionService _collectionService;
+    private readonly PermissionService _permissionService;
     private readonly CollectionContentService _collectionContentService;
     private readonly CacheProvider _cacheProvider;
     private readonly AppConstants _appConstantsConfiguration;
 
     public IndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants, SaveTagsService saveTagsService, CollectionService collectionService, CollectionContentService collectionContentService,
-        CreatorService creatorService,
-        CacheProvider cacheProvider
+        CacheProvider cacheProvider,
+        PermissionService permissionService
     )
     {
         _logger = logger;
@@ -46,9 +46,9 @@ public class IndexContent
         _saveTagsService = saveTagsService;
 
         _collectionService = collectionService;
+        _permissionService = permissionService;
 
         _collectionContentService = collectionContentService;
-        _creatorService = creatorService;
         _cacheProvider = cacheProvider;
 
         _logger.LogDebug("IndexContentService initialized");
@@ -56,45 +56,11 @@ public class IndexContent
 
     public async Task<List<Content>> Save(SaveMedia[] mediaInput, CurrentUserOutput userInput)
     {
-        var userInfo = await _creatorService.GetUserInfo(userInput.Id);
-
         // =============== PERMISSIONS CHECK =============================
-        // check if user is a creator
-        if (userInfo.User.Role != UserRole.CREATOR || userInfo.CreatorSubscription is null)
-        {
-            _logger.LogError("Error here 1");
-            throw new HttpRequestException("NotEnoughPermission", null, HttpStatusCode.Forbidden);
-        }
+        var userInfo = await _permissionService.CanUploadContent(userInput.Id, mediaInput.Length);
 
-        var yourPermissions = PermissionsHelper.GetPermissionsForPackageType(userInfo.CreatorSubscription.PackageType);
-
-        if (!PermissionsHelper.Can(new CanInput
-        {
-            Action = Permissions.UploadContent,
-            Permissions = yourPermissions
-        }))
-        {
-            _logger.LogError("Error here 2");
-            throw new HttpRequestException("NotEnoughPermission", null, HttpStatusCode.Forbidden);
-        }
-
-        var userUploadCollectionName = $"{userInfo.User.Id}::Uploads";
-        var userUploadCollectionSlug = $"{userInfo.User.Id}_uploads";
-
-        var creatorUploadsCount = 0;
-        try
-        {
-            var uploadCollection = _collectionService.GetCollectionBySlug(userUploadCollectionSlug);
-            creatorUploadsCount = uploadCollection.ContentsCount;
-        }
-        catch (Exception) { }
-
-        if (creatorUploadsCount + mediaInput.Length > PermissionsHelper.GetNumberOfUploadsForPackageType(userInfo.CreatorSubscription.PackageType))
-        {
-            throw new HttpRequestException("UploadLimitReached", null, HttpStatusCode.Forbidden);
-        }
-
-        // =============== UPLOAD CONTENT =============================
+        var userUploadCollectionName = $"{userInput.Id}::Uploads";
+        var userUploadCollectionSlug = userUploadCollectionName.Replace("::", "_").ToLower();
 
         // resolve upload collection
         var collection = _collectionService.ResolveCollection(new SaveCollection
@@ -122,7 +88,7 @@ public class IndexContent
                 Title = media.Title,
                 Slug = $"{media.Title.ToLower().Replace(" ", "_")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}",
                 IntendedVisibility = media.Visibility,
-                Amount = MoneyLib.ConvertCedisToPesewas(Convert.ToInt64(media.Amount)),
+                Amount = MoneyLib.ConvertCedisToPesewas(media.Amount),
                 Media = media.Content,
                 CreatedById = userInfo.User.Id,
             };

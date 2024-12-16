@@ -14,8 +14,8 @@ public static class MoneyLib
         return pesewas / 100;
     }
 
-    public static Int64 ConvertCedisToPesewas(Int64 cedis)
+    public static Int64 ConvertCedisToPesewas(double cedis)
     {
-        return cedis * 100;
+        return Convert.ToInt64(cedis * 100);
     }
 }
