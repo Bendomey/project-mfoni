@@ -37,12 +37,10 @@ public class E2ECacheLayer
                 // we only try to retrieve the cache if the request is a GET request
                 if (context.Request.Method == "GET")
                 {
-                    // build a string with the query parameters and values like so - key|value|key|value
-                    var queryParameters = context.Request.Query.Select(q => $"{q.Key}|{q.Value}").ToList();
-                    var strigifiedQueryParameters = string.Join("|", queryParameters);
+
 
                     // with url structure like /api/v1/entity/action?queryParameters
-                    if (context.Request.Path.Value is not null && context.Request.Path.Value.Split("/").Count() > 2)
+                    if (context.Request.Path.Value is not null && context.Request.Path.Value.Split("/").Count() >= 3)
                     {
                         var urlEntity = context.Request.Path.Value.Split("/")[3];
 
@@ -60,6 +58,10 @@ public class E2ECacheLayer
                         if (CacheProvider.CacheEntities.ContainsKey(urlEntity))
                         {
                             var entity = CacheProvider.CacheEntities[urlEntity];
+
+                            // build a string with the query parameters and values like so - key|value|key|value
+                            var queryParameters = context.Request.Query.Select(q => $"{q.Key}|{q.Value}").ToList();
+                            var strigifiedQueryParameters = string.Join("|", queryParameters);
 
                             // build the cache key from the request with structure like mfoni-entity.action:queryParameters
                             cacheKey = $"{entity}.{action}:{strigifiedQueryParameters}";

@@ -148,6 +148,7 @@ builder.Services.AddSingleton<SubscriptionService>();
 builder.Services.AddSingleton<SearchTagService>();
 builder.Services.AddSingleton<SearchContentService>();
 
+builder.Services.AddSingleton<PermissionService>();
 builder.Services.AddSingleton<SaveTagsService>();
 
 builder.Services.AddSingleton<CollectionService>();
@@ -157,6 +158,7 @@ builder.Services.AddSingleton<ContentLikeService>();
 // indexing content services
 builder.Services.AddSingleton<IndexContent>();
 builder.Services.AddSingleton<ProcessIndexContent>();
+builder.Services.AddSingleton<EditContentService>();
 
 builder.Services.AddSingleton<WaitlistService>();
 

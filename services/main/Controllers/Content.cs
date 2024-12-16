@@ -16,6 +16,7 @@ namespace main.Controllers;
 public class ContentController : ControllerBase
 {
     private readonly ILogger<ContentController> _logger;
+    private readonly EditContentService _editContentService;
     private readonly ContentLikeService _contentLikeService;
     private readonly IndexContent _indexContentService;
     private readonly SearchContentService _searchContentService;
@@ -27,6 +28,7 @@ public class ContentController : ControllerBase
         ContentLikeService contentLikeService,
         IndexContent indexContentService,
         SearchContentService searchContentService,
+        EditContentService editContentService,
         ContentTransformer contentTransformer,
         ContentLikeTransformer contentLikeTransformer
     )
@@ -35,6 +37,7 @@ public class ContentController : ControllerBase
         _contentLikeService = contentLikeService;
         _indexContentService = indexContentService;
         _searchContentService = searchContentService;
+        _editContentService = editContentService;
         _contentTransformer = contentTransformer;
         _contentLikeTransformer = contentLikeTransformer;
     }
@@ -471,6 +474,61 @@ public class ContentController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Edits a content
+    /// </summary>
+    /// <response code="200">Content Edited Successfully</response>
+    /// <response code="401">Unauthorize</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize]
+    [HttpPatch("{id}")]
+    [ProducesResponseType(typeof(OutputResponse<Models.Content>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> EditContent(string id, [FromBody] DTOs.EditContentBasicDetailsInput input)
+    {
+        try
+        {
+            _logger.LogInformation("Update basic deets on content: " + id);
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var content = await _editContentService.EditContent(new Domains.EditContentBasicDetailsInput
+            {
+                ContentId = id,
+                UserId = currentUser.Id,
+                Amount = input.Amount,
+                Title = input.Title,
+                Visibility = input.Visibility
+            });
+
+            return new ObjectResult(new GetEntityResponse<Models.Content>(content, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Update basic deets on content. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Update basic details on content"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                    {"contentId", id},
+                    {"body", StringLib.SafeString(input.ToString())},
+                });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
 
     /// <summary>
     /// Likes a content
