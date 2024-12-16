@@ -6,7 +6,9 @@ import {
   ArrowUpDown,
   ChevronsUpDownIcon,
   CreditCardIcon,
+  PaletteIcon,
   UserIcon,
+  UserRoundIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +26,31 @@ import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
 
 const USERS_PER_PAGE = 50;
+
+const filterFields: DataTableFilterField<User>[] = [
+  // {
+  //   id: "title",
+  //   label: "Title",
+  //   placeholder: "Filter titles...",
+  // },
+  {
+    id: "role",
+    label: "Role",
+    options: [
+      {
+      label: 'Creator',
+      value: 'CREATOR',
+      icon:  PaletteIcon,
+    },
+      {
+      label: 'Client',
+      value: 'CLIENT',
+      icon: UserRoundIcon,
+    }
+    ],
+  },
+]
+
 
 export const ListUsers = () => {
   const [openViewModal, setOpenViewModal] = useState(false);
@@ -220,13 +247,16 @@ export const ListUsers = () => {
           isDataLoading={isDataLoading}
           error={error ? new Error("Can't fetch users") : undefined}
           refetch={refetch}
+          filterFields={filterFields}
           dataMeta={{
             total: data?.total ?? 0,
             page: currentPage,
             pageSize: USERS_PER_PAGE,
             totalPages: data?.totalPages ?? 1,
           }}
-        />
+        >
+          
+        </DataTable>
       </div>
     </>
   );

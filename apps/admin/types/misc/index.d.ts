@@ -57,3 +57,17 @@ interface ApiResponse<T> {
   message: string
   success: boolean
 }
+
+interface Option {
+  label: string
+  value: string
+  icon?: React.ComponentType<{ className?: string }>
+  count?: number
+}
+
+interface DataTableFilterField<TData> {
+  id: StringKeyOf<TData>
+  label: string
+  placeholder?: string
+  options?: Option[]
+}
