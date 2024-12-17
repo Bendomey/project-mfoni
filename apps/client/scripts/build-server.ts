@@ -39,7 +39,7 @@ esbuild
 	.build({
 		entryPoints: entries,
 		outdir,
-		target: [`node${pkg.engines.node}`],
+		target: [`node${pkg.engines.node.replace('>=', '')}`],
 		platform: 'node',
 		sourcemap: true,
 		format: 'esm',
