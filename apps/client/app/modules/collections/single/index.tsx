@@ -1,9 +1,10 @@
-import { ArrowPathIcon, ChevronLeftIcon } from '@heroicons/react/24/outline'
+import { ArrowPathIcon, ChevronLeftIcon, EllipsisHorizontalIcon, PencilIcon } from '@heroicons/react/24/outline'
 import { useLoaderData, useNavigate, useParams } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { AddImageContentsModal } from './components/add-image-contents-modal.tsx'
 import { RemoveImageContentModal } from './components/remove-image-content-dialog.tsx'
+import { StatusButton } from './components/status-button.tsx'
 import { useGetCollectionContentsBySlug } from '@/api/collections/index.ts'
 import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
@@ -141,13 +142,25 @@ export function CollectionModule() {
 						<ChevronLeftIcon className="h-4 w-auto" />
 						Go Back
 					</Button>
-					<div className="flex items-end gap-2">
-						<h1 className="text-4xl font-black">{name}</h1>
-						{isCollectionMine ? (
-							<span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
-								{collection?.visibility}
-							</span>
-						) : null}
+					<div className="flex flex-col md:flex-row justify-between md:items-start gap-3">
+						<div className='flex flex-wrap gap-2 w-2/3'>
+							<div className='inline-flex items-center flex-wrap whitespace-normal'>
+								<h1 className="text-4xl font-black">
+									{name} aljf akj fgajs gjas gkajs gas gkha gsk sdgj sdgj sdjkg sjdk
+								</h1>
+								<PencilIcon className='size-3 text-zinc-600' />
+							</div>
+
+						</div>
+						<div className='flex items-center gap-3'>
+							{isCollectionMine ? (
+								<span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
+									{collection?.visibility}
+								</span>
+							) : null}
+
+							<StatusButton collection={collection as unknown as Collection} />
+						</div>
 					</div>
 					{collection?.createdBy ? (
 						<div className="mt-2 flex items-center gap-2">
