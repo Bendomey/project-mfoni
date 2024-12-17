@@ -265,3 +265,83 @@ export const useGetCollectionContentsBySlug = ({
 		enabled: Boolean(slug),
 		retry: retryQuery,
 	})
+
+interface AddContentsToCollection {
+	collectionId: string
+	contentIds: Array<{ type: 'CONTENT' | 'TAG' | 'COLLECTION'; id: string }>
+}
+
+export const addContentsToCollection = async (
+	input: AddContentsToCollection,
+) => {
+	try {
+		const response = await fetchClient<ApiResponse<Collection>>(
+			`/v1/collections/${input.collectionId}/contents`,
+			{
+				method: 'POST',
+				body: JSON.stringify(input),
+			},
+		)
+
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
+
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
+
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}
+
+export const useAddContentsToCollection = () =>
+	useMutation({
+		mutationFn: addContentsToCollection,
+	})
+
+interface RemoveContentsToCollection {
+	collectionId: string
+	contentIds: Array<string>
+}
+
+export const removeContentsToCollection = async (
+	input: RemoveContentsToCollection,
+) => {
+	try {
+		const response = await fetchClient<ApiResponse<Collection>>(
+			`/v1/collections/${input.collectionId}/contents`,
+			{
+				method: 'DELETE',
+				body: JSON.stringify(input),
+			},
+		)
+
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
+
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
+
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}
+
+export const useRemoveContentsToCollection = () =>
+	useMutation({
+		mutationFn: removeContentsToCollection,
+	})

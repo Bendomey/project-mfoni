@@ -34,6 +34,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 					created_by: authCookie.id,
 					visibility: 'ALL',
 				},
+				populate: ['content'],
 			}
 			await queryClient.prefetchQuery({
 				queryKey: [QUERY_KEYS.COLLECTIONS, authCookie.id, query],

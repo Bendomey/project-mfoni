@@ -17,6 +17,7 @@ export function AccountCollectionsModule() {
 			created_by: currentUser?.id,
 			visibility: 'ALL',
 		},
+		populate: ['content'],
 	})
 
 	if (isPending) {

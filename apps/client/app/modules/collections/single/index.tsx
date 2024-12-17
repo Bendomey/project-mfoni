@@ -1,6 +1,9 @@
 import { ArrowPathIcon, ChevronLeftIcon } from '@heroicons/react/24/outline'
 import { useLoaderData, useNavigate, useParams } from '@remix-run/react'
 import dayjs from 'dayjs'
+import { useState } from 'react'
+import { AddImageContentsModal } from './components/add-image-contents-modal.tsx'
+import { RemoveImageContentModal } from './components/remove-image-content-dialog.tsx'
 import { useGetCollectionContentsBySlug } from '@/api/collections/index.ts'
 import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
@@ -13,15 +16,20 @@ import { Loader } from '@/components/loader/index.tsx'
 import { ShareButton } from '@/components/share-button/index.tsx'
 import { UserImage } from '@/components/user-image.tsx'
 import { PAGES } from '@/constants/index.ts'
+import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { type loader } from '@/routes/collections.$collection.ts'
 
 export function CollectionModule() {
 	const { collection } = useLoaderData<typeof loader>()
+	const addContentsModalState = useDisclosure()
 	const navigate = useNavigate()
 	const { currentUser } = useAuth()
 	const { collection: collectionParam } = useParams()
+	const removeContentsModalState = useDisclosure()
+	const [selectedCollectionContent, setSelectedCollectionContent] =
+		useState<CollectionContent>()
 
 	const isCollectionMine = collection?.createdBy?.id === currentUser?.id
 
@@ -30,6 +38,7 @@ export function CollectionModule() {
 		query: {
 			pagination: { page: 0, per: 50 },
 			filters: { visibility: isCollectionMine ? 'ALL' : 'PUBLIC' },
+			populate: ['content'],
 		},
 	})
 
@@ -92,11 +101,25 @@ export function CollectionModule() {
 	if (data?.total) {
 		content = (
 			<FadeIn>
-				<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
+				<div className="mt-10 columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
 					{data.rows.map((collectionContent) => (
-						<div className="mb-5" key={collectionContent.id}>
+						<div className="mb-5 break-inside-avoid" key={collectionContent.id}>
 							{collectionContent.content ? (
-								<Content content={collectionContent.content} />
+								<>
+									<Content content={collectionContent.content} />
+									<div className="mt-2 flex justify-end">
+										<Button
+											onClick={() => {
+												setSelectedCollectionContent(collectionContent)
+												removeContentsModalState.onToggle()
+											}}
+											size="md"
+											color="dangerGhost"
+										>
+											Remove
+										</Button>
+									</div>
+								</>
 							) : null}
 						</div>
 					))}
@@ -139,9 +162,11 @@ export function CollectionModule() {
 							</span>
 						</div>
 					) : null}
-					<span className="text-xs font-light text-gray-500">
-						Published on {dayjs(collection?.createdAt).format('L')}
-					</span>
+					<div className="">
+						<span className="text-xs font-light text-gray-500">
+							Created on {dayjs(collection?.createdAt).format('L')}
+						</span>
+					</div>
 
 					<div className="mt-5 flex flex-col justify-between gap-5 md:flex-row">
 						<div className="md:w-2/3">
@@ -157,7 +182,11 @@ export function CollectionModule() {
 							</p>
 						</div>
 						<div className="flex flex-row items-center justify-end gap-2">
-							{isCollectionMine ? <Button>Add Contents</Button> : null}
+							{isCollectionMine ? (
+								<Button onClick={addContentsModalState.onToggle}>
+									Add Contents
+								</Button>
+							) : null}
 							<ShareButton
 								text={`Check out this collection "${name}" on mfoni`}
 							/>
@@ -169,6 +198,22 @@ export function CollectionModule() {
 				{content}
 			</div>
 			<Footer />
+			{collection ? (
+				<>
+					<AddImageContentsModal
+						existingContents={data?.rows ?? []}
+						collection={collection as unknown as Collection}
+						isOpened={addContentsModalState.isOpened}
+						onClose={addContentsModalState.onToggle}
+					/>
+					<RemoveImageContentModal
+						isOpened={removeContentsModalState.isOpened}
+						onClose={removeContentsModalState.onToggle}
+						collectionContent={selectedCollectionContent}
+						collectionSlug={collection?.slug}
+					/>
+				</>
+			) : null}
 		</>
 	)
 }

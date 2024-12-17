@@ -97,7 +97,7 @@ export const Content = ({ content, showCreator = true }: Props) => {
 										FlyoutContent={
 											<div className="z-50 flex w-48 flex-col items-center justify-center rounded-2xl bg-black px-3 py-4 shadow-xl">
 												<h3 className="text-center text-sm font-bold text-white">
-													This is image is hidden from the public
+													This image is hidden from the public
 												</h3>
 											</div>
 										}
