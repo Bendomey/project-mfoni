@@ -193,7 +193,7 @@ public class UserController : ControllerBase
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creatorApplication = await _creatorApplicationService.GetUserActiveCreatorApplication(currentUser.Id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorApplication>(_creatorApplicationTransformer.Transform(creatorApplication), null).Result()
+            new GetEntityResponse<OutputCreatorApplication>(await _creatorApplicationTransformer.Transform(creatorApplication), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -229,7 +229,7 @@ public class UserController : ControllerBase
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creatorApplication = await _creatorApplicationService.CreateCreatorApplication(input, currentUser.Id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorApplication>(_creatorApplicationTransformer.Transform(creatorApplication), null).Result()
+            new GetEntityResponse<OutputCreatorApplication>(await _creatorApplicationTransformer.Transform(creatorApplication), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -264,7 +264,7 @@ public class UserController : ControllerBase
             logger.LogInformation($"Update creator application {input}");
             var creatorApplication = await _creatorApplicationService.UpdateCreatorApplication(input, id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorApplication>(_creatorApplicationTransformer.Transform(creatorApplication), null).Result()
+            new GetEntityResponse<OutputCreatorApplication>(await _creatorApplicationTransformer.Transform(creatorApplication), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -300,7 +300,7 @@ public class UserController : ControllerBase
             logger.LogInformation($"submit creator application {id}");
             var creatorApplication = await _creatorApplicationService.SubmitCreatorApplication(id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorApplication>(_creatorApplicationTransformer.Transform(creatorApplication), null).Result()
+            new GetEntityResponse<OutputCreatorApplication>(await _creatorApplicationTransformer.Transform(creatorApplication), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -379,7 +379,7 @@ public class UserController : ControllerBase
                 Reason = input.Reason
             }, currentAdmin.Id);
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorApplication>(_creatorApplicationTransformer.Transform(creatorApplication), null).Result()
+            new GetEntityResponse<OutputCreatorApplication>(await _creatorApplicationTransformer.Transform(creatorApplication), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -533,11 +533,12 @@ public class UserController : ControllerBase
 
             long count = await _creatorApplicationService.CountCreatorApplications(status);
 
-            var outCreatorApplications = creatorApplications.ConvertAll<OutputCreatorApplication>(
-                new Converter<CreatorApplication, OutputCreatorApplication>(creatorApplication =>
-                    _creatorApplicationTransformer.Transform(creatorApplication, populate: queryFilter.Populate)
-                )
-            );
+            var outCreatorApplications = new List<OutputCreatorApplication>();
+            foreach (var creatorApplication in creatorApplications)
+            {
+                outCreatorApplications.Add(await _creatorApplicationTransformer.Transform(creatorApplication, populate: queryFilter.Populate));
+            }
+
             var response = HttpLib.GeneratePagination<OutputCreatorApplication, CreatorApplication>(
                 outCreatorApplications,
                 count,
