@@ -9,7 +9,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -25,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import React from "react";
 import { Button } from "../ui/button";
 import {
@@ -36,6 +34,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { LoadingContainer } from "../LoadingContainer";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRouter, useSearchParams } from "next/navigation";
+import { DataTableToolbar } from "./components";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -44,14 +43,22 @@ interface DataTableProps<TData, TValue> {
   boxHeight?: number;
   /** Tells whether data is being fetched or not. */
   isDataLoading?: boolean;
+  /** Tells whether filter button should show or not. */
+  showFilter?: boolean;
   error?: Error;
   /**
- * Function to trigger a refetch of data.
- * When not passed, you won't see button to help trigger refetch.
- */
+   * Function to trigger a refetch of data.
+   * When not passed, you won't see button to help trigger refetch.
+   */
   refetch?: () => void;
   dataMeta: PaginationDataMeta;
   /** React Table Columns array passed. */
+    /**
+   * An array of filter field configurations for the data table.
+   * When options are provided, a faceted filter is rendered.
+   * Otherwise, a search filter is rendered.
+   */
+  filterFields?: DataTableFilterField<TData>[]
 }
 
 export function DataTable<TData, TValue>({
@@ -62,6 +69,7 @@ export function DataTable<TData, TValue>({
   error,
   dataMeta,
   refetch,
+  filterFields,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -193,18 +201,9 @@ export function DataTable<TData, TValue>({
         </div>
       ) : data && (
         <>
-          <div className="flex items-center py-4">
-            <Input
-              placeholder="Filter emails..."
-              value={
-                (table.getColumn("email")?.getFilterValue() as string) ?? ""
-              }
-              onChange={(event) =>
-                table.getColumn("email")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm"
-            />
-          </div>
+          <div className="space-y-2.5 ">
+          <DataTableToolbar table={table} filterFields={filterFields} />
+          
           <div className="rounded-md border min-h-[410px]">
             <Table>
               <TableHeader>
@@ -255,6 +254,7 @@ export function DataTable<TData, TValue>({
                 )}
               </TableBody>
             </Table>
+          </div>
           </div>
 
           <div className="flex pt-4 items-center justify-between px-2">
