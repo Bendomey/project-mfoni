@@ -1,8 +1,8 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { DataTable } from "@/components/table";
-import { ChevronsUpDownIcon, WalletCardsIcon } from "lucide-react";
+import { ChevronsUpDownIcon, CreditCardIcon, WalletCardsIcon, WalletIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGetWalletTransactions } from "@/api";
 import { useSearchParams } from "next/navigation";
@@ -12,6 +12,26 @@ import { Badge } from "@/components/ui/badge";
 import { Wallet } from "./components/wallet";
 
 const WALLET_TRANSACTION_PER_PAGE = 50;
+
+const filterFields: DataTableFilterField<WalletTransaction>[] = [
+  {
+    id: "type",
+    label: "Type",
+    options: [
+      {
+      label: 'Deposit',
+      value: 'DEPOSIT',
+      icon:  WalletIcon,
+    },
+      {
+      label: 'Withdraw',
+      value: 'WITHDRAW',
+      icon: CreditCardIcon,
+    }
+    ],
+  },
+]
+
 
 export const WalletTransaction = () => {
   const searchParams = useSearchParams();
@@ -83,7 +103,7 @@ export const WalletTransaction = () => {
         ),
       },
       {
-        accessorKey: "email",
+        accessorKey: "amount",
         header: ({ column }) => {
           return (
             <Button
@@ -138,6 +158,7 @@ export const WalletTransaction = () => {
             error ? new Error("Can't fetch Wallet Transactions") : undefined
           }
           refetch={refetch}
+          filterFields={filterFields}
           dataMeta={{
             total: data?.total ?? 0,
             page: currentPage,
