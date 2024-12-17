@@ -35,7 +35,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 				filters: {
 					contentItemsLimit: 2,
 				},
-				populate: ['collection.createdBy', "content"],
+				populate: ['collection.createdBy', 'content'],
 			},
 			{
 				baseUrl,

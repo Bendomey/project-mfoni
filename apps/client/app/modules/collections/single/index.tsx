@@ -1,4 +1,10 @@
-import { ArrowPathIcon, ChevronLeftIcon, EllipsisHorizontalIcon, PencilIcon } from '@heroicons/react/24/outline'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import {
+	ArrowPathIcon,
+	ChevronLeftIcon,
+	EllipsisHorizontalIcon,
+	PencilIcon,
+} from '@heroicons/react/24/outline'
 import { useLoaderData, useNavigate, useParams } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { useState } from 'react'
@@ -114,7 +120,7 @@ export function CollectionModule() {
 												setSelectedCollectionContent(collectionContent)
 												removeContentsModalState.onToggle()
 											}}
-											size="md"
+											size="sm"
 											color="dangerGhost"
 										>
 											Remove
@@ -142,17 +148,9 @@ export function CollectionModule() {
 						<ChevronLeftIcon className="h-4 w-auto" />
 						Go Back
 					</Button>
-					<div className="flex flex-col md:flex-row justify-between md:items-start gap-3">
-						<div className='flex flex-wrap gap-2 w-2/3'>
-							<div className='inline-flex items-center flex-wrap whitespace-normal'>
-								<h1 className="text-4xl font-black">
-									{name} aljf akj fgajs gjas gkajs gas gkha gsk sdgj sdgj sdjkg sjdk
-								</h1>
-								<PencilIcon className='size-3 text-zinc-600' />
-							</div>
-
-						</div>
-						<div className='flex items-center gap-3'>
+					<div className="flex flex-col justify-between gap-3 md:flex-row md:items-start">
+						<h1 className="text-4xl font-black">{name}</h1>
+						<div className="flex items-center gap-3">
 							{isCollectionMine ? (
 								<span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
 									{collection?.visibility}
@@ -160,6 +158,35 @@ export function CollectionModule() {
 							) : null}
 
 							<StatusButton collection={collection as unknown as Collection} />
+
+							<Menu as="div" className="relative">
+								<div>
+									<MenuButton>
+										<Button
+											variant="unstyled"
+											className="px-2 hover:bg-zinc-100"
+										>
+											<EllipsisHorizontalIcon className="size-6 w-auto" />
+										</Button>
+									</MenuButton>
+								</div>
+								<MenuItems
+									transition
+									className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+								>
+									<MenuItem>
+										<Button
+											variant="unstyled"
+											className="flex w-full flex-col flex-wrap items-start rounded-none px-4 py-3 font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
+										>
+											<div className="flex items-center">
+												<PencilIcon className="mr-2 size-4" />
+												<p className="font-bold">Edit Title</p>
+											</div>
+										</Button>
+									</MenuItem>
+								</MenuItems>
+							</Menu>
 						</div>
 					</div>
 					{collection?.createdBy ? (
