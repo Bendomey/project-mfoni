@@ -36,7 +36,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRouter, useSearchParams } from "next/navigation";
 import { DataTableToolbar } from "./components";
 
-interface DataTableProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement>{
+interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   /** An array of data to be displayed. Should default to [] if no data is passed. */
   data: TData[];
