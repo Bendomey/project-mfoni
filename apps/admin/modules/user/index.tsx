@@ -28,11 +28,11 @@ import { localizedDayjs } from "@/lib/date";
 const USERS_PER_PAGE = 50;
 
 const filterFields: DataTableFilterField<User>[] = [
-  // {
-  //   id: "title",
-  //   label: "Title",
-  //   placeholder: "Filter titles...",
-  // },
+  {
+    id: "name",
+    label: "Name",
+    placeholder: "Filter names...",
+  },
   {
     id: "role",
     label: "Role",

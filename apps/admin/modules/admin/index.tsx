@@ -26,6 +26,14 @@ import _ from "lodash";
 
 const ADMINS_PER_PAGE = 50;
 
+const filterFields: DataTableFilterField<Admin>[] = [
+  {
+    id: "email",
+    label: "Email",
+    placeholder: "Filter email...",
+  },
+]
+
 export const ListAdmins = () => {
   const [openViewModal, setOpenViewModal] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<Admin>();
@@ -171,6 +179,7 @@ export const ListAdmins = () => {
           isDataLoading={isDataLoading}
           error={error ? new Error("Can't fetch administrators") : undefined}
           refetch={refetch}
+          filterFields={filterFields}
           dataMeta={{
             total: data?.total ?? 0,
             page: currentPage,

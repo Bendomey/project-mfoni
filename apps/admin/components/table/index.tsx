@@ -24,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import React from "react";
 import { Button } from "../ui/button";
 import {
@@ -35,7 +34,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { LoadingContainer } from "../LoadingContainer";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRouter, useSearchParams } from "next/navigation";
-import { DataTableToolbar } from "./components/data-table-toolbar";
+import { DataTableToolbar } from "./components";
 
 interface DataTableProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement>{
   columns: ColumnDef<TData, TValue>[];

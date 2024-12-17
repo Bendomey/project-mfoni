@@ -1,4 +1,3 @@
-import { SelectIcon } from "@radix-ui/react-select"
 import { type Column } from "@tanstack/react-table"
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
 import { cn } from "@/lib/utils"

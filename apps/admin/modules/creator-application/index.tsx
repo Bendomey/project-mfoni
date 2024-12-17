@@ -2,7 +2,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { DataTable } from "@/components/table";
-import { ArrowUpDown, ChevronsUpDownIcon, CreditCardIcon, UserIcon } from "lucide-react";
+import { ArrowUpDown, CheckCheckIcon, ChevronsUpDownIcon, ClockAlertIcon, CreditCardIcon, MailCheckIcon, RotateCcwIcon, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,6 +22,36 @@ import { ViewApplicationModal } from "./view";
 import { localizedDayjs } from "@/lib/date";
 
 const CREATOR_APPLICATION_PER_PAGE = 50;
+
+const filterFields: DataTableFilterField<CreatorApplication>[] = [
+  {
+    id: "email",
+    label: "Email",
+    placeholder: "Filter email...",
+  },
+  {
+    id: "status",
+    label: "Status",
+    options: [
+      {
+      label: 'Pending',
+      value: 'PENDING',
+      icon: ClockAlertIcon,
+    },
+    {
+    label: 'Submitted',
+    value: 'SUBMITTED',
+    icon: MailCheckIcon,
+  },
+      {
+      label: 'Approved',
+      value: 'APPROVED',
+      icon:  CheckCheckIcon,
+    },
+    ],
+  },
+]
+
 
 export const CreatorApplication = () => {
   const [openApproveModal, setOpenApproveModal] = useState(false)
@@ -185,6 +215,7 @@ export const CreatorApplication = () => {
             error ? new Error("Can't fetch Creator Applications") : undefined
           }
           refetch={refetch}
+          filterFields={filterFields}
           dataMeta={{
             total: data?.total ?? 0,
             page: currentPage,
