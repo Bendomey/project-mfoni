@@ -24,6 +24,7 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { useGetUsers } from "@/api";
 import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
+import { DataTableColumnHeader } from "@/components/table/components";
 
 const USERS_PER_PAGE = 50;
 
@@ -90,58 +91,19 @@ export const ListUsers = () => {
     return [
       {
         accessorKey: "name",
-        header: ({ column }) => {
-          return (
-            <Button
-              className="pl-0"
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Name
-              <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+        header: ({ column }) => <DataTableColumnHeader column={column} title={"Name"} />,
         cell: ({ row }) => <div className="lowercase">{row.original.name}</div>,
       },
       {
         accessorKey: "role",
-        header: ({ column }) => {
-          return (
-            <Button
-            className="pl-0"
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-            Role
-              <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+        header: ({ column }) => <DataTableColumnHeader column={column} title={"Role"} />,
         cell: ({ row }) => (
           <div className="capitalize">{row.getValue("role")}</div>
         ),
       },
       {
         accessorKey: "email",
-        header: ({ column }) => {
-          return (
-            <Button
-              className="pl-0"
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Email
-              <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+        header: ({ column }) => <DataTableColumnHeader column={column} title={"Email"} />,
         cell: ({ row }) =>
           row.original.email ? (
             <div className="lowercase">{row.original.email}</div>
@@ -151,20 +113,7 @@ export const ListUsers = () => {
       },
       {
         accessorKey: "phoneNumber",
-        header: ({ column }) => {
-          return (
-            <Button
-              className="pl-0"
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Phone
-              <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+        header: ({ column }) => <DataTableColumnHeader column={column} title={"Phone"} />,
         cell: ({ row }) =>
           row.original.phoneNumber ? (
             <div className="lowercase">{row.original.phoneNumber}</div>
@@ -174,20 +123,7 @@ export const ListUsers = () => {
       },
       {
         accessorKey: "status",
-        header: ({ column }) => {
-          return (
-            <Button
-              className="pl-0"
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Status
-              <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+        header: ({ column }) => <DataTableColumnHeader column={column} title={"Status"} />,
         cell: ({ row }) => (
           <div className="capitalize">{row.getValue("status")}</div>
         ),
