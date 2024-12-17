@@ -595,7 +595,7 @@ public class CollectionsController : ControllerBase
                 UserId = currentUser.Id
             });
 
-            return new ObjectResult(new GetEntityResponse<bool>(res, null).Result()) { StatusCode = StatusCodes.Status204NoContent };
+            return new EmptyResult();
         }
         catch (HttpRequestException e)
         {

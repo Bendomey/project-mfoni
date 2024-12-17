@@ -61,6 +61,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		filters: {
 			visibility: isCollectionMine ? 'ALL' : 'PUBLIC',
 		},
+		populate: ['content'],
 	}
 	await queryClient.prefetchQuery({
 		queryKey: [QUERY_KEYS.COLLECTIONS, slug, 'slug-contents', query],
