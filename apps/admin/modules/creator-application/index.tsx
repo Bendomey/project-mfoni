@@ -20,6 +20,13 @@ import { useGetCreatorApplications } from "@/api";
 import { useSearchParams } from "next/navigation";
 import { ViewApplicationModal } from "./view";
 import { localizedDayjs } from "@/lib/date";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import _ from "lodash";
+
 
 const CREATOR_APPLICATION_PER_PAGE = 50;
 
@@ -80,10 +87,11 @@ export const CreatorApplication = () => {
       sort: 'asc',
       sortBy: 'createdAt',
     },
-    populate: [],
+    populate: ['user'],
     filters: {
     },
   })
+
 
   const columns = useMemo((): ColumnDef<CreatorApplication>[] => {
     return [
@@ -104,7 +112,13 @@ export const CreatorApplication = () => {
           );
         },
         cell: ({ row }) => (row.original.user ?
-          <div className="lowercase">{row.original.user.email}</div> : 'N/A'
+          <div className="capitalize flex flxe-row items-center gap-1">
+            <Avatar className="w-8 h-8">
+        <AvatarImage src={row.original.user?.photo} alt="Profile picture" />
+        <AvatarFallback>{_.upperCase(row.original.user.name.split(' ').map(name => name[0]).join(''))}</AvatarFallback>
+      </Avatar>
+            {row.original.user.name}
+            </div> : 'N/A'
         ),
       },
       {

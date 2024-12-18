@@ -8,6 +8,8 @@ interface User {
   phoneNumber: NullableString
   phoneNumberVerifiedAt: NullableDate
   photo: string
+  wallet: number
+  bookWallet: number
   creator: Creator | null
   createdAt: Date
   updatedAt: NullableDate

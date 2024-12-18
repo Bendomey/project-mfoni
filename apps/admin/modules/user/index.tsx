@@ -25,6 +25,9 @@ import { useGetUsers } from "@/api";
 import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
 import { DataTableColumnHeader } from "@/components/table/components";
+import { ViewUserModal } from "./view";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import _ from "lodash";
 
 const USERS_PER_PAGE = 50;
 
@@ -51,6 +54,7 @@ const filterFields: DataTableFilterField<User>[] = [
     ],
   },
 ]
+
 
 
 export const ListUsers = () => {
@@ -83,7 +87,7 @@ export const ListUsers = () => {
       sort: "asc",
       sortBy: "createdAt",
     },
-    populate: [],
+    populate: ['creator'],
     filters: {},
   });
 
@@ -92,7 +96,13 @@ export const ListUsers = () => {
       {
         accessorKey: "name",
         header: ({ column }) => <DataTableColumnHeader column={column} title={"Name"} />,
-        cell: ({ row }) => <div className="lowercase">{row.original.name}</div>,
+        cell: ({ row }) => (<div className="capitalize flex flxe-row items-center gap-2">
+        <Avatar className="w-8 h-8">
+    <AvatarImage src={row.original.photo} alt="Profile picture" />
+    <AvatarFallback>{_.upperCase(row.original.name.split(' ').map(name => name[0]).join(''))}</AvatarFallback>
+  </Avatar>
+        {row.original.name}
+        </div>),
       },
       {
         accessorKey: "role",
@@ -152,7 +162,7 @@ export const ListUsers = () => {
                 <DropdownMenuItem
                   onClick={() => {
                     setSelectedUser(row.original);
-                    setOpenViewModal(true);
+                    setOpenViewModal(true)
                   }}
                 >
                   <UserIcon className="mr-2 h-4 w-4" />
@@ -194,6 +204,16 @@ export const ListUsers = () => {
           
         </DataTable>
       </div>
+      <Button
+                  onClick={() => {
+                    setSelectedUser(data?.rows[0]);
+                    setOpenViewModal(true)
+                  }}
+                >
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  View
+                </Button>
+      <ViewUserModal opened={openViewModal} setOpened={setOpenViewModal} data={selectedUser} refetch={refetch}/>
     </>
   );
 };
