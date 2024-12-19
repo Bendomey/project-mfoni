@@ -19,8 +19,12 @@ public class SearchContentService
     private readonly AppConstants _appConstantsConfiguration;
     private readonly AmazonRekognitionClient _rekognitionClient;
     private readonly IMongoCollection<ContentLike> _contentLikesCollection;
+    private readonly IMongoCollection<Models.TagContent> _contentTagsCollection;
+    private readonly CacheProvider _cacheProvider;
 
-    public SearchContentService(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTagService searchTagService)
+    public SearchContentService(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTagService searchTagService,
+        CacheProvider cacheProvider
+    )
     {
         _logger = logger;
 
@@ -29,6 +33,7 @@ public class SearchContentService
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
         _collectionsCollection = database.GetCollection<Collection>(appConstants.Value.CollectionCollection);
         _contentLikesCollection = database.GetCollection<ContentLike>(appConstants.Value.ContentLikeCollection);
+        _contentTagsCollection = database.GetCollection<Models.TagContent>(appConstants.Value.TagContentCollection);
 
         _appConstantsConfiguration = appConstants.Value;
 
@@ -38,6 +43,7 @@ public class SearchContentService
         _rekognitionClient = new AmazonRekognitionClient(credentials, region);
 
         _searchTagsService = searchTagService;
+        _cacheProvider = cacheProvider;
 
         _logger.LogDebug("SearchContentService initialized");
     }
@@ -257,6 +263,74 @@ public class SearchContentService
         }
 
         return content;
+    }
+
+    public async Task<List<Models.TagContent>> GetRelatedContents(FilterQuery<Content> queryFilter, string contentId, List<string> tagIds)
+    {
+        var pipeline = new[]
+        {
+            new BsonDocument("$match",  new BsonDocument
+            {
+                { "tag_id",new BsonDocument("$in", new BsonArray(tagIds.Select(t => ObjectId.Parse(t)))) },
+            }),
+            new BsonDocument("$lookup", new BsonDocument
+            {
+                { "from", "contents" },
+                { "localField", "content_id" },
+                { "foreignField", "_id" },
+                { "as", "content" }
+            }),
+            new BsonDocument("$unwind", "$content"),
+            new BsonDocument("$match", new BsonDocument
+            {
+                { "content.visibility", "PUBLIC" },
+                { "content._id", new BsonDocument("$ne", ObjectId.Parse(contentId)) }
+            }),
+            new BsonDocument("$project", new BsonDocument("content", 0)),
+            new BsonDocument("$limit", queryFilter.Limit),
+            new BsonDocument("$skip", queryFilter.Skip),
+            new BsonDocument("$sort", new BsonDocument("created_at", -1))
+        };
+
+        return await _contentTagsCollection
+           .Aggregate<Models.TagContent>(pipeline)
+           .ToListAsync();
+    }
+
+    public async Task<long> GetRelatedContentsCount(string contentId, List<string> tagIds)
+    {
+        var pipeline = new[]
+        {
+            new BsonDocument("$match",  new BsonDocument
+            {
+                { "tag_id",new BsonDocument("$in", new BsonArray(tagIds.Select(t => ObjectId.Parse(t)))) },
+            }),
+            new BsonDocument("$lookup", new BsonDocument
+            {
+                { "from", "contents" },
+                { "localField", "content_id" },
+                { "foreignField", "_id" },
+                { "as", "content" }
+            }),
+            new BsonDocument("$unwind", "$content"),
+            new BsonDocument("$match", new BsonDocument
+            {
+                { "content.visibility", "PUBLIC" },
+                { "content._id", new BsonDocument("$ne", ObjectId.Parse(contentId)) }
+            }),
+            new BsonDocument("$project", new BsonDocument("content", 0)),
+            new BsonDocument("$count", "totalCount")
+        };
+
+        var result = await _contentTagsCollection.AggregateAsync<MongoAggregationGetCount>(pipeline);
+
+        var count = 0;
+        await result.ForEachAsync(doc =>
+        {
+            count = doc.TotalCount;
+        });
+
+        return count;
     }
 
 }

@@ -22,6 +22,8 @@ public class ContentController : ControllerBase
     private readonly SearchContentService _searchContentService;
     private readonly ContentTransformer _contentTransformer;
     private readonly ContentLikeTransformer _contentLikeTransformer;
+    private readonly SearchTagService _searchTagsService;
+    private readonly TagContentTransformer _tagContentTransformer;
 
     public ContentController(
         ILogger<ContentController> logger,
@@ -30,7 +32,9 @@ public class ContentController : ControllerBase
         SearchContentService searchContentService,
         EditContentService editContentService,
         ContentTransformer contentTransformer,
-        ContentLikeTransformer contentLikeTransformer
+        ContentLikeTransformer contentLikeTransformer,
+        SearchTagService searchTagsService,
+        TagContentTransformer tagContentTransformer
     )
     {
         _logger = logger;
@@ -40,6 +44,8 @@ public class ContentController : ControllerBase
         _editContentService = editContentService;
         _contentTransformer = contentTransformer;
         _contentLikeTransformer = contentLikeTransformer;
+        _searchTagsService = searchTagsService;
+        _tagContentTransformer = tagContentTransformer;
     }
 
     /// <summary>
@@ -473,6 +479,108 @@ public class ContentController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
+
+    /// <summary>
+    /// Resolves related contents.
+    /// </summary>
+    /// <param name="contentId">Id of content</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
+    /// <param name="page">The page to be navigated to</param>
+    /// <param name="pageSize">The number of items on a page</param>
+    /// <param name="sort">To sort response data either by `asc` or `desc`</param>
+    /// <param name="sortBy">What field to sort by.</param>
+    /// <response code="200">Contents Retrieved Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
+    [HttpGet("{contentId}/related")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<EntityWithPagination<OutputContent>>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> GetRelatedContents(
+        string contentId,
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] string? sort,
+        [FromQuery] string populate = "",
+        [FromQuery] string sortBy = "created_at"
+    )
+    {
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
+
+        try
+        {
+
+            _logger.LogInformation("Getting related contents to: " + contentId);
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.Content>(page, pageSize, sort, sortBy, populate);
+
+            var content = await _searchContentService.GetContentById(contentId);
+
+            var contentTagsForCurrent = await _searchTagsService.GetTagsContentByContentId(content.Id);
+            var tagsId = contentTagsForCurrent.Select(t => t.TagId).ToList();
+
+            var contentTagsForAll = await _searchContentService.GetRelatedContents(queryFilter, contentId, tagsId);
+            var count = await _searchContentService.GetRelatedContentsCount(contentId, tagsId);
+
+            var outContent = new List<OutputTagContent>();
+            foreach (var contentTag in contentTagsForAll)
+            {
+                outContent.Add(await _tagContentTransformer.Transform(contentTag, populate: queryFilter.Populate, userId: userId));
+            }
+            var response = HttpLib.GeneratePagination(
+                outContent,
+                count,
+                queryFilter
+            );
+
+            return new ObjectResult(
+                new GetEntityResponse<EntityWithPagination<OutputTagContent>>(response, null).Result()
+            )
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = e.StatusCode ?? HttpStatusCode.BadRequest;
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result())
+            {
+                StatusCode = (int)statusCode
+            };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get related contents. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                        {"action", "Related Contents"},
+                        {"contentId", contentId},
+                        {"userId", StringLib.SafeString(userId)},
+                        {"populate", populate},
+                        {"page", StringLib.SafeString(page.ToString())},
+                        {"pageSize", StringLib.SafeString(pageSize.ToString())},
+                        {"sort", StringLib.SafeString(sort)},
+                        {"sortBy", sortBy},
+               });
+               SentrySdk.CaptureException(e);
+           });
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
 
     /// <summary>
     /// Edits a content

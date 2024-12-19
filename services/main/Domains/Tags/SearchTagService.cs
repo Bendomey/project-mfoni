@@ -106,7 +106,7 @@ public class SearchTagService
         return tags ?? [];
     }
 
-    public async Task<List<Models.Tag>> GetTagsForContent(string contentId)
+    public async Task<List<Models.TagContent>> GetTagsContentByContentId(string contentId)
     {
         FilterDefinitionBuilder<Models.Tag> builder = Builders<Models.Tag>.Filter;
         var filter = Builders<Models.TagContent>.Filter.Eq("content_id", ObjectId.Parse(contentId));
@@ -115,6 +115,14 @@ public class SearchTagService
         var contentTags = await _contentTagsCollection
             .Find(filter)
             .ToListAsync();
+
+        return contentTags;
+    }
+
+    public async Task<List<Models.Tag>> GetTagsForContent(string contentId)
+    {
+
+        var contentTags = await GetTagsContentByContentId(contentId);
 
         var tags = new List<Models.Tag>();
 
@@ -131,15 +139,15 @@ public class SearchTagService
     }
 
     public async Task<List<Models.TagContent>> GetTagContents(
-           FilterQuery<Models.TagContent> queryFilter,
-           GetContentsForTagInput input
-       )
+        FilterQuery<Models.TagContent> queryFilter,
+        GetContentsForTagInput input
+    )
     {
         var pipeline = new[]
         {
             new BsonDocument("$match",  new BsonDocument
             {
-                { "tag_id",new BsonDocument("$eq", new ObjectId(input.TagId)) },
+                { "tag_id",new BsonDocument("$eq", ObjectId.Parse(input.TagId)) },
             }),
             new BsonDocument("$lookup", new BsonDocument
             {
