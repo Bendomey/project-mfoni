@@ -10,9 +10,10 @@ import {
 	HeartIcon as HeartIconOutline,
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
+import {PencilIcon} from '@heroicons/react/24/solid'
 import { Link, useLoaderData } from '@remix-run/react'
 import dayjs from 'dayjs'
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { Image } from 'remix-image'
 import { RelatedContent } from './components/related-content.tsx'
 import { Button } from '@/components/button/index.tsx'
@@ -28,10 +29,20 @@ import { getSizeStringForContent } from '@/lib/image-fns.ts'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { type loader } from '@/routes/photos.$slug.ts'
+import { EditTitleModal } from './components/edit-title-modal/index.tsx'
+
+
+
 
 export const PhotoModule = () => {
 	const { currentUser } = useAuth()
 	const { content } = useLoaderData<typeof loader>()
+	const [openModal, setOpenModal] = useState(false);
+
+	const toggleModal = () => {
+		setOpenModal(!openModal)
+	}
+
 
 	if (!content) return null
 
@@ -185,7 +196,14 @@ export const PhotoModule = () => {
 					</div>
 
 					<div className="mt-5">
-						<h1 className="font-bold">{content.title}</h1>
+						<div className="flex flex-row">
+							<h1 className="font-bold">{content.title}</h1> 
+							<PencilIcon className="ml-4 h-6 w-4 text-black-700" onClick={toggleModal}/>
+								{
+									openModal && (<EditTitleModal isOpened toggleModal={toggleModal}/>)
+								}
+						</div>
+						
 						<div className="flex">
 							{content.amount === 0 ? null : (
 								<div className="rounded-full bg-black px-3 py-1 text-xs font-semibold text-white">
