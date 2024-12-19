@@ -98,9 +98,9 @@ export const ListUsers = () => {
         header: ({ column }) => <DataTableColumnHeader column={column} title={"Name"} />,
         cell: ({ row }) => (<div className="capitalize flex flxe-row items-center gap-2">
         <Avatar className="w-8 h-8">
-    <AvatarImage src={row.original.photo} alt="Profile picture" />
-    <AvatarFallback>{_.upperCase(row.original.name.split(' ').map(name => name[0]).join(''))}</AvatarFallback>
-  </Avatar>
+          <AvatarImage src={row.original.photo} alt="Profile picture" />
+          <AvatarFallback>{_.upperCase(row.original.name.split(' ').map(name => name[0]).join(''))}</AvatarFallback>
+        </Avatar>
         {row.original.name}
         </div>),
       },
