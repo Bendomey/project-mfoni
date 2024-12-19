@@ -1,8 +1,17 @@
-"use client"
+"use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { DataTable } from "@/components/table";
-import { ArrowUpDown, CheckCheckIcon, ChevronsUpDownIcon, ClockAlertIcon, CreditCardIcon, MailCheckIcon, RotateCcwIcon, UserIcon } from "lucide-react";
+import {
+  ArrowUpDown,
+  CheckCheckIcon,
+  ChevronsUpDownIcon,
+  ClockAlertIcon,
+  CreditCardIcon,
+  MailCheckIcon,
+  RotateCcwIcon,
+  UserIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,7 +21,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ApproveApplicationModal } from "./approve";
 import { RejectApplicationModal } from "./reject";
@@ -20,6 +29,8 @@ import { useGetCreatorApplications } from "@/api";
 import { useSearchParams } from "next/navigation";
 import { ViewApplicationModal } from "./view";
 import { localizedDayjs } from "@/lib/date";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import _ from "lodash";
 
 const CREATOR_APPLICATION_PER_PAGE = 50;
 
@@ -34,56 +45,60 @@ const filterFields: DataTableFilterField<CreatorApplication>[] = [
     label: "Status",
     options: [
       {
-      label: 'Pending',
-      value: 'PENDING',
-      icon: ClockAlertIcon,
-    },
-    {
-    label: 'Submitted',
-    value: 'SUBMITTED',
-    icon: MailCheckIcon,
-  },
+        label: "Pending",
+        value: "PENDING",
+        icon: ClockAlertIcon,
+      },
       {
-      label: 'Approved',
-      value: 'APPROVED',
-      icon:  CheckCheckIcon,
-    },
+        label: "Submitted",
+        value: "SUBMITTED",
+        icon: MailCheckIcon,
+      },
+      {
+        label: "Approved",
+        value: "APPROVED",
+        icon: CheckCheckIcon,
+      },
     ],
   },
-]
-
+];
 
 export const CreatorApplication = () => {
-  const [openApproveModal, setOpenApproveModal] = useState(false)
-  const [openRejectModal, setOpenRejectModal] = useState(false)
-  const [openViewModal, setOpenViewModal] = useState(false)
-  const [selectedApplication, setSelectedApplication] = useState<CreatorApplication>()
+  const [openApproveModal, setOpenApproveModal] = useState(false);
+  const [openRejectModal, setOpenRejectModal] = useState(false);
+  const [openViewModal, setOpenViewModal] = useState(false);
+  const [selectedApplication, setSelectedApplication] =
+    useState<CreatorApplication>();
   const searchParams = useSearchParams();
 
   // Retrieve query parameters
-  const page = searchParams.get('page');
-  const search = searchParams.get('search');
-  const creatorApplicationFilter = searchParams.get('status');
+  const page = searchParams.get("page");
+  const search = searchParams.get("search");
+  const creatorApplicationFilter = searchParams.get("status");
 
   const currentPage = parseInt(page ? (page as string) : "1", 10);
 
-  const {data, isPending: isDataLoading, refetch, error} = useGetCreatorApplications({
+  const {
+    data,
+    isPending: isDataLoading,
+    refetch,
+    error,
+  } = useGetCreatorApplications({
     pagination: {
       page: currentPage,
       per: CREATOR_APPLICATION_PER_PAGE,
     },
     search: {
-      fields: ['firstName'],
-      query:  search || undefined,
+      fields: ["firstName"],
+      query: search || undefined,
     },
     sorter: {
-      sort: 'asc',
-      sortBy: 'createdAt',
+      sort: "asc",
+      sortBy: "createdAt",
     },
-    populate: [],
-    filters: {
-    },
-  })
+    populate: ['user'],
+    filters: {},
+  });
 
   const columns = useMemo((): ColumnDef<CreatorApplication>[] => {
     return [
@@ -92,7 +107,7 @@ export const CreatorApplication = () => {
         header: ({ column }) => {
           return (
             <Button
-            className="pl-0"
+              className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
@@ -103,16 +118,35 @@ export const CreatorApplication = () => {
             </Button>
           );
         },
-        cell: ({ row }) => (row.original.user ?
-          <div className="lowercase">{row.original.user.email}</div> : 'N/A'
-        ),
+        cell: ({ row }) =>
+          row.original.user ? (
+            <div className="capitalize flex flxe-row items-center gap-1">
+              <Avatar className="w-8 h-8">
+                <AvatarImage
+                  src={row.original.user?.photo}
+                  alt="Profile picture"
+                />
+                <AvatarFallback>
+                  {_.upperCase(
+                    row.original.user.name
+                      .split(" ")
+                      .map((name) => name[0])
+                      .join("")
+                  )}
+                </AvatarFallback>
+              </Avatar>
+              {row.original.user.name}
+            </div>
+          ) : (
+            "N/A"
+          ),
       },
       {
         accessorKey: "email",
         header: ({ column }) => {
           return (
             <Button
-            className="pl-0"
+              className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
@@ -123,22 +157,25 @@ export const CreatorApplication = () => {
             </Button>
           );
         },
-        cell: ({ row }) => ( row.original.user ?
-          <div className="lowercase">{row.original.user.email}</div> : 'N/A'
-        ),
+        cell: ({ row }) =>
+          row.original.user ? (
+            <div className="lowercase">{row.original.user.email}</div>
+          ) : (
+            "N/A"
+          ),
       },
       {
         accessorKey: "status",
         header: ({ column }) => {
           return (
             <Button
-            className="pl-0"
+              className="pl-0"
               variant="ghost"
               onClick={() =>
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-            Status
+              Status
               <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
             </Button>
           );
@@ -150,16 +187,17 @@ export const CreatorApplication = () => {
       {
         accessorKey: "updatedAt",
         header: "Updated At",
-        cell: ({ row }) => (
-          localizedDayjs(row.getValue("updatedAt")).format("DD/MM/YYYY hh:mm a")
-        ),
+        cell: ({ row }) =>
+          localizedDayjs(row.getValue("updatedAt")).format(
+            "DD/MM/YYYY hh:mm a"
+          ),
       },
       {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-          const payment = row.original
-     
+          const payment = row.original;
+
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -170,26 +208,41 @@ export const CreatorApplication = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => {
-                      setSelectedApplication(row.original)
-                      setOpenViewModal(true)
-                    }}><UserIcon className="mr-2 h-4 w-4"/>View</DropdownMenuItem>
-               {row.original.status === "SUBMITTED" ? (
-                <>
-                <DropdownMenuItem  onClick={() => {
-                  setSelectedApplication(row.original)
-                  setOpenApproveModal(true)
-                }}><UserIcon className="mr-2 h-4 w-4"/>Approve</DropdownMenuItem>
-                    
-                <DropdownMenuItem onClick={() => {
-                  setSelectedApplication(row.original)
-                  setOpenRejectModal(true)
-                }}><CreditCardIcon className="mr-2 h-4 w-4"/>Reject</DropdownMenuItem>  
-                </>
-              ): null }           
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedApplication(row.original);
+                    setOpenViewModal(true);
+                  }}
+                >
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  View
+                </DropdownMenuItem>
+                {row.original.status === "SUBMITTED" ? (
+                  <>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setSelectedApplication(row.original);
+                        setOpenApproveModal(true);
+                      }}
+                    >
+                      <UserIcon className="mr-2 h-4 w-4" />
+                      Approve
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setSelectedApplication(row.original);
+                        setOpenRejectModal(true);
+                      }}
+                    >
+                      <CreditCardIcon className="mr-2 h-4 w-4" />
+                      Reject
+                    </DropdownMenuItem>
+                  </>
+                ) : null}
               </DropdownMenuContent>
             </DropdownMenu>
-          )
+          );
         },
       },
     ];
@@ -224,9 +277,24 @@ export const CreatorApplication = () => {
           }}
         />
       </div>
-      <ViewApplicationModal opened={openViewModal} setOpened={setOpenViewModal} data={selectedApplication} refetch={refetch}/>
-      <ApproveApplicationModal opened={openApproveModal} setOpened={setOpenApproveModal} data={selectedApplication} refetch={refetch}/>
-      <RejectApplicationModal opened={openRejectModal} setOpened={setOpenRejectModal} data={selectedApplication} refetch={refetch}/>
+      <ViewApplicationModal
+        opened={openViewModal}
+        setOpened={setOpenViewModal}
+        data={selectedApplication}
+        refetch={refetch}
+      />
+      <ApproveApplicationModal
+        opened={openApproveModal}
+        setOpened={setOpenApproveModal}
+        data={selectedApplication}
+        refetch={refetch}
+      />
+      <RejectApplicationModal
+        opened={openRejectModal}
+        setOpened={setOpenRejectModal}
+        data={selectedApplication}
+        refetch={refetch}
+      />
     </>
   );
 };
