@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import _ from "lodash";
 
 interface AvatarComponentProps {
   width?: number;
@@ -17,14 +16,12 @@ export const AvatarProfilea = ({
   return (
     <Avatar className={`w-[${width}px] h-full ${className}`}>
       <AvatarImage src={photo} alt="Profile picture" />
-      <AvatarFallback>
+      <AvatarFallback className="capitalize">
         {fallBackContent
-          ? _.upperCase(
-              fallBackContent
-                .split(" ")
-                .map((fallBackContent) => fallBackContent[0])
-                .join("")
-            )
+          ? fallBackContent
+              .split(" ")
+              .map((fallBackContent) => fallBackContent[0])
+              .join("")
           : ""}
       </AvatarFallback>
     </Avatar>

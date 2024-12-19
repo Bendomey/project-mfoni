@@ -48,8 +48,8 @@ export const ViewUserModal = ({
               className="rounded-md"
             />
             <div className="">
-              <DialogTitle className="leading-normal">
-                {data?.name ? `${_.upperFirst(data.name)}'s` : "Application"}{" "}
+              <DialogTitle className="leading-normal capitalize">
+                {data?.name ? `${data.name}'s` : "Application"}{" "}
                 Details
               </DialogTitle>
               <Badge

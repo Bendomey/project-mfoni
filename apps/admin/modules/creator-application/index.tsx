@@ -96,7 +96,7 @@ export const CreatorApplication = () => {
       sort: "asc",
       sortBy: "createdAt",
     },
-    populate: [],
+    populate: ['user'],
     filters: {},
   });
 
