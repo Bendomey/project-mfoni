@@ -18,12 +18,15 @@ const onClose = ()=>{
 				className="relative w-full p-0 md:w-4/6 lg:w-3/6"
 				canBeClosedWithBackdrop={false}
 			>
-				<div className="m-5">
+				<div >
 					<div >
-					<div>
-						<label htmlFor="title" className="block text-sm/6 font-medium text-gray-900">
-							Title
-						</label>
+					<div className="flex flex-row items-center justify-between bg-gray-100 p-4 text-gray-600">
+						<h1 className="font-bold">Edit Title</h1>
+					</div>
+					<div className="m-5">
+						{/* <label htmlFor="title" className="block text-sm/6 font-medium text-gray-900">
+							Edit Title
+						</label> */}
 						<div className="mt-2">
 							<input
 							id="title"
@@ -35,8 +38,8 @@ const onClose = ()=>{
 						</div>
 						</div>
 						
-						
-						<div className="flex flex-row items-center gap-2">
+						<div className="mt-10 flex justify-end gap-2 border-t pb-5 pr-5">
+						{/* <div className="flex flex-row items-center gap-2"> */}
 							<Button
 								className="mt-5"
 								color="primary"
