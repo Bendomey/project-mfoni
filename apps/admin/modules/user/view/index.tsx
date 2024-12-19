@@ -15,8 +15,8 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { localizedDayjs } from "@/lib/date";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AvatarProfilea } from "@/components/AvatarProfile";
 
 interface ViewApplicationModalProps {
   data?: User;
@@ -41,17 +41,12 @@ export const ViewUserModal = ({
           className={`sm:max-w-[850px] bg-white dark:bg-black top-96`}
         >
           <DialogHeader className="flex-row items-center gap-3">
-            <Avatar className="w-20 h-16 rounded-md">
-              <AvatarImage src={data?.photo} alt="Profile picture" />
-              <AvatarFallback>
-                {_.upperCase(
-                  data?.name
-                    .split(" ")
-                    .map((name) => name[0])
-                    .join("")
-                )}
-              </AvatarFallback>
-            </Avatar>
+            <AvatarProfilea
+              fallBackContent={data?.name}
+              photo={data?.photo}
+              width={60}
+              className="rounded-md"
+            />
             <div className="">
               <DialogTitle className="leading-normal">
                 {data?.name ? `${_.upperFirst(data.name)}'s` : "Application"}{" "}
