@@ -27,6 +27,7 @@ import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { type loader } from '@/routes/collections.$collection.ts'
+import { EditCollectionTitleModal } from './components/edit-collection-modal/index.tsx'
 
 export function CollectionModule() {
 	const { collection } = useLoaderData<typeof loader>()
@@ -35,6 +36,7 @@ export function CollectionModule() {
 	const { currentUser } = useAuth()
 	const { collection: collectionParam } = useParams()
 	const removeContentsModalState = useDisclosure()
+	const editCollectionModalState = useDisclosure()
 	const [selectedCollectionContent, setSelectedCollectionContent] =
 		useState<CollectionContent>()
 
@@ -149,7 +151,11 @@ export function CollectionModule() {
 						Go Back
 					</Button>
 					<div className="flex flex-col justify-between gap-3 md:flex-row md:items-start">
-						<h1 className="text-4xl font-black">{name}</h1>
+						<div className='flex flex-row'>
+							<h1 className="text-4xl font-black">{name}</h1>
+							<PencilIcon className="ml-4 mt-1 h-8 w-6 text-black-700 hover:text-gray-500" onClick={(editCollectionModalState.onToggle)}/>
+							<EditCollectionTitleModal isOpened={editCollectionModalState.isOpened} toggleModal={editCollectionModalState.onToggle} title={name}/>
+						</div>
 						<div className="flex items-center gap-3">
 							{isCollectionMine ? (
 								<>
