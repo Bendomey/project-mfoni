@@ -19,8 +19,11 @@ public class SearchContentService
     private readonly AppConstants _appConstantsConfiguration;
     private readonly AmazonRekognitionClient _rekognitionClient;
     private readonly IMongoCollection<ContentLike> _contentLikesCollection;
+    private readonly CacheProvider _cacheProvider;
 
-    public SearchContentService(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTagService searchTagService)
+    public SearchContentService(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTagService searchTagService,
+        CacheProvider cacheProvider
+    )
     {
         _logger = logger;
 
@@ -38,6 +41,7 @@ public class SearchContentService
         _rekognitionClient = new AmazonRekognitionClient(credentials, region);
 
         _searchTagsService = searchTagService;
+        _cacheProvider = cacheProvider;
 
         _logger.LogDebug("SearchContentService initialized");
     }
@@ -257,6 +261,72 @@ public class SearchContentService
         }
 
         return content;
+    }
+
+    public async Task<List<Models.Content>> GetRelatedContents(FilterQuery<Content> queryFilter, string contentId, List<string> tagIds)
+    {
+        var pipeline = new[]
+        {
+            new BsonDocument("$match", new BsonDocument
+            {
+                { "visibility", "PUBLIC" },
+                { "_id", new BsonDocument("$ne", ObjectId.Parse(contentId)) }
+            }),
+            new BsonDocument("$lookup", new BsonDocument
+            {
+                { "from", "tag_contents" },
+                { "localField", "_id" },
+                { "foreignField", "content_id" },
+                { "as", "tag_contents" }
+            }),
+            new BsonDocument("$match",  new BsonDocument
+            {
+                { "tag_contents.tag_id",new BsonDocument("$in", new BsonArray(tagIds.Select(t => ObjectId.Parse(t)))) },
+            }),
+            new BsonDocument("$project", new BsonDocument("tag_contents", 0)),
+            new BsonDocument("$limit", queryFilter.Limit),
+            new BsonDocument("$skip", queryFilter.Skip),
+            new BsonDocument("$sort", new BsonDocument("created_at", -1))
+        };
+
+        return await _contentsCollection
+           .Aggregate<Models.Content>(pipeline)
+           .ToListAsync();
+    }
+
+    public async Task<long> GetRelatedContentsCount(string contentId, List<string> tagIds)
+    {
+        var pipeline = new[]
+        {
+             new BsonDocument("$match", new BsonDocument
+            {
+                { "visibility", "PUBLIC" },
+                { "_id", new BsonDocument("$ne", ObjectId.Parse(contentId)) }
+            }),
+            new BsonDocument("$lookup", new BsonDocument
+            {
+                { "from", "tag_contents" },
+                { "localField", "_id" },
+                { "foreignField", "content_id" },
+                { "as", "tag_contents" }
+            }),
+            new BsonDocument("$match",  new BsonDocument
+            {
+                { "tag_contents.tag_id",new BsonDocument("$in", new BsonArray(tagIds.Select(t => ObjectId.Parse(t)))) },
+            }),
+            new BsonDocument("$project", new BsonDocument("tag_contents", 0)),
+            new BsonDocument("$count", "totalCount")
+        };
+
+        var result = await _contentsCollection.AggregateAsync<MongoAggregationGetCount>(pipeline);
+
+        var count = 0;
+        await result.ForEachAsync(doc =>
+        {
+            count = doc.TotalCount;
+        });
+
+        return count;
     }
 
 }
