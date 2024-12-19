@@ -87,7 +87,7 @@ export const ListUsers = () => {
       sort: "asc",
       sortBy: "createdAt",
     },
-    populate: ['creator'],
+    populate: ['creator','subscription'],
     filters: {},
   });
 
@@ -204,15 +204,7 @@ export const ListUsers = () => {
           
         </DataTable>
       </div>
-      <Button
-                  onClick={() => {
-                    setSelectedUser(data?.rows[0]);
-                    setOpenViewModal(true)
-                  }}
-                >
-                  <UserIcon className="mr-2 h-4 w-4" />
-                  View
-                </Button>
+     
       <ViewUserModal opened={openViewModal} setOpened={setOpenViewModal} data={selectedUser} refetch={refetch}/>
     </>
   );

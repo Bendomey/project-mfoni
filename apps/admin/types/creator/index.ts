@@ -4,7 +4,7 @@ interface Creator {
   status: string
   userId: string
   username: string
-  subscription: NullableString
+  subscription: Subscription
   socialMedia: SocialMedia[]
   createdAt: Date
   updatedAt: NullableDate

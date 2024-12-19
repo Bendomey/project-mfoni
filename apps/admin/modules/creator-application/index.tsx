@@ -87,7 +87,7 @@ export const CreatorApplication = () => {
       sort: 'asc',
       sortBy: 'createdAt',
     },
-    populate: ['user'],
+    populate: [],
     filters: {
     },
   })
