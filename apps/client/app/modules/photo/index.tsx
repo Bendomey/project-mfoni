@@ -13,7 +13,7 @@ import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import {PencilIcon} from '@heroicons/react/24/solid'
 import { Link, useLoaderData } from '@remix-run/react'
 import dayjs from 'dayjs'
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 import { Image } from 'remix-image'
 import { RelatedContent } from './components/related-content.tsx'
 import { Button } from '@/components/button/index.tsx'
@@ -21,7 +21,6 @@ import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
 import { LikeButton } from '@/components/like-button.tsx'
 import { ShareButton } from '@/components/share-button/index.tsx'
-
 import { UserImage } from '@/components/user-image.tsx'
 import { blurDataURL, PAGES } from '@/constants/index.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
@@ -30,19 +29,12 @@ import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { type loader } from '@/routes/photos.$slug.ts'
 import { EditTitleModal } from './components/edit-title-modal/index.tsx'
-
-
-
+import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 
 export const PhotoModule = () => {
 	const { currentUser } = useAuth()
 	const { content } = useLoaderData<typeof loader>()
-	const [openModal, setOpenModal] = useState(false);
-
-	const toggleModal = () => {
-		setOpenModal(!openModal)
-	}
-
+	const editTitleModalState = useDisclosure();
 
 	if (!content) return null
 
@@ -84,10 +76,6 @@ export const PhotoModule = () => {
 
 						<div className="flex flex-row items-center justify-between gap-2 md:justify-normal">
 							<div className="flex gap-2">
-								{/* <Button variant="outlined" size="sm">
-                  <BookmarkIcon className="h-6 w-4 text-zinc-700 mr-1" />
-                  Save
-                </Button> */}
 								{content.status !== 'DONE' ? null : (
 									<LikeButton content={content as unknown as Content}>
 										{({ isDisabled, isLiked, onClick }) => (
@@ -198,10 +186,8 @@ export const PhotoModule = () => {
 					<div className="mt-5">
 						<div className="flex flex-row">
 							<h1 className="font-bold">{content.title}</h1> 
-							<PencilIcon className="ml-4 h-6 w-4 text-black-700" onClick={toggleModal}/>
-								{
-									openModal && (<EditTitleModal isOpened toggleModal={toggleModal}/>)
-								}
+							<PencilIcon className="ml-4 h-6 w-4 text-black-700" onClick={editTitleModalState.onToggle}/>
+								<EditTitleModal isOpened={editTitleModalState.isOpened} toggleModal={editTitleModalState.onToggle} title={content.title}/>
 						</div>
 						
 						<div className="flex">

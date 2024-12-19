@@ -1,21 +1,25 @@
 import { Button } from '@/components/button/index.tsx'
 import { Modal } from '@/components/modal/index.tsx'
+import { useState } from 'react'
 
 interface Props {
 	isOpened: boolean,
-	toggleModal: () => void
+	toggleModal: () => void,
+	title: string
 }
 
-export function EditTitleModal( {isOpened, toggleModal }: Props) {
-const onClose = ()=>{
-	isOpened = false
-}
+export function EditTitleModal( {isOpened, toggleModal, title}: Props) {
+	const [editTitle, setEditTitle] = useState(title)
+	
+	const handleInputChange = (e: any) =>{
+		setEditTitle(e.target.value);
+	}
 
 	return (
 		<Modal
-		onClose={onClose}
+		onClose={toggleModal}
 				isOpened={isOpened}
-				className="relative w-full p-0 md:w-4/6 lg:w-3/6"
+				className="relative w-full p-0 md:w-3/6 lg:w-2/6"
 				canBeClosedWithBackdrop={false}
 			>
 				<div >
@@ -24,14 +28,13 @@ const onClose = ()=>{
 						<h1 className="font-bold">Edit Title</h1>
 					</div>
 					<div className="m-5">
-						{/* <label htmlFor="title" className="block text-sm/6 font-medium text-gray-900">
-							Edit Title
-						</label> */}
 						<div className="mt-2">
 							<input
 							id="title"
 							name="title"
 							type="text"
+							value={editTitle}
+							onChange={handleInputChange}
 							placeholder="Title"
 							className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 							/>
@@ -39,11 +42,9 @@ const onClose = ()=>{
 						</div>
 						
 						<div className="mt-10 flex justify-end gap-2 border-t pb-5 pr-5">
-						{/* <div className="flex flex-row items-center gap-2"> */}
 							<Button
 								className="mt-5"
 								color="primary"
-								
 							>
 								Edit
 							</Button>
