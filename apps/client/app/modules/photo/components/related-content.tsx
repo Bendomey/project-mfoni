@@ -12,7 +12,6 @@ export function RelatedContent({ contentId }: Props) {
 	const { data, isError, isPending } = useGetRelatedContents({
 		contentId,
 		query: {
-			populate: ['content'],
 			pagination: {
 				page: 0,
 				per: 50,
