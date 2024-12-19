@@ -23,7 +23,6 @@ public class ContentController : ControllerBase
     private readonly ContentTransformer _contentTransformer;
     private readonly ContentLikeTransformer _contentLikeTransformer;
     private readonly SearchTagService _searchTagsService;
-    private readonly TagContentTransformer _tagContentTransformer;
 
     public ContentController(
         ILogger<ContentController> logger,
@@ -33,8 +32,7 @@ public class ContentController : ControllerBase
         EditContentService editContentService,
         ContentTransformer contentTransformer,
         ContentLikeTransformer contentLikeTransformer,
-        SearchTagService searchTagsService,
-        TagContentTransformer tagContentTransformer
+        SearchTagService searchTagsService
     )
     {
         _logger = logger;
@@ -45,7 +43,6 @@ public class ContentController : ControllerBase
         _contentTransformer = contentTransformer;
         _contentLikeTransformer = contentLikeTransformer;
         _searchTagsService = searchTagsService;
-        _tagContentTransformer = tagContentTransformer;
     }
 
     /// <summary>
@@ -527,28 +524,27 @@ public class ContentController : ControllerBase
 
             var content = await _searchContentService.GetContentById(contentId);
 
-            var contentTagsForCurrent = await _searchTagsService.GetTagsContentByContentId(content.Id);
-            var tagsId = contentTagsForCurrent.Select(t => t.TagId).ToList();
+            var contentTags = await _searchTagsService.GetTagsContentByContentId(content.Id);
+            var tagsId = contentTags.Select(t => t.TagId).ToList();
 
-            var contentTagsForAll = await _searchContentService.GetRelatedContents(queryFilter, contentId, tagsId);
+            var contents = await _searchContentService.GetRelatedContents(queryFilter, contentId, tagsId);
             var count = await _searchContentService.GetRelatedContentsCount(contentId, tagsId);
 
-            var outContent = new List<OutputTagContent>();
-            foreach (var contentTag in contentTagsForAll)
+            var outContents = new List<OutputContent>();
+            foreach (var usercontent in contents)
             {
-                outContent.Add(await _tagContentTransformer.Transform(contentTag, populate: queryFilter.Populate, userId: userId));
+                outContents.Add(await _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
             }
+
             var response = HttpLib.GeneratePagination(
-                outContent,
+                outContents,
                 count,
                 queryFilter
             );
 
-            return new ObjectResult(
-                new GetEntityResponse<EntityWithPagination<OutputTagContent>>(response, null).Result()
-            )
+            return new ObjectResult(new GetEntityResponse<EntityWithPagination<OutputContent>>(response, null).Result())
             {
-                StatusCode = (int)HttpStatusCode.OK
+                StatusCode = StatusCodes.Status200OK
             };
         }
         catch (HttpRequestException e)

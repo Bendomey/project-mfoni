@@ -19,7 +19,6 @@ public class SearchContentService
     private readonly AppConstants _appConstantsConfiguration;
     private readonly AmazonRekognitionClient _rekognitionClient;
     private readonly IMongoCollection<ContentLike> _contentLikesCollection;
-    private readonly IMongoCollection<Models.TagContent> _contentTagsCollection;
     private readonly CacheProvider _cacheProvider;
 
     public SearchContentService(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTagService searchTagService,
@@ -33,7 +32,6 @@ public class SearchContentService
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
         _collectionsCollection = database.GetCollection<Collection>(appConstants.Value.CollectionCollection);
         _contentLikesCollection = database.GetCollection<ContentLike>(appConstants.Value.ContentLikeCollection);
-        _contentTagsCollection = database.GetCollection<Models.TagContent>(appConstants.Value.TagContentCollection);
 
         _appConstantsConfiguration = appConstants.Value;
 
@@ -265,35 +263,34 @@ public class SearchContentService
         return content;
     }
 
-    public async Task<List<Models.TagContent>> GetRelatedContents(FilterQuery<Content> queryFilter, string contentId, List<string> tagIds)
+    public async Task<List<Models.Content>> GetRelatedContents(FilterQuery<Content> queryFilter, string contentId, List<string> tagIds)
     {
         var pipeline = new[]
         {
-            new BsonDocument("$match",  new BsonDocument
+            new BsonDocument("$match", new BsonDocument
             {
-                { "tag_id",new BsonDocument("$in", new BsonArray(tagIds.Select(t => ObjectId.Parse(t)))) },
+                { "visibility", "PUBLIC" },
+                { "_id", new BsonDocument("$ne", ObjectId.Parse(contentId)) }
             }),
             new BsonDocument("$lookup", new BsonDocument
             {
-                { "from", "contents" },
-                { "localField", "content_id" },
-                { "foreignField", "_id" },
-                { "as", "content" }
+                { "from", "tag_contents" },
+                { "localField", "_id" },
+                { "foreignField", "content_id" },
+                { "as", "tag_contents" }
             }),
-            new BsonDocument("$unwind", "$content"),
-            new BsonDocument("$match", new BsonDocument
+            new BsonDocument("$match",  new BsonDocument
             {
-                { "content.visibility", "PUBLIC" },
-                { "content._id", new BsonDocument("$ne", ObjectId.Parse(contentId)) }
+                { "tag_contents.tag_id",new BsonDocument("$in", new BsonArray(tagIds.Select(t => ObjectId.Parse(t)))) },
             }),
-            new BsonDocument("$project", new BsonDocument("content", 0)),
+            new BsonDocument("$project", new BsonDocument("tag_contents", 0)),
             new BsonDocument("$limit", queryFilter.Limit),
             new BsonDocument("$skip", queryFilter.Skip),
             new BsonDocument("$sort", new BsonDocument("created_at", -1))
         };
 
-        return await _contentTagsCollection
-           .Aggregate<Models.TagContent>(pipeline)
+        return await _contentsCollection
+           .Aggregate<Models.Content>(pipeline)
            .ToListAsync();
     }
 
@@ -301,28 +298,27 @@ public class SearchContentService
     {
         var pipeline = new[]
         {
-            new BsonDocument("$match",  new BsonDocument
+             new BsonDocument("$match", new BsonDocument
             {
-                { "tag_id",new BsonDocument("$in", new BsonArray(tagIds.Select(t => ObjectId.Parse(t)))) },
+                { "visibility", "PUBLIC" },
+                { "_id", new BsonDocument("$ne", ObjectId.Parse(contentId)) }
             }),
             new BsonDocument("$lookup", new BsonDocument
             {
-                { "from", "contents" },
-                { "localField", "content_id" },
-                { "foreignField", "_id" },
-                { "as", "content" }
+                { "from", "tag_contents" },
+                { "localField", "_id" },
+                { "foreignField", "content_id" },
+                { "as", "tag_contents" }
             }),
-            new BsonDocument("$unwind", "$content"),
-            new BsonDocument("$match", new BsonDocument
+            new BsonDocument("$match",  new BsonDocument
             {
-                { "content.visibility", "PUBLIC" },
-                { "content._id", new BsonDocument("$ne", ObjectId.Parse(contentId)) }
+                { "tag_contents.tag_id",new BsonDocument("$in", new BsonArray(tagIds.Select(t => ObjectId.Parse(t)))) },
             }),
-            new BsonDocument("$project", new BsonDocument("content", 0)),
+            new BsonDocument("$project", new BsonDocument("tag_contents", 0)),
             new BsonDocument("$count", "totalCount")
         };
 
-        var result = await _contentTagsCollection.AggregateAsync<MongoAggregationGetCount>(pipeline);
+        var result = await _contentsCollection.AggregateAsync<MongoAggregationGetCount>(pipeline);
 
         var count = 0;
         await result.ForEachAsync(doc =>
