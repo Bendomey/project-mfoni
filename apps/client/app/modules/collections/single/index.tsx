@@ -157,7 +157,9 @@ export function CollectionModule() {
 										{collection?.visibility}
 									</span>
 
-									<StatusButton collection={collection as unknown as Collection} />
+									<StatusButton
+										collection={collection as unknown as Collection}
+									/>
 
 									<Menu as="div" className="relative">
 										<div>
@@ -189,7 +191,6 @@ export function CollectionModule() {
 									</Menu>
 								</>
 							) : null}
-
 						</div>
 					</div>
 					{collection?.createdBy ? (
