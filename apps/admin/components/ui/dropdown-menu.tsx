@@ -9,6 +9,7 @@ import {
 } from "@radix-ui/react-icons"
 
 import { cn } from "@/lib/utils"
+import { removePointerEventsFromBody } from "@/lib"
 
 const DropdownMenu = DropdownMenuPrimitive.Root
 
@@ -93,6 +94,14 @@ const DropdownMenuItem = React.forwardRef<
       className
     )}
     {...props}
+    // Issue: DropdownMenu `pointer-events: none` persists on the body after closing a dialog, freezing the UI.
+    // Fix: Manually reset `pointer-events` on the body when closing the dropdown.
+    onSelect={(event) => {
+      if (props.onSelect) {
+          props.onSelect(event);
+      }
+      removePointerEventsFromBody();
+  }}
   />
 ))
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
