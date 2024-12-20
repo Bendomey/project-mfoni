@@ -7,7 +7,7 @@ public class OutputCreatorApplication
 {
     public required string Id { get; set; }
     public required string UserId { get; set; }
-    public OutputUser? User { get; set; }
+    public OutputBasicUserForAdmin? User { get; set; }
     public required string Status { get; set; }
     public DateTime? SubmittedAt { get; set; }
     public DateTime? RejectedAt { get; set; }

@@ -1,27 +1,42 @@
-
-
 using main.Domains;
 using main.DTOs;
 using main.Models;
-
 
 namespace main.Transformations;
 
 public class CreatorApplicationTransformer
 {
-    public CreatorApplicationTransformer()
+    private readonly UserService _userService;
+    private readonly UserTransformer _userTransformer;
+    public CreatorApplicationTransformer(
+        UserService userService,
+        UserTransformer userTransformer
+    )
     {
+        _userService = userService;
+        _userTransformer = userTransformer;
     }
 
-    public OutputCreatorApplication Transform(CreatorApplication creatorApplication, string[]? populate = null)
+    public async Task<OutputCreatorApplication> Transform(CreatorApplication creatorApplication, string[]? populate = null)
     {
 
         populate ??= Array.Empty<string>();
 
+        OutputBasicUserForAdmin? outputBasicUser = null;
+        if (creatorApplication.UserId is not null && populate.Any(p => p.Contains(PopulateKeys.USER)))
+        {
+            var createdBy = await _userService.GetUserById(creatorApplication.UserId);
+            if (createdBy is not null)
+            {
+                outputBasicUser = _userTransformer.TransformBasicUserForAdmin(createdBy);
+            }
+        }
+
         return new OutputCreatorApplication
         {
             Id = creatorApplication.Id,
-            UserId = creatorApplication.UserId,
+            UserId = creatorApplication.UserId!,
+            User = outputBasicUser,
             Status = creatorApplication.Status,
             SubmittedAt = creatorApplication.SubmittedAt,
             RejectedAt = creatorApplication.RejectedAt,

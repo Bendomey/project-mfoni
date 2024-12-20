@@ -227,9 +227,7 @@ export const PhotoModule = () => {
 						</div>
 					</div>
 				</div>
-				<div className="mt-10">
-					<RelatedContent />
-				</div>
+				{content ? <RelatedContent contentId={content.id} /> : null}
 			</div>
 			<Footer />
 		</>

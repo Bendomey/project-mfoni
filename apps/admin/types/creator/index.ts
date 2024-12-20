@@ -4,6 +4,8 @@ interface Creator {
   status: string
   userId: string
   username: string
+  subscription: Subscription
+  socialMedia: SocialMedia[]
   createdAt: Date
   updatedAt: NullableDate
   deletedBy: string
@@ -12,4 +14,9 @@ interface Creator {
 
 interface FetchCreatorFilter {
   status?: string
+}
+
+interface SocialMedia {
+  platform: string
+  handle: string
 }

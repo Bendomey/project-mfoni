@@ -29,6 +29,16 @@ public class OutputBasicUser
     public string? Photo { get; set; }
 }
 
+public class OutputBasicUserForAdmin
+{
+    public required string Id { get; set; }
+    public string? Role { get; set; }
+    public required string Name { get; set; }
+    public string? Photo { get; set; }
+    public required string Email { get; set; }
+    public required string Phone { get; set; }
+}
+
 public class OutputBasicCreator
 {
     public required string Id { get; set; }

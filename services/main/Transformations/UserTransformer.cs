@@ -83,5 +83,19 @@ public class UserTransformer
         };
     }
 
+    public OutputBasicUserForAdmin TransformBasicUserForAdmin(User user)
+    {
+
+        return new OutputBasicUserForAdmin
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Photo = user.Photo,
+            Role = user.Role,
+            Email = user.Email,
+            Phone = user.PhoneNumber,
+        };
+    }
+
 }
 
