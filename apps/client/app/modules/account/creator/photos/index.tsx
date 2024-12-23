@@ -13,7 +13,7 @@ import { safeString } from '@/lib/strings.ts'
 
 export function CreatorPhotosModule() {
 	const creator = useCreator()
-	const { data, isError, isPending, isRefetching, refetch } =
+	const { data, isError, isPending, refetch } =
 		useGetCollectionContentsBySlug({
 			slug: `${safeString(creator?.userId)}_uploads`,
 			query: {
@@ -25,7 +25,7 @@ export function CreatorPhotosModule() {
 			},
 		})
 
-	if (isPending || isRefetching) {
+	if (isPending) {
 		return (
 			<div className="my-16 flex justify-center">
 				<Loader />

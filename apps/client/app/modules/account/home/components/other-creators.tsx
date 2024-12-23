@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function OtherCreators({ username }: Props) {
-	const { data, isPending, isError, refetch, isRefetching } =
+	const { data, isPending, isError, refetch } =
 		useGetRelatedCreators(username, {
 			pagination: {
 				page: 0,
@@ -17,7 +17,7 @@ export function OtherCreators({ username }: Props) {
 
 	let content = <></>
 
-	if (isPending || isRefetching) {
+	if (isPending) {
 		content = (
 			<>
 				<ul className="grid grid-cols-1 gap-2">

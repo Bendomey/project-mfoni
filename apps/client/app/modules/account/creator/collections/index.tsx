@@ -10,7 +10,7 @@ import { Loader } from '@/components/loader/index.tsx'
 export function CreatorCollectionsModule() {
 	const creator = useCreator()
 
-	const { data, isError, isPending, isRefetching, refetch } = useGetCollections(
+	const { data, isError, isPending, refetch } = useGetCollections(
 		{
 			pagination: { page: 0, per: 50 },
 			filters: {
@@ -22,7 +22,7 @@ export function CreatorCollectionsModule() {
 		},
 	)
 
-	if (isPending || isRefetching) {
+	if (isPending) {
 		return (
 			<div className="my-16 flex justify-center">
 				<Loader />

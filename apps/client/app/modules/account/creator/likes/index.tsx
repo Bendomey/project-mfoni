@@ -10,7 +10,7 @@ import { safeString } from '@/lib/strings.ts'
 
 export function CreatorLikesModule() {
 	const creator = useCreator()
-	const { data, isPending, isError, refetch, isRefetching } =
+	const { data, isPending, isError, refetch } =
 		useGetUserContentLikes(
 			{
 				pagination: { page: 0, per: 50 },
@@ -22,7 +22,7 @@ export function CreatorLikesModule() {
 			safeString(creator?.userId),
 		)
 
-	if (isPending || isRefetching) {
+	if (isPending) {
 		return (
 			<div className="my-16 flex justify-center">
 				<Loader />
