@@ -1,17 +1,25 @@
-import { Outlet } from '@remix-run/react'
+import { Outlet, useLoaderData } from '@remix-run/react'
+import { createContext, useContext } from 'react'
 import { OtherCreators } from '../home/components/other-creators.tsx'
 import { AccountCover } from './components/account-cover.tsx'
 import { Tabs } from './components/content-tabs.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
+import { type loader } from '@/routes/$username.ts'
+
+const CreatorContext = createContext<EnhancedCreator | null>(null)
 
 export function CreatorPage() {
+	const data = useLoaderData<typeof loader>()
+
+	if (!data.creator) return null
+
 	return (
-		<>
+		<CreatorContext.Provider value={data.creator as unknown as EnhancedCreator}>
 			<Header isHeroSearchInVisible={false} />
 			<div className="grid grid-cols-8 gap-3 bg-gray-50 px-4 pb-16 pt-4 lg:px-8">
 				<div className="col-span-8 flex flex-col gap-y-8 lg:col-span-6">
-					<AccountCover />
+					<AccountCover data={data.creator as unknown as EnhancedCreator} />
 
 					<div>
 						<div className="mb-4">
@@ -25,11 +33,13 @@ export function CreatorPage() {
 						<Outlet />
 					</div>
 				</div>
-				<div className="col-span-2 flex flex-col gap-y-10">
-					<OtherCreators />
+				<div className="col-span-8 flex flex-col gap-y-10 lg:col-span-2">
+					<OtherCreators username={data.creator.username} />
 				</div>
 			</div>
 			<Footer />
-		</>
+		</CreatorContext.Provider>
 	)
 }
+
+export const useCreator = () => useContext(CreatorContext)

@@ -1,46 +1,68 @@
 import { Image } from 'remix-image'
+import { useGetRelatedCreators } from '@/api/creators/index.ts'
+import { Button } from '@/components/button/index.tsx'
 
-const people = [
-	{
-		name: 'Leonard Krasner',
-		role: 'Creator',
-		imageUrl:
-			'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80',
-		xUrl: '#',
-		linkedinUrl: '#',
-	},
-	{
-		name: 'Leonard Krasner',
-		role: 'Creator',
-		imageUrl:
-			'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80',
-		xUrl: '#',
-		linkedinUrl: '#',
-	},
-	{
-		name: 'Leonard Krasner',
-		role: 'Creator',
-		imageUrl:
-			'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80',
-		xUrl: '#',
-		linkedinUrl: '#',
-	},
-	// More people...
-]
+interface Props {
+	username: string
+}
 
-export function OtherCreators() {
-	return (
-		<div>
-			<h3 className="text-base font-semibold leading-6 text-gray-900">
-				Creators you may like.
-			</h3>
-			<ul className="mt-3 grid grid-cols-1 gap-2">
-				{people.map((person) => (
-					<li key={person.name} className="rounded-md border bg-white p-4">
+export function OtherCreators({ username }: Props) {
+	const { data, isPending, isError, refetch, isRefetching } =
+		useGetRelatedCreators(username, {
+			pagination: {
+				page: 0,
+				per: 5,
+			},
+		})
+
+	let content = <></>
+
+	if (isPending || isRefetching) {
+		content = (
+			<>
+				<ul className="grid grid-cols-1 gap-2">
+					<OtherCreatorShimmer />
+					<OtherCreatorShimmer />
+					<OtherCreatorShimmer />
+					<OtherCreatorShimmer />
+				</ul>
+			</>
+		)
+	}
+
+	if (isError) {
+		content = (
+			<div>
+				<p className="text-sm leading-6 text-gray-400">
+					Error occured while fetching creators.
+				</p>
+				<Button
+					onClick={() => refetch()}
+					size="sm"
+					color="infoGhost"
+					className="mt-2"
+				>
+					Retry
+				</Button>
+			</div>
+		)
+	}
+
+	if (data?.rows.length === 0) {
+		content = (
+			<p className="text-sm leading-6 text-gray-400">No creators found.</p>
+		)
+	}
+
+	if (data?.rows.length) {
+		content = (
+			<ul className="grid grid-cols-1 gap-2">
+				{data?.rows.map((person) => (
+					<li key={person.id} className="rounded-md border bg-white p-4">
 						<div className="flex items-center gap-2">
 							<Image
-								alt=""
-								src={person.imageUrl}
+								alt={person.name}
+								src={person.photo}
 								className="h-20 w-20 rounded-md"
 							/>
 							<div>
@@ -48,13 +70,36 @@ export function OtherCreators() {
 									{person.name}
 								</h3>
 								<span className="text-sm leading-6 text-gray-400">
-									{person.role}
+									{person.username}
 								</span>
 							</div>
 						</div>
 					</li>
 				))}
 			</ul>
+		)
+	}
+
+	return (
+		<div>
+			<h3 className="text-base font-semibold leading-6 text-gray-900">
+				Creators you may like.
+			</h3>
+			<div className="mt-3">{content}</div>
+		</div>
+	)
+}
+
+function OtherCreatorShimmer() {
+	return (
+		<div className="animate-pulse rounded-md border bg-white p-4">
+			<div className="flex items-center gap-2">
+				<div className="h-20 w-20 rounded-md bg-zinc-100" />
+				<div>
+					<div className="h-4 w-32 bg-zinc-200" />
+					<div className="mt-3 h-3 w-20 bg-zinc-100" />
+				</div>
+			</div>
 		</div>
 	)
 }

@@ -1,5 +1,5 @@
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
-import { useGetUserContentLikes } from '@/api/contents/index.ts'
+import { useGetUserContentLikes } from '@/api/users/index.ts'
 import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Content } from '@/components/Content/index.tsx'
@@ -16,6 +16,9 @@ export function AccountLikesModule() {
 		{
 			pagination: { page: 0, per: 50 },
 			populate: ['content'],
+			filters: {
+				visibility: 'ALL',
+			},
 		},
 		safeString(currentUser?.id),
 	)

@@ -2,7 +2,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ShareIcon } from '@heroicons/react/16/solid'
 import { LinkIcon } from '@heroicons/react/24/outline'
 import { useMemo } from 'react'
-import { Button } from '../button/index.tsx'
+import { Button, type ButtonProps } from '../button/index.tsx'
 import { successToast } from '@/lib/custom-toast-functions.tsx'
 import { isBrowser } from '@/lib/is-browser.ts'
 
@@ -10,9 +10,10 @@ interface Props {
 	button?: any
 	text?: string
 	link?: string
+	buttonProps?: ButtonProps
 }
 
-export function ShareButton({ button, link, text }: Props) {
+export function ShareButton({ button, link, text, buttonProps }: Props) {
 	const resolvedText = text ?? 'Check this out'
 	const resolvedLink = useMemo(() => {
 		if (isBrowser) {
@@ -23,11 +24,11 @@ export function ShareButton({ button, link, text }: Props) {
 	}, [link])
 
 	return (
-		<Menu as="div" className="relative">
+		<Menu as="div" className="relative w-full">
 			<div>
-				<MenuButton>
+				<MenuButton className="w-full">
 					{button ?? (
-						<Button variant="outlined">
+						<Button variant="outlined" {...buttonProps}>
 							<ShareIcon className="mr-2 size-4 fill-current" />
 							Share
 						</Button>

@@ -9,6 +9,7 @@ import { Tabs } from './components/tabs.tsx'
 import { UserTimeline } from './components/timeline.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
+import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
 export const AccountModule = () => {
@@ -48,10 +49,12 @@ export const AccountModule = () => {
 						<Outlet />
 					</div>
 				</div>
-				<div className="col-span-2 flex flex-col gap-y-10">
+				<div className="col-span-8 flex flex-col gap-y-10 lg:col-span-2">
 					<QuickActions />
 					<UserTimeline />
-					<OtherCreators />
+					<OtherCreators
+						username={safeString(currentUser?.creator?.username)}
+					/>
 				</div>
 			</div>
 			<Footer />

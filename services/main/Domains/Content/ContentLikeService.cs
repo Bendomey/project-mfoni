@@ -129,23 +129,97 @@ public class ContentLikeService
         return await _contentLikeCollection.CountDocumentsAsync(filter);
     }
 
-    public async Task<List<Models.ContentLike>> GetUserContentLikes(FilterQuery<Models.ContentLike> queryFilter, string userId)
+    public async Task<List<Models.ContentLike>> GetUserContentLikes(FilterQuery<Models.ContentLike> queryFilter, GetContentLikesInput input)
     {
-        var filter = Builders<ContentLike>.Filter.Eq(r => r.UserId, userId);
+
+        var pipeline = new[]
+        {
+           new BsonDocument("$match", new BsonDocument
+            {
+                { "user_id", new BsonDocument("$eq", ObjectId.Parse(input.UserId)) },
+            }),
+            new BsonDocument("$lookup", new BsonDocument
+            {
+                { "from", "contents" },
+                { "localField", "content_id" },
+                { "foreignField", "_id" },
+                { "as", "content" }
+            })
+        };
+
+        if (input.Visibility != null && input.Visibility != "ALL")
+        {
+            pipeline = pipeline.Append(new BsonDocument("$match", new BsonDocument
+            {
+                { "content.visibility", new BsonDocument("$eq", input.Visibility) },
+            })).ToArray();
+        }
+
+        if (input.Orientation != null && input.Orientation != "ALL")
+        {
+            pipeline = pipeline.Append(new BsonDocument("$match", new BsonDocument
+            {
+                { "content.orientation", new BsonDocument("$eq", input.Orientation) },
+            })).ToArray();
+        }
+
+        pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$limit", queryFilter.Limit)).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$skip", queryFilter.Skip)).ToArray();
+
+        // TODO: figure out how to sort dynamically
+        pipeline = pipeline.Append(new BsonDocument("$sort", new BsonDocument("created_at", -1))).ToArray();
 
         return await _contentLikeCollection
-            .Find(filter)
-            .Skip(queryFilter.Skip)
-            .Limit(queryFilter.Limit)
-            .Sort(queryFilter.Sort)
-            .ToListAsync();
+           .Aggregate<Models.ContentLike>(pipeline)
+           .ToListAsync();
     }
 
-    public async Task<long> CountUserContentLikes(string userId)
+    public async Task<long> CountUserContentLikes(GetContentLikesInput input)
     {
-        var filter = Builders<ContentLike>.Filter.Eq(r => r.UserId, userId);
+        var pipeline = new[]
+         {
+           new BsonDocument("$match", new BsonDocument
+            {
+                { "user_id", new BsonDocument("$eq", ObjectId.Parse(input.UserId)) },
+            }),
+            new BsonDocument("$lookup", new BsonDocument
+            {
+                { "from", "contents" },
+                { "localField", "content_id" },
+                { "foreignField", "_id" },
+                { "as", "content" }
+            })
+        };
 
-        return await _contentLikeCollection.CountDocumentsAsync(filter);
+        if (input.Visibility != null && input.Visibility != "ALL")
+        {
+            pipeline = pipeline.Append(new BsonDocument("$match", new BsonDocument
+            {
+                { "content.visibility", new BsonDocument("$eq", input.Visibility) },
+            })).ToArray();
+        }
+
+        if (input.Orientation != null && input.Orientation != "ALL")
+        {
+            pipeline = pipeline.Append(new BsonDocument("$match", new BsonDocument
+            {
+                { "content.orientation", new BsonDocument("$eq", input.Orientation) },
+            })).ToArray();
+        }
+
+        pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$count", "totalCount")).ToArray();
+
+        var result = await _contentLikeCollection.AggregateAsync<MongoAggregationGetCount>(pipeline);
+
+        var count = 0;
+        await result.ForEachAsync(doc =>
+        {
+            count = doc.TotalCount;
+        });
+
+        return count;
     }
 
 }

@@ -21,3 +21,10 @@ public class EditContentBasicDetailsInput
     public string? Visibility { get; set; }
     public double? Amount { get; set; }
 }
+
+public class GetContentLikesInput
+{
+    public required string UserId { get; set; }
+    public string? Visibility { get; set; }
+    public string? Orientation { get; set; }
+}

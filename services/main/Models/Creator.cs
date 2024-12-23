@@ -32,6 +32,21 @@ public class Creator
     [BsonElement("social_media")]
     public SocialMedia[] SocialMedia { get; set; } = [];
 
+    [BsonElement("interests")]
+    public string[] Interests { get; set; } = [];
+
+    [BsonElement("about")]
+    public string? About { get; set; }
+
+    [BsonElement("followers")]
+    public long Followers { get; set; } = 0;
+
+    [BsonElement("address")]
+    public string Address { get; set; } = "Ghana";
+
+    [BsonElement("website_disabled_at")]
+    public DateTime? WebsiteDisabledAt { get; set; }
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 

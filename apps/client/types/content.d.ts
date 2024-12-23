@@ -65,7 +65,10 @@ interface ContentLike {
 }
 
 interface FetchContentLikeFilter {
-	contentId: string
+	contentId?: string
+	userId?: string
+	visibility?: string
+	orientation?: string
 }
 
 interface FetchContentFilter {

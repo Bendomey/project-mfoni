@@ -61,7 +61,7 @@ public class CollectionTransformer
                         Populate = populate,
                     }, new GetCollectionContentsInput
                     {
-                        CollectionId = collection.Id
+                        CollectionId = collection.Id,
                     })
             );
 

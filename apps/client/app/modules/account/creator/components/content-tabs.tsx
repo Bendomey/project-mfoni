@@ -107,7 +107,7 @@ export function Tabs() {
 									<tab.icon className="h-5 w-5 text-gray-400" />
 								</div>
 								{tab.name}
-								{tab.count ? (
+								{/* {tab.count ? (
 									<span
 										className={classNames(
 											tab.current
@@ -118,7 +118,7 @@ export function Tabs() {
 									>
 										{tab.count}
 									</span>
-								) : null}
+								) : null} */}
 							</Link>
 						))}
 					</nav>

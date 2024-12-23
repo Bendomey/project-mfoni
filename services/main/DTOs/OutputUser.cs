@@ -38,12 +38,3 @@ public class OutputBasicUserForAdmin
     public required string Email { get; set; }
     public required string Phone { get; set; }
 }
-
-public class OutputBasicCreator
-{
-    public required string Id { get; set; }
-    public required string Name { get; set; }
-    public required string Username { get; set; }
-    public string? Photo { get; set; }
-    public required SocialMedia[] SocialMedia { get; set; }
-}

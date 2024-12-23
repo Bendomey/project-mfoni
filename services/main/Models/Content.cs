@@ -69,6 +69,9 @@ public class Content
     [BsonElement("rekognition_metadata")]
     public RekognitionMetaData? RekognitionMetaData { get; set; }
 
+    [BsonElement("is_searchable")]
+    public bool IsSearchable { get; set; } = true;
+
     [BsonElement("media")]
     public required S3MetaData Media { get; set; }
 

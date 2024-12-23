@@ -142,47 +142,6 @@ export const unlikeContent = async (
 	}
 }
 
-export const getUserContentLikes = async (
-	query: FetchMultipleDataInputParams<unknown>,
-	apiConfig?: ApiConfigForServerConfig,
-) => {
-	try {
-		const removeAllNullableValues = getQueryParams<unknown>(query)
-		const params = new URLSearchParams(removeAllNullableValues)
-		const response = await fetchClient<
-			ApiResponse<FetchMultipleDataResponse<ContentLike>>
-		>(`/v1/users/contents/likes?${params.toString()}`, {
-			...(apiConfig ? apiConfig : {}),
-		})
-
-		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
-			throw new Error(response.parsedBody.errorMessage)
-		}
-
-		return response.parsedBody.data
-	} catch (error: unknown) {
-		if (error instanceof Error) {
-			throw error
-		}
-
-		// Error from server.
-		if (error instanceof Response) {
-			const response = await error.json()
-			throw new Error(response.errorMessage)
-		}
-	}
-}
-
-export const useGetUserContentLikes = (
-	query: FetchMultipleDataInputParams<unknown>,
-	userId: string,
-) =>
-	useQuery({
-		queryKey: [QUERY_KEYS.CONTENT_LIKES, 'user', userId, query],
-		queryFn: () => getUserContentLikes(query),
-		enabled: !!userId,
-	})
-
 export const getContentLikes = async (
 	query: FetchMultipleDataInputParams<unknown>,
 	contentId: string,

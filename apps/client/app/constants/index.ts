@@ -17,6 +17,7 @@ export const QUERY_KEYS = {
 	CONTENTS: 'contents',
 	COLLECTIONS: 'collections',
 	CONTENT_LIKES: 'content-likes',
+	CREATORS: 'creators',
 } as const
 
 export const MFONI_PACKAGES: Array<PackageType> = ['FREE', 'BASIC', 'ADVANCED']

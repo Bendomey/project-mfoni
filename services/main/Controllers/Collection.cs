@@ -412,6 +412,7 @@ public class CollectionsController : ControllerBase
                     {"sort", StringLib.SafeString(sort)},
                     {"sortBy", sortBy},
                     {"contentItemsLimit", contentItemsLimit.ToString()},
+                    {"visibility", visibility}
               });
               SentrySdk.CaptureException(e);
           });
@@ -631,6 +632,8 @@ public class CollectionsController : ControllerBase
     /// Get contents in a collection by slug
     /// </summary>
     /// <param name="slug">slug of collection</param>
+    /// <param name="visibility">can be `ALL`, `PUBLIC`, `PRIVATE`</param>
+    /// <param name="orientation">can be `ALL`, `LANDSCAPE`, `PORTRIAT`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
@@ -649,7 +652,9 @@ public class CollectionsController : ControllerBase
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
         [FromQuery] string populate = "",
-        [FromQuery] string sortBy = "created_at"
+        [FromQuery] string sortBy = "created_at",
+        [FromQuery] string visibility = "PUBLIC",
+        [FromQuery] string orientation = "ALL"
     )
     {
 
@@ -672,10 +677,14 @@ public class CollectionsController : ControllerBase
             var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
             {
                 CollectionId = collection.Id,
+                Visibility = visibility,
+                Orientation = orientation
             });
             long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
             {
                 CollectionId = collection.Id,
+                Visibility = visibility,
+                Orientation = orientation
             });
 
             var outContent = new List<OutputCollectionContent>();
@@ -716,6 +725,8 @@ public class CollectionsController : ControllerBase
                  {
                     {"action", "Get Contents from a Collection by slug"},
                     {"collectionSlug", slug},
+                    {"visibility", visibility},
+                    {"orientation", orientation},
                     {"page", StringLib.SafeString(page.ToString())},
                     {"pageSize", StringLib.SafeString(pageSize.ToString())},
                     {"sort", StringLib.SafeString(sort)},
@@ -731,6 +742,8 @@ public class CollectionsController : ControllerBase
     /// Get contents in a collection by name
     /// </summary>
     /// <param name="name">name of collection</param>
+    /// <param name="visibility">can be `ALL`, `PUBLIC`, `PRIVATE`</param>
+    /// <param name="orientation">can be `ALL`, `LANDSCAPE`, `PORTRIAT`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
@@ -749,7 +762,9 @@ public class CollectionsController : ControllerBase
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
         [FromQuery] string populate = "",
-        [FromQuery] string sortBy = "created_at"
+        [FromQuery] string sortBy = "created_at",
+        [FromQuery] string visibility = "PUBLIC",
+        [FromQuery] string orientation = "ALL"
     )
     {
         // Don't break the request if user is not authenticated
@@ -771,10 +786,14 @@ public class CollectionsController : ControllerBase
             var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
             {
                 CollectionId = collection.Id,
+                Visibility = visibility,
+                Orientation = orientation
             });
             long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
             {
                 CollectionId = collection.Id,
+                Visibility = visibility,
+                Orientation = orientation
             });
 
             var outContent = new List<OutputCollectionContent>();
@@ -815,6 +834,8 @@ public class CollectionsController : ControllerBase
                  {
                     {"action", "Get Contents from a Collection by name"},
                     {"collectionName", name},
+                    {"visibility", visibility},
+                    {"orientation", orientation},
                     {"page", StringLib.SafeString(page.ToString())},
                     {"pageSize", StringLib.SafeString(pageSize.ToString())},
                     {"sort", StringLib.SafeString(sort)},
@@ -831,6 +852,8 @@ public class CollectionsController : ControllerBase
     /// Get all contents in a collection by id
     /// </summary>
     /// <param name="id">id of collection</param>
+    /// <param name="visibility">can be `ALL`, `PUBLIC`, `PRIVATE`</param>
+    /// <param name="orientation">can be `ALL`, `LANDSCAPE`, `PORTRIAT`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
@@ -849,7 +872,9 @@ public class CollectionsController : ControllerBase
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
         [FromQuery] string populate = "",
-        [FromQuery] string sortBy = "created_at"
+        [FromQuery] string sortBy = "created_at",
+        [FromQuery] string visibility = "PUBLIC",
+        [FromQuery] string orientation = "ALL"
     )
     {
         // Don't break the request if user is not authenticated
@@ -870,10 +895,14 @@ public class CollectionsController : ControllerBase
             var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
             {
                 CollectionId = id,
+                Visibility = visibility,
+                Orientation = orientation
             });
             long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
             {
                 CollectionId = id,
+                Visibility = visibility,
+                Orientation = orientation
             });
 
             var outContent = new List<OutputCollectionContent>();
@@ -913,6 +942,8 @@ public class CollectionsController : ControllerBase
                  {
                     {"action", "Get Contents from a Collection by id"},
                     {"collectionId", id},
+                    {"visibility", visibility},
+                    {"orientation", orientation},
                     {"page", StringLib.SafeString(page.ToString())},
                     {"pageSize", StringLib.SafeString(pageSize.ToString())},
                     {"sort", StringLib.SafeString(sort)},
