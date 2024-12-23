@@ -53,4 +53,6 @@ public class GetCollectionContentsInput
     public string? ContentId { get; set; }
     public string? TagId { get; set; }
     public string? ChildCollectionId { get; set; }
+    public string? Visibility { get; set; }
+    public string? Orientation { get; set; }
 }

@@ -17,6 +17,7 @@ interface FetchCollectionFilter {
 	contentItemsLimit?: number
 	created_by?: string
 	visibility?: string
+	orientation?: string
 }
 
 interface CollectionContent {

@@ -39,4 +39,19 @@ interface BasicCreator {
 	username: string
 	photo: string
 	socialMedia: Array<CreatorSocialMedia>
+	address: string
+}
+
+interface EnhancedCreator {
+	id: string
+	name: string
+	username: string
+	photo: string
+	userId: string
+	interests: Array<string>
+	about: Nullable<string>
+	followers: number
+	address: string
+	socialMedia: Array<CreatorSocialMedia>
+	createdAt: Date
 }

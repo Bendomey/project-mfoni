@@ -1,6 +1,5 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import {
-	ShareIcon,
 	UserIcon,
 	CheckIcon,
 	ArchiveBoxIcon,
@@ -9,9 +8,11 @@ import {
 } from '@heroicons/react/24/outline'
 import { Image } from 'remix-image'
 import { Button } from '@/components/button/index.tsx'
+import { ShareButton } from '@/components/share-button/index.tsx'
 import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
 import { useValidateImage } from '@/hooks/use-validate-image.tsx'
 import { classNames } from '@/lib/classNames.ts'
+import { isBrowser } from '@/lib/is-browser.ts'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
@@ -102,10 +103,20 @@ export function AccountCover() {
 					<div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
 						<div className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-2 sm:space-y-0">
 							{currentUser?.role === 'CREATOR' ? (
-								<Button variant="solid" className="w-full md:w-auto">
-									<ShareIcon className="mr-3 h-5 w-5" aria-hidden="true" />
-									Share
-								</Button>
+								<ShareButton
+									buttonProps={{
+										variant: 'solid',
+										className: 'w-full md:w-auto',
+									}}
+									link={
+										isBrowser
+											? `${window.location.origin}/${safeString(
+													currentUser?.creator?.username,
+												)}`
+											: undefined
+									}
+									text={`View ${currentUser.name}'s mfoni profile`}
+								/>
 							) : null}
 							<Button variant="outlined">
 								<UserIcon

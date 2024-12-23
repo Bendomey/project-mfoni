@@ -126,66 +126,187 @@ public class CollectionContentService
         GetCollectionContentsInput input
     )
     {
-        // TODO: Add support for license and orientation filters for image/video content
-        // TODO: add support for visibility filter for content
-        var filter = Builders<Models.CollectionContent>.Filter.Eq(r => r.CollectionId, input.CollectionId);
-
-        if (input.CollectionId is not null)
+        var pipeline = new BsonDocument[]
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.CollectionId, input.CollectionId);
+        };
+
+        if (input.CollectionId != null)
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "collection_id", new BsonDocument("$eq", ObjectId.Parse(input.CollectionId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.TagId is not null)
+        if (input.TagId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.TagId, input.TagId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "tag_id", new BsonDocument("$eq", ObjectId.Parse(input.TagId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.ChildCollectionId is not null)
+        if (input.ChildCollectionId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ChildCollectionId, input.ChildCollectionId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "child_collection_id", new BsonDocument("$eq", ObjectId.Parse(input.ChildCollectionId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.ContentId is not null)
+        if (input.ContentId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ContentId, input.ContentId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content_id", new BsonDocument("$eq", ObjectId.Parse(input.ContentId)) },
+                })
+            ).ToArray();
         }
 
-        var contents = await _collectionContentCollection
-            .Find(filter)
-            .Skip(queryFilter.Skip)
-            .Limit(queryFilter.Limit)
-            .Sort(queryFilter.Sort)
-            .ToListAsync();
+        pipeline = pipeline.Append(
+            new BsonDocument("$lookup", new BsonDocument
+            {
+                { "from", "contents" },
+                { "localField", "content_id" },
+                { "foreignField", "_id" },
+                { "as", "content" }
+            })
+        ).ToArray();
 
-        return contents ?? [];
+        pipeline = pipeline.Append(
+            new BsonDocument("$unwind", "$content")
+        ).ToArray();
+
+        if (input.Visibility != null && input.Visibility != "ALL")
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content.visibility", new BsonDocument("$eq", input.Visibility) },
+                })
+            ).ToArray();
+        }
+
+        if (input.Orientation != null && input.Orientation != "ALL")
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content.orientation", new BsonDocument("$eq", input.Orientation) },
+                })
+            ).ToArray();
+        }
+
+        pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$limit", queryFilter.Limit)).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$skip", queryFilter.Skip)).ToArray();
+
+        // TODO: figure out how to sort dynamically
+        pipeline = pipeline.Append(new BsonDocument("$sort", new BsonDocument("created_at", -1))).ToArray();
+
+        return await _collectionContentCollection
+           .Aggregate<Models.CollectionContent>(pipeline)
+           .ToListAsync();
     }
 
     public async Task<long> CountCollectionContents(GetCollectionContentsInput input)
     {
-        var filter = Builders<Models.CollectionContent>.Filter.Eq(r => r.CollectionId, input.CollectionId);
+        var pipeline = new BsonDocument[]
+       {
+       };
 
-        if (input.CollectionId is not null)
+        if (input.CollectionId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.CollectionId, input.CollectionId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "collection_id", new BsonDocument("$eq", ObjectId.Parse(input.CollectionId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.TagId is not null)
+        if (input.TagId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.TagId, input.TagId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "tag_id", new BsonDocument("$eq", ObjectId.Parse(input.TagId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.ChildCollectionId is not null)
+        if (input.ChildCollectionId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ChildCollectionId, input.ChildCollectionId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "child_collection_id", new BsonDocument("$eq", ObjectId.Parse(input.ChildCollectionId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.ContentId is not null)
+        if (input.ContentId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ContentId, input.ContentId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content_id", new BsonDocument("$eq", ObjectId.Parse(input.ContentId)) },
+                })
+            ).ToArray();
         }
 
+        pipeline = pipeline.Append(
+            new BsonDocument("$lookup", new BsonDocument
+            {
+                { "from", "contents" },
+                { "localField", "content_id" },
+                { "foreignField", "_id" },
+                { "as", "content" }
+            })
+        ).ToArray();
 
-        long count = await _collectionContentCollection.CountDocumentsAsync(filter);
+        pipeline = pipeline.Append(
+            new BsonDocument("$unwind", "$content")
+        ).ToArray();
+
+        if (input.Visibility != null && input.Visibility != "ALL")
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content.visibility", new BsonDocument("$eq", input.Visibility) },
+                })
+            ).ToArray();
+        }
+
+        if (input.Orientation != null && input.Orientation != "ALL")
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content.orientation", new BsonDocument("$eq", input.Orientation) },
+                })
+            ).ToArray();
+        }
+
+        pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$count", "totalCount")).ToArray();
+
+        var result = await _collectionContentCollection.AggregateAsync<MongoAggregationGetCount>(pipeline);
+
+        var count = 0;
+        await result.ForEachAsync(doc =>
+        {
+            count = doc.TotalCount;
+        });
+
         return count;
     }
 

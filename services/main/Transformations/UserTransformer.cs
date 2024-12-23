@@ -59,15 +59,15 @@ public class UserTransformer
     {
 
         var creator = await _creatorService.GetCreatorByUserId(user.Id);
-        var creatorTransformer = await _creatorTransformer.Transform(creator);
 
         return new OutputBasicCreator
         {
             Id = user.Id,
             Name = user.Name,
             Photo = user.Photo,
-            SocialMedia = creatorTransformer.SocialMedia,
-            Username = creatorTransformer.Username,
+            SocialMedia = creator.SocialMedia,
+            Username = creator.Username,
+            Address = creator.Address,
         };
     }
 

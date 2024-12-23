@@ -18,6 +18,8 @@ public class CacheProvider
         { "contents", "contents" },
         { "tags", "tags" },
 
+        { "creators", "creators" },
+
         // { "admins", "admins" },
         // { "auth", "users" },
         // { "waitlists", "waitlist" },
