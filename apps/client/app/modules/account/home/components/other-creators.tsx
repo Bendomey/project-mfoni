@@ -1,6 +1,7 @@
 import { Image } from 'remix-image'
 import { useGetRelatedCreators } from '@/api/creators/index.ts'
 import { Button } from '@/components/button/index.tsx'
+import { Link } from '@remix-run/react'
 
 interface Props {
 	username: string
@@ -58,23 +59,25 @@ export function OtherCreators({ username }: Props) {
 		content = (
 			<ul className="grid grid-cols-1 gap-2">
 				{data?.rows.map((person) => (
-					<li key={person.id} className="rounded-md border bg-white p-4">
-						<div className="flex items-center gap-2">
-							<Image
-								alt={person.name}
-								src={person.photo}
-								className="h-20 w-20 rounded-md"
-							/>
-							<div>
-								<h3 className="text-base font-semibold leading-7 tracking-tight">
-									{person.name}
-								</h3>
-								<span className="text-sm leading-6 text-gray-400">
-									{person.username}
-								</span>
+					<Link prefetch='intent' to={`/@${person.username}`} key={person.id}>
+						<li className="rounded-md border bg-white hover:bg-zinc-100 p-4">
+							<div className="flex items-center gap-2">
+								<Image
+									alt={person.name}
+									src={person.photo}
+									className="h-20 w-20 rounded-md"
+								/>
+								<div>
+									<h3 className="text-base font-semibold leading-7 tracking-tight">
+										{person.name}
+									</h3>
+									<span className="text-sm leading-6 text-gray-400">
+										{person.username}
+									</span>
+								</div>
 							</div>
-						</div>
-					</li>
+						</li>
+					</Link>
 				))}
 			</ul>
 		)
