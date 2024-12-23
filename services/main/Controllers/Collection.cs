@@ -670,22 +670,30 @@ public class CollectionsController : ControllerBase
         try
         {
             _logger.LogInformation("Getting collection contents");
-            var collection = _collectionService.GetCollectionBySlug(slug);
-
             var queryFilter = HttpLib.GenerateFilterQuery<Models.CollectionContent>(page, pageSize, sort, sortBy, populate);
 
-            var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+            List<CollectionContent> contents = [];
+            long count = 0;
+            try
             {
-                CollectionId = collection.Id,
-                Visibility = visibility,
-                Orientation = orientation
-            });
-            long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
-            {
-                CollectionId = collection.Id,
-                Visibility = visibility,
-                Orientation = orientation
-            });
+                var collection = _collectionService.GetCollectionBySlug(slug);
+
+
+                contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+                {
+                    CollectionId = collection.Id,
+                    Visibility = visibility,
+                    Orientation = orientation
+                });
+
+                count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
+                {
+                    CollectionId = collection.Id,
+                    Visibility = visibility,
+                    Orientation = orientation
+                });
+            }
+            catch (HttpRequestException) { }
 
             var outContent = new List<OutputCollectionContent>();
             foreach (var content in contents)
@@ -779,22 +787,30 @@ public class CollectionsController : ControllerBase
         try
         {
             _logger.LogInformation("Getting collection contents");
-            var collection = _collectionService.GetCollectionByName(name);
 
             var queryFilter = HttpLib.GenerateFilterQuery<Models.CollectionContent>(page, pageSize, sort, sortBy, populate);
 
-            var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+            List<CollectionContent> contents = [];
+            long count = 0;
+            try
             {
-                CollectionId = collection.Id,
-                Visibility = visibility,
-                Orientation = orientation
-            });
-            long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
-            {
-                CollectionId = collection.Id,
-                Visibility = visibility,
-                Orientation = orientation
-            });
+                var collection = _collectionService.GetCollectionByName(name);
+                contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+                {
+                    CollectionId = collection.Id,
+                    Visibility = visibility,
+                    Orientation = orientation
+                });
+                count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
+                {
+                    CollectionId = collection.Id,
+                    Visibility = visibility,
+                    Orientation = orientation
+                });
+
+            }
+            catch (HttpRequestException) { }
+
 
             var outContent = new List<OutputCollectionContent>();
             foreach (var content in contents)
