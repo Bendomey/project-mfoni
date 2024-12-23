@@ -75,7 +75,7 @@ public class CreatorService
         var filters = FilterDefinition<Models.Creator>.Empty;
         filters &= Builders<Models.Creator>.Filter.Ne(creator => creator.Username, username);
         filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.Status, CreatorStatus.ACTIVE);
-        filters &= Builders<Models.Creator>.Filter.Ne(creator => creator.WebsiteDisabledAt, null);
+        filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.WebsiteDisabledAt, null);
 
         var creators = await __creatorCollection.Find(filters).ToListAsync();
         return creators;
@@ -86,7 +86,7 @@ public class CreatorService
         var filters = FilterDefinition<Models.Creator>.Empty;
         filters &= Builders<Models.Creator>.Filter.Ne(creator => creator.Username, username);
         filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.Status, CreatorStatus.ACTIVE);
-        filters &= Builders<Models.Creator>.Filter.Ne(creator => creator.WebsiteDisabledAt, null);
+        filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.WebsiteDisabledAt, null);
 
         var creatorsCount = await __creatorCollection.CountDocumentsAsync(filters);
         return creatorsCount;
