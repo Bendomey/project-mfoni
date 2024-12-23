@@ -82,14 +82,15 @@ export async function loader(args: LoaderFunctionArgs) {
 						url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
 					) {
 						return redirect(
-							`${
-								PAGES.AUTHENTICATED_PAGES.ONBOARDING
+							`${PAGES.AUTHENTICATED_PAGES.ONBOARDING
 							}?return_to=${getFullUrlPath(url)}`,
 						)
 					}
 				}
 			} catch (e: unknown) {
-				return redirect(`${PAGES.LOGIN}?return_to=${getFullUrlPath(url)}`)
+				if (url.pathname !== PAGES.LOGIN) {
+					return redirect(`${PAGES.LOGIN}?return_to=${getFullUrlPath(url)}`)
+				}
 			}
 		}
 	}
