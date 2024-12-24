@@ -10,17 +10,15 @@ import { Loader } from '@/components/loader/index.tsx'
 export function CreatorCollectionsModule() {
 	const creator = useCreator()
 
-	const { data, isError, isPending, refetch } = useGetCollections(
-		{
-			pagination: { page: 0, per: 50 },
-			filters: {
-				created_by: creator?.userId,
-				visibility: 'PUBLIC',
-				contentItemsLimit: 4,
-			},
-			populate: ['content'],
+	const { data, isError, isPending, refetch } = useGetCollections({
+		pagination: { page: 0, per: 50 },
+		filters: {
+			created_by: creator?.userId,
+			visibility: 'PUBLIC',
+			contentItemsLimit: 4,
 		},
-	)
+		populate: ['content'],
+	})
 
 	if (isPending) {
 		return (

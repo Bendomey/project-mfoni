@@ -13,17 +13,16 @@ import { safeString } from '@/lib/strings.ts'
 
 export function CreatorPhotosModule() {
 	const creator = useCreator()
-	const { data, isError, isPending, refetch } =
-		useGetCollectionContentsBySlug({
-			slug: `${safeString(creator?.userId)}_uploads`,
-			query: {
-				pagination: { page: 0, per: 50 },
-				populate: ['content', 'content.tags'],
-				filters: {
-					visibility: 'PUBLIC',
-				},
+	const { data, isError, isPending, refetch } = useGetCollectionContentsBySlug({
+		slug: `${safeString(creator?.userId)}_uploads`,
+		query: {
+			pagination: { page: 0, per: 50 },
+			populate: ['content', 'content.tags'],
+			filters: {
+				visibility: 'PUBLIC',
 			},
-		})
+		},
+	})
 
 	if (isPending) {
 		return (

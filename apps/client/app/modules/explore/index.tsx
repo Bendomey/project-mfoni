@@ -1,57 +1,72 @@
-import { useState } from 'react'
-import { useInView } from 'react-intersection-observer'
-import { imageUrls } from '../landing-page/index.tsx'
-import { ExploreHeroSection } from './components/hero/index.tsx'
-import { MobileTabComponent } from './components/tabs/mobile.tsx'
-import { WebTabComponent } from './components/tabs/web.tsx'
-import { FadeIn, FadeInStagger } from '@/components/animation/FadeIn.tsx'
-import { Content } from '@/components/Content/index.tsx'
-import { EmptyState } from '@/components/empty-state/index.tsx'
+import { ExploreSection } from './components/section/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
 
 export const ExploreModule = () => {
-	const { ref: heroRef, inView } = useInView({
-		threshold: 0,
-	})
-
-	const [empty] = useState(false)
-
 	return (
 		<div className="relative">
-			<div ref={heroRef}>
-				<ExploreHeroSection />
-			</div>
-			{inView ? null : <Header isHeroSearchInVisible={false} />}
-			<div className="mx-auto my-2 grid max-w-7xl grid-cols-1 gap-8 px-3 sm:px-3 md:px-8 lg:my-16 lg:grid-cols-4">
-				{/* web */}
-				<div className="lg:col-span-1">
-					<WebTabComponent />
-				</div>
-				{/* mobile */}
-				<div className="col-span-1 lg:hidden">
-					<MobileTabComponent />
-				</div>
-				{empty ? (
-					<EmptyState
-						message="It seems like the category currently has no items for."
-						title="Detty December"
-					/>
-				) : (
-					<div className="col-span-1 lg:col-span-3">
-						<FadeInStagger faster>
-							<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8">
-								{imageUrls.map((url, index) => (
-									<div className="mb-5" key={index}>
-										<FadeIn>
-											<Content content={{ media: { url } } as any} />
-										</FadeIn>
-									</div>
-								))}
-							</div>
-						</FadeInStagger>
+			<Header isHeroSearchInVisible={false} />
+			<div className="max-w-8xl mx-auto px-4 py-4 lg:px-8">
+				<div className="mt-5">
+					<h1 className="text-4xl font-black">Explore mfoni contents</h1>
+					<div className="mt-5">
+						<p className="w-full text-zinc-600 md:w-2/4">
+							mfoni offers millions of free, high-quality pictures. All pictures
+							are free to download and use under the mfoni license.
+						</p>
 					</div>
-				)}
+				</div>
+
+				<div className="mt-10 space-y-10">
+					{/* for featured tags */}
+					<ExploreSection<Tag>
+						isLoading
+						type="TAG"
+						title="Featured Tags"
+						contents={[...new Array(30)]}
+					/>
+
+					<ExploreSection<Collection>
+						isLoading
+						type="COLLECTION"
+						title="Featured Collections"
+						seeMoreLink="/collections"
+						contents={[]}
+					/>
+					<ExploreSection<EnhancedCreator>
+						isLoading
+						type="CREATOR"
+						title="Featured creators"
+						contents={[]}
+					/>
+					<ExploreSection<Content>
+						isLoading
+						type="CONTENT"
+						title="Featured Photos"
+						seeMoreLink="/collections/featured_contents"
+						contents={[]}
+					/>
+					<ExploreSection<Collection>
+						isLoading
+						type="COLLECTION"
+						title="Trending Collections"
+						seeMoreLink="/collections"
+						contents={[]}
+					/>
+					<ExploreSection<Tag>
+						isLoading
+						type="TAG"
+						title="Popular tags"
+						seeMoreLink="/tags"
+						contents={[...new Array(30)]}
+					/>
+					<ExploreSection<EnhancedCreator>
+						isLoading
+						type="CREATOR"
+						title="Your Followings"
+						contents={[]}
+					/>
+				</div>
 			</div>
 			<Footer />
 		</div>

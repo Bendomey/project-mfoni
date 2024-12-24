@@ -8,13 +8,15 @@ interface Props {
 }
 
 export function OtherCreators({ username }: Props) {
-	const { data, isPending, isError, refetch } =
-		useGetRelatedCreators(username, {
+	const { data, isPending, isError, refetch } = useGetRelatedCreators(
+		username,
+		{
 			pagination: {
 				page: 0,
 				per: 5,
 			},
-		})
+		},
+	)
 
 	let content = <></>
 
@@ -59,8 +61,8 @@ export function OtherCreators({ username }: Props) {
 		content = (
 			<ul className="grid grid-cols-1 gap-2">
 				{data?.rows.map((person) => (
-					<Link prefetch='intent' to={`/@${person.username}`} key={person.id}>
-						<li className="rounded-md border bg-white hover:bg-zinc-100 p-4">
+					<Link prefetch="intent" to={`/@${person.username}`} key={person.id}>
+						<li className="rounded-md border bg-white p-4 hover:bg-zinc-100">
 							<div className="flex items-center gap-2">
 								<Image
 									alt={person.name}

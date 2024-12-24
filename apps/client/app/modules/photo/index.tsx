@@ -10,7 +10,7 @@ import {
 	HeartIcon as HeartIconOutline,
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
-import {PencilIcon} from '@heroicons/react/24/solid'
+import { PencilIcon } from '@heroicons/react/24/solid'
 import { Link, useLoaderData } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { Fragment } from 'react'
@@ -34,7 +34,7 @@ import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 export const PhotoModule = () => {
 	const { currentUser } = useAuth()
 	const { content } = useLoaderData<typeof loader>()
-	const editTitleModalState = useDisclosure();
+	const editTitleModalState = useDisclosure()
 
 	if (!content) return null
 
@@ -185,11 +185,18 @@ export const PhotoModule = () => {
 
 					<div className="mt-5">
 						<div className="flex flex-row">
-							<h1 className="font-bold">{content.title}</h1> 
-							<PencilIcon className="ml-4 h-6 w-4 text-black-700" onClick={editTitleModalState.onToggle}/>
-								<EditTitleModal isOpened={editTitleModalState.isOpened} toggleModal={editTitleModalState.onToggle} title={content.title}/>
+							<h1 className="font-bold">{content.title}</h1>
+							<PencilIcon
+								className="text-black-700 ml-4 h-6 w-4"
+								onClick={editTitleModalState.onToggle}
+							/>
+							<EditTitleModal
+								isOpened={editTitleModalState.isOpened}
+								toggleModal={editTitleModalState.onToggle}
+								title={content.title}
+							/>
 						</div>
-						
+
 						<div className="flex">
 							{content.amount === 0 ? null : (
 								<div className="rounded-full bg-black px-3 py-1 text-xs font-semibold text-white">
