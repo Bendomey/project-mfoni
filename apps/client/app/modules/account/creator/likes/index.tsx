@@ -10,17 +10,16 @@ import { safeString } from '@/lib/strings.ts'
 
 export function CreatorLikesModule() {
 	const creator = useCreator()
-	const { data, isPending, isError, refetch } =
-		useGetUserContentLikes(
-			{
-				pagination: { page: 0, per: 50 },
-				populate: ['content'],
-				filters: {
-					visibility: 'PUBLIC',
-				},
+	const { data, isPending, isError, refetch } = useGetUserContentLikes(
+		{
+			pagination: { page: 0, per: 50 },
+			populate: ['content'],
+			filters: {
+				visibility: 'PUBLIC',
 			},
-			safeString(creator?.userId),
-		)
+		},
+		safeString(creator?.userId),
+	)
 
 	if (isPending) {
 		return (

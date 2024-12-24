@@ -82,7 +82,8 @@ export async function loader(args: LoaderFunctionArgs) {
 						url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
 					) {
 						return redirect(
-							`${PAGES.AUTHENTICATED_PAGES.ONBOARDING
+							`${
+								PAGES.AUTHENTICATED_PAGES.ONBOARDING
 							}?return_to=${getFullUrlPath(url)}`,
 						)
 					}
