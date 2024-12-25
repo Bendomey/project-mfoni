@@ -66,6 +66,6 @@ export const useGetRelatedCreators = (
 	query: FetchMultipleDataInputParams<FetchWalletTransactionFilter>,
 ) =>
 	useQuery({
-		queryKey: [QUERY_KEYS.CREATORS, 'related', query],
+		queryKey: [QUERY_KEYS.CREATORS, 'related', username, query],
 		queryFn: () => getRelatedCreators(username, query),
 	})
