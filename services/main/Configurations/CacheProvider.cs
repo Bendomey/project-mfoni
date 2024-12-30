@@ -17,6 +17,7 @@ public class CacheProvider
         { "collections", "collections" },
         { "contents", "contents" },
         { "tags", "tags" },
+        { "explore", "explore" },
 
         { "creators", "creators" },
 
