@@ -10,4 +10,5 @@ export const QUERY_KEYS = {
   USERS: 'users',
   WALLET_TRANSACTIONS: 'wallet-transactions',
   WALLET: 'wallet',
+  CONTENTS: 'contents',
 } as const
