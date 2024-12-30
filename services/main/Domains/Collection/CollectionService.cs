@@ -231,7 +231,7 @@ public class CollectionService
     public void BootstrapCollections()
     {
         _logger.LogInformation("Bootsrapping collections");
-        string[] collections = { "Featured::Contents", "Featured::Tags", "Featured::Collections" };
+        string[] collections = { "Featured::Contents", "Featured::Tags", "Featured::Collections", "Trending::Collections", "Popular::Tags", "Featured::Creators" };
         string collectionDescription = "Carefully curated collection of contents for your viewing pleasure by our team of experts at mfoni";
 
         foreach (var collection in collections)

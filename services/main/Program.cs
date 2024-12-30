@@ -155,6 +155,8 @@ builder.Services.AddSingleton<CollectionService>();
 builder.Services.AddSingleton<CollectionContentService>();
 builder.Services.AddSingleton<ContentLikeService>();
 
+builder.Services.AddSingleton<ExploreSectionService>();
+
 // indexing content services
 builder.Services.AddSingleton<IndexContent>();
 builder.Services.AddSingleton<ProcessIndexContent>();
@@ -176,6 +178,7 @@ builder.Services.AddSingleton<CollectionContentTransformer>();
 builder.Services.AddSingleton<TagTransformer>();
 builder.Services.AddSingleton<ContentLikeTransformer>();
 builder.Services.AddSingleton<TagContentTransformer>();
+builder.Services.AddSingleton<ExploreSectionTransformer>();
 
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();

@@ -18,6 +18,7 @@ public class AppConstants
     public string ContentDownloadCollection { get; init; } = "content_downloads";
     public string CreatorApplicatonCollection { get; init; } = "creator_applications";
     public string CreatorCollection { get; init; } = "creators";
+    public string ExploreSectionCollection { get; init; } = "explore_sections";
     public string TagCollection { get; init; } = "tags";
     public string TagContentCollection { get; init; } = "tag_contents";
     public string WaitlistCollection { get; init; } = "waitlists";
