@@ -115,7 +115,7 @@ public class ExploreSectionService
             new CreateExploreSection
             {
                 Title = "Featured Images",
-                Endpoint = "/api/v1/collections/featured_contents",
+                Endpoint = "/v1/collections/featured_contents/slug/contents?page=0&pageSize=10&populate=content,content.createdBy",
                 Type = ExploreSectionType.CONTENT,
                 SeeMorePathname = "/explore/contents?type=image&featured=true",
                 Visibility = ExploreSectionVisibility.PUBLIC,
@@ -123,7 +123,7 @@ public class ExploreSectionService
             new CreateExploreSection
             {
                 Title = "Featured Collections",
-                Endpoint = "/api/v1/collections/featured_collections",
+                Endpoint = "/v1/collections/featured_collections/slug/contents?page=0&pageSize=10",
                 Type = ExploreSectionType.COLLECTION,
                 SeeMorePathname = "/explore/collections?featured=true",
                 Visibility = ExploreSectionVisibility.PUBLIC,
@@ -131,7 +131,7 @@ public class ExploreSectionService
             new CreateExploreSection
             {
                 Title = "Featured Tags",
-                Endpoint = "/api/v1/collections/featured_tags",
+                Endpoint = "/v1/collections/featured_tags/slug/contents?page=0&pageSize=10&populate=tag",
                 Type = ExploreSectionType.TAG,
                 SeeMorePathname = "/explore/tags?featured=true",
                 Visibility = ExploreSectionVisibility.PUBLIC,
@@ -139,7 +139,7 @@ public class ExploreSectionService
             new CreateExploreSection
             {
                 Title = "Featured Creators",
-                Endpoint = "/api/v1/collections/featured_creators",
+                Endpoint = "/v1/collections/featured_creators/slug/contents?page=0&pageSize=10&populate=creator",
                 Type = ExploreSectionType.CREATOR,
                 SeeMorePathname = "/explore/creators?featured=true",
                 Visibility = ExploreSectionVisibility.PUBLIC,
@@ -147,7 +147,7 @@ public class ExploreSectionService
             new CreateExploreSection
             {
                 Title = "Trending Collections",
-                Endpoint = "/api/v1/collections/trending_collections",
+                Endpoint = "/v1/collections/trending_collections/slug/contents?page=0&pageSize=10",
                 Type = ExploreSectionType.COLLECTION,
                 SeeMorePathname = "/explore/collections?trending=true",
                 Visibility = ExploreSectionVisibility.PUBLIC,
@@ -155,7 +155,7 @@ public class ExploreSectionService
             new CreateExploreSection
             {
                 Title = "Popular Tags",
-                Endpoint = "/api/v1/collections/popular_tags",
+                Endpoint = "/v1/collections/popular_tags/slug/contents?page=0&pageSize=10&populate=tag",
                 Type = ExploreSectionType.TAG,
                 SeeMorePathname = "/explore/tags?popular=true",
                 Visibility = ExploreSectionVisibility.PUBLIC,
@@ -163,7 +163,7 @@ public class ExploreSectionService
             new CreateExploreSection
             {
                 Title = "Your Followings",
-                Endpoint = "/api/v1/followings",
+                Endpoint = "/v1/followings",
                 Type = ExploreSectionType.CREATOR,
                 EnsureAuth = true,
                 SeeMorePathname = "/account/followings",

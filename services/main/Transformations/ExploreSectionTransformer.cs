@@ -41,6 +41,7 @@ public class ExploreSectionTransformer
         {
             Id = exploreSection.Id,
             Visibility = exploreSection.Visibility,
+            SeeMorePathname = exploreSection.SeeMorePathname,
             Endpoint = exploreSection.Endpoint,
             Sort = exploreSection.Sort,
             Title = exploreSection.Title,

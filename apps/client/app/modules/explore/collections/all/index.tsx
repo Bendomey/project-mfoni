@@ -14,7 +14,7 @@ export function CollectionsModule() {
 	const { data, isPending, isError } = useGetCollections({
 		pagination: { page: 0, per: 50 },
 		filters: { visibility: 'PUBLIC' },
-		populate: ['collection.createdBy'],
+		populate: ['collection.createdBy', 'content'],
 	})
 
 	let content = <></>

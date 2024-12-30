@@ -27,6 +27,8 @@ interface CollectionContent {
 	collection: Nullable<Collection>
 	contentId: Nullable<string>
 	content: Nullable<Content>
+	creatorId: Nullable<string>
+	creator: Nullable<EnhancedCreator>
 	tagId: Nullable<string>
 	tag: Nullable<Tag>
 	childCollectionId: Nullable<string>

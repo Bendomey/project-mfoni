@@ -12,6 +12,9 @@ public class OutputCollectionContent
     public OutputContent? Content { get; set; }
     public string? TagId { get; set; }
     public OutputTag? Tag { get; set; }
+
+    public string? CreatorId { get; set; }
+    public OutputCreatorEnhanced? Creator { get; set; }
     public string? ChildCollectionId { get; set; }
     public OutputCollection? ChildCollection { get; set; }
     public required DateTime CreatedAt { get; set; }
