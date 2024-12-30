@@ -149,6 +149,7 @@ function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
 					value={{
 						MFONI_GOOGLE_AUTH_CLIENT_ID: ENV.MFONI_GOOGLE_AUTH_CLIENT_ID,
 						FACEBOOK_APP_ID: ENV.FACEBOOK_APP_ID,
+						API_ADDRESS: ENV.API_ADDRESS,
 					}}
 				>
 					{children}

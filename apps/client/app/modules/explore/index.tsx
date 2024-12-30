@@ -1,8 +1,33 @@
+import { useLoaderData } from '@remix-run/react'
+import { useMemo, useRef } from 'react'
 import { ExploreSection } from './components/section/index.tsx'
+import { EmptyState } from '@/components/empty-state/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
+import { useAuth } from '@/providers/auth/index.tsx'
+import { type loader } from '@/routes/explore._index.ts'
 
 export const ExploreModule = () => {
+	const { isLoggedIn } = useAuth()
+	const { exploreSections } = useLoaderData<typeof loader>()
+	const containerRef = useRef<HTMLDivElement>(null)
+
+	const contents = useMemo(() => {
+		return exploreSections?.rows?.map((section) => {
+			if (section.ensureAuth && !isLoggedIn) return null
+
+			// TODO: bring this back after the backend is ready.
+			if (section.endpoint.includes('/followings')) return null
+
+			return (
+				<ExploreSection
+					key={section.id}
+					section={section as unknown as ExploreSection}
+				/>
+			)
+		})
+	}, [exploreSections?.rows, isLoggedIn])
+
 	return (
 		<div className="relative">
 			<Header isHeroSearchInVisible={false} />
@@ -17,55 +42,14 @@ export const ExploreModule = () => {
 					</div>
 				</div>
 
-				<div className="mt-10 space-y-10">
-					{/* for featured tags */}
-					<ExploreSection<Tag>
-						isLoading
-						type="TAG"
-						title="Featured Tags"
-						contents={[...new Array(30)]}
-					/>
+				{containerRef.current?.children?.length === 0 ? (
+					<div className="my-28 space-y-10">
+						<EmptyState title="No contents found" message="Come back later" />
+					</div>
+				) : null}
 
-					<ExploreSection<Collection>
-						isLoading
-						type="COLLECTION"
-						title="Featured Collections"
-						seeMoreLink="/collections"
-						contents={[]}
-					/>
-					<ExploreSection<EnhancedCreator>
-						isLoading
-						type="CREATOR"
-						title="Featured creators"
-						contents={[]}
-					/>
-					<ExploreSection<Content>
-						isLoading
-						type="CONTENT"
-						title="Featured Photos"
-						seeMoreLink="/collections/featured_contents"
-						contents={[]}
-					/>
-					<ExploreSection<Collection>
-						isLoading
-						type="COLLECTION"
-						title="Trending Collections"
-						seeMoreLink="/collections"
-						contents={[]}
-					/>
-					<ExploreSection<Tag>
-						isLoading
-						type="TAG"
-						title="Popular tags"
-						seeMoreLink="/tags"
-						contents={[...new Array(30)]}
-					/>
-					<ExploreSection<EnhancedCreator>
-						isLoading
-						type="CREATOR"
-						title="Your Followings"
-						contents={[]}
-					/>
+				<div ref={containerRef} className="mt-10 space-y-10">
+					{contents}
 				</div>
 			</div>
 			<Footer />

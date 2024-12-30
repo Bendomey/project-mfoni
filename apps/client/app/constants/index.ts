@@ -18,6 +18,7 @@ export const QUERY_KEYS = {
 	COLLECTIONS: 'collections',
 	CONTENT_LIKES: 'content-likes',
 	CREATORS: 'creators',
+	EXPLORE: 'explore',
 } as const
 
 export const MFONI_PACKAGES: Array<PackageType> = ['FREE', 'BASIC', 'ADVANCED']
@@ -67,10 +68,10 @@ export const PAGES = {
 		PACKAGE_AND_BILLINGS: '/account/package-and-billings',
 	},
 	PHOTO: '/photos/:slug',
-	TAGS: '/tags',
-	TAG: '/tags/:tag',
-	COLLECTIONS: '/collections',
-	COLLECTION: '/collections/:collection',
+	TAGS: '/explore/tags',
+	TAG: '/explore/tags/:tag',
+	COLLECTIONS: '/explore/collections',
+	COLLECTION: '/explore/collections/:collection',
 	SEARCH: {
 		CREATORS: '/search/creators/:query',
 		PHOTOS: '/search/photos/:query',

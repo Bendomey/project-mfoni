@@ -9,6 +9,7 @@ import { useLoaderData, useNavigate, useParams } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { AddImageContentsModal } from './components/add-image-contents-modal.tsx'
+import { EditCollectionTitleModal } from './components/edit-collection-modal/index.tsx'
 import { RemoveImageContentModal } from './components/remove-image-content-dialog.tsx'
 import { StatusButton } from './components/status-button.tsx'
 import { useGetCollectionContentsBySlug } from '@/api/collections/index.ts'
@@ -26,8 +27,7 @@ import { PAGES } from '@/constants/index.ts'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
-import { type loader } from '@/routes/collections.$collection.ts'
-import { EditCollectionTitleModal } from './components/edit-collection-modal/index.tsx'
+import { type loader } from '@/routes/explore.collections.$collection.ts'
 
 export function CollectionModule() {
 	const { collection } = useLoaderData<typeof loader>()

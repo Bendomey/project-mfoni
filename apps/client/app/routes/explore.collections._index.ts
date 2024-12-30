@@ -32,7 +32,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		filters: {
 			visibility: 'PUBLIC',
 		},
-		populate: ['collection.createdBy'],
+		populate: ['collection.createdBy', 'content'],
 	}
 	await queryClient.prefetchQuery({
 		queryKey: [QUERY_KEYS.COLLECTIONS, query],

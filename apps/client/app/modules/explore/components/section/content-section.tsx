@@ -1,11 +1,16 @@
 import { Link } from '@remix-run/react'
+import { Content } from '@/components/Content/index.tsx'
 
 interface Props {
 	data: Content
 }
 
-export function ContentSection({}: Props) {
-	return <>Content</>
+export function ContentSection({ data }: Props) {
+	return (
+		<div className="h-auto w-80">
+			<Content content={data} />
+		</div>
+	)
 }
 
 export function ContentShimmer() {

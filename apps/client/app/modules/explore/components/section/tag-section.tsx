@@ -14,9 +14,7 @@ export function TagSection({ data }: Props) {
 				<div className="flex items-center gap-2">
 					<TagIcon className="size-5 text-black" />
 					<div>
-						<h1 className="truncate capitalize">
-							Tag akjbcjas fjas fhas fhas fhas fhas fh ashfj asjhf asj kofi
-						</h1>
+						<h1 className="truncate capitalize">{data.name}</h1>
 						<p className="text-xs text-zinc-400">
 							created on {dayjs().format('L')}
 						</p>

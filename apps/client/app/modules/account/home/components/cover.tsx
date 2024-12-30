@@ -13,14 +13,9 @@ import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
 import { useValidateImage } from '@/hooks/use-validate-image.tsx'
 import { classNames } from '@/lib/classNames.ts'
 import { isBrowser } from '@/lib/is-browser.ts'
+import { getNameInitials } from '@/lib/misc.ts'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
-
-const getNameInitials = (name: string) =>
-	name
-		.split(' ')
-		.map((n) => n[0])
-		.join('')
 
 interface Props {
 	application: CreatorApplication

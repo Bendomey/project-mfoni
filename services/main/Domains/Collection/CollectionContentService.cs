@@ -181,28 +181,34 @@ public class CollectionContentService
         ).ToArray();
 
         pipeline = pipeline.Append(
-            new BsonDocument("$unwind", "$content")
+            new BsonDocument("$unwind",
+                new BsonDocument
+                {
+                    { "path", "$content" },
+                    { "preserveNullAndEmptyArrays", true }
+                }
+            )
         ).ToArray();
 
-        if (input.Visibility != null && input.Visibility != "ALL")
-        {
-            pipeline = pipeline.Append(
-                new BsonDocument("$match", new BsonDocument
-                {
-                    { "content.visibility", new BsonDocument("$eq", input.Visibility) },
-                })
-            ).ToArray();
-        }
+        // if (input.Visibility != null && input.Visibility != "ALL")
+        // {
+        //     pipeline = pipeline.Append(
+        //         new BsonDocument("$match", new BsonDocument
+        //         {
+        //             { "content.visibility", new BsonDocument("$eq", input.Visibility) },
+        //         })
+        //     ).ToArray();
+        // }
 
-        if (input.Orientation != null && input.Orientation != "ALL")
-        {
-            pipeline = pipeline.Append(
-                new BsonDocument("$match", new BsonDocument
-                {
-                    { "content.orientation", new BsonDocument("$eq", input.Orientation) },
-                })
-            ).ToArray();
-        }
+        // if (input.Orientation != null && input.Orientation != "ALL")
+        // {
+        //     pipeline = pipeline.Append(
+        //         new BsonDocument("$match", new BsonDocument
+        //         {
+        //             { "content.orientation", new BsonDocument("$eq", input.Orientation) },
+        //         })
+        //     ).ToArray();
+        // }
 
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$limit", queryFilter.Limit)).ToArray();
@@ -273,28 +279,34 @@ public class CollectionContentService
         ).ToArray();
 
         pipeline = pipeline.Append(
-            new BsonDocument("$unwind", "$content")
-        ).ToArray();
+           new BsonDocument("$unwind",
+               new BsonDocument
+               {
+                    { "path", "$content" },
+                    { "preserveNullAndEmptyArrays", true }
+               }
+           )
+       ).ToArray();
 
-        if (input.Visibility != null && input.Visibility != "ALL")
-        {
-            pipeline = pipeline.Append(
-                new BsonDocument("$match", new BsonDocument
-                {
-                    { "content.visibility", new BsonDocument("$eq", input.Visibility) },
-                })
-            ).ToArray();
-        }
+        // if (input.Visibility != null && input.Visibility != "ALL")
+        // {
+        //     pipeline = pipeline.Append(
+        //         new BsonDocument("$match", new BsonDocument
+        //         {
+        //             { "content.visibility", new BsonDocument("$eq", input.Visibility) },
+        //         })
+        //     ).ToArray();
+        // }
 
-        if (input.Orientation != null && input.Orientation != "ALL")
-        {
-            pipeline = pipeline.Append(
-                new BsonDocument("$match", new BsonDocument
-                {
-                    { "content.orientation", new BsonDocument("$eq", input.Orientation) },
-                })
-            ).ToArray();
-        }
+        // if (input.Orientation != null && input.Orientation != "ALL")
+        // {
+        //     pipeline = pipeline.Append(
+        //         new BsonDocument("$match", new BsonDocument
+        //         {
+        //             { "content.orientation", new BsonDocument("$eq", input.Orientation) },
+        //         })
+        //     ).ToArray();
+        // }
 
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$count", "totalCount")).ToArray();

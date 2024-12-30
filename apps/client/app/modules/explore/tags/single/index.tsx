@@ -13,7 +13,7 @@ import { Loader } from '@/components/loader/index.tsx'
 import { ShareButton } from '@/components/share-button/index.tsx'
 import { PAGES } from '@/constants/index.ts'
 import { safeString } from '@/lib/strings.ts'
-import { type loader } from '@/routes/tags.$tag.ts'
+import { type loader } from '@/routes/explore.tags.$tag.ts'
 
 export function TagModule() {
 	const navigate = useNavigate()
