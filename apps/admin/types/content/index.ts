@@ -2,13 +2,13 @@ interface Content {
   id: string
   title: string
   slug: string
-  type: "IMAGE" 
+  type: "IMAGE"
   status: string
-	rejectedAt: NullableDate
-	doneAt: NullableDate
+  rejectedAt: NullableDate
+  doneAt: NullableDate
   meta: ContentMeta
   tags: Tag[]
-	createdById: string
+  createdById: string
   amount: number
   createdAt: Date
   updatedAt: NullableDate
@@ -21,7 +21,7 @@ interface FetchContentFilter {
 }
 
 interface ContentMeta {
-	views: number
-	downloads: number
-	likes: number
+  views: number
+  downloads: number
+  likes: number
 }

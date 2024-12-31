@@ -18,6 +18,7 @@ import { useGetContents } from "@/api";
 import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
 import { DataTableColumnHeader } from "@/components/table/components";
+import { createDataTableError } from "@/lib/utils";
 
 const CONTENTS_PER_PAGE = 50;
 
@@ -66,6 +67,8 @@ export const ListContents = () => {
     populate: [],
     filters: {},
   });
+
+  const dataTableError = createDataTableError(error, "Can't fetch contents");
 
   const columns = useMemo((): ColumnDef<Content>[] => {
     return [
@@ -163,7 +166,7 @@ export const ListContents = () => {
           columns={columns}
           data={data?.rows ?? []}
           isDataLoading={isDataLoading}
-          error={error ? new Error("Can't fetch contents") : undefined}
+          error={dataTableError}
           refetch={refetch}
           filterFields={filterFields}
           dataMeta={{
