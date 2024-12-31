@@ -7,6 +7,7 @@ interface Content {
 	rejectedAt: NullableDate
 	doneAt: NullableDate
   meta: ContentMeta
+  tags: Tag[]
 	createdById: string
   amount: number
   createdAt: Date
