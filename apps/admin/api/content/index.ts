@@ -22,7 +22,7 @@ const getContents = async (
     const params = new URLSearchParams(removeAllNullableValues)
 
     const response: APIResponse<Content> = await fetchClient(
-      `/v1/contents?${params.toString()}`,
+      `/v1/contents/search/textual?${params.toString()}`,
     )
 
     return response.parsedBody.data
