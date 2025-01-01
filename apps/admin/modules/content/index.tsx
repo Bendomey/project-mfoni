@@ -19,6 +19,7 @@ import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
 import { DataTableColumnHeader } from "@/components/table/components";
 import { createDataTableError } from "@/lib/utils";
+import { FeatureContentModal } from "./feature";
 
 const CONTENTS_PER_PAGE = 50;
 
@@ -180,6 +181,12 @@ export const ListContents = () => {
         </DataTable>
       </div>
      
+      <FeatureContentModal
+        opened={openFeaturedModal}
+        setOpened={setOpenFeaturedModal}
+        data={selectedContent}
+        refetch={refetch}
+      />
     </>
   );
 };
