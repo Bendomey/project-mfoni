@@ -58,7 +58,7 @@ export const useGetContents = (
 
 const featureContent = async (id: string) => {
   try {
-    await fetchClient<CreatorApplication>(`/v1/contents/${id}/feature`, {
+    await fetchClient<Content>(`/v1/contents/${id}/feature`, {
       method: 'PATCH',
     })
   } catch (error) {
