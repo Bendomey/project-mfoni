@@ -10,7 +10,7 @@ import {
   DialogOverlay,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { useApproveCreatorApplication } from "@/api";
+import { useApproveCreatorApplication, useFeatureContent } from "@/api";
 import { Loader2Icon } from "lucide-react";
 
 interface FeatureContentModalProps {
@@ -27,7 +27,7 @@ export const FeatureContentModal = ({
   setOpened,
 }: FeatureContentModalProps) => {
   const { toast } = useToast();
-  const { mutate, isPending: isLoading } = useApproveCreatorApplication();
+  const { mutate, isPending: isLoading } = useFeatureContent();
 
   const handleSubmit = () => {
     if (!data) {
@@ -71,12 +71,12 @@ export const FeatureContentModal = ({
           </DialogTitle>
           <DialogDescription className="text-gray-600 dark:text-gray-400">
             Are you sure you want to mark{" "}
-            {data?.title ? title : "this"} as featured?
+            {data?.title ? title : "this"} content as featured?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button disabled={isLoading} type="button" onClick={() => handleSubmit()}>
-          { isLoading ? <Loader2Icon className="animate-spin" /> : null} Yes, set as featured
+          <Button className="bg-emerald-600 hover:bg-emerald-400" disabled={isLoading} type="button" onClick={() => handleSubmit()}>
+          { isLoading ? <Loader2Icon className="animate-spin" /> : null} Yes, mark as featured
           </Button>
         </DialogFooter>
       </DialogContent>
