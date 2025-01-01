@@ -187,7 +187,7 @@ export const PhotoModule = () => {
 						<div className="flex flex-row">
 							<h1 className="font-bold">{content.title}</h1> 
 							<PencilIcon className="ml-4 h-6 w-4 text-black-700" onClick={editTitleModalState.onToggle}/>
-								<EditTitleModal isOpened={editTitleModalState.isOpened} toggleModal={editTitleModalState.onToggle} title={content.title}/>
+								<EditTitleModal isOpened={editTitleModalState.isOpened} toggleModal={editTitleModalState.onToggle} title={content.title} contentId={content.id} amount={content.amount}/>
 						</div>
 						
 						<div className="flex">

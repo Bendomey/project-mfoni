@@ -1,15 +1,52 @@
 import { Button } from '@/components/button/index.tsx'
 import { Modal } from '@/components/modal/index.tsx'
 import { useState } from 'react'
+import { useEditContentTitle } from '@/api/photos/index.ts'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
+import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS } from '@/constants/index.ts'
 
 interface Props {
 	isOpened: boolean,
 	toggleModal: () => void,
-	title: string
+	title: string,
+	contentId: string,
+	amount: number
 }
 
-export function EditTitleModal( {isOpened, toggleModal, title}: Props) {
-	const [editTitle, setEditTitle] = useState(title)
+interface Inputs {
+	title: string,
+	visibility: string,
+	amount: number
+}
+
+export function EditTitleModal( {isOpened, toggleModal, title, contentId}: Props) {
+	const [editTitle, setEditTitle] = useState(title);
+	const { mutate } = useEditContentTitle();
+	const queryClient = useQueryClient()
+	const {handleSubmit} = useForm<Inputs>()
+	
+
+	const onSubmit: SubmitHandler<Inputs> = (data) => 
+		mutate(
+			{
+				props: {title: data.title,
+					visibility: 'PUBLIC',
+					amount: data.amount},
+				contentId: contentId
+			},
+			{
+				onError: () =>{
+					errorToast('Title could not edit. Try again')
+				},
+			onSuccess: () =>{
+				queryClient.invalidateQueries({
+					queryKey: [QUERY_KEYS.CONTENTS]
+				})
+				successToast('Title edited successfully')				
+			}}
+		)
 	
 	const handleInputChange = (e: any) =>{
 		setEditTitle(e.target.value);
@@ -45,6 +82,7 @@ export function EditTitleModal( {isOpened, toggleModal, title}: Props) {
 							<Button
 								className="mt-5"
 								color="primary"
+								onClick={handleSubmit(onSubmit)}
 							>
 								Edit
 							</Button>

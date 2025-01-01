@@ -27,7 +27,7 @@ export function CreateCollectionModal({ isOpened, onToggle }: Props) {
 	} = useForm<Inputs>()
 	const queryClient = useQueryClient()
 	const { currentUser } = useAuth()
-	const { mutate, isPending } = useCreateCollection()
+	const { mutate, isPending, } = useCreateCollection()
 	const onSubmit: SubmitHandler<Inputs> = (data) =>
 		mutate(
 			{
