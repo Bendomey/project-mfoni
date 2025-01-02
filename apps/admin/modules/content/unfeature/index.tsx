@@ -50,7 +50,7 @@ export const UnfeatureContentModal = ({
           }, onSuccess: () => {
           refetch()
           toast({
-            title: "Content marked as featured",
+            title: "Content unfeatured successfully",
             variant: "success",
           });
           setOpened(false);
