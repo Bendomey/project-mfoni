@@ -3,6 +3,12 @@ interface Tag {
 	slug: string
 	name: string
 	description: NullableString
+	createdByAdmin: Admin
+	createdByUser: User
 	createdAt: Date
-	updatedAt: Date
+	updatedAt: NullableDate
 }
+
+interface FetchTagFilter {
+}
+  

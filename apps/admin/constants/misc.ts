@@ -11,4 +11,5 @@ export const QUERY_KEYS = {
   WALLET_TRANSACTIONS: 'wallet-transactions',
   WALLET: 'wallet',
   CONTENTS: 'contents',
+  TAGS: 'tags',
 } as const
