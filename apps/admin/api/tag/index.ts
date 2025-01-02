@@ -21,7 +21,7 @@ const getTags = async (
     const removeAllNullableValues = getQueryParams<FetchTagFilter>(props)
     const params = new URLSearchParams(removeAllNullableValues)
 
-    const response: APIResponse<Content> = await fetchClient(
+    const response: APIResponse<Tag> = await fetchClient(
       `/v1/tags?${params.toString()}`,
     )
 

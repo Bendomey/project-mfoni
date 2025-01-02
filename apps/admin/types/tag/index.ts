@@ -7,7 +7,6 @@ interface Tag {
 	createdByUser: User
 	createdAt: Date
 	updatedAt: NullableDate
-
 }
 
 interface FetchTagFilter {
