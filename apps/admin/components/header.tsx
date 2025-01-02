@@ -42,6 +42,10 @@ const links = [
         href: "/contents"
     },
     {
+        name: "Tags",
+        href: "/tags"
+    },
+    {
         name: "Settings",
         href: "/settings"
     }
