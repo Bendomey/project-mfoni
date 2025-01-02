@@ -434,7 +434,7 @@ public class CollectionContentService
         return true;
     }
 
-        public async Task<CollectionContent> FeatureCollection(string collectionId)
+    public async Task<CollectionContent> FeatureCollection(string collectionId)
     {
         var collection = _collectionService.GetCollection(collectionId);
 
