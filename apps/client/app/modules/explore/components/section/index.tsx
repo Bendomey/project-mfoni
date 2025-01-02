@@ -12,8 +12,6 @@ interface Props {
 	section: ExploreSection
 }
 
-
-
 const loadingSections = {
 	TAG: TagShimmer,
 	CONTENT: ContentShimmer,
@@ -45,7 +43,6 @@ export function ExploreSection({ section }: Props) {
 
 	if (data?.total) {
 		content = data?.rows.map((content, index) => {
-
 			switch (section.type) {
 				case 'TAG':
 					const tag = (content as CollectionContent).tag

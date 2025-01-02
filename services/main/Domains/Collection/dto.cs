@@ -45,6 +45,7 @@ public class RemoveContentsFromCollectionInput
     public required string Id { get; set; }
     public string? UserId { get; set; }
     public required string[] ContentIds { get; set; }
+    public required string Type { get; set; }
 }
 
 public class GetCollectionContentsInput

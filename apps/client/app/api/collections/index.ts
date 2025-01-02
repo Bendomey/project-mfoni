@@ -358,6 +358,7 @@ export const useAddContentsToCollection = () =>
 interface RemoveContentsToCollection {
 	collectionId: string
 	contentIds: Array<string>
+	type: string
 }
 
 export const removeContentsToCollection = async (

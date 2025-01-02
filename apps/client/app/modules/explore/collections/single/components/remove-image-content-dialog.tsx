@@ -28,6 +28,7 @@ export function RemoveImageContentModal({
 			{
 				collectionId: collectionContent?.collectionId,
 				contentIds: [safeString(collectionContent?.contentId)],
+				type: 'CONTENT',
 			},
 			{
 				onSuccess: () => {

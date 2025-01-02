@@ -393,7 +393,19 @@ public class CollectionContentService
         {
             // if collectionContent is available
             var collectionContentFilter = Builders<CollectionContent>.Filter.Eq(r => r.CollectionId, input.Id);
-            collectionContentFilter &= Builders<CollectionContent>.Filter.Eq(r => r.ContentId, contentId);
+
+            if (input.Type == "TAG")
+            {
+                collectionContentFilter &= Builders<CollectionContent>.Filter.Eq(r => r.TagId, contentId);
+            }
+            else if (input.Type == "COLLECTION")
+            {
+                collectionContentFilter &= Builders<CollectionContent>.Filter.Eq(r => r.ChildCollectionId, contentId);
+            }
+            else if (input.Type == "CONTENT")
+            {
+                collectionContentFilter &= Builders<CollectionContent>.Filter.Eq(r => r.ContentId, contentId);
+            }
 
             var oldCollectionContent = _collectionContentCollection.Find(collectionContentFilter).FirstOrDefault();
 

@@ -87,6 +87,9 @@ public class Content
     [BsonElement("large_media")]
     public S3MetaData? LargeMedia { get; set; }
 
+    [BsonElement("is_featured")]
+    public bool IsFeatured { get; set; } = false;
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
