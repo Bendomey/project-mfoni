@@ -24,6 +24,8 @@ public class CollectionService
         _logger = logger;
         _collectionCollection = databaseConfig.Database.GetCollection<Models.Collection>(appConstants.Value.CollectionCollection);
         _cacheProvider = cacheProvider;
+
+
         _appConstantsConfiguration = appConstants.Value;
 
         logger.LogDebug("Collection service initialized");

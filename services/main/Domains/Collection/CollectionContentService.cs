@@ -434,4 +434,70 @@ public class CollectionContentService
         return true;
     }
 
+    public async Task<CollectionContent> FeatureCollection(string collectionId)
+    {
+        var collection = _collectionService.GetCollection(collectionId);
+
+        if (collection.IsFeatured)
+        {
+            throw new HttpRequestException("CollectionAlreadyFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_collections");
+
+        var newCollectionContent = SaveCollectionContent(new SaveCollectionContent
+        {
+            CollectionId = featuredCollection.Id,
+            Type = "COLLECTION",
+            ChildCollectionId = collection.Id,
+        });
+
+        var update = Builders<Models.Collection>.Update
+            .Set("is_featured", true)
+            .Set("updated_at", DateTime.UtcNow);
+        await _collectionCollection.UpdateOneAsync(collection => collection.Id == collectionId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["collections"]}.find*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Slug}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Id}*",
+        });
+
+        return newCollectionContent;
+    }
+
+    public async Task<bool> UnFeatureCollection(string collectionId)
+    {
+        var collection = _collectionService.GetCollection(collectionId);
+
+        if (!collection.IsFeatured)
+        {
+            throw new HttpRequestException("CollectionNotFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_collections");
+
+        RemoveContentsFromCollection(new RemoveContentsFromCollectionInput
+        {
+            ContentIds = [collectionId],
+            Id = featuredCollection.Id,
+            Type = "COLLECTION",
+        });
+
+        var update = Builders<Models.Collection>.Update
+            .Set("is_featured", false)
+            .Set("updated_at", DateTime.UtcNow);
+        await _collectionCollection.UpdateOneAsync(tag => tag.Id == collectionId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["collections"]}.find*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Slug}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Id}*",
+        });
+
+        return true;
+    }
+
+
+
 }

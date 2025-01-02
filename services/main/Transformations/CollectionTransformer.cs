@@ -75,6 +75,7 @@ public class CollectionTransformer
         return new OutputCollection
         {
             Id = collection.Id,
+            IsFeatured = collection.IsFeatured,
             Name = collection.Name,
             Slug = collection.Slug,
             Visibility = collection.Visibility,

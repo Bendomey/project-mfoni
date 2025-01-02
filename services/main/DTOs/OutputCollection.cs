@@ -12,6 +12,7 @@ public class OutputCollection
     public string? Description { get; set; }
     public string CreatedByRole { get; set; } = CollectionCreatedByRole.SYSTEM;
     public string? CreatedById { get; set; }
+    public required bool IsFeatured { get; set; }
     public OutputBasicUser? CreatedBy { get; set; }
     public List<OutputCollectionContent>? ContentItems { get; set; } = null;
     public required DateTime CreatedAt { get; set; }
