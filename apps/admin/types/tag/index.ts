@@ -3,6 +3,7 @@ interface Tag {
 	slug: string
 	name: string
 	description: NullableString
+	isFeatured: boolean
 	createdByAdmin: Admin
 	createdByUser: User
 	createdAt: Date

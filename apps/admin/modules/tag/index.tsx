@@ -20,6 +20,7 @@ import { useSearchParams } from "next/navigation";
 import { localizedDayjs } from "@/lib/date";
 import { DataTableColumnHeader } from "@/components/table/components";
 import { createDataTableError } from "@/lib/utils";
+import { FeatureTagModal } from "./feature";
 
 const TAGS_PER_PAGE = 50;
 
@@ -74,7 +75,7 @@ export const ListTags = () => {
         accessorKey: "name",
         header: ({ column }) => <DataTableColumnHeader column={column} title={"Name"} />,
         cell: ({ row }) => (<div className="capitalize flex flex-row justify-start align-middle">
-        <StarIcon className="mr-2 h-4 w-4" color="gold"/> {row.original.name}
+        {row.original.isFeatured ? <StarIcon className="mr-2 h-4 w-4" color="gold"/> : <span className="mr-2 h-4 w-4"/> } {row.original.name}
         </div>),
       },
       {
@@ -115,15 +116,8 @@ export const ListTags = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => {
-                    setSelectedTag(row.original);
-                    setOpenFeaturedModal(true)
-                  }}
-                >
-                  <StarIcon className="mr-2 h-4 w-4" />
-                  Feature
-                </DropdownMenuItem>
+                {row.original.isFeatured ?
+                (
                 <DropdownMenuItem
                   onClick={() => {
                     setSelectedTag(row.original);
@@ -132,7 +126,15 @@ export const ListTags = () => {
                 >
                   <StarOffIcon className="mr-2 h-4 w-4" />
                   UnFeature
-                </DropdownMenuItem>
+                </DropdownMenuItem>):(<DropdownMenuItem
+                  onClick={() => {
+                    setSelectedTag(row.original);
+                    setOpenFeaturedModal(true)
+                  }}
+                >
+                  <StarIcon className="mr-2 h-4 w-4" />
+                  Feature
+                </DropdownMenuItem>)}
               </DropdownMenuContent>
             </DropdownMenu>
           );
@@ -170,6 +172,12 @@ export const ListTags = () => {
         </DataTable>
       </div>
      
+      <FeatureTagModal
+        opened={openFeaturedModal}
+        setOpened={setOpenFeaturedModal}
+        data={selectedTag}
+        refetch={refetch}
+      />
     </>
   );
 };

@@ -46,3 +46,32 @@ export const useGetTags = (
     queryKey: [QUERY_KEYS.TAGS,JSON.stringify(query)],
     queryFn: () => getTags(query),
   })
+
+
+/**
+ * Feature tag
+ *
+ * @throws {Error} - Throws an error if there's a problem with the API response.
+ *
+ *  @returns {Promise<object>} - The tag data.
+ */
+
+const featureTag = async (id: string) => {
+  try {
+    await fetchClient<Tag>(`/v1/tags/${id}/feature`, {
+      method: 'PATCH',
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+
+    // Error from server.
+    if (error instanceof Response) {
+      const response = await error.json()
+      throw new Error(response.message)
+    }
+  }
+}
+
+export const useFeatureTag = () => useMutation({mutationFn: featureTag})
