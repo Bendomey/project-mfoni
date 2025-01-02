@@ -512,12 +512,12 @@ public class TagsController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogError($"Failed to get tag. Exception: {e}");
+            this._logger.LogError($"Failed to feature tag. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
             {
                 scope.SetTags(new Dictionary<string, string>
                 {
-                    {"action", "Get Tag by id"},
+                    {"action", "Feature Tag"},
                     {"id", id}
                });
                 SentrySdk.CaptureException(e);
@@ -563,12 +563,12 @@ public class TagsController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogError($"Failed to get tag. Exception: {e}");
+            this._logger.LogError($"Failed to unfeature tag. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
             {
                 scope.SetTags(new Dictionary<string, string>
                 {
-                    {"action", "Get Tag by id"},
+                    {"action", "Unfeature tag"},
                     {"id", id}
                });
                 SentrySdk.CaptureException(e);
