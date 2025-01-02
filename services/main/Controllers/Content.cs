@@ -17,6 +17,7 @@ public class ContentController : ControllerBase
 {
     private readonly ILogger<ContentController> _logger;
     private readonly EditContentService _editContentService;
+    private readonly CollectionContentService _collectionContentService;
     private readonly ContentLikeService _contentLikeService;
     private readonly IndexContent _indexContentService;
     private readonly SearchContentService _searchContentService;
@@ -32,7 +33,8 @@ public class ContentController : ControllerBase
         EditContentService editContentService,
         ContentTransformer contentTransformer,
         ContentLikeTransformer contentLikeTransformer,
-        SearchTagService searchTagsService
+        SearchTagService searchTagsService,
+        CollectionContentService collectionContentService
     )
     {
         _logger = logger;
@@ -43,6 +45,7 @@ public class ContentController : ControllerBase
         _contentTransformer = contentTransformer;
         _contentLikeTransformer = contentLikeTransformer;
         _searchTagsService = searchTagsService;
+        _collectionContentService = collectionContentService;
     }
 
     /// <summary>
@@ -833,6 +836,108 @@ public class ContentController : ControllerBase
               SentrySdk.CaptureException(e);
           });
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// Feature content.
+    /// </summary>
+    /// <param name="id">id of content</param>
+    /// <response code="200">content Featured Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize(Policy = "Admin")]
+    [HttpPatch("{id}/feature")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<Models.CollectionContent>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> FeatureContent(string id)
+    {
+        try
+        {
+            _logger.LogInformation("Featuring content: " + id);
+            var collectionContent = await _collectionContentService.FeatureCollection(id);
+
+            return new ObjectResult(new GetEntityResponse<Models.CollectionContent>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to feature content. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Feature content"},
+                    {"id", id}
+               });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
+    /// <summary>
+    /// Feature content.
+    /// </summary>
+    /// <param name="id">id of content</param>
+    /// <response code="200">content UnFeatured Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize(Policy = "Admin")]
+    [HttpPatch("{id}/unfeature")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<bool>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> UnFeatureContent(string id)
+    {
+        try
+        {
+            _logger.LogInformation("UnFeaturing content: " + id);
+            var collectionContent = await _collectionContentService.UnFeatureCollection(id);
+
+            return new ObjectResult(new GetEntityResponse<bool>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to unfeature collection. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Unfeature collection"},
+                    {"id", id}
+               });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
         }
     }
 

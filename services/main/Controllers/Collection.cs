@@ -1054,7 +1054,7 @@ public class CollectionsController : ControllerBase
         StatusCodes.Status500InternalServerError,
         Type = typeof(StatusCodeResult)
     )]
-    public async Task<IActionResult> FeatureTag(string id)
+    public async Task<IActionResult> FeatureContent(string id)
     {
         try
         {
