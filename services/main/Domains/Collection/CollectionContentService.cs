@@ -10,7 +10,9 @@ namespace main.Domains;
 
 public class CollectionContentService
 {
+    private readonly SearchContentService _searchContentService;
     private readonly CollectionService _collectionService;
+    private readonly SearchTagService _searchTagService;
     private readonly ILogger<CollectionContentService> _logger;
     private readonly IMongoCollection<Models.CollectionContent> _collectionContentCollection;
     private readonly IMongoCollection<Models.Collection> _collectionCollection;
@@ -24,7 +26,9 @@ public class CollectionContentService
         DatabaseSettings databaseConfig,
         IOptions<AppConstants> appConstants,
         CacheProvider cacheProvider,
-        CollectionService collectionService
+        CollectionService collectionService,
+        SearchTagService searchTagService,
+        SearchContentService searchContentService
     )
     {
         _logger = logger;
@@ -35,6 +39,8 @@ public class CollectionContentService
         _cacheProvider = cacheProvider;
         _appConstantsConfiguration = appConstants.Value;
         _collectionService = collectionService;
+        _searchTagService = searchTagService;
+        _searchContentService = searchContentService;
 
         logger.LogDebug("Collection Content service initialized");
     }
@@ -499,5 +505,140 @@ public class CollectionContentService
     }
 
 
+    public async Task<CollectionContent> FeatureTag(string tagId)
+    {
+        var tag = await _searchTagService.Get(tagId);
+        if (tag is null)
+        {
+            throw new HttpRequestException("TagNotFound");
+        }
+
+        if (tag.IsFeatured)
+        {
+            throw new HttpRequestException("TagAlreadyFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_tags");
+
+        var newCollectionContent = SaveCollectionContent(new SaveCollectionContent
+        {
+            CollectionId = featuredCollection.Id,
+            Type = "TAG",
+            TagId = tag.Id,
+        });
+
+        var update = Builders<Models.Tag>.Update
+            .Set("is_featured", true)
+            .Set("updated_at", DateTime.UtcNow);
+        await _tagCollection.UpdateOneAsync(tag => tag.Id == tagId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["tags"]}.find*",
+            $"{CacheProvider.CacheEntities["tags"]}*{tag.Slug}*",
+            $"{CacheProvider.CacheEntities["tags"]}*{tag.Id}*",
+        });
+
+        return newCollectionContent;
+    }
+
+    public async Task<bool> UnFeatureTag(string tagId)
+    {
+        var tag = await _searchTagService.Get(tagId);
+        if (tag is null)
+        {
+            throw new HttpRequestException("TagNotFound");
+        }
+
+        if (!tag.IsFeatured)
+        {
+            throw new HttpRequestException("TagNotFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_tags");
+
+        RemoveContentsFromCollection(new RemoveContentsFromCollectionInput
+        {
+            ContentIds = [tagId],
+            Id = featuredCollection.Id,
+            Type = "TAG",
+        });
+
+        var update = Builders<Models.Tag>.Update
+            .Set("is_featured", false)
+            .Set("updated_at", DateTime.UtcNow);
+        await _tagCollection.UpdateOneAsync(tag => tag.Id == tagId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["tags"]}.find*",
+            $"{CacheProvider.CacheEntities["tags"]}*{tag.Slug}*",
+            $"{CacheProvider.CacheEntities["tags"]}*{tag.Id}*",
+        });
+
+        return true;
+    }
+
+    public async Task<CollectionContent> FeatureContent(string contentId)
+    {
+        var content = await _searchContentService.GetContentById(contentId);
+
+        if (content.IsFeatured)
+        {
+            throw new HttpRequestException("ContentAlreadyFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_contents");
+
+        var newCollectionContent = SaveCollectionContent(new SaveCollectionContent
+        {
+            CollectionId = featuredCollection.Id,
+            Type = "CONTENT",
+            ContentId = content.Id,
+        });
+
+        var update = Builders<Models.Content>.Update
+            .Set("is_featured", true)
+            .Set("updated_at", DateTime.UtcNow);
+        await _contentCollection.UpdateOneAsync(content => content.Id == contentId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["contents"]}.find*",
+            $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+            $"{CacheProvider.CacheEntities["contents"]}*{content.Id}*",
+        });
+
+        return newCollectionContent;
+    }
+
+    public async Task<bool> UnFeatureContent(string contentId)
+    {
+        var content = await _searchContentService.GetContentById(contentId);
+
+        if (!content.IsFeatured)
+        {
+            throw new HttpRequestException("ContentNotFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_contents");
+
+        RemoveContentsFromCollection(new RemoveContentsFromCollectionInput
+        {
+            ContentIds = [contentId],
+            Id = featuredCollection.Id,
+            Type = "CONTENT",
+        });
+
+        var update = Builders<Models.Content>.Update
+            .Set("is_featured", false)
+            .Set("updated_at", DateTime.UtcNow);
+        await _contentCollection.UpdateOneAsync(content => content.Id == contentId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["contents"]}.find*",
+            $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+            $"{CacheProvider.CacheEntities["contents"]}*{content.Id}*",
+        });
+
+        return true;
+    }
 
 }

@@ -5,6 +5,7 @@ namespace main.DTOs;
 public class OutputContent
 {
     public string Id { get; set; } = null!;
+    public required bool IsFeatured { get; set; }
     public required string Title { get; set; }
     public required string Slug { get; set; }
     public string Type { get; set; } = "IMAGE";

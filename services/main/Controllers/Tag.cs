@@ -17,6 +17,7 @@ namespace main.Controllers;
 public class TagsController : ControllerBase
 {
     private readonly ILogger<TagsController> _logger;
+    private readonly CollectionContentService _collectionContentsService;
     private readonly SaveTagsService _saveTagsService;
     private readonly SearchTagService _searchTagsService;
     private readonly TagTransformer _tagTransformer;
@@ -25,7 +26,8 @@ public class TagsController : ControllerBase
 
     public TagsController(ILogger<TagsController> logger, SaveTagsService saveTagsService, SearchTagService searchTagService, TagTransformer tagTransformer,
         ContentTransformer contentTransformer,
-        TagContentTransformer tagContentTransformer
+        TagContentTransformer tagContentTransformer,
+        CollectionContentService collectionContentsService
     )
     {
         _logger = logger;
@@ -34,6 +36,7 @@ public class TagsController : ControllerBase
         _tagTransformer = tagTransformer;
         _contentTransformer = contentTransformer;
         _tagContentTransformer = tagContentTransformer;
+        _collectionContentsService = collectionContentsService;
     }
 
     /// <summary>
@@ -496,7 +499,7 @@ public class TagsController : ControllerBase
         try
         {
             _logger.LogInformation("Featuring tag: " + id);
-            var collectionContent = await _saveTagsService.FeatureTag(id);
+            var collectionContent = await _collectionContentsService.FeatureTag(id);
 
             return new ObjectResult(new GetEntityResponse<CollectionContent>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
@@ -547,7 +550,7 @@ public class TagsController : ControllerBase
         try
         {
             _logger.LogInformation("UnFeaturing tag: " + id);
-            var collectionContent = await _saveTagsService.UnFeatureTag(id);
+            var collectionContent = await _collectionContentsService.UnFeatureTag(id);
 
             return new ObjectResult(new GetEntityResponse<bool>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
