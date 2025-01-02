@@ -103,4 +103,4 @@ const unfeatureContent = async (id: string) => {
   }
 }
 
-export const useUnFeatureContent = () => useMutation({mutationFn: unfeatureContent})
+export const useUnfeatureContent = () => useMutation({mutationFn: unfeatureContent})

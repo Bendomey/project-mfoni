@@ -10,24 +10,24 @@ import {
   DialogOverlay,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { useFeatureContent } from "@/api";
+import { useUnfeatureContent } from "@/api";
 import { Loader2Icon } from "lucide-react";
 
-interface FeatureContentModalProps {
+interface UnfeatureContentModalProps {
   data?: Content;
   refetch: VoidFunction;
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;
 }
 
-export const FeatureContentModal = ({
+export const UnfeatureContentModal = ({
   data,
   refetch,
   opened,
   setOpened,
-}: FeatureContentModalProps) => {
+}: UnfeatureContentModalProps) => {
   const { toast } = useToast();
-  const { mutate, isPending: isLoading } = useFeatureContent();
+  const { mutate, isPending: isLoading } = useUnfeatureContent();
 
   const handleSubmit = () => {
     if (!data) {
@@ -67,16 +67,16 @@ export const FeatureContentModal = ({
       <DialogContent className="sm:max-w-[425px] bg-white dark:bg-black top-32">
         <DialogHeader>
           <DialogTitle className="leading-normal">
-          Feature {data?.title ? title : "this"} content
+          Stop featuring {data?.title ? title : "this"} content
           </DialogTitle>
           <DialogDescription className="text-gray-600 dark:text-gray-400">
-            Are you sure you want to mark{" "}
-            {data?.title ? title : "this"} content as featured?
+            Are you sure you want to stop featuring{" "}
+            {data?.title ? title : "this"} content?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button className="bg-emerald-600 hover:bg-emerald-400" disabled={isLoading} type="button" onClick={() => handleSubmit()}>
-          { isLoading ? <Loader2Icon className="animate-spin" /> : null} Yes, mark as featured
+          { isLoading ? <Loader2Icon className="animate-spin" /> : null} Yes, stop featuring
           </Button>
         </DialogFooter>
       </DialogContent>

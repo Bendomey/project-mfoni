@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { DataTable } from "@/components/table";
 import {
   StarIcon,
+  StarOffIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +21,7 @@ import { localizedDayjs } from "@/lib/date";
 import { DataTableColumnHeader } from "@/components/table/components";
 import { createDataTableError } from "@/lib/utils";
 import { FeatureContentModal } from "./feature";
+import { UnfeatureContentModal } from "./unfeature";
 
 const CONTENTS_PER_PAGE = 50;
 
@@ -34,6 +36,7 @@ const filterFields: DataTableFilterField<Content>[] = [
 
 export const ListContents = () => {
   const [openFeaturedModal, setOpenFeaturedModal] = useState(false);
+  const [openUnFeaturedModal, setOpenUnFeaturedModal] = useState(false);
   const [selectedContent, setSelectedContent] = useState<Content>();
   const searchParams = useSearchParams();
 
@@ -144,6 +147,15 @@ export const ListContents = () => {
                   <StarIcon className="mr-2 h-4 w-4" />
                   Feature
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedContent(row.original);
+                    setOpenUnFeaturedModal(true)
+                  }}
+                >
+                  <StarOffIcon className="mr-2 h-4 w-4" />
+                  UnFeature
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           );
@@ -184,6 +196,13 @@ export const ListContents = () => {
       <FeatureContentModal
         opened={openFeaturedModal}
         setOpened={setOpenFeaturedModal}
+        data={selectedContent}
+        refetch={refetch}
+      />
+
+      <UnfeatureContentModal
+        opened={openUnFeaturedModal}
+        setOpened={setOpenUnFeaturedModal}
         data={selectedContent}
         refetch={refetch}
       />
