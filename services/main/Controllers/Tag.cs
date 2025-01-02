@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Microsoft.OpenApi.Any;
 using main.Lib;
 using main.Transformations;
+using main.Models;
 
 namespace main.Controllers;
 
@@ -470,6 +471,108 @@ public class TagsController : ControllerBase
                 });
                  SentrySdk.CaptureException(e);
              });
+            return new StatusCodeResult(500);
+        }
+    }
+
+    /// <summary>
+    /// Feature tag.
+    /// </summary>
+    /// <param name="id">id of tag</param>
+    /// <response code="200">Tag Featured Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize(Policy = "Admin")]
+    [HttpPatch("{id}/feature")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<Models.CollectionContent>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> FeatureTag(string id)
+    {
+        try
+        {
+            _logger.LogInformation("Featuring tag: " + id);
+            var collectionContent = await _saveTagsService.FeatureTag(id);
+
+            return new ObjectResult(new GetEntityResponse<CollectionContent>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<Models.Tag>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get tag. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Get Tag by id"},
+                    {"id", id}
+               });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
+    /// <summary>
+    /// Feature tag.
+    /// </summary>
+    /// <param name="id">id of tag</param>
+    /// <response code="200">Tag UnFeatured Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize(Policy = "Admin")]
+    [HttpPatch("{id}/unfeature")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<bool>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> UnFeatureTag(string id)
+    {
+        try
+        {
+            _logger.LogInformation("UnFeaturing tag: " + id);
+            var collectionContent = await _saveTagsService.UnFeatureTag(id);
+
+            return new ObjectResult(new GetEntityResponse<bool>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<Models.Tag>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get tag. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Get Tag by id"},
+                    {"id", id}
+               });
+                SentrySdk.CaptureException(e);
+            });
             return new StatusCodeResult(500);
         }
     }

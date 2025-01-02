@@ -42,6 +42,9 @@ public class Collection
     [BsonElement("is_custom")]
     public bool IsCustom { get; set; } = false;
 
+    [BsonElement("is_featured")]
+    public bool IsFeatured { get; set; } = false;
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

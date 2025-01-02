@@ -593,7 +593,8 @@ public class CollectionsController : ControllerBase
             {
                 ContentIds = input.ContentIds,
                 Id = id,
-                UserId = currentUser.Id
+                UserId = currentUser.Id,
+                Type = input.Type
             });
 
             return new EmptyResult();

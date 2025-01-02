@@ -18,6 +18,9 @@ public class Tag
     [BsonElement("description")]
     public string? Description { get; set; }
 
+    [BsonElement("is_featured")]
+    public bool IsFeatured { get; set; } = false;
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

@@ -58,6 +58,7 @@ public class TagTransformer
         return new OutputTag
         {
             Id = tag.Id,
+            IsFeatured = tag.IsFeatured,
             Name = tag.Name,
             Slug = tag.Slug,
             Description = tag.Description,
