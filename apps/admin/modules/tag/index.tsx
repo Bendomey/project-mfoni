@@ -21,6 +21,7 @@ import { localizedDayjs } from "@/lib/date";
 import { DataTableColumnHeader } from "@/components/table/components";
 import { createDataTableError } from "@/lib/utils";
 import { FeatureTagModal } from "./feature";
+import { UnfeatureTagModal } from "./unfeature";
 
 const TAGS_PER_PAGE = 50;
 
@@ -121,7 +122,7 @@ export const ListTags = () => {
                 <DropdownMenuItem
                   onClick={() => {
                     setSelectedTag(row.original);
-                    setOpenFeaturedModal(true)
+                    setOpenUnFeaturedModal(true)
                   }}
                 >
                   <StarOffIcon className="mr-2 h-4 w-4" />
@@ -175,6 +176,13 @@ export const ListTags = () => {
       <FeatureTagModal
         opened={openFeaturedModal}
         setOpened={setOpenFeaturedModal}
+        data={selectedTag}
+        refetch={refetch}
+      />
+
+      <UnfeatureTagModal
+        opened={openUnFeaturedModal}
+        setOpened={setOpenUnFeaturedModal}
         data={selectedTag}
         refetch={refetch}
       />

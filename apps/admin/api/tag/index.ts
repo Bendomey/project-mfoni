@@ -75,3 +75,32 @@ const featureTag = async (id: string) => {
 }
 
 export const useFeatureTag = () => useMutation({mutationFn: featureTag})
+
+
+/**
+ * Unfeature tag
+ *
+ * @throws {Error} - Throws an error if there's a problem with the API response.
+ *
+ *  @returns {Promise<object>} - boolean
+ */
+
+const unfeatureTag = async (id: string) => {
+  try {
+    await fetchClient<boolean>(`/v1/tags/${id}/unfeature`, {
+      method: 'PATCH',
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+
+    // Error from server.
+    if (error instanceof Response) {
+      const response = await error.json()
+      throw new Error(response.message)
+    }
+  }
+}
+
+export const useUnfeatureTag = () => useMutation({mutationFn: unfeatureTag})
