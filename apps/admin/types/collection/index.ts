@@ -1,12 +1,12 @@
 interface Collection {
   id: string
-	name: string
+  name: string
   slug: string
   contentsCount: number
-	description: string
+  description: string
   isFeatured: boolean
-	createdByRole: string
-	visibility: string
+  createdByRole: string
+  visibility: string
   createdById: string
   createdAt: Date
   updatedAt: NullableDate
