@@ -4,6 +4,7 @@ interface Collection {
   slug: string
   contentsCount: number
 	description: string
+  isFeatured: boolean
 	createdByRole: string
 	visibility: string
   createdById: string
