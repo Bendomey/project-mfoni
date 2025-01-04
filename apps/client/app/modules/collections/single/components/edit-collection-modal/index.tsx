@@ -31,7 +31,6 @@ export function EditCollectionTitleModal({ isOpened, toggleModal, title, collect
 	}
 
 	const onSubmit: SubmitHandler<Inputs> = (data) => {
-		console.log("collection id", collectionId)
 		mutate(
 			{
 				props: {
@@ -53,7 +52,6 @@ export function EditCollectionTitleModal({ isOpened, toggleModal, title, collect
 				}
 			}
 		)
-		
 	}
 
 	return (
