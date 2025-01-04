@@ -10,6 +10,12 @@ interface CreateCollection {
 	visibility: 'PUBLIC' | 'PRIVATE'
 }
 
+export type EditInput = {
+	name: string,
+	discription?: string,
+	visibility?: string
+}
+
 export const createCollection = async (input: CreateCollection) => {
 	try {
 		const response = await fetchClient<ApiResponse<Collection>>(
@@ -344,4 +350,37 @@ export const removeContentsToCollection = async (
 export const useRemoveContentsToCollection = () =>
 	useMutation({
 		mutationFn: removeContentsToCollection,
+	})
+
+export const EditCollectionTitle = async (
+	{props, id}: {props: EditInput,
+		id: string }
+) =>{
+	try{
+		const response = await fetchClient(
+			`/v1/collections/${id}`,
+			{
+				method: 'PATCH',
+				body: JSON.stringify(props)
+			}
+		)
+		return response
+	}
+	catch (error: unknown){
+		if (error instanceof Error){
+		   throw error
+		}
+
+		if (error instanceof Response) {
+		   const response = await error.json()
+		   throw new Error(response.errorMessage)
+		}
+   }
+}
+
+export const useEditCollectionTitle = (
+	
+) =>
+	useMutation({
+		mutationFn: EditCollectionTitle
 	})

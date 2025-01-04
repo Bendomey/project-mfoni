@@ -153,8 +153,11 @@ export function CollectionModule() {
 					<div className="flex flex-col justify-between gap-3 md:flex-row md:items-start">
 						<div className='flex flex-row'>
 							<h1 className="text-4xl font-black">{name}</h1>
-							<PencilIcon className="ml-4 mt-1 h-8 w-6 text-black-700 hover:text-gray-500" onClick={(editCollectionModalState.onToggle)}/>
-							<EditCollectionTitleModal isOpened={editCollectionModalState.isOpened} toggleModal={editCollectionModalState.onToggle} title={name}/>
+							<PencilIcon className="ml-4 mt-1 h-8 w-6 text-black-700 hover:text-gray-500" onClick={(editCollectionModalState.onToggle)} />
+							{collection ?
+								<EditCollectionTitleModal isOpened={editCollectionModalState.isOpened} toggleModal={editCollectionModalState.onToggle} title={name} collectionId={collection?.id} /> :
+								null
+							}
 						</div>
 						<div className="flex items-center gap-3">
 							{isCollectionMine ? (

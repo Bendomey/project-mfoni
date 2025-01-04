@@ -18,8 +18,8 @@ export const EditContentTitle = async (
 				method: 'PATCH',
 				body: JSON.stringify(props)
 			}
-
 		)
+
 		return response
 	}
 	catch (error: unknown){

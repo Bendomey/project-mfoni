@@ -21,77 +21,80 @@ interface Inputs {
 	amount: number
 }
 
-export function EditTitleModal( {isOpened, toggleModal, title, contentId}: Props) {
+export function EditTitleModal({ isOpened, toggleModal, title, contentId }: Props) {
 	const [editTitle, setEditTitle] = useState(title);
 	const { mutate } = useEditContentTitle();
 	const queryClient = useQueryClient()
-	const {handleSubmit} = useForm<Inputs>()
-	
+	const { handleSubmit } = useForm<Inputs>()
 
-	const onSubmit: SubmitHandler<Inputs> = (data) => 
+	const onSubmit: SubmitHandler<Inputs> = (data) => {
 		mutate(
 			{
-				props: {title: data.title,
+				props: {
+					title: data.title,
 					visibility: 'PUBLIC',
-					amount: data.amount},
+					amount: data.amount
+				},
 				contentId: contentId
 			},
 			{
-				onError: () =>{
+				onError: () => {
 					errorToast('Title could not edit. Try again')
 				},
-			onSuccess: () =>{
-				queryClient.invalidateQueries({
-					queryKey: [QUERY_KEYS.CONTENTS]
-				})
-				successToast('Title edited successfully')				
-			}}
+				onSuccess: () => {
+					queryClient.invalidateQueries({
+						queryKey: [QUERY_KEYS.CONTENTS]
+					})
+					successToast('Title edited successfully')
+				}
+			}
 		)
-	
-	const handleInputChange = (e: any) =>{
+	}
+
+	const handleInputChange = (e: any) => {
 		setEditTitle(e.target.value);
 	}
 
 	return (
 		<Modal
-		onClose={toggleModal}
-				isOpened={isOpened}
-				className="relative w-full p-0 md:w-3/6 lg:w-2/6"
-				canBeClosedWithBackdrop={false}
-			>
+			onClose={toggleModal}
+			isOpened={isOpened}
+			className="relative w-full p-0 md:w-3/6 lg:w-2/6"
+			canBeClosedWithBackdrop={false}
+		>
+			<div >
 				<div >
-					<div >
 					<div className="flex flex-row items-center justify-between bg-gray-100 p-4 text-gray-600">
 						<h1 className="font-bold">Edit Title</h1>
 					</div>
 					<div className="m-5">
 						<div className="mt-2">
 							<input
-							id="title"
-							name="title"
-							type="text"
-							value={editTitle}
-							onChange={handleInputChange}
-							placeholder="Title"
-							className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+								id="title"
+								name="title"
+								type="text"
+								value={editTitle}
+								onChange={handleInputChange}
+								placeholder="Title"
+								className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 							/>
 						</div>
-						</div>
-						
-						<div className="mt-10 flex justify-end gap-2 border-t pb-5 pr-5">
-							<Button
-								className="mt-5"
-								color="primary"
-								onClick={handleSubmit(onSubmit)}
-							>
-								Edit
-							</Button>
-							<Button variant="outlined" className="mt-5" onClick={toggleModal}>
-								Close
-							</Button>
-						</div>
+					</div>
+
+					<div className="mt-10 flex justify-end gap-2 border-t pb-5 pr-5">
+						<Button
+							className="mt-5"
+							color="primary"
+							onClick={handleSubmit(onSubmit)}
+						>
+							Edit
+						</Button>
+						<Button variant="outlined" className="mt-5" onClick={toggleModal}>
+							Close
+						</Button>
 					</div>
 				</div>
-			</Modal>
+			</div>
+		</Modal>
 	)
 }
