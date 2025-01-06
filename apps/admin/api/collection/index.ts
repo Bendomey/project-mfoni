@@ -48,8 +48,6 @@ export const useGetCollections = (
   })
 
 
-
-
 /**
  * Feature collection
  *

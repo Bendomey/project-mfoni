@@ -59,7 +59,7 @@ export const FeatureCollectionModal = ({
       )
   };
 
-  const name = <span className="capitalize">{data?.name ? (data.name.endsWith("s") ? data.name : `${data.name}'s`) : "this"} </span> 
+  const name = <span className="capitalize">{data?.name.endsWith("s") ? data?.name : `${data?.name}'s`} </span> 
 
   return (
     <Dialog open={opened} onOpenChange={() => setOpened(false)}>
@@ -67,11 +67,11 @@ export const FeatureCollectionModal = ({
       <DialogContent className="sm:max-w-[425px] bg-white dark:bg-black top-32">
         <DialogHeader>
           <DialogTitle className="leading-normal">
-          Feature {name} collection
+          Feature {data?.name ? name : "this"} collection
           </DialogTitle>
           <DialogDescription className="text-gray-600 dark:text-gray-400">
             Are you sure you want to mark{" "}
-            {name} collection as featured?
+            {data?.name ? name : "this"} collection as featured?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
