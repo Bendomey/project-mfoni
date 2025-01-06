@@ -4,6 +4,7 @@ public class SaveCollection
 {
     public required string Name { get; set; }
     public required string Slug { get; set; }
+    public required bool IsCustom { get; set; }
     public string? Description { get; set; }
     public string? CreatedById { get; set; }
     public string? CreatedByRole { get; set; }
