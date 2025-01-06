@@ -1,6 +1,7 @@
 interface Collection {
 	id: string
 	slug: string
+	isFeatured: boolean
 	contentsCount: number
 	name: string
 	description: string

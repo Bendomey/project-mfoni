@@ -70,6 +70,7 @@ public class IndexContent
             Description = $"{userInfo.User.Name}'s collection for all uploads",
             CreatedByRole = CollectionCreatedByRole.USER,
             CreatedById = userInfo.User.Id,
+            IsCustom = false,
         });
 
         if (collection is null)

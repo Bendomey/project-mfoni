@@ -3,6 +3,7 @@ interface Content {
 	title: string
 	slug: string
 	type: 'IMAGE'
+	isFeatured: boolean
 	status: IContentStatus
 	rejectedAt: Nullable<Date>
 	doneAt: Nullable<Date>
