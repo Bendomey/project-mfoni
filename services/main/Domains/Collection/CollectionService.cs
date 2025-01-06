@@ -45,7 +45,7 @@ public class CollectionService
             Slug = input.Slug,
             Description = input.Description,
             CreatedById = input.CreatedById,
-            IsCustom = true
+            IsCustom = input.IsCustom
         };
 
         if (input.Visibility is not null)
@@ -243,6 +243,7 @@ public class CollectionService
                 Name = collection,
                 Slug = $"{collection.ToLower().Replace("::", "_")}",
                 Description = collectionDescription,
+                IsCustom = false,
 
             });
         }

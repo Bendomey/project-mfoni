@@ -1,27 +1,30 @@
 import { FolderIcon, PhotoIcon, UsersIcon } from '@heroicons/react/20/solid'
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline'
 import {
 	Link,
 	Outlet,
 	useLocation,
-	useNavigate,
 	useParams,
 	useSearchParams,
 } from '@remix-run/react'
 import { useMemo } from 'react'
+import { FiltersDialog } from './components/filters-dialog/index.tsx'
 import { FilterByLicense } from './components/license-select/index.tsx'
 import { FilterByOrientation } from './components/orientation-select/index.tsx'
+import { Button } from '@/components/button/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
 
 import { PAGES } from '@/constants/index.ts'
+import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { classNames } from '@/lib/classNames.ts'
 import { safeString } from '@/lib/strings.ts'
 
 export function SearchModule() {
 	const { query: queryParam } = useParams()
 	const location = useLocation()
-	const navigate = useNavigate()
 	const [searchParams, setSearchParams] = useSearchParams()
+	const filterModalState = useDisclosure()
 
 	const tabs = useMemo(
 		() => [
@@ -72,27 +75,7 @@ export function SearchModule() {
 			<Header isHeroSearchInVisible={false} />
 			<div className="max-w-8xl mx-auto px-4 lg:px-8">
 				<div>
-					<div className="grid grid-cols-1 sm:hidden">
-						<select
-							value={activeTab}
-							onChange={(e) => {
-								navigate(
-									tabs.find((tab) => tab.name === e.target.value)?.href ??
-										PAGES.SEARCH.PHOTOS.replace(
-											':query',
-											safeString(queryParam),
-										),
-								)
-							}}
-							aria-label="Select a tab"
-							className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-2 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600"
-						>
-							{tabs.map((tab) => (
-								<option key={tab.name}>{tab.name}</option>
-							))}
-						</select>
-					</div>
-					<div className="hidden sm:block">
+					<div className="">
 						<div className="flex items-center justify-between border-b border-gray-200">
 							<nav aria-label="Tabs" className="-mb-px flex space-x-8">
 								{tabs.map((tab) => (
@@ -132,7 +115,7 @@ export function SearchModule() {
 								))}
 							</nav>
 							{activeTab === 'Photos' ? (
-								<div className="flex flex-row items-center gap-3">
+								<div className="hidden lg:flex flex-row items-center gap-3">
 									{showClearButton ? (
 										<button
 											onClick={clearFilters}
@@ -149,12 +132,22 @@ export function SearchModule() {
 						</div>
 					</div>
 				</div>
+				<div className='mt-5 flex justify-end lg:hidden'>
+					<Button
+						onClick={filterModalState.onOpen}
+						size='sm'
+						color='secondaryGhost'
+					>
+						<AdjustmentsHorizontalIcon className='w-5 h-auto mr-2' /> Filters {searchParams.size > 0 ? `(${searchParams.size})` : ''}
+					</Button>
+				</div>
 				<div className="mt-3">
 					<h1 className="text-2xl font-black">{queryParam}</h1>
 				</div>
 				<Outlet />
 			</div>
 			<Footer />
+			<FiltersDialog isOpened={filterModalState.isOpened} onClose={filterModalState.onClose} />
 		</>
 	)
 }

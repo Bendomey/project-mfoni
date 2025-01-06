@@ -2,6 +2,7 @@ interface Tag {
 	id: string
 	slug: string
 	name: string
+	isFeatured: boolean
 	description: Nullable<String>
 	createdAt: Date
 	updatedAt: Date

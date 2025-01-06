@@ -62,7 +62,8 @@ public class CollectionsController : ControllerBase
                 Description = input.Description,
                 CreatedById = currentUser.Id,
                 CreatedByRole = CollectionCreatedByRole.USER,
-                Visibility = input.Visibility
+                Visibility = input.Visibility,
+                IsCustom = true
             });
 
             return new ObjectResult(new GetEntityResponse<Models.Collection>(collection, null).Result()) { StatusCode = StatusCodes.Status201Created };
@@ -117,6 +118,7 @@ public class CollectionsController : ControllerBase
                 Description = input.Description,
                 CreatedByRole = CollectionCreatedByRole.SYSTEM,
                 Visibility = input.Visibility,
+                IsCustom = true
             });
 
             return new ObjectResult(new GetEntityResponse<Models.Collection>(collection, null).Result()) { StatusCode = StatusCodes.Status201Created };
