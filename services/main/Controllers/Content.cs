@@ -481,6 +481,115 @@ public class ContentController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves all contents
+    /// </summary>
+    /// <param name="license">Can be `ALL` or `FREE` or `PREMIUM`</param>
+    /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT` or `SQUARE`</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
+    /// <param name="page">The page to be navigated to</param>
+    /// <param name="pageSize">The number of items on a page</param>
+    /// <param name="sort">To sort response data either by `asc` or `desc`</param>
+    /// <param name="sortBy">What field to sort by.</param>
+    /// <response code="200">Contents Retrieved Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
+    [HttpGet()]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<EntityWithPagination<OutputContent>>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> GetAllContents(
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] string? sort,
+        [FromQuery] string populate = "",
+        [FromQuery] string sortBy = "created_at",
+        [FromQuery] string license = "ALL",
+        [FromQuery] string orientation = "ALL"
+    )
+    {
+
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
+
+        try
+        {
+
+            _logger.LogInformation("Getting contents");
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.Content>(page, pageSize, sort, sortBy, populate);
+
+            var contents = await _searchContentService.GetContents(queryFilter, new GetContentsInput
+            {
+                License = license,
+                Orientation = orientation
+            });
+
+            var count = await _searchContentService.GetContentsCount(new GetContentsInput
+            {
+                License = license,
+                Orientation = orientation
+            });
+
+
+            var outContents = new List<OutputContent>();
+            foreach (var usercontent in contents)
+            {
+                outContents.Add(await _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
+            }
+
+            var response = HttpLib.GeneratePagination(
+                outContents,
+                count,
+                queryFilter
+            );
+
+            return new ObjectResult(new GetEntityResponse<EntityWithPagination<OutputContent>>(response, null).Result())
+            {
+                StatusCode = StatusCodes.Status200OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = e.StatusCode ?? HttpStatusCode.BadRequest;
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result())
+            {
+                StatusCode = (int)statusCode
+            };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get contents. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                        {"action", "Get all contents"},
+                        {"populate", populate},
+                        {"license", license},
+                        {"orientation", orientation},
+                        {"page", StringLib.SafeString(page.ToString())},
+                        {"pageSize", StringLib.SafeString(pageSize.ToString())},
+                        {"sort", StringLib.SafeString(sort)},
+                        {"sortBy", sortBy},
+               });
+               SentrySdk.CaptureException(e);
+           });
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+
+    /// <summary>
     /// Resolves related contents.
     /// </summary>
     /// <param name="contentId">Id of content</param>

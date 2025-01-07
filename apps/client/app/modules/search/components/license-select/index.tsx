@@ -13,7 +13,9 @@ export function FilterByLicense() {
 
 	const selectedLicense = searchParams.get('license') ?? 'ALL'
 
-	const selectedLicenseObj = licenses.find((license) => license.value === selectedLicense)
+	const selectedLicenseObj = licenses.find(
+		(license) => license.value === selectedLicense,
+	)
 
 	return (
 		<Menu as="div" className="relative">
@@ -48,9 +50,9 @@ export function FilterByLicense() {
 							variant="unstyled"
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>
-							{
-								selectedLicense === 'ALL' ? <CheckIcon className="mr-3 size-4" /> : null
-							}
+							{selectedLicense === 'ALL' ? (
+								<CheckIcon className="mr-3 size-4" />
+							) : null}
 							All
 						</Button>
 					</MenuItem>
@@ -63,9 +65,9 @@ export function FilterByLicense() {
 							variant="unstyled"
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>
-							{
-								selectedLicense === 'FREE' ? <CheckIcon className="mr-3 size-4" /> : null
-							}
+							{selectedLicense === 'FREE' ? (
+								<CheckIcon className="mr-3 size-4" />
+							) : null}
 							Free
 						</Button>
 					</MenuItem>
@@ -78,9 +80,9 @@ export function FilterByLicense() {
 							variant="unstyled"
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>
-							{
-								selectedLicense === 'PREMIUM' ? <CheckIcon className="mr-3 size-4" /> : null
-							}
+							{selectedLicense === 'PREMIUM' ? (
+								<CheckIcon className="mr-3 size-4" />
+							) : null}
 							mfoni +
 						</Button>
 					</MenuItem>

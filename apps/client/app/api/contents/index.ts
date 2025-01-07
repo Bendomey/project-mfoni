@@ -279,3 +279,47 @@ export const useGetRelatedContents = ({
 		enabled: Boolean(contentId),
 		retry: retryQuery,
 	})
+
+export const getContents = async (
+	query: FetchMultipleDataInputParams<FetchContentFilter>,
+	apiConfig?: ApiConfigForServerConfig,
+) => {
+	try {
+		const removeAllNullableValues = getQueryParams<FetchContentFilter>(query)
+		const params = new URLSearchParams(removeAllNullableValues)
+		const response = await fetchClient<
+			ApiResponse<FetchMultipleDataResponse<Content>>
+		>(`/v1/contents?${params.toString()}`, {
+			...(apiConfig ? apiConfig : {}),
+		})
+
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
+
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
+
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}
+
+export const useGetContents = ({
+	query,
+	retryQuery,
+}: {
+	query: FetchMultipleDataInputParams<FetchContentFilter>
+	retryQuery?: boolean
+}) =>
+	useQuery({
+		queryKey: [QUERY_KEYS.CONTENTS, query],
+		queryFn: () => getContents(query),
+		retry: retryQuery,
+	})
