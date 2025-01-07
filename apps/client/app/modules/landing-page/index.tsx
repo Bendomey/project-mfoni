@@ -5,6 +5,8 @@ import { FadeIn, FadeInStagger } from '@/components/animation/FadeIn.tsx'
 import { Content } from '@/components/Content/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
+import { Button } from '@/components/button/index.tsx'
+import { PAGES } from '@/constants/index.ts'
 
 export const imageUrls = [
 	'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image.jpg',
@@ -42,6 +44,10 @@ export const LandingPageModule = () => {
 								</FadeIn>
 							</div>
 						))}
+					</div>
+
+					<div className='flex justify-center'>
+						<Button isLink href={PAGES.CONTENTS} variant='solid' color='secondaryGhost' size='xl'>See More Contents</Button>
 					</div>
 				</FadeInStagger>
 				<Pricing />
