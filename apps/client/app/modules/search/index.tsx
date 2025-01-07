@@ -115,7 +115,7 @@ export function SearchModule() {
 								))}
 							</nav>
 							{activeTab === 'Photos' ? (
-								<div className="hidden lg:flex flex-row items-center gap-3">
+								<div className="hidden flex-row items-center gap-3 lg:flex">
 									{showClearButton ? (
 										<button
 											onClick={clearFilters}
@@ -132,13 +132,14 @@ export function SearchModule() {
 						</div>
 					</div>
 				</div>
-				<div className='mt-5 flex justify-end lg:hidden'>
+				<div className="mt-5 flex justify-end lg:hidden">
 					<Button
 						onClick={filterModalState.onOpen}
-						size='sm'
-						color='secondaryGhost'
+						size="sm"
+						color="secondaryGhost"
 					>
-						<AdjustmentsHorizontalIcon className='w-5 h-auto mr-2' /> Filters {searchParams.size > 0 ? `(${searchParams.size})` : ''}
+						<AdjustmentsHorizontalIcon className="mr-2 h-auto w-5" /> Filters{' '}
+						{searchParams.size > 0 ? `(${searchParams.size})` : ''}
 					</Button>
 				</div>
 				<div className="mt-3">
@@ -147,7 +148,10 @@ export function SearchModule() {
 				<Outlet />
 			</div>
 			<Footer />
-			<FiltersDialog isOpened={filterModalState.isOpened} onClose={filterModalState.onClose} />
+			<FiltersDialog
+				isOpened={filterModalState.isOpened}
+				onClose={filterModalState.onClose}
+			/>
 		</>
 	)
 }

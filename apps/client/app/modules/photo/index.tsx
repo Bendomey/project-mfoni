@@ -9,7 +9,10 @@ import {
 	ShieldCheckIcon,
 	HeartIcon as HeartIconOutline,
 } from '@heroicons/react/24/outline'
-import { HeartIcon as HeartIconSolid, PencilIcon } from '@heroicons/react/24/solid'
+import {
+	HeartIcon as HeartIconSolid,
+	PencilIcon,
+} from '@heroicons/react/24/solid'
 import { Link, useLoaderData } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { Fragment } from 'react'
@@ -173,15 +176,12 @@ export const PhotoModule = () => {
 								<h1 className="text-gray-500">Likes</h1>
 								<p className="font-semibold">{content.meta.likes}</p>
 							</div>
-							{
-								content.isFeatured ? (
-									<div className="text-sm">
-										<h1 className="text-gray-500">Is featured</h1>
-										<p className="font-semibold">Yes</p>
-									</div>
-								) : null
-							}
-
+							{content.isFeatured ? (
+								<div className="text-sm">
+									<h1 className="text-gray-500">Is featured</h1>
+									<p className="font-semibold">Yes</p>
+								</div>
+							) : null}
 						</div>
 						<div className="flex flex-row items-center gap-2">
 							<ShareButton

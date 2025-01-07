@@ -72,6 +72,7 @@ export const PAGES = {
 	TAG: '/explore/tags/:tag',
 	COLLECTIONS: '/explore/collections',
 	COLLECTION: '/explore/collections/:collection',
+	CONTENTS: '/explore/contents',
 	SEARCH: {
 		CREATORS: '/search/creators/:query',
 		PHOTOS: '/search/photos/:query',

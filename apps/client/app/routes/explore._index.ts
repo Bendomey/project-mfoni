@@ -8,7 +8,11 @@ import { ExploreModule } from '@/modules/index.ts'
 export const meta: MetaFunction = () => {
 	return [
 		{ title: 'Explore | mfoni' },
-		{ name: 'description', content: 'Welcome to mfoni!' },
+		{
+			name: 'description',
+			content:
+				'mfoni offers millions of free, high-quality pictures. All pictures are free to download and use under the mfoni license.',
+		},
 		{ name: 'keywords', content: 'mfoni, Mfoni' },
 	]
 }

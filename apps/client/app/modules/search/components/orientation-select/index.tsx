@@ -5,12 +5,13 @@ import { orientations } from '../filters-dialog/index.tsx'
 import { Button } from '@/components/button/index.tsx'
 
 export function FilterByOrientation() {
-
 	const [searchParams, setSearchParams] = useSearchParams()
 
 	const selectedOrientation = searchParams.get('orientation') ?? 'ALL'
 
-	const selectedOrientationObj = orientations.find((orientation) => orientation.value === selectedOrientation)
+	const selectedOrientationObj = orientations.find(
+		(orientation) => orientation.value === selectedOrientation,
+	)
 
 	return (
 		<Menu as="div" className="relative">
@@ -35,7 +36,9 @@ export function FilterByOrientation() {
 						<span className="">Orientation</span>
 
 						<div className="ml-2 flex items-center">
-							<span className="text-gray-600">{selectedOrientationObj?.label}</span>
+							<span className="text-gray-600">
+								{selectedOrientationObj?.label}
+							</span>
 							<ChevronDownIcon className="ml-1 size-4" />
 						</div>
 					</Button>
@@ -55,9 +58,9 @@ export function FilterByOrientation() {
 							variant="unstyled"
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>
-							{
-								selectedOrientation === 'ALL' ? <CheckIcon className="mr-3 size-4" /> : null
-							}
+							{selectedOrientation === 'ALL' ? (
+								<CheckIcon className="mr-3 size-4" />
+							) : null}
 							<svg
 								className="mr-1 size-4 fill-current"
 								width="24"
@@ -81,9 +84,9 @@ export function FilterByOrientation() {
 							variant="unstyled"
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>
-							{
-								selectedOrientation === 'LANDSCAPE' ? <CheckIcon className="mr-3 size-4" /> : null
-							}
+							{selectedOrientation === 'LANDSCAPE' ? (
+								<CheckIcon className="mr-3 size-4" />
+							) : null}
 							<svg
 								className="mr-1 size-4 fill-current"
 								width="24"
@@ -107,9 +110,9 @@ export function FilterByOrientation() {
 							variant="unstyled"
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>
-							{
-								selectedOrientation === 'PORTRAIT' ? <CheckIcon className="mr-3 size-4" /> : null
-							}
+							{selectedOrientation === 'PORTRAIT' ? (
+								<CheckIcon className="mr-3 size-4" />
+							) : null}
 							<svg
 								className="mr-1 size-4 fill-current"
 								width="24"
@@ -134,9 +137,9 @@ export function FilterByOrientation() {
 							className="group flex w-full items-center justify-start rounded-none px-4 py-2 text-xs font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 						>
 							{/* TODO: get the perfect square. */}
-							{
-								selectedOrientation === 'SQUARE' ? <CheckIcon className="mr-3 size-4" /> : null
-							}
+							{selectedOrientation === 'SQUARE' ? (
+								<CheckIcon className="mr-3 size-4" />
+							) : null}
 							<svg
 								className="mr-1 size-4 fill-current"
 								width="24"
