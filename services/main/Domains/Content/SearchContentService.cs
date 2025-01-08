@@ -270,6 +270,11 @@ public class SearchContentService
             }
         }
 
+        if (input.IsFeatured)
+        {
+            filter &= builder.Eq(r => r.IsFeatured, true);
+        }
+
         var contents = await _contentsCollection
             .Find(filter)
             .Skip(queryFilter.Skip)
@@ -306,6 +311,11 @@ public class SearchContentService
                 var licenseFilter = builder.Gt(r => r.Amount, 0);
                 filter &= licenseFilter;
             }
+        }
+
+        if (input.IsFeatured)
+        {
+            filter &= builder.Eq(r => r.IsFeatured, true);
         }
 
         var contents = await _contentsCollection.CountDocumentsAsync(filter);
