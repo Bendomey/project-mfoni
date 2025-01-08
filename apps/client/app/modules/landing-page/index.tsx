@@ -63,8 +63,16 @@ export const LandingPageModule = () => {
 					))}
 				</div>
 
-				<div className='flex justify-center'>
-					<Button isLink href={PAGES.CONTENTS} variant='solid' color='secondaryGhost' size='xl'>See More Contents</Button>
+				<div className="flex justify-center">
+					<Button
+						isLink
+						href={PAGES.CONTENTS}
+						variant="solid"
+						color="secondaryGhost"
+						size="xl"
+					>
+						See More Contents
+					</Button>
 				</div>
 			</FadeInStagger>
 		)
