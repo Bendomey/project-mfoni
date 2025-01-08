@@ -9,6 +9,7 @@ import { UserAccountMobileNav, UserAccountNav } from './user-account/index.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { APP_NAME, PAGES } from '@/constants/index.ts'
 import useScroll from '@/hooks/use-scroll.ts'
+import { classNames } from '@/lib/classNames.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
 const navigation = (isLoggedIn: boolean) => [
@@ -26,27 +27,28 @@ const navigation = (isLoggedIn: boolean) => [
 interface Props {
 	isHeroSearchInVisible: boolean
 	shouldHeaderBlur?: boolean
+	searchQuery?: string
 }
 
 export const Header = ({
 	isHeroSearchInVisible,
 	shouldHeaderBlur = true,
+	searchQuery,
 }: Props) => {
 	const { isLoggedIn } = useAuth()
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 	const scrolled = useScroll(50)
 
 	const headerBlurred = shouldHeaderBlur
-		? 'bg-white/95 backdrop-blur-xl sticky top-0 z-50'
-		: 'sticky top-0 z-50 bg-white'
+		? 'bg-white/95 backdrop-blur-xl sticky top-0 z-50 shadow-lg'
+		: 'sticky top-0 z-50 bg-white '
 
 	return (
 		<header
-			className={
-				isHeroSearchInVisible
-					? undefined
-					: `${scrolled ? headerBlurred : 'sticky top-0 z-50 bg-white'}`
-			}
+			className={classNames({
+				[headerBlurred]: !isHeroSearchInVisible && scrolled,
+				'z sticky top-0 z-50 bg-white': !isHeroSearchInVisible && !scrolled,
+			})}
 		>
 			<NoticeBanner />
 			<nav
@@ -62,7 +64,9 @@ export const Header = ({
 					</div>
 				</Link>
 				<div className="mx-8 hidden h-11 flex-grow md:flex">
-					{isHeroSearchInVisible ? null : <SearchPhotos />}
+					{isHeroSearchInVisible ? null : (
+						<SearchPhotos searchQuery={searchQuery} />
+					)}
 				</div>
 				<div className="flex lg:hidden">
 					<button
@@ -103,7 +107,7 @@ export const Header = ({
 			</nav>
 			{isHeroSearchInVisible ? null : (
 				<div className="mx-4 pb-4 md:pb-0">
-					<SearchPhotosForMobile />
+					<SearchPhotosForMobile searchQuery={searchQuery} />
 				</div>
 			)}
 			<Dialog

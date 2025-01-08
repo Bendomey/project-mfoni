@@ -33,8 +33,9 @@ export function SearchModule() {
 				href: PAGES.SEARCH.PHOTOS.replace(':query', safeString(queryParam)),
 				icon: PhotoIcon,
 				current:
-					PAGES.SEARCH.PHOTOS.replace(':query', safeString(queryParam)) ===
-					location.pathname,
+					encodeURI(
+						PAGES.SEARCH.PHOTOS.replace(':query', safeString(queryParam)),
+					) === location.pathname,
 			},
 			{
 				name: 'Collections',
@@ -44,16 +45,18 @@ export function SearchModule() {
 				),
 				icon: FolderIcon,
 				current:
-					PAGES.SEARCH.COLLECTIONS.replace(':query', safeString(queryParam)) ===
-					location.pathname,
+					encodeURI(
+						PAGES.SEARCH.COLLECTIONS.replace(':query', safeString(queryParam)),
+					) === location.pathname,
 			},
 			{
 				name: 'Creators',
 				href: PAGES.SEARCH.CREATORS.replace(':query', safeString(queryParam)),
 				icon: UsersIcon,
 				current:
-					PAGES.SEARCH.CREATORS.replace(':query', safeString(queryParam)) ===
-					location.pathname,
+					encodeURI(
+						PAGES.SEARCH.CREATORS.replace(':query', safeString(queryParam)),
+					) === location.pathname,
 			},
 		],
 		[location.pathname, queryParam],
@@ -72,7 +75,7 @@ export function SearchModule() {
 
 	return (
 		<>
-			<Header isHeroSearchInVisible={false} />
+			<Header isHeroSearchInVisible={false} searchQuery={queryParam} />
 			<div className="max-w-8xl mx-auto px-4 lg:px-8">
 				<div>
 					<div className="">
@@ -101,7 +104,7 @@ export function SearchModule() {
 											)}
 										/>
 										<span>{tab.name}</span>
-										<span
+										{/* <span
 											className={classNames(
 												tab.current
 													? 'bg-blue-100 text-blue-600'
@@ -110,7 +113,7 @@ export function SearchModule() {
 											)}
 										>
 											1k
-										</span>
+										</span> */}
 									</Link>
 								))}
 							</nav>
@@ -132,19 +135,19 @@ export function SearchModule() {
 						</div>
 					</div>
 				</div>
-				<div className="mt-5 flex justify-end lg:hidden">
-					<Button
-						onClick={filterModalState.onOpen}
-						size="sm"
-						color="secondaryGhost"
-					>
-						<AdjustmentsHorizontalIcon className="mr-2 h-auto w-5" /> Filters{' '}
-						{searchParams.size > 0 ? `(${searchParams.size})` : ''}
-					</Button>
-				</div>
-				<div className="mt-3">
-					<h1 className="text-2xl font-black">{queryParam}</h1>
-				</div>
+				{activeTab === 'Photos' ? (
+					<div className="mt-5 flex justify-end lg:hidden">
+						<Button
+							onClick={filterModalState.onOpen}
+							size="sm"
+							color="secondaryGhost"
+						>
+							<AdjustmentsHorizontalIcon className="mr-2 h-auto w-5" /> Filters{' '}
+							{searchParams.size > 0 ? `(${searchParams.size})` : ''}
+						</Button>
+					</div>
+				) : null}
+
 				<Outlet />
 			</div>
 			<Footer />
