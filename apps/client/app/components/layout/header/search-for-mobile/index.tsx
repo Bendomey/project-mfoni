@@ -68,7 +68,7 @@ const SearchModal = ({ isOpened, onClose, searchQuery }: Props) => {
 								type="button"
 								className={`mx-10 p-4`}
 							>
-								<MagnifyingGlassIcon className="size-32 text-zinc-400" />
+								<MagnifyingGlassIcon className="size-20 text-zinc-400" />
 								<h1 className="text-lg font-bold">Textual Search</h1>
 							</button>
 						</DialogPanel>
@@ -81,7 +81,7 @@ const SearchModal = ({ isOpened, onClose, searchQuery }: Props) => {
 								type="button"
 								className={`mx-10 p-4`}
 							>
-								<ViewfinderCircleIcon className="size-32 text-zinc-400" />
+								<ViewfinderCircleIcon className="size-20 text-zinc-400" />
 								<h1 className="text-lg font-bold">Visual Search</h1>
 							</button>
 						</DialogPanel>

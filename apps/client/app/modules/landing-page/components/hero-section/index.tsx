@@ -15,7 +15,7 @@ export const HeroSection = () => {
 				backgroundSize: 'cover',
 				backgroundPosition: 'left',
 			}}
-			className="h-[40vh] bg-gradient-to-r from-sky-500 to-indigo-500 lg:h-[30vh] xl:h-[50vh]"
+			className="h-[60vh] bg-gradient-to-r from-sky-500 to-indigo-500"
 		>
 			<Header isHeroSearchInVisible={true} />
 			<FadeIn className="px-6 pt-14 lg:px-8">
