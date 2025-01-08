@@ -5,7 +5,7 @@ import {
 	DialogPanel,
 	DialogBackdrop,
 } from '@headlessui/react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/20/solid'
 import * as outline from '@heroicons/react/24/outline'
 import { useNavigate } from '@remix-run/react'
 import { useState } from 'react'
@@ -37,6 +37,18 @@ export function SearchPalette({ isOpened, onClose, searchQuery }: Props) {
 			/>
 
 			<div className="fixed inset-0 z-10 w-screen overflow-y-auto p-4 sm:p-6 md:p-20">
+				<div className="my-3 flex justify-center md:hidden">
+					<Button
+						onClick={() => {
+							onClose()
+							setRawQuery('')
+						}}
+						variant="unstyled"
+						className="rounded-full bg-gray-100 p-2 outline outline-white"
+					>
+						<XMarkIcon className="h-6 w-6" />
+					</Button>
+				</div>
 				<DialogPanel
 					transition
 					className="mx-auto transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl outline outline-2 outline-offset-1 outline-blue-300 ring-1 ring-black/5 transition-all data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in md:w-5/6 lg:w-4/6"
