@@ -75,4 +75,5 @@ interface FetchContentLikeFilter {
 interface FetchContentFilter {
 	orientation?: string
 	license?: string
+	is_featured?: boolean
 }

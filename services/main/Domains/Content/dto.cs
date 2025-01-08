@@ -5,6 +5,7 @@ public class GetContentsInput
 {
     public string Orientation { get; set; } = "ALL";
     public string License { get; set; } = "ALL";
+    public bool IsFeatured { get; set; } = false;
 }
 
 public class ContentLikeInput

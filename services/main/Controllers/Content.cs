@@ -483,6 +483,7 @@ public class ContentController : ControllerBase
     /// <summary>
     /// Retrieves all contents
     /// </summary>
+    /// <param name="is_featured">Can be `true` or `false`</param>
     /// <param name="license">Can be `ALL` or `FREE` or `PREMIUM`</param>
     /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT` or `SQUARE`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
@@ -509,7 +510,8 @@ public class ContentController : ControllerBase
         [FromQuery] string populate = "",
         [FromQuery] string sortBy = "created_at",
         [FromQuery] string license = "ALL",
-        [FromQuery] string orientation = "ALL"
+        [FromQuery] string orientation = "ALL",
+        [FromQuery] bool is_featured = false
     )
     {
 
@@ -531,13 +533,15 @@ public class ContentController : ControllerBase
             var contents = await _searchContentService.GetContents(queryFilter, new GetContentsInput
             {
                 License = license,
-                Orientation = orientation
+                Orientation = orientation,
+                IsFeatured = is_featured
             });
 
             var count = await _searchContentService.GetContentsCount(new GetContentsInput
             {
                 License = license,
-                Orientation = orientation
+                Orientation = orientation,
+                IsFeatured = is_featured
             });
 
 
