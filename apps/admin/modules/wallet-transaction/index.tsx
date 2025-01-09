@@ -41,7 +41,7 @@ export const WalletTransaction = () => {
   const search = searchParams.get("search");
   const walletTransactionFilter = searchParams.get("type")?.toUpperCase();
 
-  const currentPage = parseInt(page ? (page as string) : "1", 10);
+  const currentPage = parseInt(page ? (page as string) : "0", 10);
 
   const {
     data,

@@ -42,13 +42,10 @@ export const ListContents = () => {
 
   // Retrieve query parameters
   const page = searchParams.get("page");
-
-  // TODO :Uncomment when contents api is created
-  // const search = searchParams.get("search");
-  const search = 'Search=name';
+  const search = searchParams.get("search");
   const contentFilter = searchParams.get("status");
 
-  const currentPage = parseInt(page ? (page as string) : "1", 10);
+  const currentPage = parseInt(page ? (page as string) : "0", 10);
 
   const {
     data,
@@ -80,7 +77,7 @@ export const ListContents = () => {
         accessorKey: "title",
         header: ({ column }) => <DataTableColumnHeader column={column} title={"Title"} />,
         cell: ({ row }) => (<div className="capitalize flex flex-row justify-start align-middle">
-        <StarIcon className="mr-2 h-4 w-4" color="gold"/> {row.original.title}
+        {row.original.isFeatured ? <StarIcon className="mr-2 h-4 w-4" color="gold"/> : <span className="mr-2 h-4 w-4"/> } {row.original.title}
         </div>),
       },
       {
@@ -138,15 +135,8 @@ export const ListContents = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => {
-                    setSelectedContent(row.original);
-                    setOpenFeaturedModal(true)
-                  }}
-                >
-                  <StarIcon className="mr-2 h-4 w-4" />
-                  Feature
-                </DropdownMenuItem>
+                {row.original.isFeatured ?
+                (
                 <DropdownMenuItem
                   onClick={() => {
                     setSelectedContent(row.original);
@@ -155,7 +145,16 @@ export const ListContents = () => {
                 >
                   <StarOffIcon className="mr-2 h-4 w-4" />
                   UnFeature
-                </DropdownMenuItem>
+                </DropdownMenuItem>):(
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedContent(row.original);
+                    setOpenFeaturedModal(true)
+                  }}
+                >
+                  <StarIcon className="mr-2 h-4 w-4" />
+                  Feature
+                </DropdownMenuItem>)}
               </DropdownMenuContent>
             </DropdownMenu>
           );

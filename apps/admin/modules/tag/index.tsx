@@ -44,7 +44,7 @@ export const ListTags = () => {
   const page = searchParams.get("page");
   const search = searchParams.get("search");
 
-  const currentPage = parseInt(page ? (page as string) : "1", 10);
+  const currentPage = parseInt(page ? (page as string) : "0", 10);
 
   const {
     data,

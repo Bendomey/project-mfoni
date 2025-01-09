@@ -44,7 +44,7 @@ export const ListAdmins = () => {
   const search = searchParams.get("search");
   const adminFilter = searchParams.get("status");
 
-  const currentPage = parseInt(page ? (page as string) : "1", 10);
+  const currentPage = parseInt(page ? (page as string) : "0", 10);
 
   const {
     data,
