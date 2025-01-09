@@ -76,7 +76,7 @@ export const CreatorApplication = () => {
   const search = searchParams.get("search");
   const creatorApplicationFilter = searchParams.get("status");
 
-  const currentPage = parseInt(page ? (page as string) : "1", 10);
+  const currentPage = parseInt(page ? (page as string) : "0", 10);
 
   const {
     data,
