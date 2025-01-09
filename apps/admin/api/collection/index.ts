@@ -75,3 +75,32 @@ const featureCollection = async (id: string) => {
 }
 
 export const useFeatureCollection = () => useMutation({mutationFn: featureCollection})
+
+
+/**
+ * Unfeature collection
+ *
+ * @throws {Error} - Throws an error if there's a problem with the API response.
+ *
+ *  @returns {Promise<object>} - boolean
+ */
+
+const unfeatureCollection = async (id: string) => {
+  try {
+    await fetchClient<boolean>(`/v1/collections/${id}/unfeature`, {
+      method: 'PATCH',
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+
+    // Error from server.
+    if (error instanceof Response) {
+      const response = await error.json()
+      throw new Error(response.message)
+    }
+  }
+}
+
+export const useUnfeatureCollection = () => useMutation({mutationFn: unfeatureCollection})

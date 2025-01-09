@@ -44,7 +44,7 @@ export const ListCollections = () => {
   const search = searchParams.get("search");
   const contentFilter = searchParams.get("visibility");
 
-  const currentPage = parseInt(page ? (page as string) : "1", 10);
+  const currentPage = parseInt(page ? (page as string) : "0", 10);
 
   const {
     data,
