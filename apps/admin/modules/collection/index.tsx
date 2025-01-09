@@ -21,6 +21,7 @@ import { localizedDayjs } from "@/lib/date";
 import { DataTableColumnHeader } from "@/components/table/components";
 import { createDataTableError } from "@/lib/utils";
 import { FeatureCollectionModal } from "./feature";
+import { UnfeatureCollectionModal } from "./unfeature";
 
 const COLLECTIONS_PER_PAGE = 50;
 
@@ -184,6 +185,13 @@ export const ListCollections = () => {
       <FeatureCollectionModal
         opened={openFeaturedModal}
         setOpened={setOpenFeaturedModal}
+        data={selectedCollection}
+        refetch={refetch}
+      />
+
+<UnfeatureCollectionModal
+        opened={openUnFeaturedModal}
+        setOpened={setOpenUnFeaturedModal}
         data={selectedCollection}
         refetch={refetch}
       />
