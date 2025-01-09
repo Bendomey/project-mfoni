@@ -189,7 +189,7 @@ export const ListCollections = () => {
         refetch={refetch}
       />
 
-<UnfeatureCollectionModal
+      <UnfeatureCollectionModal
         opened={openUnFeaturedModal}
         setOpened={setOpenUnFeaturedModal}
         data={selectedCollection}
