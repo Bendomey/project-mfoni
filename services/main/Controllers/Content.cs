@@ -17,6 +17,7 @@ public class ContentController : ControllerBase
 {
     private readonly ILogger<ContentController> _logger;
     private readonly EditContentService _editContentService;
+    private readonly CollectionContentService _collectionContentService;
     private readonly ContentLikeService _contentLikeService;
     private readonly IndexContent _indexContentService;
     private readonly SearchContentService _searchContentService;
@@ -32,7 +33,8 @@ public class ContentController : ControllerBase
         EditContentService editContentService,
         ContentTransformer contentTransformer,
         ContentLikeTransformer contentLikeTransformer,
-        SearchTagService searchTagsService
+        SearchTagService searchTagsService,
+        CollectionContentService collectionContentService
     )
     {
         _logger = logger;
@@ -43,6 +45,7 @@ public class ContentController : ControllerBase
         _contentTransformer = contentTransformer;
         _contentLikeTransformer = contentLikeTransformer;
         _searchTagsService = searchTagsService;
+        _collectionContentService = collectionContentService;
     }
 
     /// <summary>
@@ -478,6 +481,119 @@ public class ContentController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves all contents
+    /// </summary>
+    /// <param name="is_featured">Can be `true` or `false`</param>
+    /// <param name="license">Can be `ALL` or `FREE` or `PREMIUM`</param>
+    /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT` or `SQUARE`</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
+    /// <param name="page">The page to be navigated to</param>
+    /// <param name="pageSize">The number of items on a page</param>
+    /// <param name="sort">To sort response data either by `asc` or `desc`</param>
+    /// <param name="sortBy">What field to sort by.</param>
+    /// <response code="200">Contents Retrieved Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
+    [HttpGet()]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<EntityWithPagination<OutputContent>>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> GetAllContents(
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] string? sort,
+        [FromQuery] string populate = "",
+        [FromQuery] string sortBy = "created_at",
+        [FromQuery] string license = "ALL",
+        [FromQuery] string orientation = "ALL",
+        [FromQuery] bool is_featured = false
+    )
+    {
+
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
+
+        try
+        {
+
+            _logger.LogInformation("Getting contents");
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.Content>(page, pageSize, sort, sortBy, populate);
+
+            var contents = await _searchContentService.GetContents(queryFilter, new GetContentsInput
+            {
+                License = license,
+                Orientation = orientation,
+                IsFeatured = is_featured
+            });
+
+            var count = await _searchContentService.GetContentsCount(new GetContentsInput
+            {
+                License = license,
+                Orientation = orientation,
+                IsFeatured = is_featured
+            });
+
+
+            var outContents = new List<OutputContent>();
+            foreach (var usercontent in contents)
+            {
+                outContents.Add(await _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
+            }
+
+            var response = HttpLib.GeneratePagination(
+                outContents,
+                count,
+                queryFilter
+            );
+
+            return new ObjectResult(new GetEntityResponse<EntityWithPagination<OutputContent>>(response, null).Result())
+            {
+                StatusCode = StatusCodes.Status200OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = e.StatusCode ?? HttpStatusCode.BadRequest;
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result())
+            {
+                StatusCode = (int)statusCode
+            };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to get contents. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                        {"action", "Get all contents"},
+                        {"populate", populate},
+                        {"license", license},
+                        {"orientation", orientation},
+                        {"page", StringLib.SafeString(page.ToString())},
+                        {"pageSize", StringLib.SafeString(pageSize.ToString())},
+                        {"sort", StringLib.SafeString(sort)},
+                        {"sortBy", sortBy},
+               });
+               SentrySdk.CaptureException(e);
+           });
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+
+    /// <summary>
     /// Resolves related contents.
     /// </summary>
     /// <param name="contentId">Id of content</param>
@@ -833,6 +949,108 @@ public class ContentController : ControllerBase
               SentrySdk.CaptureException(e);
           });
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// Feature content.
+    /// </summary>
+    /// <param name="id">id of content</param>
+    /// <response code="200">content Featured Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize(Policy = "Admin")]
+    [HttpPatch("{id}/feature")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<Models.CollectionContent>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> FeatureContent(string id)
+    {
+        try
+        {
+            _logger.LogInformation("Featuring content: " + id);
+            var collectionContent = await _collectionContentService.FeatureCollection(id);
+
+            return new ObjectResult(new GetEntityResponse<Models.CollectionContent>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to feature content. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Feature content"},
+                    {"id", id}
+               });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
+    /// <summary>
+    /// Feature content.
+    /// </summary>
+    /// <param name="id">id of content</param>
+    /// <response code="200">content UnFeatured Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize(Policy = "Admin")]
+    [HttpPatch("{id}/unfeature")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<bool>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> UnFeatureContent(string id)
+    {
+        try
+        {
+            _logger.LogInformation("UnFeaturing content: " + id);
+            var collectionContent = await _collectionContentService.UnFeatureCollection(id);
+
+            return new ObjectResult(new GetEntityResponse<bool>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to unfeature collection. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Unfeature collection"},
+                    {"id", id}
+               });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
         }
     }
 

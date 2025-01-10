@@ -13,6 +13,8 @@ public class CollectionContentTransformer
     private readonly SearchTagService _tagService;
     private readonly TagTransformer _tagTransformer;
     private readonly SearchContentService _contentService;
+    private readonly CreatorService _creatorService;
+    private readonly CreatorTransformer _creatorTransformer;
     private readonly ContentTransformer _contentTransformer;
     private readonly CacheProvider _cacheProvider;
 
@@ -20,14 +22,18 @@ public class CollectionContentTransformer
        SearchTagService tagService,
         TagTransformer tagTransformer,
         SearchContentService contentService,
+        CreatorService creatorService,
         ContentTransformer contentTransformer,
+        CreatorTransformer creatorTransformer,
         CacheProvider cacheProvider
     )
     {
         _tagService = tagService;
         _tagTransformer = tagTransformer;
         _contentService = contentService;
+        _creatorService = creatorService;
         _contentTransformer = contentTransformer;
+        _creatorTransformer = creatorTransformer;
         _cacheProvider = cacheProvider;
     }
 
@@ -55,6 +61,16 @@ public class CollectionContentTransformer
             }
         }
 
+        OutputCreatorEnhanced? outputCreator = null;
+        if (collectionContent.CreatorId is not null && populate.Any(p => p.Contains(PopulateKeys.CREATOR)))
+        {
+            var creator = await _cacheProvider.ResolveCache($"{CacheProvider.CacheEntities["creators"]}.{collectionContent.CreatorId}", () => _creatorService.GetCreatorById(collectionContent.CreatorId));
+            if (creator is not null)
+            {
+                outputCreator = await _creatorTransformer.TransformEnhancedCreator(creator);
+            }
+        }
+
         return new OutputCollectionContent
         {
             Id = collectionContent.Id,
@@ -63,6 +79,8 @@ public class CollectionContentTransformer
             // Collection = outputCollection,
             ContentId = collectionContent.ContentId,
             Content = outputContent,
+            CreatorId = collectionContent.CreatorId,
+            Creator = outputCreator,
             ChildCollectionId = collectionContent.ChildCollectionId,
             // ChildCollection = outputChildCollection,
             TagId = collectionContent.TagId,

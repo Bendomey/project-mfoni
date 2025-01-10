@@ -31,7 +31,7 @@ export function AccountCollectionsModule() {
 	if (isError) {
 		return (
 			<ErrorState
-				message="An error occurred fetching your contents."
+				message="An error occurred fetching your collections."
 				title="Something happened."
 			>
 				<Button
@@ -66,8 +66,8 @@ export function AccountCollectionsModule() {
 	return (
 		<FadeIn>
 			<div className="grid grid-cols-2 gap-8 md:grid-cols-3">
-				{data.rows.map((collection, index) => (
-					<CollectionCard key={index} collection={collection} />
+				{data.rows.map((collection) => (
+					<CollectionCard key={collection.id} collection={collection} />
 				))}
 			</div>
 		</FadeIn>

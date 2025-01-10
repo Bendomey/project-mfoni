@@ -241,6 +241,88 @@ public class SearchContentService
         return contents;
     }
 
+    public async Task<List<Content>> GetContents(
+        FilterQuery<Content> queryFilter,
+        GetContentsInput input
+    )
+    {
+        FilterDefinitionBuilder<Content> builder = Builders<Content>.Filter;
+        var filter = builder.Eq(r => r.Visibility, "PUBLIC");
+        filter &= builder.Eq(r => r.Status, "DONE");
+
+        if (input.Orientation != "ALL")
+        {
+            var orientationFilter = builder.Eq(r => r.Media.Orientation, input.Orientation);
+            filter &= orientationFilter;
+        }
+
+        if (input.License != "ALL")
+        {
+            if (input.License == "FREE")
+            {
+                var licenseFilter = builder.Eq(r => r.Amount, 0);
+                filter &= licenseFilter;
+            }
+            else if (input.License == "PREMIUM")
+            {
+                var licenseFilter = builder.Gt(r => r.Amount, 0);
+                filter &= licenseFilter;
+            }
+        }
+
+        if (input.IsFeatured)
+        {
+            filter &= builder.Eq(r => r.IsFeatured, true);
+        }
+
+        var contents = await _contentsCollection
+            .Find(filter)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return contents;
+    }
+
+    public async Task<long> GetContentsCount(
+        GetContentsInput input
+    )
+    {
+        FilterDefinitionBuilder<Content> builder = Builders<Content>.Filter;
+        var filter = builder.Eq(r => r.Visibility, "PUBLIC");
+        filter &= builder.Eq(r => r.Status, "DONE");
+
+        if (input.Orientation != "ALL")
+        {
+            var orientationFilter = builder.Eq(r => r.Media.Orientation, input.Orientation);
+            filter &= orientationFilter;
+        }
+
+        if (input.License != "ALL")
+        {
+            if (input.License == "FREE")
+            {
+                var licenseFilter = builder.Eq(r => r.Amount, 0);
+                filter &= licenseFilter;
+            }
+            else if (input.License == "PREMIUM")
+            {
+                var licenseFilter = builder.Gt(r => r.Amount, 0);
+                filter &= licenseFilter;
+            }
+        }
+
+        if (input.IsFeatured)
+        {
+            filter &= builder.Eq(r => r.IsFeatured, true);
+        }
+
+        var contents = await _contentsCollection.CountDocumentsAsync(filter);
+
+        return contents;
+    }
+
     public async Task<Models.Content> GetContentById(string contentId)
     {
         var content = await _contentsCollection.Find(c => c.Id == contentId).FirstOrDefaultAsync();

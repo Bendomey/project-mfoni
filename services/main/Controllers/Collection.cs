@@ -62,7 +62,8 @@ public class CollectionsController : ControllerBase
                 Description = input.Description,
                 CreatedById = currentUser.Id,
                 CreatedByRole = CollectionCreatedByRole.USER,
-                Visibility = input.Visibility
+                Visibility = input.Visibility,
+                IsCustom = true
             });
 
             return new ObjectResult(new GetEntityResponse<Models.Collection>(collection, null).Result()) { StatusCode = StatusCodes.Status201Created };
@@ -117,6 +118,7 @@ public class CollectionsController : ControllerBase
                 Description = input.Description,
                 CreatedByRole = CollectionCreatedByRole.SYSTEM,
                 Visibility = input.Visibility,
+                IsCustom = true
             });
 
             return new ObjectResult(new GetEntityResponse<Models.Collection>(collection, null).Result()) { StatusCode = StatusCodes.Status201Created };
@@ -412,6 +414,7 @@ public class CollectionsController : ControllerBase
                     {"sort", StringLib.SafeString(sort)},
                     {"sortBy", sortBy},
                     {"contentItemsLimit", contentItemsLimit.ToString()},
+                    {"visibility", visibility}
               });
               SentrySdk.CaptureException(e);
           });
@@ -592,7 +595,8 @@ public class CollectionsController : ControllerBase
             {
                 ContentIds = input.ContentIds,
                 Id = id,
-                UserId = currentUser.Id
+                UserId = currentUser.Id,
+                Type = input.Type
             });
 
             return new EmptyResult();
@@ -631,6 +635,8 @@ public class CollectionsController : ControllerBase
     /// Get contents in a collection by slug
     /// </summary>
     /// <param name="slug">slug of collection</param>
+    /// <param name="visibility">can be `ALL`, `PUBLIC`, `PRIVATE`</param>
+    /// <param name="orientation">can be `ALL`, `LANDSCAPE`, `PORTRIAT`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
@@ -649,7 +655,9 @@ public class CollectionsController : ControllerBase
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
         [FromQuery] string populate = "",
-        [FromQuery] string sortBy = "created_at"
+        [FromQuery] string sortBy = "created_at",
+        [FromQuery] string visibility = "PUBLIC",
+        [FromQuery] string orientation = "ALL"
     )
     {
 
@@ -665,18 +673,30 @@ public class CollectionsController : ControllerBase
         try
         {
             _logger.LogInformation("Getting collection contents");
-            var collection = _collectionService.GetCollectionBySlug(slug);
-
             var queryFilter = HttpLib.GenerateFilterQuery<Models.CollectionContent>(page, pageSize, sort, sortBy, populate);
 
-            var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+            List<CollectionContent> contents = [];
+            long count = 0;
+            try
             {
-                CollectionId = collection.Id,
-            });
-            long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
-            {
-                CollectionId = collection.Id,
-            });
+                var collection = _collectionService.GetCollectionBySlug(slug);
+
+
+                contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+                {
+                    CollectionId = collection.Id,
+                    Visibility = visibility,
+                    Orientation = orientation
+                });
+
+                count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
+                {
+                    CollectionId = collection.Id,
+                    Visibility = visibility,
+                    Orientation = orientation
+                });
+            }
+            catch (HttpRequestException) { }
 
             var outContent = new List<OutputCollectionContent>();
             foreach (var content in contents)
@@ -716,6 +736,8 @@ public class CollectionsController : ControllerBase
                  {
                     {"action", "Get Contents from a Collection by slug"},
                     {"collectionSlug", slug},
+                    {"visibility", visibility},
+                    {"orientation", orientation},
                     {"page", StringLib.SafeString(page.ToString())},
                     {"pageSize", StringLib.SafeString(pageSize.ToString())},
                     {"sort", StringLib.SafeString(sort)},
@@ -731,6 +753,8 @@ public class CollectionsController : ControllerBase
     /// Get contents in a collection by name
     /// </summary>
     /// <param name="name">name of collection</param>
+    /// <param name="visibility">can be `ALL`, `PUBLIC`, `PRIVATE`</param>
+    /// <param name="orientation">can be `ALL`, `LANDSCAPE`, `PORTRIAT`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
@@ -749,7 +773,9 @@ public class CollectionsController : ControllerBase
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
         [FromQuery] string populate = "",
-        [FromQuery] string sortBy = "created_at"
+        [FromQuery] string sortBy = "created_at",
+        [FromQuery] string visibility = "PUBLIC",
+        [FromQuery] string orientation = "ALL"
     )
     {
         // Don't break the request if user is not authenticated
@@ -764,18 +790,30 @@ public class CollectionsController : ControllerBase
         try
         {
             _logger.LogInformation("Getting collection contents");
-            var collection = _collectionService.GetCollectionByName(name);
 
             var queryFilter = HttpLib.GenerateFilterQuery<Models.CollectionContent>(page, pageSize, sort, sortBy, populate);
 
-            var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+            List<CollectionContent> contents = [];
+            long count = 0;
+            try
             {
-                CollectionId = collection.Id,
-            });
-            long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
-            {
-                CollectionId = collection.Id,
-            });
+                var collection = _collectionService.GetCollectionByName(name);
+                contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
+                {
+                    CollectionId = collection.Id,
+                    Visibility = visibility,
+                    Orientation = orientation
+                });
+                count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
+                {
+                    CollectionId = collection.Id,
+                    Visibility = visibility,
+                    Orientation = orientation
+                });
+
+            }
+            catch (HttpRequestException) { }
+
 
             var outContent = new List<OutputCollectionContent>();
             foreach (var content in contents)
@@ -815,6 +853,8 @@ public class CollectionsController : ControllerBase
                  {
                     {"action", "Get Contents from a Collection by name"},
                     {"collectionName", name},
+                    {"visibility", visibility},
+                    {"orientation", orientation},
                     {"page", StringLib.SafeString(page.ToString())},
                     {"pageSize", StringLib.SafeString(pageSize.ToString())},
                     {"sort", StringLib.SafeString(sort)},
@@ -831,6 +871,8 @@ public class CollectionsController : ControllerBase
     /// Get all contents in a collection by id
     /// </summary>
     /// <param name="id">id of collection</param>
+    /// <param name="visibility">can be `ALL`, `PUBLIC`, `PRIVATE`</param>
+    /// <param name="orientation">can be `ALL`, `LANDSCAPE`, `PORTRIAT`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>
@@ -849,7 +891,9 @@ public class CollectionsController : ControllerBase
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
         [FromQuery] string populate = "",
-        [FromQuery] string sortBy = "created_at"
+        [FromQuery] string sortBy = "created_at",
+        [FromQuery] string visibility = "PUBLIC",
+        [FromQuery] string orientation = "ALL"
     )
     {
         // Don't break the request if user is not authenticated
@@ -870,10 +914,14 @@ public class CollectionsController : ControllerBase
             var contents = await _collectionContentService.GetCollectionContents(queryFilter, new Domains.GetCollectionContentsInput
             {
                 CollectionId = id,
+                Visibility = visibility,
+                Orientation = orientation
             });
             long count = await _collectionContentService.CountCollectionContents(new Domains.GetCollectionContentsInput
             {
                 CollectionId = id,
+                Visibility = visibility,
+                Orientation = orientation
             });
 
             var outContent = new List<OutputCollectionContent>();
@@ -913,6 +961,8 @@ public class CollectionsController : ControllerBase
                  {
                     {"action", "Get Contents from a Collection by id"},
                     {"collectionId", id},
+                    {"visibility", visibility},
+                    {"orientation", orientation},
                     {"page", StringLib.SafeString(page.ToString())},
                     {"pageSize", StringLib.SafeString(pageSize.ToString())},
                     {"sort", StringLib.SafeString(sort)},
@@ -989,5 +1039,108 @@ public class CollectionsController : ControllerBase
             return new StatusCodeResult(500);
         }
     }
+
+    /// <summary>
+    /// Feature collection.
+    /// </summary>
+    /// <param name="id">id of collection</param>
+    /// <response code="200">Collection Featured Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize(Policy = "Admin")]
+    [HttpPatch("{id}/feature")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<Models.CollectionContent>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> FeatureContent(string id)
+    {
+        try
+        {
+            _logger.LogInformation("Featuring collection: " + id);
+            var collectionContent = await _collectionContentService.FeatureCollection(id);
+
+            return new ObjectResult(new GetEntityResponse<CollectionContent>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to feature collection. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Feature collection"},
+                    {"id", id}
+               });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
+    /// <summary>
+    /// Feature collection.
+    /// </summary>
+    /// <param name="id">id of collection</param>
+    /// <response code="200">Collection UnFeatured Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize(Policy = "Admin")]
+    [HttpPatch("{id}/unfeature")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<bool>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> UnFeatureCollection(string id)
+    {
+        try
+        {
+            _logger.LogInformation("UnFeaturing collection: " + id);
+            var collectionContent = await _collectionContentService.UnFeatureCollection(id);
+
+            return new ObjectResult(new GetEntityResponse<bool>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to unfeature collection. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Unfeature collection"},
+                    {"id", id}
+               });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
 
 }

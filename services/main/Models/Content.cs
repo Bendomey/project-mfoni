@@ -69,6 +69,9 @@ public class Content
     [BsonElement("rekognition_metadata")]
     public RekognitionMetaData? RekognitionMetaData { get; set; }
 
+    [BsonElement("is_searchable")]
+    public bool IsSearchable { get; set; } = true;
+
     [BsonElement("media")]
     public required S3MetaData Media { get; set; }
 
@@ -83,6 +86,9 @@ public class Content
 
     [BsonElement("large_media")]
     public S3MetaData? LargeMedia { get; set; }
+
+    [BsonElement("is_featured")]
+    public bool IsFeatured { get; set; } = false;
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -1,3 +1,4 @@
+using Amazon.S3.Model;
 using main.Configurations;
 using main.Configuratons;
 using main.Lib;
@@ -56,6 +57,39 @@ public class CreatorService
         }
 
         return creator;
+    }
+
+    public async Task<Models.Creator> GetCreatorByUsername(string username)
+    {
+        var creator = await __creatorCollection.Find(creator => creator.Username == username).FirstOrDefaultAsync();
+        if (creator is null)
+        {
+            throw new HttpRequestException("CreatorNotFound");
+        }
+
+        return creator;
+    }
+
+    public async Task<List<Models.Creator>> GetRelatedCreators(string username)
+    {
+        var filters = FilterDefinition<Models.Creator>.Empty;
+        filters &= Builders<Models.Creator>.Filter.Ne(creator => creator.Username, username);
+        filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.Status, CreatorStatus.ACTIVE);
+        filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.WebsiteDisabledAt, null);
+
+        var creators = await __creatorCollection.Find(filters).ToListAsync();
+        return creators;
+    }
+
+    public async Task<long> GetRelatedCreatorsCount(string username)
+    {
+        var filters = FilterDefinition<Models.Creator>.Empty;
+        filters &= Builders<Models.Creator>.Filter.Ne(creator => creator.Username, username);
+        filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.Status, CreatorStatus.ACTIVE);
+        filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.WebsiteDisabledAt, null);
+
+        var creatorsCount = await __creatorCollection.CountDocumentsAsync(filters);
+        return creatorsCount;
     }
 
     public async Task<Creator> Create(string creatorApplicationId)

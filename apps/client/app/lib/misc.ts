@@ -34,3 +34,12 @@ export const getNameInitials = (name: string) =>
 		.split(' ')
 		.map((n) => n[0])
 		.join('')
+
+export const isALink = (url: string) => {
+	try {
+		new URL(url)
+		return true
+	} catch (e) {
+		return false
+	}
+}

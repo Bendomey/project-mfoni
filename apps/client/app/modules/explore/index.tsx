@@ -1,57 +1,56 @@
-import { useState } from 'react'
-import { useInView } from 'react-intersection-observer'
-import { imageUrls } from '../landing-page/index.tsx'
-import { ExploreHeroSection } from './components/hero/index.tsx'
-import { MobileTabComponent } from './components/tabs/mobile.tsx'
-import { WebTabComponent } from './components/tabs/web.tsx'
-import { FadeIn, FadeInStagger } from '@/components/animation/FadeIn.tsx'
-import { Content } from '@/components/Content/index.tsx'
+import { useLoaderData } from '@remix-run/react'
+import { useMemo, useRef } from 'react'
+import { ExploreSection } from './components/section/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
+import { useAuth } from '@/providers/auth/index.tsx'
+import { type loader } from '@/routes/explore._index.ts'
 
 export const ExploreModule = () => {
-	const { ref: heroRef, inView } = useInView({
-		threshold: 0,
-	})
+	const { isLoggedIn } = useAuth()
+	const { exploreSections } = useLoaderData<typeof loader>()
+	const containerRef = useRef<HTMLDivElement>(null)
 
-	const [empty] = useState(false)
+	const contents = useMemo(() => {
+		return exploreSections?.rows?.map((section) => {
+			if (section.ensureAuth && !isLoggedIn) return null
+
+			// TODO: bring this back after the backend is ready.
+			if (section.endpoint.includes('/followings')) return null
+
+			return (
+				<ExploreSection
+					key={section.id}
+					section={section as unknown as ExploreSection}
+				/>
+			)
+		})
+	}, [exploreSections?.rows, isLoggedIn])
 
 	return (
 		<div className="relative">
-			<div ref={heroRef}>
-				<ExploreHeroSection />
-			</div>
-			{inView ? null : <Header isHeroSearchInVisible={false} />}
-			<div className="mx-auto my-2 grid max-w-7xl grid-cols-1 gap-8 px-3 sm:px-3 md:px-8 lg:my-16 lg:grid-cols-4">
-				{/* web */}
-				<div className="lg:col-span-1">
-					<WebTabComponent />
-				</div>
-				{/* mobile */}
-				<div className="col-span-1 lg:hidden">
-					<MobileTabComponent />
-				</div>
-				{empty ? (
-					<EmptyState
-						message="It seems like the category currently has no items for."
-						title="Detty December"
-					/>
-				) : (
-					<div className="col-span-1 lg:col-span-3">
-						<FadeInStagger faster>
-							<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8">
-								{imageUrls.map((url, index) => (
-									<div className="mb-5" key={index}>
-										<FadeIn>
-											<Content content={{ media: { url } } as any} />
-										</FadeIn>
-									</div>
-								))}
-							</div>
-						</FadeInStagger>
+			<Header isHeroSearchInVisible={false} />
+			<div className="max-w-8xl mx-auto px-4 py-4 lg:px-8">
+				<div className="mt-5">
+					<h1 className="text-4xl font-black">Explore mfoni contents</h1>
+					<div className="mt-5">
+						<p className="w-full text-zinc-600 md:w-2/4">
+							mfoni offers millions of free, high-quality pictures. All pictures
+							are free to download and use under the mfoni license.
+						</p>
 					</div>
-				)}
+				</div>
+
+				{containerRef.current?.children?.length === 0 ? (
+					<div className="my-28 space-y-10">
+						<EmptyState title="No contents found" message="Come back later" />
+					</div>
+				) : null}
+
+				<div ref={containerRef} className="mt-10 space-y-10">
+					{contents}
+				</div>
 			</div>
 			<Footer />
 		</div>

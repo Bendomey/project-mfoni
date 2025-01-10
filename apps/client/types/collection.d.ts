@@ -1,6 +1,7 @@
 interface Collection {
 	id: string
 	slug: string
+	isFeatured: boolean
 	contentsCount: number
 	name: string
 	description: string
@@ -17,6 +18,7 @@ interface FetchCollectionFilter {
 	contentItemsLimit?: number
 	created_by?: string
 	visibility?: string
+	orientation?: string
 }
 
 interface CollectionContent {
@@ -26,6 +28,8 @@ interface CollectionContent {
 	collection: Nullable<Collection>
 	contentId: Nullable<string>
 	content: Nullable<Content>
+	creatorId: Nullable<string>
+	creator: Nullable<EnhancedCreator>
 	tagId: Nullable<string>
 	tag: Nullable<Tag>
 	childCollectionId: Nullable<string>

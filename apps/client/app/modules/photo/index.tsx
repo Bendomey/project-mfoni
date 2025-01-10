@@ -9,12 +9,15 @@ import {
 	ShieldCheckIcon,
 	HeartIcon as HeartIconOutline,
 } from '@heroicons/react/24/outline'
-import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
-import {PencilIcon} from '@heroicons/react/24/solid'
+import {
+	HeartIcon as HeartIconSolid,
+	PencilIcon,
+} from '@heroicons/react/24/solid'
 import { Link, useLoaderData } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { Fragment } from 'react'
 import { Image } from 'remix-image'
+import { EditTitleModal } from './components/edit-title-modal/index.tsx'
 import { RelatedContent } from './components/related-content.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
@@ -23,18 +26,17 @@ import { LikeButton } from '@/components/like-button.tsx'
 import { ShareButton } from '@/components/share-button/index.tsx'
 import { UserImage } from '@/components/user-image.tsx'
 import { blurDataURL, PAGES } from '@/constants/index.ts'
+import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
 import { getSizeStringForContent } from '@/lib/image-fns.ts'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { type loader } from '@/routes/photos.$slug.ts'
-import { EditTitleModal } from './components/edit-title-modal/index.tsx'
-import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 
 export const PhotoModule = () => {
 	const { currentUser } = useAuth()
 	const { content } = useLoaderData<typeof loader>()
-	const editTitleModalState = useDisclosure();
+	const editTitleModalState = useDisclosure()
 
 	if (!content) return null
 
@@ -174,6 +176,12 @@ export const PhotoModule = () => {
 								<h1 className="text-gray-500">Likes</h1>
 								<p className="font-semibold">{content.meta.likes}</p>
 							</div>
+							{content.isFeatured ? (
+								<div className="text-sm">
+									<h1 className="text-gray-500">Is featured</h1>
+									<p className="font-semibold">Yes</p>
+								</div>
+							) : null}
 						</div>
 						<div className="flex flex-row items-center gap-2">
 							<ShareButton
@@ -189,7 +197,7 @@ export const PhotoModule = () => {
 							<PencilIcon className="ml-4 h-6 w-4 text-black-700" onClick={editTitleModalState.onToggle}/>
 								<EditTitleModal isOpened={editTitleModalState.isOpened} toggleModal={editTitleModalState.onToggle} title={content.title} contentId={content.id} amount={content.amount}/>
 						</div>
-						
+
 						<div className="flex">
 							{content.amount === 0 ? null : (
 								<div className="rounded-full bg-black px-3 py-1 text-xs font-semibold text-white">

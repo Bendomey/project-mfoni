@@ -38,6 +38,18 @@ const links = [
         href: "/wallet-transactions"
     },
     {
+        name: "Contents",
+        href: "/contents"
+    },
+    {
+        name: "Tags",
+        href: "/tags"
+    },
+    {
+        name: "Collections",
+        href: "/collections"
+    },
+    {
         name: "Settings",
         href: "/settings"
     }

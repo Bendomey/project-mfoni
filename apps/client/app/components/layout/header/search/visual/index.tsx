@@ -30,7 +30,7 @@ export const VisualSearch = () => {
 					<span>Need Help?</span>
 				</Button>
 			</div>
-			<div className="lg:[44vh] 2xl:[15vh] relative h-[55vh] bg-gray-50 p-3 md:h-[48vh]">
+			<div className="h-full bg-gray-50 p-3">
 				<div className="rounded-md p-1">
 					{imgSrc ? (
 						<Image
@@ -49,25 +49,17 @@ export const VisualSearch = () => {
 							/>
 						</Fragment>
 					)}
-					{imgSrc ? (
-						<Button
-							variant="solid"
-							type="button"
-							onClick={handleRetake}
-							className="absolute bottom-0 z-30 mt-2"
-						>
-							Retake
-						</Button>
-					) : (
-						<Button
-							variant="solid"
-							type="button"
-							onClick={handleCapture}
-							className="absolute bottom-0 z-30 mt-2"
-						>
-							Capture
-						</Button>
-					)}
+					<div className="mt-5">
+						{imgSrc ? (
+							<Button variant="solid" type="button" onClick={handleRetake}>
+								Retake
+							</Button>
+						) : (
+							<Button variant="solid" type="button" onClick={handleCapture}>
+								Capture
+							</Button>
+						)}
+					</div>
 				</div>
 			</div>
 		</>

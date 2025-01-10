@@ -30,6 +30,9 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 			const query = {
 				pagination: { page: 0, per: 50 },
 				populate: ['content', 'content.tags'],
+				filters: {
+					visibility: 'ALL',
+				},
 			}
 			const slug = `${authCookie.id}_uploads`
 			await queryClient.prefetchQuery({

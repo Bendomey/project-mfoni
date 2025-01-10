@@ -695,6 +695,9 @@ public class UserController : ControllerBase
     /// <summary>
     /// Retrieves all user's likes on the platform
     /// </summary>
+    /// <param name="userId">user's Id</param>
+    /// <param name="visibility">can be `ALL`, `PUBLIC`, `PRIVATE`</param>
+    /// <param name="orientation">can be `ALL`, `LANDSCAPE`, `PORTRIAT`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="search">Search by name</param>
     /// <param name="page">The page to be navigated to</param>
@@ -704,7 +707,7 @@ public class UserController : ControllerBase
     /// <response code="200">Content Likes Retrieved Successfully</response>
     /// <response code="500">An unexpected error occured</response>
     [AllowAnonymous]
-    [HttpGet("users/contents/likes")]
+    [HttpGet("users/{userId}/likes")]
     [Authorize]
     [ProducesResponseType(
         StatusCodes.Status200OK,
@@ -715,30 +718,33 @@ public class UserController : ControllerBase
         Type = typeof(StatusCodeResult)
     )]
     public async Task<IActionResult> GetUserContentLikes(
+        string userId,
         [FromQuery] string? search,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
         [FromQuery] string populate = "",
-        [FromQuery] string sortBy = "created_at"
+        [FromQuery] string sortBy = "created_at",
+        [FromQuery] string visibility = "PUBLIC",
+        [FromQuery] string orientation = "ALL"
     )
     {
-        // Don't break the request if user is not authenticated
-        string? userId = null;
-        try
-        {
-            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
-            userId = currentUser.Id;
-        }
-        catch (Exception) { }
-
         try
         {
             logger.LogInformation("Getting all user's content likes");
-            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var queryFilter = HttpLib.GenerateFilterQuery<Models.ContentLike>(page, pageSize, sort, sortBy, populate);
-            var contents = await _contentLikeService.GetUserContentLikes(queryFilter, currentUser.Id);
-            long count = await _contentLikeService.CountUserContentLikes(currentUser.Id);
+            var contents = await _contentLikeService.GetUserContentLikes(queryFilter, new GetContentLikesInput
+            {
+                UserId = userId,
+                Visibility = visibility,
+                Orientation = orientation,
+            });
+            long count = await _contentLikeService.CountUserContentLikes(new GetContentLikesInput
+            {
+                UserId = userId,
+                Visibility = visibility,
+                Orientation = orientation,
+            });
 
             var outContent = new List<OutputContentLike>();
             foreach (var content in contents)
@@ -776,13 +782,15 @@ public class UserController : ControllerBase
               scope.SetTags(new Dictionary<string, string>
               {
                     {"action", "Get user's content likes"},
-                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                    {"userId", userId},
                     {"populate", StringLib.SafeString(populate)},
                     {"search", StringLib.SafeString(search)},
                     {"page", StringLib.SafeString(page.ToString())},
                     {"pageSize", StringLib.SafeString(pageSize.ToString())},
                     {"sort", StringLib.SafeString(sort)},
                     {"sortBy", sortBy},
+                    {"visibility", visibility},
+                    {"orientation", orientation},
               });
               SentrySdk.CaptureException(e);
           });

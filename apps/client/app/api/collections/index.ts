@@ -224,6 +224,55 @@ export const useGetCollectionBySlug = ({
 		retry: retryQuery,
 	})
 
+export const getCollectionById = async (
+	id: string,
+	query: FetchMultipleDataInputParams<FetchCollectionFilter>,
+	apiConfig?: ApiConfigForServerConfig,
+) => {
+	try {
+		const removeAllNullableValues = getQueryParams<FetchCollectionFilter>(query)
+		const params = new URLSearchParams(removeAllNullableValues)
+		const response = await fetchClient<ApiResponse<Collection>>(
+			`/v1/collections/${id}?${params.toString()}`,
+			{
+				...(apiConfig ? apiConfig : {}),
+			},
+		)
+
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
+
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
+
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}
+
+export const useGetCollectionById = ({
+	id,
+	query,
+	retryQuery,
+}: {
+	id?: string
+	query: FetchMultipleDataInputParams<FetchCollectionFilter>
+	retryQuery?: boolean
+}) =>
+	useQuery({
+		queryKey: [QUERY_KEYS.COLLECTIONS, id, 'id'],
+		queryFn: () => getCollectionById(safeString(id), query),
+		enabled: Boolean(id),
+		retry: retryQuery,
+	})
+
 export const getCollectionContentsBySlug = async (
 	slug: string,
 	query: FetchMultipleDataInputParams<FetchCollectionFilter>,
@@ -315,6 +364,7 @@ export const useAddContentsToCollection = () =>
 interface RemoveContentsToCollection {
 	collectionId: string
 	contentIds: Array<string>
+	type: string
 }
 
 export const removeContentsToCollection = async (

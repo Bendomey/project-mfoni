@@ -22,6 +22,7 @@ public class AddContentsToCollectionInput
 public class RemoveContentsFromCollectionInput
 {
     public required string[] ContentIds { get; set; }
+    public required string Type { get; set; }
 }
 
 public class EditContentBasicDetailsInput

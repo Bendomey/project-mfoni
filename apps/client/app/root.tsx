@@ -89,7 +89,9 @@ export async function loader(args: LoaderFunctionArgs) {
 					}
 				}
 			} catch (e: unknown) {
-				return redirect(`${PAGES.LOGIN}?return_to=${getFullUrlPath(url)}`)
+				if (url.pathname !== PAGES.LOGIN) {
+					return redirect(`${PAGES.LOGIN}?return_to=${getFullUrlPath(url)}`)
+				}
 			}
 		}
 	}
@@ -147,6 +149,7 @@ function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
 					value={{
 						MFONI_GOOGLE_AUTH_CLIENT_ID: ENV.MFONI_GOOGLE_AUTH_CLIENT_ID,
 						FACEBOOK_APP_ID: ENV.FACEBOOK_APP_ID,
+						API_ADDRESS: ENV.API_ADDRESS,
 					}}
 				>
 					{children}

@@ -6,15 +6,19 @@ import {
 } from '@heroicons/react/24/outline'
 import {
 	HeartIcon as HeartIconSolid,
+	StarIcon,
 	XCircleIcon,
 } from '@heroicons/react/24/solid'
-import { Link } from '@remix-run/react'
+import { Link, useNavigate } from '@remix-run/react'
 import { Image } from 'remix-image'
 import { Button } from '../button/index.tsx'
 import { PhotographerCreatorCard } from '../creator-card/index.tsx'
 import { FlyoutContainer } from '../flyout/flyout-container.tsx'
 import { LikeButton } from '@/components/like-button.tsx'
 import { blurDataURL, PAGES } from '@/constants/index.ts'
+import { useValidateImage } from '@/hooks/use-validate-image.tsx'
+import { getNameInitials } from '@/lib/misc.ts'
+import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
 interface Props {
@@ -25,6 +29,7 @@ interface Props {
 
 export const Content = ({ content, showCreator = true }: Props) => {
 	const { currentUser } = useAuth()
+	const navigate = useNavigate()
 
 	const isContentMine = content.createdById === currentUser?.id
 	return (
@@ -40,8 +45,8 @@ export const Content = ({ content, showCreator = true }: Props) => {
 					alt={content.title}
 				/>
 				<div className="group absolute top-0 h-full w-full rounded-lg hover:bg-black/50">
-					<div className="flex h-full w-full flex-col justify-between p-2">
-						<div className="flex flex-row items-center justify-between p-2">
+					<div className="flex h-full w-full flex-col justify-between p-4">
+						<div className="flex flex-row items-center justify-between">
 							<div className="flex items-center gap-1">
 								{content.amount > 0 ? (
 									<FlyoutContainer
@@ -108,30 +113,49 @@ export const Content = ({ content, showCreator = true }: Props) => {
 									</FlyoutContainer>
 								) : null}
 							</div>
-							<div className="hidden group-hover:block">
-								{content.status !== 'DONE' ? null : (
-									<LikeButton content={content}>
-										{({ isDisabled, isLiked, onClick }) => (
-											<Button
-												title={isLiked ? 'Remove Like' : 'Like Image'}
-												onClick={(e) => {
-													e.preventDefault()
-													onClick()
-												}}
-												variant="outlined"
-												size="sm"
-												className="px-2"
-												disabled={isDisabled}
-											>
-												{isLiked ? (
-													<HeartIconSolid className="h-6 w-6 text-blue-700" />
-												) : (
-													<HeartIconOutline className="h-6 w-6 text-zinc-700" />
-												)}
-											</Button>
-										)}
-									</LikeButton>
-								)}
+
+							<div className="flex items-center gap-4">
+								<div className="hidden group-hover:block">
+									{content.status !== 'DONE' ? null : (
+										<LikeButton content={content}>
+											{({ isDisabled, isLiked, onClick }) => (
+												<Button
+													title={isLiked ? 'Remove Like' : 'Like Image'}
+													onClick={(e) => {
+														e.preventDefault()
+														onClick()
+													}}
+													variant="outlined"
+													size="sm"
+													className="px-2"
+													disabled={isDisabled}
+												>
+													{isLiked ? (
+														<HeartIconSolid className="h-6 w-6 text-blue-700" />
+													) : (
+														<HeartIconOutline className="h-6 w-6 text-zinc-700" />
+													)}
+												</Button>
+											)}
+										</LikeButton>
+									)}
+								</div>
+								{content.isFeatured ? (
+									<div>
+										<FlyoutContainer
+											intendedPosition="y"
+											FlyoutContent={
+												<div className="z-50 flex w-48 flex-col items-center justify-center rounded-2xl bg-black px-3 py-4 shadow-xl">
+													<h3 className="text-center text-sm font-bold text-white">
+														This image is featured
+													</h3>
+												</div>
+											}
+										>
+											<StarIcon className="h-7 w-7 text-white" />
+										</FlyoutContainer>
+									</div>
+								) : null}
 							</div>
 						</div>
 						<div className="hidden flex-row items-center justify-between gap-2.5 group-hover:flex">
@@ -145,12 +169,19 @@ export const Content = ({ content, showCreator = true }: Props) => {
 										/>
 									}
 								>
-									<div className="flex items-center">
-										<Image
-											className="inline-block h-7 w-7 rounded-full"
-											src={content.createdBy.photo}
-											alt={content.createdBy.name}
-										/>
+									<div
+										className="flex items-center"
+										onClick={(e) => {
+											e.preventDefault()
+											navigate(
+												PAGES.CREATOR.PHOTOS.replace(
+													':username',
+													safeString(content?.createdBy?.username),
+												),
+											)
+										}}
+									>
+										<CreatedByCard createdBy={content.createdBy} />
 										<span className="ml-2 text-sm font-medium text-white">
 											{content.createdBy.name}
 										</span>
@@ -188,5 +219,30 @@ export const Content = ({ content, showCreator = true }: Props) => {
 				</div>
 			</div>
 		</Link>
+	)
+}
+
+interface CreatedByCardProps {
+	createdBy: BasicCreator
+}
+
+const CreatedByCard = ({ createdBy }: CreatedByCardProps) => {
+	const isProfilePhotoValid = useValidateImage(safeString(createdBy?.photo))
+	const initials = getNameInitials(safeString(createdBy?.name))
+
+	return (
+		<div className="flex">
+			{isProfilePhotoValid && createdBy?.photo ? (
+				<Image
+					className="inline-block h-7 w-7 rounded-full"
+					src={createdBy.photo}
+					alt={createdBy.name}
+				/>
+			) : (
+				<span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white ring-1 ring-white">
+					<span className="text-xs font-medium leading-none">{initials}</span>
+				</span>
+			)}
+		</div>
 	)
 }

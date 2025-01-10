@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using main.DTOs;
 using NanoidDotNet;
+using main.Models;
 
 namespace main.Domains;
 
@@ -11,10 +12,15 @@ public class SaveTagsService
     private readonly ILogger<SaveTagsService> _logger;
     private readonly IMongoCollection<Models.Tag> _tagsCollection;
     private readonly SearchTagService _searchTagService;
+    private readonly CollectionContentService _collectionContentService;
+    private readonly CollectionService _collectionService;
     private readonly CacheProvider _cacheProvider;
 
     public SaveTagsService(ILogger<SaveTagsService> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants, SearchTagService searchTagService,
-        CacheProvider cacheProvider)
+        CacheProvider cacheProvider,
+        CollectionContentService collectionContentService,
+        CollectionService collectionService
+    )
     {
         _logger = logger;
 
@@ -23,6 +29,8 @@ public class SaveTagsService
         _tagsCollection = database.GetCollection<Models.Tag>(appConstants.Value.TagCollection);
 
         _searchTagService = searchTagService;
+        _collectionContentService = collectionContentService;
+        _collectionService = collectionService;
 
         _cacheProvider = cacheProvider;
 

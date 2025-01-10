@@ -32,7 +32,7 @@ export function getSocialMetas({
 		{ title },
 		{ name: 'title', content: title },
 		{ name: 'description', content: truncateDescription },
-		{ name: 'keywords', content: keywords },
+		{ name: 'keywords', content: `mfoni${keywords ? `, ${keywords}` : ''}` },
 		{ name: 'og:url', content: url },
 		{ name: 'og:site_name', content: 'mfoni' },
 		{ name: 'og:type', content: 'website' },

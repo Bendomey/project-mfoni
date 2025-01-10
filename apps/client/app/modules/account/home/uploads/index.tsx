@@ -18,6 +18,9 @@ export function AccountUploadsModule() {
 		query: {
 			pagination: { page: 0, per: 50 },
 			populate: ['content', 'content.tags'],
+			filters: {
+				visibility: 'ALL',
+			},
 		},
 	})
 

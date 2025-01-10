@@ -106,6 +106,7 @@ public class ContentTransformer
         return new OutputContent
         {
             Id = content.Id,
+            IsFeatured = content.IsFeatured,
             Title = content.Title,
             Slug = content.Slug,
             Type = content.Type,

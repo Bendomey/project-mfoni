@@ -1,6 +1,6 @@
 import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
-import { getUserContentLikes } from '@/api/contents/index.ts'
+import { getUserContentLikes } from '@/api/users/index.ts'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
@@ -28,11 +28,14 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		const query = {
 			pagination: { page: 0, per: 50 },
 			populate: ['content'],
+			filters: {
+				visibility: 'ALL',
+			},
 		}
 		await queryClient.prefetchQuery({
 			queryKey: [QUERY_KEYS.CONTENT_LIKES, 'user', authCookie.id, query],
 			queryFn: () =>
-				getUserContentLikes(query, {
+				getUserContentLikes(authCookie.id, query, {
 					authToken: authCookie.token,
 					baseUrl,
 				}),

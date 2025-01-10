@@ -10,7 +10,9 @@ namespace main.Domains;
 
 public class CollectionContentService
 {
+    private readonly SearchContentService _searchContentService;
     private readonly CollectionService _collectionService;
+    private readonly SearchTagService _searchTagService;
     private readonly ILogger<CollectionContentService> _logger;
     private readonly IMongoCollection<Models.CollectionContent> _collectionContentCollection;
     private readonly IMongoCollection<Models.Collection> _collectionCollection;
@@ -24,7 +26,9 @@ public class CollectionContentService
         DatabaseSettings databaseConfig,
         IOptions<AppConstants> appConstants,
         CacheProvider cacheProvider,
-        CollectionService collectionService
+        CollectionService collectionService,
+        SearchTagService searchTagService,
+        SearchContentService searchContentService
     )
     {
         _logger = logger;
@@ -35,6 +39,8 @@ public class CollectionContentService
         _cacheProvider = cacheProvider;
         _appConstantsConfiguration = appConstants.Value;
         _collectionService = collectionService;
+        _searchTagService = searchTagService;
+        _searchContentService = searchContentService;
 
         logger.LogDebug("Collection Content service initialized");
     }
@@ -126,66 +132,199 @@ public class CollectionContentService
         GetCollectionContentsInput input
     )
     {
-        // TODO: Add support for license and orientation filters for image/video content
-        // TODO: add support for visibility filter for content
-        var filter = Builders<Models.CollectionContent>.Filter.Eq(r => r.CollectionId, input.CollectionId);
-
-        if (input.CollectionId is not null)
+        var pipeline = new BsonDocument[]
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.CollectionId, input.CollectionId);
+        };
+
+        if (input.CollectionId != null)
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "collection_id", new BsonDocument("$eq", ObjectId.Parse(input.CollectionId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.TagId is not null)
+        if (input.TagId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.TagId, input.TagId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "tag_id", new BsonDocument("$eq", ObjectId.Parse(input.TagId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.ChildCollectionId is not null)
+        if (input.ChildCollectionId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ChildCollectionId, input.ChildCollectionId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "child_collection_id", new BsonDocument("$eq", ObjectId.Parse(input.ChildCollectionId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.ContentId is not null)
+        if (input.ContentId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ContentId, input.ContentId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content_id", new BsonDocument("$eq", ObjectId.Parse(input.ContentId)) },
+                })
+            ).ToArray();
         }
 
-        var contents = await _collectionContentCollection
-            .Find(filter)
-            .Skip(queryFilter.Skip)
-            .Limit(queryFilter.Limit)
-            .Sort(queryFilter.Sort)
-            .ToListAsync();
+        pipeline = pipeline.Append(
+            new BsonDocument("$lookup", new BsonDocument
+            {
+                { "from", "contents" },
+                { "localField", "content_id" },
+                { "foreignField", "_id" },
+                { "as", "content" }
+            })
+        ).ToArray();
 
-        return contents ?? [];
+        pipeline = pipeline.Append(
+            new BsonDocument("$unwind",
+                new BsonDocument
+                {
+                    { "path", "$content" },
+                    { "preserveNullAndEmptyArrays", true }
+                }
+            )
+        ).ToArray();
+
+        // if (input.Visibility != null && input.Visibility != "ALL")
+        // {
+        //     pipeline = pipeline.Append(
+        //         new BsonDocument("$match", new BsonDocument
+        //         {
+        //             { "content.visibility", new BsonDocument("$eq", input.Visibility) },
+        //         })
+        //     ).ToArray();
+        // }
+
+        // if (input.Orientation != null && input.Orientation != "ALL")
+        // {
+        //     pipeline = pipeline.Append(
+        //         new BsonDocument("$match", new BsonDocument
+        //         {
+        //             { "content.orientation", new BsonDocument("$eq", input.Orientation) },
+        //         })
+        //     ).ToArray();
+        // }
+
+        pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$limit", queryFilter.Limit)).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$skip", queryFilter.Skip)).ToArray();
+
+        // TODO: figure out how to sort dynamically
+        pipeline = pipeline.Append(new BsonDocument("$sort", new BsonDocument("created_at", -1))).ToArray();
+
+        return await _collectionContentCollection
+           .Aggregate<Models.CollectionContent>(pipeline)
+           .ToListAsync();
     }
 
     public async Task<long> CountCollectionContents(GetCollectionContentsInput input)
     {
-        var filter = Builders<Models.CollectionContent>.Filter.Eq(r => r.CollectionId, input.CollectionId);
+        var pipeline = new BsonDocument[]
+       {
+       };
 
-        if (input.CollectionId is not null)
+        if (input.CollectionId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.CollectionId, input.CollectionId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "collection_id", new BsonDocument("$eq", ObjectId.Parse(input.CollectionId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.TagId is not null)
+        if (input.TagId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.TagId, input.TagId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "tag_id", new BsonDocument("$eq", ObjectId.Parse(input.TagId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.ChildCollectionId is not null)
+        if (input.ChildCollectionId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ChildCollectionId, input.ChildCollectionId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "child_collection_id", new BsonDocument("$eq", ObjectId.Parse(input.ChildCollectionId)) },
+                })
+            ).ToArray();
         }
 
-        if (input.ContentId is not null)
+        if (input.ContentId != null)
         {
-            filter &= Builders<Models.CollectionContent>.Filter.Eq(r => r.ContentId, input.ContentId);
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content_id", new BsonDocument("$eq", ObjectId.Parse(input.ContentId)) },
+                })
+            ).ToArray();
         }
 
+        pipeline = pipeline.Append(
+            new BsonDocument("$lookup", new BsonDocument
+            {
+                { "from", "contents" },
+                { "localField", "content_id" },
+                { "foreignField", "_id" },
+                { "as", "content" }
+            })
+        ).ToArray();
 
-        long count = await _collectionContentCollection.CountDocumentsAsync(filter);
+        pipeline = pipeline.Append(
+           new BsonDocument("$unwind",
+               new BsonDocument
+               {
+                    { "path", "$content" },
+                    { "preserveNullAndEmptyArrays", true }
+               }
+           )
+       ).ToArray();
+
+        // if (input.Visibility != null && input.Visibility != "ALL")
+        // {
+        //     pipeline = pipeline.Append(
+        //         new BsonDocument("$match", new BsonDocument
+        //         {
+        //             { "content.visibility", new BsonDocument("$eq", input.Visibility) },
+        //         })
+        //     ).ToArray();
+        // }
+
+        // if (input.Orientation != null && input.Orientation != "ALL")
+        // {
+        //     pipeline = pipeline.Append(
+        //         new BsonDocument("$match", new BsonDocument
+        //         {
+        //             { "content.orientation", new BsonDocument("$eq", input.Orientation) },
+        //         })
+        //     ).ToArray();
+        // }
+
+        pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$count", "totalCount")).ToArray();
+
+        var result = await _collectionContentCollection.AggregateAsync<MongoAggregationGetCount>(pipeline);
+
+        var count = 0;
+        await result.ForEachAsync(doc =>
+        {
+            count = doc.TotalCount;
+        });
+
         return count;
     }
 
@@ -260,7 +399,19 @@ public class CollectionContentService
         {
             // if collectionContent is available
             var collectionContentFilter = Builders<CollectionContent>.Filter.Eq(r => r.CollectionId, input.Id);
-            collectionContentFilter &= Builders<CollectionContent>.Filter.Eq(r => r.ContentId, contentId);
+
+            if (input.Type == "TAG")
+            {
+                collectionContentFilter &= Builders<CollectionContent>.Filter.Eq(r => r.TagId, contentId);
+            }
+            else if (input.Type == "COLLECTION")
+            {
+                collectionContentFilter &= Builders<CollectionContent>.Filter.Eq(r => r.ChildCollectionId, contentId);
+            }
+            else if (input.Type == "CONTENT")
+            {
+                collectionContentFilter &= Builders<CollectionContent>.Filter.Eq(r => r.ContentId, contentId);
+            }
 
             var oldCollectionContent = _collectionContentCollection.Find(collectionContentFilter).FirstOrDefault();
 
@@ -286,6 +437,207 @@ public class CollectionContentService
             $"{CacheProvider.CacheEntities["collections"]}.find*",
             $"{CacheProvider.CacheEntities["collections"]}*contents*",
         });
+        return true;
+    }
+
+    public async Task<CollectionContent> FeatureCollection(string collectionId)
+    {
+        var collection = _collectionService.GetCollection(collectionId);
+
+        if (collection.IsFeatured)
+        {
+            throw new HttpRequestException("CollectionAlreadyFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_collections");
+
+        var newCollectionContent = SaveCollectionContent(new SaveCollectionContent
+        {
+            CollectionId = featuredCollection.Id,
+            Type = "COLLECTION",
+            ChildCollectionId = collection.Id,
+        });
+
+        var update = Builders<Models.Collection>.Update
+            .Set("is_featured", true)
+            .Set("updated_at", DateTime.UtcNow);
+        await _collectionCollection.UpdateOneAsync(collection => collection.Id == collectionId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["collections"]}.find*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Slug}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Id}*",
+        });
+
+        return newCollectionContent;
+    }
+
+    public async Task<bool> UnFeatureCollection(string collectionId)
+    {
+        var collection = _collectionService.GetCollection(collectionId);
+
+        if (!collection.IsFeatured)
+        {
+            throw new HttpRequestException("CollectionNotFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_collections");
+
+        RemoveContentsFromCollection(new RemoveContentsFromCollectionInput
+        {
+            ContentIds = [collectionId],
+            Id = featuredCollection.Id,
+            Type = "COLLECTION",
+        });
+
+        var update = Builders<Models.Collection>.Update
+            .Set("is_featured", false)
+            .Set("updated_at", DateTime.UtcNow);
+        await _collectionCollection.UpdateOneAsync(tag => tag.Id == collectionId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["collections"]}.find*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Slug}*",
+            $"{CacheProvider.CacheEntities["collections"]}*{collection.Id}*",
+        });
+
+        return true;
+    }
+
+
+    public async Task<CollectionContent> FeatureTag(string tagId)
+    {
+        var tag = await _searchTagService.Get(tagId);
+        if (tag is null)
+        {
+            throw new HttpRequestException("TagNotFound");
+        }
+
+        if (tag.IsFeatured)
+        {
+            throw new HttpRequestException("TagAlreadyFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_tags");
+
+        var newCollectionContent = SaveCollectionContent(new SaveCollectionContent
+        {
+            CollectionId = featuredCollection.Id,
+            Type = "TAG",
+            TagId = tag.Id,
+        });
+
+        var update = Builders<Models.Tag>.Update
+            .Set("is_featured", true)
+            .Set("updated_at", DateTime.UtcNow);
+        await _tagCollection.UpdateOneAsync(tag => tag.Id == tagId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["tags"]}.find*",
+            $"{CacheProvider.CacheEntities["tags"]}*{tag.Slug}*",
+            $"{CacheProvider.CacheEntities["tags"]}*{tag.Id}*",
+        });
+
+        return newCollectionContent;
+    }
+
+    public async Task<bool> UnFeatureTag(string tagId)
+    {
+        var tag = await _searchTagService.Get(tagId);
+        if (tag is null)
+        {
+            throw new HttpRequestException("TagNotFound");
+        }
+
+        if (!tag.IsFeatured)
+        {
+            throw new HttpRequestException("TagNotFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_tags");
+
+        RemoveContentsFromCollection(new RemoveContentsFromCollectionInput
+        {
+            ContentIds = [tagId],
+            Id = featuredCollection.Id,
+            Type = "TAG",
+        });
+
+        var update = Builders<Models.Tag>.Update
+            .Set("is_featured", false)
+            .Set("updated_at", DateTime.UtcNow);
+        await _tagCollection.UpdateOneAsync(tag => tag.Id == tagId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["tags"]}.find*",
+            $"{CacheProvider.CacheEntities["tags"]}*{tag.Slug}*",
+            $"{CacheProvider.CacheEntities["tags"]}*{tag.Id}*",
+        });
+
+        return true;
+    }
+
+    public async Task<CollectionContent> FeatureContent(string contentId)
+    {
+        var content = await _searchContentService.GetContentById(contentId);
+
+        if (content.IsFeatured)
+        {
+            throw new HttpRequestException("ContentAlreadyFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_contents");
+
+        var newCollectionContent = SaveCollectionContent(new SaveCollectionContent
+        {
+            CollectionId = featuredCollection.Id,
+            Type = "CONTENT",
+            ContentId = content.Id,
+        });
+
+        var update = Builders<Models.Content>.Update
+            .Set("is_featured", true)
+            .Set("updated_at", DateTime.UtcNow);
+        await _contentCollection.UpdateOneAsync(content => content.Id == contentId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["contents"]}.find*",
+            $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+            $"{CacheProvider.CacheEntities["contents"]}*{content.Id}*",
+        });
+
+        return newCollectionContent;
+    }
+
+    public async Task<bool> UnFeatureContent(string contentId)
+    {
+        var content = await _searchContentService.GetContentById(contentId);
+
+        if (!content.IsFeatured)
+        {
+            throw new HttpRequestException("ContentNotFeatured");
+        }
+
+        var featuredCollection = _collectionService.GetCollectionBySlug("featured_contents");
+
+        RemoveContentsFromCollection(new RemoveContentsFromCollectionInput
+        {
+            ContentIds = [contentId],
+            Id = featuredCollection.Id,
+            Type = "CONTENT",
+        });
+
+        var update = Builders<Models.Content>.Update
+            .Set("is_featured", false)
+            .Set("updated_at", DateTime.UtcNow);
+        await _contentCollection.UpdateOneAsync(content => content.Id == contentId, update);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["contents"]}.find*",
+            $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+            $"{CacheProvider.CacheEntities["contents"]}*{content.Id}*",
+        });
+
         return true;
     }
 
