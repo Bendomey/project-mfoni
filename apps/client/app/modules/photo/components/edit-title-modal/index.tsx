@@ -77,13 +77,6 @@ export function EditTitleModal({ isOpened, toggleModal, title, contentId }: Prop
 								onChange={handleInputChange}
 								placeholder="Title"
 								className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-								id="title"
-								name="title"
-								type="text"
-								value={editTitle}
-								onChange={handleInputChange}
-								placeholder="Title"
-								className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 							/>
 						</div>
 					</div>
@@ -103,18 +96,6 @@ export function EditTitleModal({ isOpened, toggleModal, title, contentId }: Prop
 				</div>
 			</div>
 		</Modal>
-					</div>
-
-					<div className="mt-10 flex justify-end gap-2 border-t pb-5 pr-5">
-						<Button className="mt-5" color="primary">
-							Edit
-						</Button>
-						<Button variant="outlined" className="mt-5" onClick={toggleModal}>
-							Close
-						</Button>
-					</div>
-				</div>
-			</div>
-		</Modal>
+					
 	)
 }
