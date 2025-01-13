@@ -973,7 +973,7 @@ public class ContentController : ControllerBase
         try
         {
             _logger.LogInformation("Featuring content: " + id);
-            var collectionContent = await _collectionContentService.FeatureCollection(id);
+            var collectionContent = await _collectionContentService.FeatureContent(id);
 
             return new ObjectResult(new GetEntityResponse<Models.CollectionContent>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
@@ -1024,7 +1024,7 @@ public class ContentController : ControllerBase
         try
         {
             _logger.LogInformation("UnFeaturing content: " + id);
-            var collectionContent = await _collectionContentService.UnFeatureCollection(id);
+            var collectionContent = await _collectionContentService.UnFeatureContent(id);
 
             return new ObjectResult(new GetEntityResponse<bool>(collectionContent, null).Result()) { StatusCode = StatusCodes.Status200OK };
         }
