@@ -1,42 +1,39 @@
-import { fetchClient } from "@/lib/transport/index.ts";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation } from '@tanstack/react-query'
+import { fetchClient } from '@/lib/transport/index.ts'
 
 export type EditInput = {
-	title: string,
-	visibility: string,
-	amount: number
+	title?: string
+	visibility?: string
+	amount?: number
 }
 
-export const EditContentTitle = async (
-	{props, contentId}: {props: EditInput,
-		contentId: string}
-) =>{
-	try{
-		const response = await fetchClient(
-			`/v1/contents/${contentId}`,
-			{
-				method: 'PATCH',
-				body: JSON.stringify(props)
-			}
-		)
+export const EditContent = async ({
+	props,
+	contentId,
+}: {
+	props: EditInput
+	contentId: string
+}) => {
+	try {
+		const response = await fetchClient(`/v1/contents/${contentId}`, {
+			method: 'PATCH',
+			body: JSON.stringify(props),
+		})
 
 		return response
-	}
-	catch (error: unknown){
-	     if (error instanceof Error){
+	} catch (error: unknown) {
+		if (error instanceof Error) {
 			throw error
-		 }
+		}
 
-		 if (error instanceof Response) {
+		if (error instanceof Response) {
 			const response = await error.json()
 			throw new Error(response.errorMessage)
-		 }
+		}
 	}
 }
 
-export const useEditContentTitle = (
-	
-) =>
+export const useEditContent = () =>
 	useMutation({
-		mutationFn: EditContentTitle
+		mutationFn: EditContent,
 	})

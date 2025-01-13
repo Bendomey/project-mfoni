@@ -1,11 +1,11 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { useEditCollectionTitle } from '@/api/collections/index.ts'
 import { Button } from '@/components/button/index.tsx'
 import { Modal } from '@/components/modal/index.tsx'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
-import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
 
 interface Props {
 	isOpened: boolean,
