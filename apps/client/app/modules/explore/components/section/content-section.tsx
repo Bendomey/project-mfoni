@@ -8,15 +8,14 @@ interface Props {
 
 export function ContentSection({ data }: Props) {
 	return (
-		<Content content={data} className={
-			classNames(
-				{
-					'h-80 w-[28rem]': data.media.orientation === 'LANDSCAPE',
-					'h-80 w-80': data.media.orientation === 'SQUARE',
-					'h-80 w-[19rem]' : data.media.orientation === 'PORTRAIT',
-				}
-			)
-		} />
+		<Content
+			content={data}
+			className={classNames({
+				'h-80 w-[28rem]': data.media.orientation === 'LANDSCAPE',
+				'h-80 w-80': data.media.orientation === 'SQUARE',
+				'h-80 w-[19rem]': data.media.orientation === 'PORTRAIT',
+			})}
+		/>
 	)
 }
 

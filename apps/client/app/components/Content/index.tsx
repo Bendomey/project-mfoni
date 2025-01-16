@@ -39,10 +39,10 @@ export const Content = ({ content, showCreator = true, className }: Props) => {
 			to={PAGES.PHOTO.replace(':slug', content.slug)}
 			state={{ modal: true }}
 		>
-			<div className={classNames("relative cursor-zoom-in", className)}>
+			<div className={classNames('relative cursor-zoom-in', className)}>
 				<Image
 					src={content.media.url}
-					className="object-cover w-full h-full rounded-lg"
+					className="h-full w-full rounded-lg object-cover"
 					blurDataURL={blurDataURL}
 					alt={content.title}
 				/>
@@ -160,7 +160,7 @@ export const Content = ({ content, showCreator = true, className }: Props) => {
 								) : null}
 							</div>
 						</div>
-						<div className="hidden flex-row items-center justify-between gap-2.5 group-hover:flex w-full">
+						<div className="hidden w-full flex-row items-center justify-between gap-2.5 group-hover:flex">
 							{showCreator && content.createdBy ? (
 								<FlyoutContainer
 									intendedPosition="y"
@@ -184,8 +184,8 @@ export const Content = ({ content, showCreator = true, className }: Props) => {
 										}}
 									>
 										<CreatedByCard createdBy={content.createdBy} />
-										<span className="ml-2 text-sm font-medium text-white truncate">
-											{content.createdBy.name} 
+										<span className="ml-2 truncate text-sm font-medium text-white">
+											{content.createdBy.name}
 										</span>
 									</div>
 								</FlyoutContainer>
@@ -193,7 +193,7 @@ export const Content = ({ content, showCreator = true, className }: Props) => {
 								<div />
 							)}
 
-							<div className='flex justify-end '>
+							<div className="flex justify-end">
 								{content.amount === 0 || isContentMine ? (
 									<Button
 										variant="outlined"
