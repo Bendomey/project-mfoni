@@ -11,6 +11,7 @@ interface Content {
 	tags: Nullable<Array<Tag>>
 	media: ContentMedia
 	meta: ContentMeta
+	orientation: IContentOrientation
 	visibility: IContentVisibility
 	amount: number
 	currentUserLike: Nullable<ContentLike>
@@ -29,7 +30,7 @@ interface ContentMeta {
 
 interface ContentMedia {
 	url: string
-	orientation: string
+	orientation: IContentOrientation
 	sizes: ContentMediaSizes
 }
 

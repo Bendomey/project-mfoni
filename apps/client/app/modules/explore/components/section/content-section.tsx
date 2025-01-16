@@ -1,5 +1,6 @@
 import { Link } from '@remix-run/react'
 import { Content } from '@/components/Content/index.tsx'
+import { classNames } from '@/lib/classNames.ts'
 
 interface Props {
 	data: Content
@@ -7,9 +8,15 @@ interface Props {
 
 export function ContentSection({ data }: Props) {
 	return (
-		<div className="h-auto w-80">
-			<Content content={data} />
-		</div>
+		<Content content={data} className={
+			classNames(
+				{
+					'h-80 w-[28rem]': data.media.orientation === 'LANDSCAPE',
+					'h-80 w-80': data.media.orientation === 'SQUARE',
+					'h-80 w-[19rem]' : data.media.orientation === 'PORTRAIT',
+				}
+			)
+		} />
 	)
 }
 

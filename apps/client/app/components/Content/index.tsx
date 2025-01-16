@@ -17,6 +17,7 @@ import { FlyoutContainer } from '../flyout/flyout-container.tsx'
 import { LikeButton } from '@/components/like-button.tsx'
 import { blurDataURL, PAGES } from '@/constants/index.ts'
 import { useValidateImage } from '@/hooks/use-validate-image.tsx'
+import { classNames } from '@/lib/classNames.ts'
 import { getNameInitials } from '@/lib/misc.ts'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
@@ -25,9 +26,10 @@ interface Props {
 	content: Content
 	showCreator?: boolean
 	showTags?: boolean
+	className?: string
 }
 
-export const Content = ({ content, showCreator = true }: Props) => {
+export const Content = ({ content, showCreator = true, className }: Props) => {
 	const { currentUser } = useAuth()
 	const navigate = useNavigate()
 
@@ -37,10 +39,10 @@ export const Content = ({ content, showCreator = true }: Props) => {
 			to={PAGES.PHOTO.replace(':slug', content.slug)}
 			state={{ modal: true }}
 		>
-			<div className="relative cursor-zoom-in">
+			<div className={classNames("relative cursor-zoom-in", className)}>
 				<Image
 					src={content.media.url}
-					className="h-auto max-w-full rounded-lg"
+					className="object-cover w-full h-full rounded-lg"
 					blurDataURL={blurDataURL}
 					alt={content.title}
 				/>
@@ -158,7 +160,7 @@ export const Content = ({ content, showCreator = true }: Props) => {
 								) : null}
 							</div>
 						</div>
-						<div className="hidden flex-row items-center justify-between gap-2.5 group-hover:flex">
+						<div className="hidden flex-row items-center justify-between gap-2.5 group-hover:flex w-full">
 							{showCreator && content.createdBy ? (
 								<FlyoutContainer
 									intendedPosition="y"
@@ -182,8 +184,8 @@ export const Content = ({ content, showCreator = true }: Props) => {
 										}}
 									>
 										<CreatedByCard createdBy={content.createdBy} />
-										<span className="ml-2 text-sm font-medium text-white">
-											{content.createdBy.name}
+										<span className="ml-2 text-sm font-medium text-white truncate">
+											{content.createdBy.name} 
 										</span>
 									</div>
 								</FlyoutContainer>
@@ -191,7 +193,7 @@ export const Content = ({ content, showCreator = true }: Props) => {
 								<div />
 							)}
 
-							<div>
+							<div className='flex justify-end '>
 								{content.amount === 0 || isContentMine ? (
 									<Button
 										variant="outlined"
