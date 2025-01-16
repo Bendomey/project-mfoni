@@ -1,7 +1,7 @@
+import { Link } from '@remix-run/react'
 import { Image } from 'remix-image'
 import { useGetRelatedCreators } from '@/api/creators/index.ts'
 import { Button } from '@/components/button/index.tsx'
-import { Link } from '@remix-run/react'
 
 interface Props {
 	username: string
