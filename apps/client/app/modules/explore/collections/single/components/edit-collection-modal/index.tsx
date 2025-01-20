@@ -34,8 +34,6 @@ export function EditCollectionTitleModal({
 	const queryClient = useQueryClient()
 	const fetcher = useFetcher<{ error: string; success: boolean }>()
 
-	console.log(collectionId, title)
-
 	const {
 		register,
 		handleSubmit,
