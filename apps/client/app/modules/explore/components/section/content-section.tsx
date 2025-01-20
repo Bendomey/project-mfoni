@@ -22,7 +22,7 @@ export function ContentSection({ data }: Props) {
 export function ContentShimmer() {
 	return (
 		<Link to="" preventScrollReset className="space-y-2">
-			<div className="h-36 w-60 animate-pulse rounded-md bg-zinc-100" />
+			<div className="h-80 w-[28rem] animate-pulse rounded-md bg-zinc-100" />
 		</Link>
 	)
 }

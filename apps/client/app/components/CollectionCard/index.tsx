@@ -1,18 +1,25 @@
 import { Link } from '@remix-run/react'
 import { ContentItemImages } from './content-item.tsx'
 import { PAGES } from '@/constants/index.ts'
+import { classNames } from '@/lib/classNames.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
 interface Props {
 	collection: Collection
+	className?: string
 }
 
-export function CollectionCard({ collection }: Props) {
+export function CollectionCard({ collection, className }: Props) {
 	const { currentUser } = useAuth()
 	const isCollectionMine = currentUser?.id === collection.createdBy?.id
 	return (
 		<Link to={PAGES.COLLECTION.replace(':collection', collection.slug)}>
-			<div className="relative h-52 overflow-hidden rounded-md">
+			<div
+				className={classNames(
+					'relative h-52 overflow-hidden rounded-md',
+					className,
+				)}
+			>
 				<ContentItemImages
 					collectionName={collection.name}
 					contents={collection.contentItems ?? []}
