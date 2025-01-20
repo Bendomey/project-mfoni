@@ -323,3 +323,42 @@ export const useGetContents = ({
 		queryFn: () => getContents(query),
 		retry: retryQuery,
 	})
+
+interface UpdateContentInput {
+	title?: string
+	visibility?: string
+	amount?: number
+}
+
+export const updateContent = async (
+	contentId: string,
+	data: UpdateContentInput,
+	apiConfig: ApiConfigForServerConfig,
+) => {
+	try {
+		const response = await fetchClient<ApiResponse<boolean>>(
+			`/v1/contents/${contentId}`,
+			{
+				method: 'PATCH',
+				body: JSON.stringify(data),
+				...apiConfig,
+			},
+		)
+
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
+
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
+
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}

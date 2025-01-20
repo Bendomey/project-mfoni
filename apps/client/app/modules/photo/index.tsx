@@ -192,17 +192,23 @@ export const PhotoModule = () => {
 					</div>
 
 					<div className="mt-5">
-						<div className="flex flex-row">
+						<div className="flex flex-row items-center">
 							<h1 className="font-bold">{content.title}</h1>
-							<PencilIcon
-								className="text-black-700 ml-4 h-6 w-4"
-								onClick={editTitleModalState.onToggle}
-							/>
-							<EditTitleModal
-								isOpened={editTitleModalState.isOpened}
-								toggleModal={editTitleModalState.onToggle}
-								title={content.title}
-							/>
+							{isContentMine ? (
+								<Button
+									variant="unstyled"
+									className="ml-4"
+									onClick={editTitleModalState.onToggle}
+								>
+									<PencilIcon className="h-4 w-auto" />
+									<EditTitleModal
+										isOpened={editTitleModalState.isOpened}
+										closeModal={editTitleModalState.onClose}
+										title={content.title}
+										contentId={content.id}
+									/>
+								</Button>
+							) : null}
 						</div>
 
 						<div className="flex">
