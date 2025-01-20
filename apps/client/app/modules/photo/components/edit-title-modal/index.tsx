@@ -60,7 +60,7 @@ export function EditTitleModal({
 	}, [fetcher?.data])
 
 	useEffect(() => {
-		if (fetcher?.data?.success && fetcher.state !== 'submitting') {
+		if (fetcher?.data?.success && fetcher.state === 'idle') {
 			successToast('Title updated successfully', {
 				id: 'success-content-update',
 			})

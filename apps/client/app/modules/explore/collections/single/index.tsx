@@ -51,6 +51,8 @@ export function CollectionModule() {
 		},
 	})
 
+	if (!collection) return null
+
 	const name = collection ? collection.name : collectionParam
 
 	let content = <></>
@@ -153,15 +155,6 @@ export function CollectionModule() {
 					<div className="flex flex-col justify-between gap-3 md:flex-row md:items-start">
 						<div className="flex flex-row">
 							<h1 className="text-4xl font-black">{name}</h1>
-							<PencilIcon
-								className="text-black-700 ml-4 mt-1 h-8 w-6 hover:text-gray-500"
-								onClick={editCollectionModalState.onToggle}
-							/>
-							<EditCollectionTitleModal
-								isOpened={editCollectionModalState.isOpened}
-								toggleModal={editCollectionModalState.onToggle}
-								title={name}
-							/>
 						</div>
 						<div className="flex items-center gap-3">
 							{isCollectionMine ? (
@@ -191,6 +184,7 @@ export function CollectionModule() {
 										>
 											<MenuItem>
 												<Button
+													onClick={editCollectionModalState.onToggle}
 													variant="unstyled"
 													className="flex w-full flex-col flex-wrap items-start rounded-none px-4 py-3 font-medium text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
 												>
@@ -255,22 +249,24 @@ export function CollectionModule() {
 				{content}
 			</div>
 			<Footer />
-			{collection ? (
-				<>
-					<AddImageContentsModal
-						existingContents={data?.rows ?? []}
-						collection={collection as unknown as Collection}
-						isOpened={addContentsModalState.isOpened}
-						onClose={addContentsModalState.onToggle}
-					/>
-					<RemoveImageContentModal
-						isOpened={removeContentsModalState.isOpened}
-						onClose={removeContentsModalState.onToggle}
-						collectionContent={selectedCollectionContent}
-						collectionSlug={collection?.slug}
-					/>
-				</>
-			) : null}
+			<AddImageContentsModal
+				existingContents={data?.rows ?? []}
+				collection={collection as unknown as Collection}
+				isOpened={addContentsModalState.isOpened}
+				onClose={addContentsModalState.onToggle}
+			/>
+			<RemoveImageContentModal
+				isOpened={removeContentsModalState.isOpened}
+				onClose={removeContentsModalState.onToggle}
+				collectionContent={selectedCollectionContent}
+				collectionSlug={collection?.slug}
+			/>
+			<EditCollectionTitleModal
+				isOpened={editCollectionModalState.isOpened}
+				closeModal={editCollectionModalState.onClose}
+				title={collection.name}
+				collectionId={collection?.id}
+			/>
 		</>
 	)
 }
