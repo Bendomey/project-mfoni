@@ -1,4 +1,6 @@
+import { useFetcher } from '@remix-run/react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { useRemoveContentsToCollection } from '@/api/collections/index.ts'
 import { Button } from '@/components/button/index.tsx'
 import { Modal } from '@/components/modal/index.tsx'
@@ -11,16 +13,27 @@ interface Props {
 	onClose: () => void
 	collectionSlug: string
 	collectionContent?: CollectionContent
+	count: number
+	collectionVisibility: string
 }
 
 export function RemoveImageContentModal({
 	collectionContent,
-	collectionSlug,
 	isOpened,
 	onClose,
+	count,
+	collectionVisibility,
 }: Props) {
 	const queryClient = useQueryClient()
-	const { isPending: isSubmitting, mutate } = useRemoveContentsToCollection()
+	const { isPending, mutate } = useRemoveContentsToCollection()
+	const fetcher = useFetcher<{ error: string; success: boolean }>()
+
+	useEffect(() => {
+		if (fetcher?.data?.success && fetcher.state === 'idle') {
+			onClose()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [fetcher])
 
 	const handleSubmit = () => {
 		if (!collectionContent) return
@@ -32,10 +45,27 @@ export function RemoveImageContentModal({
 			},
 			{
 				onSuccess: () => {
+					if (count === 1 && collectionVisibility === 'PUBLIC') {
+						// hide collection since it has no more content
+						fetcher.submit(
+							{
+								collectionId: collectionContent.collectionId,
+								visibility: 'PRIVATE',
+							},
+							{
+								action: `/api/update-collection`,
+								encType: 'multipart/form-data',
+								method: 'patch',
+								preventScrollReset: true,
+							},
+						)
+					} else {
+						onClose()
+					}
+
 					queryClient.invalidateQueries({
-						queryKey: [QUERY_KEYS.COLLECTIONS, collectionSlug, 'slug-contents'],
+						queryKey: [QUERY_KEYS.COLLECTIONS],
 					})
-					onClose()
 				},
 				onError: () => {
 					errorToast('Removing content failed. Please try again.')
@@ -43,6 +73,10 @@ export function RemoveImageContentModal({
 			},
 		)
 	}
+
+	const isHidingCollection = fetcher.state !== 'idle'
+	const isSubmitting = isHidingCollection || isPending
+
 	return (
 		<Modal
 			className="w-full md:w-4/6 lg:w-2/6"
@@ -61,8 +95,17 @@ export function RemoveImageContentModal({
 						Cancel
 					</Button>
 
-					<Button variant="solid" color="danger" onClick={handleSubmit}>
-						{isSubmitting ? 'Removing...' : 'Remove'}
+					<Button
+						disabled={isSubmitting}
+						variant="solid"
+						color="danger"
+						onClick={handleSubmit}
+					>
+						{isPending
+							? 'Removing...'
+							: isHidingCollection
+								? 'Hiding Collection ...'
+								: 'Remove'}
 					</Button>
 				</div>
 			</div>

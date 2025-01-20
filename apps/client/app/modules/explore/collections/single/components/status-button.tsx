@@ -2,6 +2,7 @@ import { useFetcher } from '@remix-run/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { Button } from '@/components/button/index.tsx'
+import { FlyoutContainer } from '@/components/flyout/flyout-container.tsx'
 import { Modal } from '@/components/modal/index.tsx'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
@@ -68,7 +69,25 @@ function PublishButton({ collection }: Props) {
 
 	return (
 		<>
-			<Button onClick={publishModalState.onToggle}>Publish</Button>
+			<FlyoutContainer
+				intendedPosition="y"
+				FlyoutContent={
+					collection.contentsCount === 0 ? (
+						<div className="z-50 flex w-48 flex-col items-center justify-center rounded-2xl bg-black px-3 py-4 shadow-xl">
+							<h3 className="text-center text-sm font-bold text-white">
+								Add contents to publish
+							</h3>
+						</div>
+					) : undefined
+				}
+			>
+				<Button
+					disabled={collection.contentsCount === 0}
+					onClick={publishModalState.onToggle}
+				>
+					Publish
+				</Button>
+			</FlyoutContainer>
 			<Modal
 				className="w-full md:w-4/6 lg:w-2/6"
 				isOpened={publishModalState.isOpened}
