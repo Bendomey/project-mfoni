@@ -176,6 +176,7 @@ public class CollectionContentService
             ).ToArray();
         }
 
+        // FOR CONTENT
         pipeline = pipeline.Append(
             new BsonDocument("$lookup", new BsonDocument
             {
@@ -196,25 +197,56 @@ public class CollectionContentService
             )
         ).ToArray();
 
-        // if (input.Visibility != null && input.Visibility != "ALL")
-        // {
-        //     pipeline = pipeline.Append(
-        //         new BsonDocument("$match", new BsonDocument
-        //         {
-        //             { "content.visibility", new BsonDocument("$eq", input.Visibility) },
-        //         })
-        //     ).ToArray();
-        // }
+        if (input.Visibility != null && input.Visibility != "ALL")
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content.visibility", new BsonDocument("$eq", input.Visibility) },
+                })
+            ).ToArray();
+        }
 
-        // if (input.Orientation != null && input.Orientation != "ALL")
-        // {
-        //     pipeline = pipeline.Append(
-        //         new BsonDocument("$match", new BsonDocument
-        //         {
-        //             { "content.orientation", new BsonDocument("$eq", input.Orientation) },
-        //         })
-        //     ).ToArray();
-        // }
+        if (input.Orientation != null && input.Orientation != "ALL")
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content.orientation", new BsonDocument("$eq", input.Orientation) },
+                })
+            ).ToArray();
+        }
+
+        // FOR CHILD COLLECTION
+        pipeline = pipeline.Append(
+           new BsonDocument("$lookup", new BsonDocument
+           {
+                { "from", "collections" },
+                { "localField", "child_collection_id" },
+                { "foreignField", "_id" },
+                { "as", "child_collection" }
+           })
+       ).ToArray();
+
+        pipeline = pipeline.Append(
+            new BsonDocument("$unwind",
+                new BsonDocument
+                {
+                    { "path", "$child_collection" },
+                    { "preserveNullAndEmptyArrays", true }
+                }
+            )
+        ).ToArray();
+
+        if (input.Visibility != null && input.Visibility != "ALL")
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "child_collection.visibility", new BsonDocument("$eq", input.Visibility) },
+                })
+            ).ToArray();
+        }
 
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$limit", queryFilter.Limit)).ToArray();
@@ -274,6 +306,7 @@ public class CollectionContentService
             ).ToArray();
         }
 
+        // FOR CONTENT
         pipeline = pipeline.Append(
             new BsonDocument("$lookup", new BsonDocument
             {
@@ -285,34 +318,66 @@ public class CollectionContentService
         ).ToArray();
 
         pipeline = pipeline.Append(
-           new BsonDocument("$unwind",
-               new BsonDocument
-               {
+            new BsonDocument("$unwind",
+                new BsonDocument
+                {
                     { "path", "$content" },
                     { "preserveNullAndEmptyArrays", true }
-               }
-           )
+                }
+            )
+        ).ToArray();
+
+        if (input.Visibility != null && input.Visibility != "ALL")
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content.visibility", new BsonDocument("$eq", input.Visibility) },
+                })
+            ).ToArray();
+        }
+
+        if (input.Orientation != null && input.Orientation != "ALL")
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "content.orientation", new BsonDocument("$eq", input.Orientation) },
+                })
+            ).ToArray();
+        }
+
+        // FOR CHILD COLLECTION
+        pipeline = pipeline.Append(
+           new BsonDocument("$lookup", new BsonDocument
+           {
+                { "from", "collections" },
+                { "localField", "child_collection_id" },
+                { "foreignField", "_id" },
+                { "as", "child_collection" }
+           })
        ).ToArray();
 
-        // if (input.Visibility != null && input.Visibility != "ALL")
-        // {
-        //     pipeline = pipeline.Append(
-        //         new BsonDocument("$match", new BsonDocument
-        //         {
-        //             { "content.visibility", new BsonDocument("$eq", input.Visibility) },
-        //         })
-        //     ).ToArray();
-        // }
+        pipeline = pipeline.Append(
+            new BsonDocument("$unwind",
+                new BsonDocument
+                {
+                    { "path", "$child_collection" },
+                    { "preserveNullAndEmptyArrays", true }
+                }
+            )
+        ).ToArray();
 
-        // if (input.Orientation != null && input.Orientation != "ALL")
-        // {
-        //     pipeline = pipeline.Append(
-        //         new BsonDocument("$match", new BsonDocument
-        //         {
-        //             { "content.orientation", new BsonDocument("$eq", input.Orientation) },
-        //         })
-        //     ).ToArray();
-        // }
+        if (input.Visibility != null && input.Visibility != "ALL")
+        {
+            pipeline = pipeline.Append(
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "child_collection.visibility", new BsonDocument("$eq", input.Visibility) },
+                })
+            ).ToArray();
+        }
+
 
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$count", "totalCount")).ToArray();
