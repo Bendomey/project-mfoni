@@ -395,3 +395,42 @@ export const useRemoveContentsToCollection = () =>
 	useMutation({
 		mutationFn: removeContentsToCollection,
 	})
+
+interface UpdateCollectionInput {
+	name?: string
+	visibility?: string
+	description?: string
+}
+
+export const updateCollection = async (
+	collectionId: string,
+	data: UpdateCollectionInput,
+	apiConfig: ApiConfigForServerConfig,
+) => {
+	try {
+		const response = await fetchClient<ApiResponse<boolean>>(
+			`/v1/collections/${collectionId}`,
+			{
+				method: 'PATCH',
+				body: JSON.stringify(data),
+				...apiConfig,
+			},
+		)
+
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
+
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
+
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}
