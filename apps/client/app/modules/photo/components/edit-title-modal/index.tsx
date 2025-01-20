@@ -1,28 +1,104 @@
-import { useState } from 'react'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useFetcher } from '@remix-run/react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { type SubmitHandler, useForm } from 'react-hook-form'
+import * as Yup from 'yup'
 import { Button } from '@/components/button/index.tsx'
 import { Modal } from '@/components/modal/index.tsx'
+import { QUERY_KEYS } from '@/constants/index.ts'
+import { classNames } from '@/lib/classNames.ts'
+import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
 
-interface Props {
-	isOpened: boolean
-	toggleModal: () => void
+interface Inputs {
 	title: string
 }
 
-export function EditTitleModal({ isOpened, toggleModal, title }: Props) {
-	const [editTitle, setEditTitle] = useState(title)
+const schema = Yup.object().shape({
+	title: Yup.string().required('Title is required.'),
+})
 
-	const handleInputChange = (e: any) => {
-		setEditTitle(e.target.value)
+interface Props {
+	isOpened: boolean
+	closeModal: () => void
+	title: string
+	contentId: string
+}
+
+export function EditTitleModal({
+	isOpened,
+	closeModal,
+	title,
+	contentId,
+}: Props) {
+	const queryClient = useQueryClient()
+	const fetcher = useFetcher<{ error: string; success: boolean }>()
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		setValue,
+		watch,
+	} = useForm<Inputs>({
+		resolver: yupResolver(schema),
+	})
+
+	useEffect(() => {
+		if (title) {
+			setValue('title', title)
+		}
+	}, [title, setValue])
+
+	// where there is an error in the action data, show an error toast
+	useEffect(() => {
+		if (fetcher?.data?.error) {
+			errorToast(fetcher?.data.error, {
+				id: 'error-content-update',
+			})
+		}
+	}, [fetcher?.data])
+
+	useEffect(() => {
+		if (fetcher?.data?.success && fetcher.state !== 'submitting') {
+			successToast('Title updated successfully', {
+				id: 'success-content-update',
+			})
+			closeModal()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [fetcher])
+
+	const onSubmit: SubmitHandler<Inputs> = (data) => {
+		fetcher.submit(
+			{
+				contentId: contentId,
+				title: data.title,
+			},
+			{
+				action: `/api/update-content`,
+				encType: 'multipart/form-data',
+				method: 'patch',
+				preventScrollReset: true,
+			},
+		)
+
+		queryClient.invalidateQueries({
+			queryKey: [QUERY_KEYS.CONTENTS],
+		})
 	}
+
+	const isDisabled =
+		watch('title') === title || fetcher.state !== 'idle' || !!errors.title
 
 	return (
 		<Modal
-			onClose={toggleModal}
+			onClose={closeModal}
 			isOpened={isOpened}
 			className="relative w-full p-0 md:w-3/6 lg:w-2/6"
 			canBeClosedWithBackdrop={false}
 		>
-			<div>
+			<form onSubmit={handleSubmit(onSubmit)}>
 				<div>
 					<div className="flex flex-row items-center justify-between bg-gray-100 p-4 text-gray-600">
 						<h1 className="font-bold">Edit Title</h1>
@@ -31,26 +107,34 @@ export function EditTitleModal({ isOpened, toggleModal, title }: Props) {
 						<div className="mt-2">
 							<input
 								id="title"
-								name="title"
 								type="text"
-								value={editTitle}
-								onChange={handleInputChange}
+								{...register('title')}
 								placeholder="Title"
-								className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+								className={classNames(
+									'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6',
+									errors.title
+										? 'outline-red-500 focus:outline-red-500'
+										: 'outline-gray-300 focus:outline-gray-500',
+								)}
 							/>
 						</div>
 					</div>
 
 					<div className="mt-10 flex justify-end gap-2 border-t pb-5 pr-5">
-						<Button className="mt-5" color="primary">
+						<Button
+							disabled={isDisabled}
+							type="submit"
+							className="mt-5"
+							color="primary"
+						>
 							Edit
 						</Button>
-						<Button variant="outlined" className="mt-5" onClick={toggleModal}>
+						<Button variant="outlined" className="mt-5" onClick={closeModal}>
 							Close
 						</Button>
 					</div>
 				</div>
-			</div>
+			</form>
 		</Modal>
 	)
 }
