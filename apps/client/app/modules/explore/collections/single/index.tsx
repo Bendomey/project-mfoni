@@ -257,9 +257,11 @@ export function CollectionModule() {
 			/>
 			<RemoveImageContentModal
 				isOpened={removeContentsModalState.isOpened}
-				onClose={removeContentsModalState.onToggle}
+				onClose={removeContentsModalState.onClose}
 				collectionContent={selectedCollectionContent}
 				collectionSlug={collection?.slug}
+				collectionVisibility={collection?.visibility}
+				count={data?.rows.length ?? 0}
 			/>
 			<EditCollectionTitleModal
 				isOpened={editCollectionModalState.isOpened}

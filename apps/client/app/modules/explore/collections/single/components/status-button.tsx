@@ -1,28 +1,93 @@
+import { useFetcher } from '@remix-run/react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { Button } from '@/components/button/index.tsx'
+import { FlyoutContainer } from '@/components/flyout/flyout-container.tsx'
 import { Modal } from '@/components/modal/index.tsx'
+import { QUERY_KEYS } from '@/constants/index.ts'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
+import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
 	collection: Collection
 }
 export function StatusButton({ collection }: Props) {
+	const fetcher = useFetcher<{ error: string; success: boolean }>()
+
+	// where there is an error in the action data, show an error toast
+	useEffect(() => {
+		if (fetcher?.data?.error) {
+			errorToast(fetcher?.data.error, {
+				id: 'error-collection-visibility-update',
+			})
+		}
+	}, [fetcher?.data])
+
 	if (collection.visibility === 'PRIVATE') {
-		return <PublishButton />
+		return <PublishButton collection={collection} />
 	}
 
-	return <HideButton />
+	return <HideButton collection={collection} />
 }
 
-function PublishButton() {
+function PublishButton({ collection }: Props) {
+	const queryClient = useQueryClient()
+	const fetcher = useFetcher<{ error: string; success: boolean }>()
+
 	const publishModalState = useDisclosure()
 
-	const isSubmitting = false
+	useEffect(() => {
+		if (fetcher?.data?.success && fetcher.state === 'idle') {
+			successToast('Collection published successfully', {
+				id: 'success-collection-visibility-update',
+			})
+			publishModalState.onClose()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [fetcher])
 
-	const handleSubmit = () => {}
+	const isSubmitting = fetcher.state !== 'idle'
+
+	const handleSubmit = () => {
+		fetcher.submit(
+			{
+				collectionId: collection.id,
+				visibility: 'PUBLIC',
+			},
+			{
+				action: `/api/update-collection`,
+				encType: 'multipart/form-data',
+				method: 'patch',
+				preventScrollReset: true,
+			},
+		)
+
+		queryClient.invalidateQueries({
+			queryKey: [QUERY_KEYS.COLLECTIONS],
+		})
+	}
 
 	return (
 		<>
-			<Button onClick={publishModalState.onToggle}>Publish</Button>
+			<FlyoutContainer
+				intendedPosition="y"
+				FlyoutContent={
+					collection.contentsCount === 0 ? (
+						<div className="z-50 flex w-48 flex-col items-center justify-center rounded-2xl bg-black px-3 py-4 shadow-xl">
+							<h3 className="text-center text-sm font-bold text-white">
+								Add contents to publish
+							</h3>
+						</div>
+					) : undefined
+				}
+			>
+				<Button
+					disabled={collection.contentsCount === 0}
+					onClick={publishModalState.onToggle}
+				>
+					Publish
+				</Button>
+			</FlyoutContainer>
 			<Modal
 				className="w-full md:w-4/6 lg:w-2/6"
 				isOpened={publishModalState.isOpened}
@@ -30,7 +95,7 @@ function PublishButton() {
 			>
 				<div>
 					<div className="mt-2 grid grid-cols-1">
-						<h1 className="text-2xl font-bold">Publish "Name of Content"?</h1>
+						<h1 className="text-2xl font-bold">Publish "{collection.name}"?</h1>
 						<p className="mt-2 text-sm">
 							This will make the collection public. You can always hide it.
 						</p>
@@ -54,12 +119,42 @@ function PublishButton() {
 	)
 }
 
-function HideButton() {
+function HideButton({ collection }: Props) {
+	const queryClient = useQueryClient()
+	const fetcher = useFetcher<{ error: string; success: boolean }>()
+
 	const hideModalState = useDisclosure()
 
-	const isSubmitting = false
+	useEffect(() => {
+		if (fetcher?.data?.success && fetcher.state === 'idle') {
+			successToast('Collection hidden successfully', {
+				id: 'success-collection-visibility-update',
+			})
+			hideModalState.onClose()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [fetcher])
 
-	const handleSubmit = () => {}
+	const isSubmitting = fetcher.state !== 'idle'
+
+	const handleSubmit = () => {
+		fetcher.submit(
+			{
+				collectionId: collection.id,
+				visibility: 'PRIVATE',
+			},
+			{
+				action: `/api/update-collection`,
+				encType: 'multipart/form-data',
+				method: 'patch',
+				preventScrollReset: true,
+			},
+		)
+
+		queryClient.invalidateQueries({
+			queryKey: [QUERY_KEYS.COLLECTIONS],
+		})
+	}
 
 	return (
 		<>
@@ -73,7 +168,7 @@ function HideButton() {
 			>
 				<div>
 					<div className="mt-2 grid grid-cols-1">
-						<h1 className="text-2xl font-bold">Hide "Name of Content"?</h1>
+						<h1 className="text-2xl font-bold">Hide "{collection.name}"?</h1>
 						<p className="mt-2 text-sm">
 							This will hide the collection from users. You can always publish
 							it.
