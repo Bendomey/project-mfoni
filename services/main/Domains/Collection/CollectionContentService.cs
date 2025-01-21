@@ -207,8 +207,8 @@ public class CollectionContentService
                         new BsonDocument("content_id", new BsonDocument("$ne", null)),
                         new BsonDocument
                         {
-                            "content", new BsonDocument("$type", "object"),
-                            "content.visibility", new BsonDocument("$eq", input.Visibility)
+                            new BsonDocument("content", new BsonDocument("$type", "object")),
+                            new BsonDocument("content.visibility", new BsonDocument("$eq", input.Visibility))
                         }
                     })
                 )
@@ -225,8 +225,8 @@ public class CollectionContentService
                         new BsonDocument("content_id", new BsonDocument("$ne", null)),
                         new BsonDocument
                         {
-                            "content", new BsonDocument("$type", "object"),
-                            "content.orientation", new BsonDocument("$eq", input.Orientation)
+                            new BsonDocument("content", new BsonDocument("$type", "object")),
+                            new BsonDocument("content.orientation", new BsonDocument("$eq", input.Orientation))
                         }
                     })
                 )
@@ -264,8 +264,8 @@ public class CollectionContentService
                         new BsonDocument("child_collection_id", new BsonDocument("$ne", null)),
                         new BsonDocument
                         {
-                            "child_collection", new BsonDocument("$type", "object"),
-                            "child_collection.visibility", new BsonDocument("$eq", input.Visibility)
+                            new BsonDocument("child_collection", new BsonDocument("$type", "object")),
+                            new BsonDocument("child_collection.visibility", new BsonDocument("$eq", input.Visibility))
                         }
                     })
                 )
@@ -361,8 +361,8 @@ public class CollectionContentService
                         new BsonDocument("content_id", new BsonDocument("$ne", null)),
                         new BsonDocument
                         {
-                            "content", new BsonDocument("$type", "object"),
-                            "content.visibility", new BsonDocument("$eq", input.Visibility)
+                            new BsonDocument("content", new BsonDocument("$type", "object")),
+                            new BsonDocument("content.visibility", new BsonDocument("$eq", input.Visibility))
                         }
                     })
                 )
@@ -379,8 +379,8 @@ public class CollectionContentService
                         new BsonDocument("content_id", new BsonDocument("$ne", null)),
                         new BsonDocument
                         {
-                            "content", new BsonDocument("$type", "object"),
-                            "content.orientation", new BsonDocument("$eq", input.Orientation)
+                            new BsonDocument("content", new BsonDocument("$type", "object")),
+                            new BsonDocument("content.orientation", new BsonDocument("$eq", input.Orientation))
                         }
                     })
                 )
@@ -418,8 +418,8 @@ public class CollectionContentService
                         new BsonDocument("child_collection_id", new BsonDocument("$ne", null)),
                         new BsonDocument
                         {
-                            "child_collection", new BsonDocument("$type", "object"),
-                            "child_collection.visibility", new BsonDocument("$eq", input.Visibility)
+                            new BsonDocument("child_collection", new BsonDocument("$type", "object")),
+                            new BsonDocument("child_collection.visibility", new BsonDocument("$eq", input.Visibility))
                         }
                     })
                 )
