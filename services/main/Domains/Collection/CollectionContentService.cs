@@ -200,20 +200,36 @@ public class CollectionContentService
         if (input.Visibility != null && input.Visibility != "ALL")
         {
             pipeline = pipeline.Append(
-                new BsonDocument("$match", new BsonDocument
-                {
-                    { "content.visibility", new BsonDocument("$eq", input.Visibility) },
-                })
+                new BsonDocument("$match", new BsonDocument("$or",
+                    new BsonArray
+                    {
+                        new BsonDocument("content_id", new BsonDocument("$exists", true)),
+                        new BsonDocument("content_id", new BsonDocument("$ne", null)),
+                        new BsonDocument
+                        {
+                            "content", new BsonDocument("$type", "object"),
+                            "content.visibility", new BsonDocument("$eq", input.Visibility)
+                        }
+                    })
+                )
             ).ToArray();
         }
 
         if (input.Orientation != null && input.Orientation != "ALL")
         {
             pipeline = pipeline.Append(
-                new BsonDocument("$match", new BsonDocument
-                {
-                    { "content.orientation", new BsonDocument("$eq", input.Orientation) },
-                })
+                new BsonDocument("$match", new BsonDocument("$or",
+                    new BsonArray
+                    {
+                        new BsonDocument("content_id", new BsonDocument("$exists", true)),
+                        new BsonDocument("content_id", new BsonDocument("$ne", null)),
+                        new BsonDocument
+                        {
+                            "content", new BsonDocument("$type", "object"),
+                            "content.orientation", new BsonDocument("$eq", input.Orientation)
+                        }
+                    })
+                )
             ).ToArray();
         }
 
@@ -241,10 +257,18 @@ public class CollectionContentService
         if (input.Visibility != null && input.Visibility != "ALL")
         {
             pipeline = pipeline.Append(
-                new BsonDocument("$match", new BsonDocument
-                {
-                    { "child_collection.visibility", new BsonDocument("$eq", input.Visibility) },
-                })
+                new BsonDocument("$match", new BsonDocument("$or",
+                    new BsonArray
+                    {
+                        new BsonDocument("child_collection_id", new BsonDocument("$exists", true)),
+                        new BsonDocument("child_collection_id", new BsonDocument("$ne", null)),
+                        new BsonDocument
+                        {
+                            "child_collection", new BsonDocument("$type", "object"),
+                            "child_collection.visibility", new BsonDocument("$eq", input.Visibility)
+                        }
+                    })
+                )
             ).ToArray();
         }
 
@@ -330,20 +354,36 @@ public class CollectionContentService
         if (input.Visibility != null && input.Visibility != "ALL")
         {
             pipeline = pipeline.Append(
-                new BsonDocument("$match", new BsonDocument
-                {
-                    { "content.visibility", new BsonDocument("$eq", input.Visibility) },
-                })
+                new BsonDocument("$match", new BsonDocument("$or",
+                    new BsonArray
+                    {
+                        new BsonDocument("content_id", new BsonDocument("$exists", true)),
+                        new BsonDocument("content_id", new BsonDocument("$ne", null)),
+                        new BsonDocument
+                        {
+                            "content", new BsonDocument("$type", "object"),
+                            "content.visibility", new BsonDocument("$eq", input.Visibility)
+                        }
+                    })
+                )
             ).ToArray();
         }
 
         if (input.Orientation != null && input.Orientation != "ALL")
         {
             pipeline = pipeline.Append(
-                new BsonDocument("$match", new BsonDocument
-                {
-                    { "content.orientation", new BsonDocument("$eq", input.Orientation) },
-                })
+                new BsonDocument("$match", new BsonDocument("$or",
+                    new BsonArray
+                    {
+                        new BsonDocument("content_id", new BsonDocument("$exists", true)),
+                        new BsonDocument("content_id", new BsonDocument("$ne", null)),
+                        new BsonDocument
+                        {
+                            "content", new BsonDocument("$type", "object"),
+                            "content.orientation", new BsonDocument("$eq", input.Orientation)
+                        }
+                    })
+                )
             ).ToArray();
         }
 
@@ -371,10 +411,18 @@ public class CollectionContentService
         if (input.Visibility != null && input.Visibility != "ALL")
         {
             pipeline = pipeline.Append(
-                new BsonDocument("$match", new BsonDocument
-                {
-                    { "child_collection.visibility", new BsonDocument("$eq", input.Visibility) },
-                })
+                new BsonDocument("$match", new BsonDocument("$or",
+                    new BsonArray
+                    {
+                        new BsonDocument("child_collection_id", new BsonDocument("$exists", true)),
+                        new BsonDocument("child_collection_id", new BsonDocument("$ne", null)),
+                        new BsonDocument
+                        {
+                            "child_collection", new BsonDocument("$type", "object"),
+                            "child_collection.visibility", new BsonDocument("$eq", input.Visibility)
+                        }
+                    })
+                )
             ).ToArray();
         }
 
