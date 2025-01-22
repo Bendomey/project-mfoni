@@ -234,25 +234,25 @@ public class CollectionContentService
         }
 
         // FOR CHILD COLLECTION
-    //     pipeline = pipeline.Append(
-    //        new BsonDocument("$lookup", new BsonDocument
-    //        {
-    //             { "from", "collections" },
-    //             { "localField", "child_collection_id" },
-    //             { "foreignField", "_id" },
-    //             { "as", "child_collection" }
-    //        })
-    //    ).ToArray();
+        //     pipeline = pipeline.Append(
+        //        new BsonDocument("$lookup", new BsonDocument
+        //        {
+        //             { "from", "collections" },
+        //             { "localField", "child_collection_id" },
+        //             { "foreignField", "_id" },
+        //             { "as", "child_collection" }
+        //        })
+        //    ).ToArray();
 
-    //     pipeline = pipeline.Append(
-    //         new BsonDocument("$unwind",
-    //             new BsonDocument
-    //             {
-    //                 { "path", "$child_collection" },
-    //                 { "preserveNullAndEmptyArrays", true }
-    //             }
-    //         )
-    //     ).ToArray();
+        //     pipeline = pipeline.Append(
+        //         new BsonDocument("$unwind",
+        //             new BsonDocument
+        //             {
+        //                 { "path", "$child_collection" },
+        //                 { "preserveNullAndEmptyArrays", true }
+        //             }
+        //         )
+        //     ).ToArray();
 
         // if (input.Visibility != null && input.Visibility != "ALL")
         // {
@@ -387,44 +387,44 @@ public class CollectionContentService
             ).ToArray();
         }
 
-    //     // FOR CHILD COLLECTION
-    //     pipeline = pipeline.Append(
-    //        new BsonDocument("$lookup", new BsonDocument
-    //        {
-    //             { "from", "collections" },
-    //             { "localField", "child_collection_id" },
-    //             { "foreignField", "_id" },
-    //             { "as", "child_collection" }
-    //        })
-    //    ).ToArray();
+        //     // FOR CHILD COLLECTION
+        //     pipeline = pipeline.Append(
+        //        new BsonDocument("$lookup", new BsonDocument
+        //        {
+        //             { "from", "collections" },
+        //             { "localField", "child_collection_id" },
+        //             { "foreignField", "_id" },
+        //             { "as", "child_collection" }
+        //        })
+        //    ).ToArray();
 
-    //     pipeline = pipeline.Append(
-    //         new BsonDocument("$unwind",
-    //             new BsonDocument
-    //             {
-    //                 { "path", "$child_collection" },
-    //                 { "preserveNullAndEmptyArrays", true }
-    //             }
-    //         )
-    //     ).ToArray();
+        //     pipeline = pipeline.Append(
+        //         new BsonDocument("$unwind",
+        //             new BsonDocument
+        //             {
+        //                 { "path", "$child_collection" },
+        //                 { "preserveNullAndEmptyArrays", true }
+        //             }
+        //         )
+        //     ).ToArray();
 
-    //     if (input.Visibility != null && input.Visibility != "ALL")
-    //     {
-    //         pipeline = pipeline.Append(
-    //             new BsonDocument("$match", new BsonDocument("$or",
-    //                 new BsonArray
-    //                 {
-    //                     new BsonDocument("child_collection_id", new BsonDocument("$exists", true)),
-    //                     new BsonDocument("child_collection_id", new BsonDocument("$ne", null)),
-    //                     new BsonDocument
-    //                     {
-    //                         new BsonDocument("child_collection", new BsonDocument("$type", "object")),
-    //                         new BsonDocument("child_collection.visibility", new BsonDocument("$eq", input.Visibility))
-    //                     }
-    //                 })
-    //             )
-    //         ).ToArray();
-    //     }
+        //     if (input.Visibility != null && input.Visibility != "ALL")
+        //     {
+        //         pipeline = pipeline.Append(
+        //             new BsonDocument("$match", new BsonDocument("$or",
+        //                 new BsonArray
+        //                 {
+        //                     new BsonDocument("child_collection_id", new BsonDocument("$exists", true)),
+        //                     new BsonDocument("child_collection_id", new BsonDocument("$ne", null)),
+        //                     new BsonDocument
+        //                     {
+        //                         new BsonDocument("child_collection", new BsonDocument("$type", "object")),
+        //                         new BsonDocument("child_collection.visibility", new BsonDocument("$eq", input.Visibility))
+        //                     }
+        //                 })
+        //             )
+        //         ).ToArray();
+        //     }
 
 
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
