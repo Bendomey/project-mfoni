@@ -22,6 +22,7 @@ import { DataTableColumnHeader } from "@/components/table/components";
 import { createDataTableError } from "@/lib/utils";
 import { FeatureContentModal } from "./feature";
 import { UnfeatureContentModal } from "./unfeature";
+import { convertPesewasToCedis, formatAmountAsFreeIfZero } from "@/lib";
 
 const CONTENTS_PER_PAGE = 50;
 
@@ -91,7 +92,7 @@ export const ListContents = () => {
         accessorKey: "amount",
         header: ({ column }) => <DataTableColumnHeader column={column} title={"Amount"} />,
         cell: ({ row }) =>
-          row.original.amount,
+        formatAmountAsFreeIfZero(convertPesewasToCedis(row.original.amount)),
       },
       {
         accessorKey: "likes",

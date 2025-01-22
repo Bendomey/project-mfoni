@@ -10,6 +10,7 @@ import { localizedDayjs } from "@/lib/date";
 import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Wallet } from "./components/wallet";
+import { convertPesewasToCedis, formatAmount } from "@/lib";
 
 const WALLET_TRANSACTION_PER_PAGE = 50;
 
@@ -120,7 +121,7 @@ export const WalletTransaction = () => {
         },
         cell: ({ row }) =>
           row.original.amount ? (
-            <div className="lowercase">{row.original.amount}</div>
+            <div className="lowercase">{formatAmount(convertPesewasToCedis(row.original.amount))}</div>
           ) : (
             "N/A"
           ),

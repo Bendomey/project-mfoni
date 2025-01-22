@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { convertPesewasToCedis, formatAmount } from "@/lib";
 
 export const Wallet = () => {
   const { data, isPending: isDataLoading, refetch, error } = useGetWallet();
@@ -45,8 +46,8 @@ export const Wallet = () => {
                   </p>
                 </div>
 
-                <div className="flex items-end gap-1">
-                  <h1 className="text-3xl font-bold">GH₵&nbsp;{data.wallet}</h1>
+                <div className="flex items-end gap-1 pl-3">
+                  <h1 className="text-3xl font-bold">{formatAmount(convertPesewasToCedis(data.wallet))}</h1>
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end gap-4 py-2 px-3 border-t border-gray-200 dark:border-gray-600">
