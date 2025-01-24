@@ -12,6 +12,11 @@ linters:
     - depguard
     - nolintlint
     - exhaustruct
+    - ireturn
+    - wrapcheck
+    - err113
+    - nlreturn
+    - wsl
 
   presets:
     - bugs

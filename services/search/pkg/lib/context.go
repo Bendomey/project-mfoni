@@ -16,8 +16,8 @@ func NewMfoniSearchContext(
 	config *viper.Viper,
 	rabbitMqChannel *amqp.Channel,
 	grpcServer *grpc.Server,
-) *MfoniSearchContext {
-	return &MfoniSearchContext{
+) MfoniSearchContext {
+	return MfoniSearchContext{
 		Config:          config,
 		RabbitMqChannel: rabbitMqChannel,
 		GrpcServer:      grpcServer,
