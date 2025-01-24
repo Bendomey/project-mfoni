@@ -1,0 +1,38 @@
+name: API CI
+
+on:
+  push:
+    paths:
+        - 'services/search/**'
+    branches:
+      - main
+      - prod
+  pull_request:
+    paths:
+      - 'services/search/**'
+
+jobs:
+  check-code:
+      name: 🧹 Lint
+      runs-on: ubuntu-latest
+
+      defaults:
+        run:
+          working-directory: services/search
+
+      # lint go app
+      steps:
+        - name: ⬇️ Checkout repo
+          uses: actions/checkout@v4
+
+        - name: Setup Go
+          uses: actions/setup-go@v5
+          with:
+            go-version: '1.23.5'
+
+        - name: go Lint
+          uses: golangci/golangci-lint-action@v6
+          with:
+            version: v1.60
+
+      

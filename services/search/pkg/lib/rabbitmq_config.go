@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Factory connects app to rabbitmq.
+// InitQueue connects app to queue(rabbitmq).
 func InitQueue(config *viper.Viper) *amqp.Channel {
 	queueServerURL := config.GetString("rabbitmq.url")
 
