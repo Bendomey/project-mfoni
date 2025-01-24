@@ -12,7 +12,11 @@ type MfoniSearchContext struct {
 	GrpcServer      *grpc.Server
 }
 
-func NewMfoniSearchContext(config *viper.Viper, rabbitMqChannel *amqp.Channel, grpcServer *grpc.Server) *MfoniSearchContext {
+func NewMfoniSearchContext(
+	config *viper.Viper,
+	rabbitMqChannel *amqp.Channel,
+	grpcServer *grpc.Server,
+) *MfoniSearchContext {
 	return &MfoniSearchContext{
 		Config:          config,
 		RabbitMqChannel: rabbitMqChannel,

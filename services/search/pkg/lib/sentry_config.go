@@ -29,12 +29,14 @@ func InitSentry(config *viper.Viper) {
 	if err != nil {
 		log.Fatalf("sentry.Init: %s", err)
 	}
-	// Flush buffered events before the program terminates.
-	// Set the timeout to the maximum duration the program can afford to wait.
-	defer sentry.Flush(2 * time.Second)
 
 	setDSNError := raven.SetDSN(dsn)
 	if setDSNError != nil {
 		log.Fatalf("raven.SetDSN: %s", setDSNError)
 	}
+
+	// Flush buffered events before the program terminates.
+	// Set the timeout to the maximum duration the program can afford to wait.
+	// nolint: mnd
+	defer sentry.Flush(2 * time.Second)
 }

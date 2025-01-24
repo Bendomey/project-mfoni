@@ -2,6 +2,7 @@ package lib
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/getsentry/raven-go"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -56,20 +57,26 @@ func PublishMessageToQueue(input PublishMessageToQueueInput) error {
 	)
 
 	if queueDeclareErr != nil {
-		return queueDeclareErr
+		return fmt.Errorf("failed to declare queue: %w", queueDeclareErr)
 	}
 
-	err := input.AppContext.RabbitMqChannel.PublishWithContext(
+	publishMessageErr := input.AppContext.RabbitMqChannel.PublishWithContext(
 		context.Background(),
 		input.ExchangeName, // exchange
 		queueDeclare.Name,  // routing key
 		false,              // mandatory
 		false,              // immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        input.Message,
+			ContentType:     "text/plain",
+			Body:            input.Message,
+			Headers:         amqp.Table{},
+			ContentEncoding: "",
+			DeliveryMode:    amqp.Persistent,
+			Priority:        0,
+			AppId:           QueueAppID,
+			UserId:          "guest",
 		},
 	)
 
-	return err
+	return fmt.Errorf("failed to publish message: %w", publishMessageErr)
 }

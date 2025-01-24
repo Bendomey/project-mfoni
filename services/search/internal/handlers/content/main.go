@@ -5,8 +5,8 @@ import (
 	"github.com/Bendomey/project-mfoni/services/search/pkg/lib"
 )
 
-func NewContentHandlers(ctx lib.MfoniSearchContext) {
-	contentServer := ContentHandler{
+func InitHandler(ctx lib.MfoniSearchContext) {
+	contentServer := Handler{
 		AppContext: ctx,
 	}
 
