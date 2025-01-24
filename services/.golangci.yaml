@@ -1,0 +1,28 @@
+linters:
+  enable:
+    - goconst
+    - godot
+    - gofmt
+    - goimports
+    - importas
+    - whitespace
+    - misspell
+
+  disable:
+    - depguard
+    - nolintlint
+
+  presets:
+    - bugs
+    - comment
+    - complexity
+    - error
+    - format
+    - import
+    - metalinter
+    - module
+    - performance
+    - sql
+    - style
+    - test
+    - unused

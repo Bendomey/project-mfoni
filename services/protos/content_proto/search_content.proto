@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option go_package="github.com/Bendomey/project-mfoni/services/search/internal/protos/content_proto";
+
+package searchcontent;
+
+service SearchContentService {
+  rpc Search (SearchRequest) returns (SearchResponse) {}
+  rpc Update (UpdateRequest) returns (UpdateResponse) {}
+}
+
+message SearchRequest {
+  string keyword = 1;
+  optional int64 take = 2;
+  optional int64 skip = 3;
+}
+
+message SearchResponse {
+  repeated string products = 1;
+}
+
+message UpdateRequest {
+  string type = 1;
+  string contentId = 2;
+  optional string title = 3;
+  optional bool isVisible = 4;
+  optional bool isSearchable = 5;
+  repeated string status = 6;
+  repeated string tags = 7;
+  repeated string collections = 8;
+  repeated string orientation = 9;
+  repeated bool isFree = 10;
+}
+
+message UpdateResponse {
+  bool update = 1;
+}
+
