@@ -1,6 +1,10 @@
 package contentservice
 
-import "github.com/sirupsen/logrus"
+import (
+	"context"
+
+	"github.com/sirupsen/logrus"
+)
 
 type SearchContentInput struct {
 	Keyword string
@@ -9,7 +13,7 @@ type SearchContentInput struct {
 }
 
 // Runs a search in the content index.
-func (context *IContext) Search(input SearchContentInput) ([]string, error) {
+func (context *IContext) Search(requestCtx context.Context, input SearchContentInput) ([]string, error) {
 	logrus.Info("Searching for content with keyword: ", input.Keyword)
 	return make([]string, 0), nil
 }

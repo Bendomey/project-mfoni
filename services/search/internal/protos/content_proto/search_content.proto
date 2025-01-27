@@ -6,7 +6,6 @@ package searchcontent;
 
 service SearchContentService {
   rpc Search (SearchRequest) returns (SearchResponse) {}
-  rpc Update (UpdateRequest) returns (UpdateResponse) {}
 }
 
 message SearchRequest {
@@ -16,23 +15,5 @@ message SearchRequest {
 }
 
 message SearchResponse {
-  repeated string products = 1;
+  repeated string contents = 1;
 }
-
-message UpdateRequest {
-  optional string type = 1;
-  string contentId = 2;
-  optional string title = 3;
-  optional bool isVisible = 4;
-  optional bool isSearchable = 5;
-  optional string status = 6;
-  repeated string tags = 7;
-  repeated string collections = 8;
-  optional string orientation = 9;
-  optional bool isFree = 10;
-}
-
-message UpdateResponse {
-  bool update = 1;
-}
-

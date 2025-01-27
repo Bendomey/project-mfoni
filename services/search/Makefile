@@ -11,7 +11,7 @@ build-server:
 
 # install golangci-lint to run: https://golangci-lint.run/welcome/install/
 lint:
-	golangci-lint run
+	gofmt -w . && golangci-lint run
 
 # install protoc to run: https://grpc.io/docs/protoc-installation/
 gen-protos:

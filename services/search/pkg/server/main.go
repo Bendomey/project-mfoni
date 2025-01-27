@@ -19,11 +19,19 @@ func Init() {
 		lib.InitSentry(config)
 	}
 
+	openSearchClient := lib.InitOpenSearch(config)
+
 	rabbitmqChannel := lib.InitQueue(config)
 
 	gprcServer := grpc.NewServer()
 
-	context := lib.NewMfoniSearchContext(config, rabbitmqChannel, gprcServer)
+	// create an app context.
+	context := lib.MfoniSearchContext{
+		Config:           config,
+		RabbitMqChannel:  rabbitmqChannel,
+		GrpcServer:       gprcServer,
+		OpenSearchClient: openSearchClient,
+	}
 
 	// Register the rpc handlers
 	services := services.InitServices(context)

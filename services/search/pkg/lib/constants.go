@@ -1,7 +1,7 @@
 package lib
 
 const (
-	ContentsIndexName     = "contents"
+	ContentsIndexName     = "v0.contents"
 	ContentIngestionQueue = "update-content-index"
 
 	ContentQueueName = "v1.mfoni-search.data-ingestion.content"
