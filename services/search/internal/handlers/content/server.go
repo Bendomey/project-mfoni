@@ -5,7 +5,6 @@ import (
 
 	"github.com/Bendomey/project-mfoni/services/search/internal/protos/content_proto"
 	"github.com/Bendomey/project-mfoni/services/search/internal/services"
-	contentservice "github.com/Bendomey/project-mfoni/services/search/internal/services/content"
 	"github.com/Bendomey/project-mfoni/services/search/pkg/lib"
 	"github.com/sirupsen/logrus"
 )
@@ -19,11 +18,7 @@ type Handler struct {
 }
 
 func (s *Handler) Search(_ context.Context, in *content_proto.SearchRequest) (*content_proto.SearchResponse, error) {
-	products, productsErr := s.Services.ContentService.Search(contentservice.SearchContentInput{
-		Keyword: in.GetKeyword(),
-		Take:    in.GetTake(),
-		Skip:    in.GetSkip(),
-	})
+	products, productsErr := s.Services.ContentService.Search(cleanUpSearchInput(in))
 
 	if productsErr != nil {
 		return nil, productsErr
@@ -34,8 +29,13 @@ func (s *Handler) Search(_ context.Context, in *content_proto.SearchRequest) (*c
 	}, nil
 }
 
-func (s *Handler) Update(ctx context.Context, in *content_proto.UpdateRequest) (*content_proto.UpdateResponse, error) {
-	logrus.Info("Search request received", ctx.Value("request_id"), in.GetContentId())
+func (s *Handler) Update(ctx context.Context, input *content_proto.UpdateRequest) (*content_proto.UpdateResponse, error) {
+	cleanedInput, cleanedInputErr := cleanUpUpdateContentInput(input)
+	if cleanedInputErr != nil {
+		return nil, cleanedInputErr
+	}
+
+	logrus.Info("Search request received", ctx.Value("request_id"), cleanedInput.ContentID)
 
 	return &content_proto.UpdateResponse{
 		Update: true,

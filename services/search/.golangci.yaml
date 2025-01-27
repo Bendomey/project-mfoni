@@ -17,6 +17,8 @@ linters:
     - err113
     - nlreturn
     - wsl
+    - protogetter
+    - lll
 
   presets:
     - bugs

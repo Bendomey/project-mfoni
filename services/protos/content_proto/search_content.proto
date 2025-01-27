@@ -20,16 +20,16 @@ message SearchResponse {
 }
 
 message UpdateRequest {
-  string type = 1;
+  optional string type = 1;
   string contentId = 2;
   optional string title = 3;
   optional bool isVisible = 4;
   optional bool isSearchable = 5;
-  repeated string status = 6;
+  optional string status = 6;
   repeated string tags = 7;
   repeated string collections = 8;
-  repeated string orientation = 9;
-  repeated bool isFree = 10;
+  optional string orientation = 9;
+  optional bool isFree = 10;
 }
 
 message UpdateResponse {
