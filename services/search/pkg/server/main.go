@@ -6,6 +6,7 @@ import (
 
 	"github.com/Bendomey/project-mfoni/services/search/config"
 	"github.com/Bendomey/project-mfoni/services/search/internal/handlers"
+	"github.com/Bendomey/project-mfoni/services/search/internal/processors"
 	"github.com/Bendomey/project-mfoni/services/search/internal/services"
 	"github.com/Bendomey/project-mfoni/services/search/pkg/lib"
 	log "github.com/sirupsen/logrus"
@@ -21,14 +22,11 @@ func Init() {
 
 	openSearchClient := lib.InitOpenSearch(config)
 
-	rabbitmqChannel := lib.InitQueue(config)
-
 	gprcServer := grpc.NewServer()
 
 	// create an app context.
 	context := lib.MfoniSearchContext{
 		Config:           config,
-		RabbitMqChannel:  rabbitmqChannel,
 		GrpcServer:       gprcServer,
 		OpenSearchClient: openSearchClient,
 	}
@@ -36,6 +34,10 @@ func Init() {
 	// Register the rpc handlers
 	services := services.InitServices(context)
 
+	// Register the processors
+	processors.Factory(context, services)
+
+	// Register the handlers
 	handlers.Factory(context, services)
 
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GetInt("app.port")))
