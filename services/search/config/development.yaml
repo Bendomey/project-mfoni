@@ -5,7 +5,7 @@ app:
   url: ${URL}
 
 openSearch:
-  url: ${OPENSEARCH_URL}
+  url: ${OPENSEARCH_NODE}
   number_of_shards: ${NUMBER_OF_SHARDS}
   number_of_replicas: ${NUMBER_OF_REPLICAS}
 

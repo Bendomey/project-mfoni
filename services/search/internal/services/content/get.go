@@ -14,7 +14,6 @@ import (
 )
 
 func (context *IContext) Get(requestCtx context.Context, contentID string) (*models.Content, error) {
-
 	getRequest := opensearchapi.GetRequest{
 		Index:      lib.ContentsIndexName,
 		DocumentID: contentID,
@@ -32,11 +31,13 @@ func (context *IContext) Get(requestCtx context.Context, contentID string) (*mod
 	if getResponse.StatusCode == http.StatusNotFound {
 		return nil, &GetContentError{Message: "Document not found", Type: "NOT_FOUND"}
 	} else if getResponse.StatusCode == http.StatusOK {
-
 		// Parse and handle the response
 		var responseBody models.Content
 		if err := json.NewDecoder(getResponse.Body).Decode(&responseBody); err != nil {
-			return nil, &GetContentError{Message: fmt.Sprintf("Error parsing response body: %s", err), Type: "INTERNAL_SERVER_ERROR"}
+			return nil, &GetContentError{
+				Message: fmt.Sprintf("Error parsing response body: %s", err),
+				Type:    "INTERNAL_SERVER_ERROR",
+			}
 		}
 
 		return &responseBody, nil

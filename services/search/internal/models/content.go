@@ -6,7 +6,8 @@ type Content struct {
 	Type      *string `json:"type"`
 	Title     *string `json:"title"`
 	// nolint: tagliatelle
-	IsVisible    *bool `json:"is_visible"`
+	IsVisible *bool `json:"is_visible"`
+	// nolint: tagliatelle
 	IsSearchable *bool `json:"is_searchable"`
 	// nolint: tagliatelle
 	IsFree      *bool    `json:"is_free"`
