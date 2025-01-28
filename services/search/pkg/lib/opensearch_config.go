@@ -29,7 +29,7 @@ func InitOpenSearch(config *viper.Viper) *opensearch.Client {
 		return nil
 	}
 
-	logger.Info("[OpenSearch]:: Connected successfully...dsgsdg:", config.GetString("openSearch.url"))
+	logger.Info("[OpenSearch]:: Connected successfully...")
 
 	// Create indices if they do not exist.
 	createIndicesIfNotExists(client, config)
