@@ -12,10 +12,13 @@ import (
 	logger "github.com/sirupsen/logrus"
 )
 
-// Client is the base struct for handling connection recovery, consumption and
-// publishing. Note that this struct has an internal mutex to safeguard against
-// data races. As you develop and iterate over this example, you may need to add
-// further locks, or safeguards, to keep your application safe from data races
+/**
+* Client is the base struct for handling connection recovery, consumption and
+* publishing. Note that this struct has an internal mutex to safeguard against
+* data races. As you develop and iterate over this example, you may need to add
+* further locks, or safeguards, to keep your application safe from data races
+ */
+
 type Client struct {
 	M               *sync.Mutex
 	QueueName       string

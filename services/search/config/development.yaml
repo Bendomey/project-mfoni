@@ -22,3 +22,12 @@ redis:
 
 rabbitmq:
   url: ${RABBITMQ_URL}
+
+mongo:
+  uri: ${MONGODB_URI}
+  database_name: ${DATABASE_NAME}
+  content_collection: ${CONTENT_COLLECTION}
+  tag_collection: ${TAG_COLLECTION}
+  collections_collection: ${COLLECTIONS_COLLECTION}
+  content_tags_collection: ${CONTENT_TAGS_COLLECTION}
+  content_collections_collection: ${CONTENT_COLLECTIONS_COLLECTION}

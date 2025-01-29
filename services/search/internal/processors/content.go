@@ -1,7 +1,9 @@
 package processors
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/Bendomey/project-mfoni/services/search/internal/services"
@@ -18,6 +20,9 @@ const (
 
 	// How long we should wait before processing the next message.
 	processingMessageDelay = time.Second * 2
+
+	// How many contents to index at a time.
+	indexLimit = int64(50)
 )
 
 // Subscribe as a worker to rabbitmq queue and ingest data into opensearch.
@@ -65,7 +70,7 @@ func ProcessContent(appCtx lib.MfoniSearchContext, services services.Services) {
 			chClosedCh = make(chan *amqp.Error, 1)
 			contentQueue.Channel.NotifyClose(chClosedCh)
 		case delivery := <-deliveries:
-			if processErr := ProcessMessage(delivery.Body); processErr != nil {
+			if processErr := ProcessMessage(delivery.Body, services); processErr != nil {
 				raven.CaptureError(processErr, map[string]string{
 					"message": string(delivery.Body),
 					"queue":   lib.ContentQueueName,
@@ -74,6 +79,7 @@ func ProcessContent(appCtx lib.MfoniSearchContext, services services.Services) {
 
 				contentQueue.Errlog.Errorf("[Worker]:: error processing message: %s\n", processErr)
 
+				// Don't acknowledge the message.
 				if nackErr := delivery.Nack(false, false); nackErr != nil {
 					raven.CaptureError(nackErr, map[string]string{
 						"message": string(delivery.Body),
@@ -81,19 +87,22 @@ func ProcessContent(appCtx lib.MfoniSearchContext, services services.Services) {
 					})
 					contentQueue.Errlog.Printf("[Worker]:: error not-acknowledging message: %s\n", nackErr)
 				}
+			} else {
+				// Acknowledge the message.
+				if ackErr := delivery.Ack(false); ackErr != nil {
+					raven.CaptureError(
+						ackErr,
+						map[string]string{
+							"message": string(delivery.Body),
+							"action":  "acknowledging message",
+						},
+					)
+					contentQueue.Errlog.Printf("[Worker]:: error acknowledging message: %s\n", ackErr)
+				}
+
+				contentQueue.Infolog.Info("[Worker]:: message processed successfully")
 			}
 
-			// Acknowledge the message.
-			if ackErr := delivery.Ack(false); ackErr != nil {
-				raven.CaptureError(
-					ackErr,
-					map[string]string{
-						"message": string(delivery.Body),
-						"action":  "acknowledging message",
-					},
-				)
-				contentQueue.Errlog.Printf("[Worker]:: error acknowledging message: %s\n", ackErr)
-			}
 			<-time.After(processingMessageDelay)
 		}
 	}
@@ -105,7 +114,7 @@ type Message struct {
 	ContentID string `json:"content_id"`
 }
 
-func ProcessMessage(imessage []byte) error {
+func ProcessMessage(imessage []byte, svcs services.Services) error {
 	logrus.Info("Processing message: ", string(imessage))
 
 	// Declare a variable of the struct type.
@@ -117,16 +126,117 @@ func ProcessMessage(imessage []byte) error {
 		return err
 	}
 
-	logrus.Info("Message type: ", message.Type)
-	logrus.Info("Content ID: ", message.ContentID)
-	// get the type of message
+	switch message.Type {
+	case "CREATE":
+		// Get the content data.
+		contentData, contentDataErr := svcs.ContentService.FindOne(context.Background(), message.ContentID)
+		if contentDataErr != nil {
+			return contentDataErr
+		}
 
-	// get the content_id.
-	// get the content from the database.
-	// push the content to opensearch.
-	// if the content is not found, log the error.
-	// if the content is found, push the content to opensearch.
-	// if the content is pushed to opensearch, log the success.
-	// if the content is not pushed to opensearch, log the error.
+		contentTags, contentTagsErr := svcs.ContentService.FindTags(context.Background(), message.ContentID)
+		if contentTagsErr != nil {
+			return contentTagsErr
+		}
+
+		contentData.Tags = *contentTags
+
+		contentCollections, contentCollectionsErr := svcs.ContentService.
+			FindCollections(context.Background(), message.ContentID)
+
+		if contentCollectionsErr != nil {
+			return contentCollectionsErr
+		}
+
+		contentData.Collections = *contentCollections
+
+		// Index the content.
+		_, indexErr := svcs.ContentService.Index(context.Background(), *contentData)
+		if indexErr != nil {
+			return indexErr
+		}
+	case "UPDATE_BASIC":
+		contentData, contentDataErr := svcs.ContentService.FindOne(context.Background(), message.ContentID)
+		if contentDataErr != nil {
+			return contentDataErr
+		}
+
+		_, updateErr := svcs.ContentService.UpdateBase(context.Background(), *contentData)
+		if updateErr != nil {
+			return updateErr
+		}
+	case "UPDATE_TAGS":
+		contentTags, contentTagsErr := svcs.ContentService.FindTags(context.Background(), message.ContentID)
+		if contentTagsErr != nil {
+			return contentTagsErr
+		}
+		_, updateErr := svcs.ContentService.UpdateTags(context.Background(), message.ContentID, *contentTags)
+
+		if updateErr != nil {
+			return updateErr
+		}
+	case "UPDATE_COLLECTIONS":
+		contentCollections, contentCollectionsErr := svcs.ContentService.
+			FindCollections(context.Background(), message.ContentID)
+
+		if contentCollectionsErr != nil {
+			return contentCollectionsErr
+		}
+		_, updateErr := svcs.ContentService.UpdateCollections(context.Background(), message.ContentID, *contentCollections)
+
+		if updateErr != nil {
+			return updateErr
+		}
+	case "DELETE":
+		_, deleteErr := svcs.ContentService.Purge(context.Background(), message.ContentID)
+
+		if deleteErr != nil {
+			return deleteErr
+		}
+	case "INDEX_ALL":
+		limit := indexLimit
+		skip := int64(0)
+		for {
+			contentsData, contentDataErr := svcs.ContentService.FindMany(context.Background(), skip, limit)
+			if contentDataErr != nil {
+				return contentDataErr
+			}
+
+			if len(*contentsData) == 0 {
+				break
+			}
+
+			for _, contentData := range *contentsData {
+				contentTags, contentTagsErr := svcs.ContentService.FindTags(context.Background(), contentData.ContentID)
+				if contentTagsErr != nil {
+					return contentTagsErr
+				}
+
+				contentData.Tags = *contentTags
+
+				contentCollections, contentCollectionsErr := svcs.ContentService.
+					FindCollections(context.Background(), contentData.ContentID)
+
+				if contentCollectionsErr != nil {
+					return contentCollectionsErr
+				}
+
+				contentData.Collections = *contentCollections
+
+				// Index the content.
+				_, indexErr := svcs.ContentService.Index(context.Background(), contentData)
+				if indexErr != nil {
+					logrus.Errorf("error indexing content: %s", indexErr)
+					continue
+				}
+			}
+
+			logrus.Infof("Indexed %d - %d contents", skip, skip+limit)
+			skip += limit
+		}
+	default:
+		return fmt.Errorf("unknown message type: %s", message.Type)
+	}
+
 	return nil
 }

@@ -9,17 +9,23 @@ import (
 
 	"github.com/Bendomey/project-mfoni/services/search/internal/models"
 	"github.com/Bendomey/project-mfoni/services/search/pkg/lib"
-	"github.com/opensearch-project/opensearch-go/opensearchapi"
+	"github.com/opensearch-project/opensearch-go/v2"
+	"github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	"github.com/sirupsen/logrus"
 )
 
-func (context *IContext) Get(requestCtx context.Context, contentID string) (*models.Content, error) {
+type OpenSearchGetOutput struct {
+	// nolint: tagliatelle
+	Source models.Content `json:"_source"`
+}
+
+func _get(requestCtx context.Context, client *opensearch.Client, contentID string) (*models.Content, error) {
 	getRequest := opensearchapi.GetRequest{
 		Index:      lib.ContentsIndexName,
 		DocumentID: contentID,
 	}
 
-	getResponse, getResponseErr := getRequest.Do(requestCtx, context.AppContext.OpenSearchClient)
+	getResponse, getResponseErr := getRequest.Do(requestCtx, client)
 
 	if getResponseErr != nil {
 		logrus.Error("Error getting content: ", getResponseErr)
@@ -31,8 +37,8 @@ func (context *IContext) Get(requestCtx context.Context, contentID string) (*mod
 	if getResponse.StatusCode == http.StatusNotFound {
 		return nil, &GetContentError{Message: "Document not found", Type: "NOT_FOUND"}
 	} else if getResponse.StatusCode == http.StatusOK {
-		// Parse and handle the response
-		var responseBody models.Content
+		// Parse and handle the response.
+		var responseBody OpenSearchGetOutput
 		if err := json.NewDecoder(getResponse.Body).Decode(&responseBody); err != nil {
 			return nil, &GetContentError{
 				Message: fmt.Sprintf("Error parsing response body: %s", err),
@@ -40,7 +46,7 @@ func (context *IContext) Get(requestCtx context.Context, contentID string) (*mod
 			}
 		}
 
-		return &responseBody, nil
+		return &responseBody.Source, nil
 	}
 
 	// Some other error occurred.

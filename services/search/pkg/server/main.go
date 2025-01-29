@@ -22,23 +22,26 @@ func Init() {
 
 	openSearchClient := lib.InitOpenSearch(config)
 
+	mongoClient := lib.InitMongoConfig(config)
+
 	gprcServer := grpc.NewServer()
 
 	// create an app context.
-	context := lib.MfoniSearchContext{
+	appContext := lib.MfoniSearchContext{
 		Config:           config,
 		GrpcServer:       gprcServer,
 		OpenSearchClient: openSearchClient,
+		MongoClient:      mongoClient,
 	}
 
 	// Register the rpc handlers
-	services := services.InitServices(context)
+	services := services.InitServices(appContext)
 
 	// Register the processors
-	processors.Factory(context, services)
+	processors.Factory(appContext, services)
 
 	// Register the handlers
-	handlers.Factory(context, services)
+	handlers.Factory(appContext, services)
 
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GetInt("app.port")))
 	if err != nil {

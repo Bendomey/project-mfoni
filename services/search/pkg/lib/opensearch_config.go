@@ -8,8 +8,8 @@ import (
 
 	"github.com/Bendomey/project-mfoni/services/search/internal/models"
 	"github.com/getsentry/raven-go"
-	"github.com/opensearch-project/opensearch-go"
-	"github.com/opensearch-project/opensearch-go/opensearchapi"
+	"github.com/opensearch-project/opensearch-go/v2"
+	"github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	logger "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
