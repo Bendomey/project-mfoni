@@ -10,7 +10,7 @@ import (
 
 type ContentService interface {
 	Index(requestCtx context.Context, input models.Content) (bool, error)
-	Search(requestCtx context.Context, input SearchContentInput) ([]string, error)
+	Search(requestCtx context.Context, input SearchContentInput) (*[]string, error)
 	UpdateBase(requestCtx context.Context, input models.Content) (bool, error)
 	UpdateTags(requestCtx context.Context, contentID string, tags []string) (bool, error)
 	UpdateCollections(requestCtx context.Context, contentID string, collections []string) (bool, error)

@@ -6,6 +6,7 @@ import (
 	"github.com/Bendomey/project-mfoni/services/search/internal/protos/content_proto"
 	"github.com/Bendomey/project-mfoni/services/search/internal/services"
 	"github.com/Bendomey/project-mfoni/services/search/pkg/lib"
+	"github.com/sirupsen/logrus"
 )
 
 type Handler struct {
@@ -20,10 +21,11 @@ func (s *Handler) Search(ctx context.Context, in *content_proto.SearchRequest) (
 	contents, contentsErr := s.Services.ContentService.Search(ctx, cleanUpSearchInput(in))
 
 	if contentsErr != nil {
+		logrus.Error("Error searching for content: ", contentsErr)
 		return nil, contentsErr
 	}
 
 	return &content_proto.SearchResponse{
-		Contents: contents,
+		Contents: *contents,
 	}, nil
 }
