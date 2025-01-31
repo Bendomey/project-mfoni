@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
+	// nolint: staticcheck
 	"io/ioutil"
 	"net/http"
 

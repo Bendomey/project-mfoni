@@ -15,6 +15,7 @@ func InitMongoConfig(config *viper.Viper) *mongo.Client {
 	// Initialize the mongo config.
 	mongoURI := config.GetString("mongo.uri")
 
+	// nolint: mnd
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

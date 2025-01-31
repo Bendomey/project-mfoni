@@ -18,6 +18,13 @@ linters:
     - nlreturn
     - wsl
     - protogetter
+    - gofumpt
+    - funlen
+    - gocognit
+    - govet
+    - godox
+    - cyclop
+    - gci
 
   presets:
     - bugs
