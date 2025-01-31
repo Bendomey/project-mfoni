@@ -1,0 +1,50 @@
+name: Search Deploy
+
+on:
+  push:
+    paths:
+      - 'services/search/**'
+    branches:
+      - main
+      - prod
+
+jobs:
+  deploy:
+    name: ⚙️ Build And Deploy
+    runs-on: ubuntu-latest
+    concurrency: deploy-group
+
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+    defaults:
+      run:
+        working-directory: services/search
+
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🎈 Setup Fly
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: 🚀 Deploy Staging
+        run: flyctl deploy --remote-only
+          --build-arg APP_NAME=${{ secrets.STAGING_SEARCH_SERVICE_APP_NAME }}
+          --build-arg GO_ENV=${{ secrets.STAGING_SEARCH_SERVICE_GO_ENV }}
+          --build-arg PORT=${{ secrets.STAGING_SEARCH_SERVICE_PORT }}
+          --build-arg URL=${{ secrets.STAGING_SEARCH_SERVICE_URL }}
+          --build-arg OPENSEARCH_NODE=${{ secrets.STAGING_SEARCH_SERVICE_OPENSEARCH_NODE }}
+          --build-arg NUMBER_OF_SHARDS=${{ secrets.STAGING_SEARCH_SERVICE_NUMBER_OF_SHARDS }}
+          --build-arg NUMBER_OF_REPLICAS=${{ secrets.STAGING_SEARCH_SERVICE_NUMBER_OF_REPLICAS }}
+          --build-arg SENTRY_DSN=${{ secrets.STAGING_SEARCH_SERVICE_SENTRY_DSN }}
+          --build-arg SENTRY_ENVIRONMENT=${{ secrets.STAGING_SEARCH_SERVICE_SENTRY_ENVIRONMENT }}
+          --build-arg SENTRY_DEBUG=${{ secrets.STAGING_SEARCH_SERVICE_SENTRY_DEBUG }}
+          --build-arg RABBITMQ_URL=${{ secrets.STAGING_SEARCH_SERVICE_RABBITMQ_URL }}
+          --build-arg MONGODB_URI=${{ secrets.STAGING_SEARCH_SERVICE_MONGODB_URI }}
+          --build-arg DATABASE_NAME=${{ secrets.STAGING_SEARCH_SERVICE_DATABASE_NAME }}
+          --build-arg CONTENT_COLLECTION=${{ secrets.STAGING_SEARCH_SERVICE_CONTENT_COLLECTION }}
+          --build-arg TAG_COLLECTION=${{ secrets.STAGING_SEARCH_SERVICE_TAG_COLLECTION }}
+          --build-arg COLLECTIONS_COLLECTION=${{ secrets.STAGING_SEARCH_SERVICE_COLLECTIONS_COLLECTION }}
+          --build-arg CONTENT_TAGS_COLLECTION=${{ secrets.STAGING_SEARCH_SERVICE_CONTENT_TAGS_COLLECTION }}
+          --build-arg CONTENT_COLLECTIONS_COLLECTION=${{ secrets.STAGING_SEARCH_SERVICE_CONTENT_COLLECTIONS_COLLECTION }}

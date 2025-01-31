@@ -7,7 +7,10 @@ run-dev:
 	chmod u+r+x ./scripts/run-dev.sh && scripts/run-dev.sh
 
 build-server:
-	scripts/build.sh
+	chmod u+r+x scripts/build.sh && scripts/build.sh
+
+build-docker:
+	chmod u+r+x scripts/build-docker.sh && scripts/build-docker.sh
 
 # install golangci-lint to run: https://golangci-lint.run/welcome/install/
 lint:
