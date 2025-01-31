@@ -1,0 +1,33 @@
+app:
+  env: ${GO_ENV}
+  name: ${APP_NAME}
+  port: ${PORT}
+  url: ${URL}
+
+openSearch:
+  url: ${OPENSEARCH_NODE}
+  number_of_shards: ${NUMBER_OF_SHARDS}
+  number_of_replicas: ${NUMBER_OF_REPLICAS}
+
+sentry:
+  dsn: ${SENTRY_DSN}
+  environment: ${SENTRY_ENVIRONMENT}
+  debug: ${SENTRY_DEBUG}
+
+redis:
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
+  password: ${REDIS_PASSWORD}
+  db: ${REDIS_DB}
+
+rabbitmq:
+  url: ${RABBITMQ_URL}
+
+mongo:
+  uri: ${MONGODB_URI}
+  database_name: ${DATABASE_NAME}
+  content_collection: ${CONTENT_COLLECTION}
+  tag_collection: ${TAG_COLLECTION}
+  collections_collection: ${COLLECTIONS_COLLECTION}
+  content_tags_collection: ${CONTENT_TAGS_COLLECTION}
+  content_collections_collection: ${CONTENT_COLLECTIONS_COLLECTION}

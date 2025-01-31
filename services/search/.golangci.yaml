@@ -1,0 +1,42 @@
+linters:
+  enable:
+    - goconst
+    - godot
+    - gofmt
+    - goimports
+    - importas
+    - whitespace
+    - misspell
+
+  disable:
+    - depguard
+    - nolintlint
+    - exhaustruct
+    - ireturn
+    - wrapcheck
+    - err113
+    - nlreturn
+    - wsl
+    - protogetter
+    - gofumpt
+    - funlen
+    - gocognit
+    - govet
+    - godox
+    - cyclop
+    - gci
+
+  presets:
+    - bugs
+    - comment
+    - complexity
+    - error
+    - format
+    - import
+    - metalinter
+    - module
+    - performance
+    - sql
+    - style
+    - test
+    - unused

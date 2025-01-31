@@ -14,3 +14,6 @@ run-api:
 open-browser:
 	open http://localhost:3000
 .PHONY: open-browser
+
+run-opensearch:
+	cd infrastructure && docker-compose -f opensearch-local-compose.yml up
