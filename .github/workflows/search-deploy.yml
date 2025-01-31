@@ -30,7 +30,7 @@ jobs:
 
       - name: 🚀 Deploy Staging
         run: flyctl deploy --remote-only
-          --build-arg APP_NAME=${{ secrets.STAGING_SEARCH_SERVICE_APP_NAME }}
+          --build-arg "APP_NAME=${{ secrets.STAGING_SEARCH_SERVICE_APP_NAME }}"
           # --build-arg GO_ENV=${{ secrets.STAGING_SEARCH_SERVICE_GO_ENV }}
           # --build-arg PORT=${{ secrets.STAGING_SEARCH_SERVICE_PORT }}
           # --build-arg URL=${{ secrets.STAGING_SEARCH_SERVICE_URL }}
