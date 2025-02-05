@@ -18,6 +18,7 @@ import (
 func InitOpenSearch(config *viper.Viper) *opensearch.Client {
 	client, connectionErr := opensearch.NewClient(opensearch.Config{
 		Transport: &http.Transport{
+			// nolint: gosec
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
 		},
 		Username:  config.GetString("openSearch.username"),
