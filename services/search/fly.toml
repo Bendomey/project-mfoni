@@ -18,7 +18,7 @@ primary_region = 'lhr'
   protocol = "tcp"
   [[services.ports]]
     port = "443"
-    handlers = ["tls", "http2"]
+    handlers = ["tls"]
 
 [[vm]]
   memory = '1gb'
