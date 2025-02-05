@@ -8,14 +8,17 @@ primary_region = 'lhr'
 
 [build]
 
-[http_service]
-  internal_port = 8080
-  protocol = "tcp"
-  force_https = true
+[experimental]
   auto_stop_machines = true
   auto_start_machines = true
   min_machines_running = 0
-  processes = ['app']
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+  [[services.ports]]
+    port = "443"
+    handlers = ["tls", "http2"]
 
 [[vm]]
   memory = '1gb'
