@@ -5,6 +5,8 @@ export PORT=3000
 export URL=dns:///0.0.0.0
 
 export OPENSEARCH_NODE=http://localhost:9200
+export OPENSEARCH_USERNAME=
+export OPENSEARCH_PASSWORD=
 export NUMBER_OF_SHARDS=1
 export NUMBER_OF_REPLICAS=1
 

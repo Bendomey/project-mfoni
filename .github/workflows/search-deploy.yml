@@ -35,6 +35,8 @@ jobs:
           --build-arg "PORT=${{ secrets.STAGING_SEARCH_SERVICE_PORT }}"
           --build-arg "URL=${{ secrets.STAGING_SEARCH_SERVICE_URL }}"
           --build-arg "OPENSEARCH_NODE=${{ secrets.STAGING_SEARCH_SERVICE_OPENSEARCH_NODE }}"
+          --build-arg "OPENSEARCH_USERNAME=${{ secrets.STAGING_SEARCH_SERVICE_OPENSEARCH_USERNAME }}"
+          --build-arg "OPENSEARCH_PASSWORD=${{ secrets.STAGING_SEARCH_SERVICE_OPENSEARCH_PASSWORD }}"
           --build-arg "NUMBER_OF_SHARDS=${{ secrets.STAGING_SEARCH_SERVICE_NUMBER_OF_SHARDS }}"
           --build-arg "NUMBER_OF_REPLICAS=${{ secrets.STAGING_SEARCH_SERVICE_NUMBER_OF_REPLICAS }}"
           --build-arg "SENTRY_DSN=${{ secrets.STAGING_SEARCH_SERVICE_SENTRY_DSN }}"

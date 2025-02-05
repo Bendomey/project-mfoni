@@ -8,6 +8,8 @@ docker buildx build\
     --build-arg PORT=$PORT\
     --build-arg URL=$URL\
     --build-arg OPENSEARCH_NODE=$OPENSEARCH_NODE\
+    --build-arg OPENSEARCH_USERNAME=$OPENSEARCH_USERNAME\
+    --build-arg OPENSEARCH_PASSWORD=$OPENSEARCH_PASSWORD\
     --build-arg NUMBER_OF_SHARDS=$NUMBER_OF_SHARDS\
     --build-arg NUMBER_OF_REPLICAS=$NUMBER_OF_REPLICAS\
     --build-arg SENTRY_DSN=$SENTRY_DSN\

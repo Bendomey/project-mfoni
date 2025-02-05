@@ -3,6 +3,7 @@ package lib
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"net/http"
 
@@ -16,9 +17,11 @@ import (
 
 func InitOpenSearch(config *viper.Viper) *opensearch.Client {
 	client, connectionErr := opensearch.NewClient(opensearch.Config{
-		// Transport: &http.Transport{
-		// 	TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
-		// },
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
+		},
+		Username:  config.GetString("openSearch.username"),
+		Password:  config.GetString("openSearch.password"),
 		Addresses: []string{config.GetString("openSearch.url")},
 	})
 
