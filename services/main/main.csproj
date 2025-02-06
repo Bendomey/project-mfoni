@@ -13,6 +13,13 @@
     <PackageReference Include="AWSSDK.Core" Version="3.7.302.8" />
     <PackageReference Include="AWSSDK.Rekognition" Version="3.7.300.25" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.305.24" />
+    <PackageReference Include="Google.Protobuf" Version="3.29.3" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.67.0" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.67.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.69.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.23.1" />
     <PackageReference Include="Nanoid" Version="3.0.0" />
@@ -28,6 +35,8 @@
     <Content Include="Assets\Fonts\*.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+
+    <Protobuf Include="Protos\content_proto\search_content.proto" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>

@@ -37,6 +37,14 @@ builder.Services.Configure<RabbitMQConnection>(
     builder.Configuration.GetSection("RabbitMQConnection")
 );
 
+builder.Services.AddGrpcClient<Searchcontent.SearchContentService.SearchContentServiceClient>(options =>
+{
+    options.Address = new Uri(builder
+        .Configuration.GetSection("AppConstants:SearchServiceURL")
+        .Get<string>()!
+    );
+});
+
 builder.Services.Configure<AppConstants>(builder.Configuration.GetSection("AppConstants"));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>

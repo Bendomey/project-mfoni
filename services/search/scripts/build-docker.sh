@@ -23,6 +23,9 @@ docker buildx build\
     --build-arg COLLECTIONS_COLLECTION=$COLLECTIONS_COLLECTION\
     --build-arg CONTENT_TAGS_COLLECTION=$CONTENT_TAGS_COLLECTION\
     --build-arg CONTENT_COLLECTIONS_COLLECTION=$CONTENT_COLLECTIONS_COLLECTION\
+    --build-arg JWT_SECRET_KEY=$JWT_SECRET_KEY\
+    --build-arg JWT_ISSUER=$JWT_ISSUER\
+    --build-arg JWT_AUTHORIZED_APPS=$JWT_AUTHORIZED_APPS\
     --tag mfoni-search-service .
 
 printf "Done building!"

@@ -41,4 +41,6 @@ public class AppConstants
     public string EmailFrom { get; init; } = "Mfoni Notifications <noreply@notifications.mfoni.app>";
     public string RegisterSwaggerDocs { get; set; } = null!;
     public string SentryDSN { get; set; } = null!;
+    public string SearchServiceURL { get; set; } = null!;
+    public string SearchServiceAuthToken { get; set; } = null!;
 }

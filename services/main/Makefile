@@ -22,3 +22,7 @@ build-docker:
 
 lint:
 	dotnet format main.sln
+
+get-protos:
+	mkdir -p Protos
+	cp -r ../protos/* ./Protos

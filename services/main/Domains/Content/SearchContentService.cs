@@ -166,75 +166,25 @@ public class SearchContentService
     }
 
     public async Task<List<Content>> TextualSearch(
-        FilterQuery<Content> queryFilter,
-        string query,
-        GetContentsInput input
+        List<string> contentIds
     )
     {
-        // TODO: implement search with ELASTICSEARCH
-
-        FilterDefinitionBuilder<Content> builder = Builders<Content>.Filter;
-        var filter = builder.Empty;
-
-        if (input.Orientation != "ALL")
-        {
-            var orientationFilter = builder.Eq(r => r.Media.Orientation, input.Orientation);
-            filter &= orientationFilter;
-        }
-
-        if (input.License != "ALL")
-        {
-            if (input.License == "FREE")
-            {
-                var licenseFilter = builder.Eq(r => r.Amount, 0);
-                filter &= licenseFilter;
-            }
-            else if (input.License == "PREMIUM")
-            {
-                var licenseFilter = builder.Gt(r => r.Amount, 0);
-                filter &= licenseFilter;
-            }
-        }
+        var contentIdsObject = contentIds.Select(id => ObjectId.Parse(id)).ToList();
+        var filter = Builders<Content>.Filter.In("_id", contentIdsObject);
 
         var contents = await _contentsCollection
             .Find(filter)
-            .Skip(queryFilter.Skip)
-            .Limit(queryFilter.Limit)
-            .Sort(queryFilter.Sort)
             .ToListAsync();
 
         return contents;
     }
 
     public async Task<long> TextualSearchCount(
-        string query,
-        GetContentsInput input
+        List<string> contentIds
     )
     {
-        // TODO: implement search with ELASTICSEARCH
-
-        FilterDefinitionBuilder<Content> builder = Builders<Content>.Filter;
-        var filter = builder.Empty;
-
-        if (input.Orientation != "ALL")
-        {
-            var orientationFilter = builder.Eq(r => r.Media.Orientation, input.Orientation);
-            filter &= orientationFilter;
-        }
-
-        if (input.License != "ALL")
-        {
-            if (input.License == "FREE")
-            {
-                var licenseFilter = builder.Eq(r => r.Amount, 0);
-                filter &= licenseFilter;
-            }
-            else if (input.License == "PREMIUM")
-            {
-                var licenseFilter = builder.Gt(r => r.Amount, 0);
-                filter &= licenseFilter;
-            }
-        }
+        var contentIdsObject = contentIds.Select(id => ObjectId.Parse(id)).ToList();
+        var filter = Builders<Content>.Filter.In("_id", contentIdsObject);
 
         var contents = await _contentsCollection.CountDocumentsAsync(filter);
 

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Security.Claims;
+using main.Configuratons;
 using main.Domains;
 using main.DTOs;
 using main.Lib;
@@ -7,6 +8,7 @@ using main.Middlewares;
 using main.Transformations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 
 namespace main.Controllers;
@@ -24,6 +26,8 @@ public class ContentController : ControllerBase
     private readonly ContentTransformer _contentTransformer;
     private readonly ContentLikeTransformer _contentLikeTransformer;
     private readonly SearchTagService _searchTagsService;
+    private readonly Searchcontent.SearchContentService.SearchContentServiceClient _searchServiceRpcClient;
+    private readonly AppConstants _appConstants;
 
     public ContentController(
         ILogger<ContentController> logger,
@@ -34,7 +38,9 @@ public class ContentController : ControllerBase
         ContentTransformer contentTransformer,
         ContentLikeTransformer contentLikeTransformer,
         SearchTagService searchTagsService,
-        CollectionContentService collectionContentService
+        CollectionContentService collectionContentService,
+        Searchcontent.SearchContentService.SearchContentServiceClient searchServiceRpcClient,
+        IOptions<AppConstants> appConstants
     )
     {
         _logger = logger;
@@ -46,6 +52,8 @@ public class ContentController : ControllerBase
         _contentLikeTransformer = contentLikeTransformer;
         _searchTagsService = searchTagsService;
         _collectionContentService = collectionContentService;
+        _searchServiceRpcClient = searchServiceRpcClient;
+        _appConstants = appConstants.Value;
     }
 
     /// <summary>
@@ -419,17 +427,45 @@ public class ContentController : ControllerBase
             _logger.LogInformation("Getting contents by textual search");
             var queryFilter = HttpLib.GenerateFilterQuery<Models.Content>(page, pageSize, sort, sortBy, populate);
 
-            var contents = await _searchContentService.TextualSearch(queryFilter, search, new GetContentsInput
-            {
-                License = license,
-                Orientation = orientation
-            });
+            Searchcontent.SearchResponse? searchResponse = null;
 
-            var count = await _searchContentService.TextualSearchCount(search, new GetContentsInput
+            try
             {
-                License = license,
-                Orientation = orientation
-            });
+                var searchResults = await _searchServiceRpcClient.SearchAsync(
+                    new Searchcontent.SearchRequest
+                    {
+                        Keyword = search,
+                        // TODO: add these to the search filters
+                        // License = license,
+                        // Orientation = orientation
+
+                        Take = queryFilter.Limit,
+                        Skip = queryFilter.Skip,
+                    },
+                    new Grpc.Core.Metadata
+                    {
+                        new Grpc.Core.Metadata.Entry("Authorization", "Bearer " + _appConstants.SearchServiceAuthToken)
+                    }
+                );
+
+                if (searchResults is null)
+                {
+                    throw new Exception();
+                }
+
+                searchResponse = searchResults;
+            }
+            catch (System.Exception)
+            {
+                // We're hoping search service will notify us.
+                throw new HttpRequestException("Failed to search content");
+            }
+
+            var contentIds = searchResponse is not null ? searchResponse.Contents.Select(c => c).ToList() : new List<string>();
+
+            var contents = await _searchContentService.TextualSearch(contentIds);
+
+            var count = await _searchContentService.TextualSearchCount(contentIds);
 
 
             var outContents = new List<OutputContent>();

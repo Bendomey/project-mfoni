@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package="github.com/Bendomey/project-mfoni/services/search/internal/protos/content_proto";
+
+package searchcontent;
+
+service SearchContentService {
+  rpc Search (SearchRequest) returns (SearchResponse) {}
+}
+
+message SearchRequest {
+  string keyword = 1;
+  optional int64 take = 2;
+  optional int64 skip = 3;
+}
+
+message SearchResponse {
+  repeated string contents = 1;
+}
