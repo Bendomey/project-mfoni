@@ -19,6 +19,8 @@ dump.rdb
 .env
 .env.local
 .envrc
+.envrc.staging
+.envrc.production
 
 
 ngrok

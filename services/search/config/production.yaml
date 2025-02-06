@@ -11,6 +11,11 @@ openSearch:
   number_of_shards: ${NUMBER_OF_SHARDS}
   number_of_replicas: ${NUMBER_OF_REPLICAS}
 
+jwt:
+  secret_key: ${JWT_SECRET_KEY}
+  issuer: ${JWT_ISSUER}
+  authorized_apps: ${JWT_AUTHORIZED_APPS}
+
 sentry:
   dsn: ${SENTRY_DSN}
   environment: ${SENTRY_ENVIRONMENT}

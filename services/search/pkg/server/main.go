@@ -43,7 +43,7 @@ func Init() {
 	// Register the handlers
 	handlers.Factory(appContext, services)
 
-	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.GetInt("app.port")))
+	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GetInt("app.port")))
 	if err != nil {
 		log.Fatalf("Could not listen on port %d: %v", config.GetInt("app.port"), err)
 	}
