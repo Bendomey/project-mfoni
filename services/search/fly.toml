@@ -17,15 +17,11 @@ primary_region = 'lhr'
 
   [[services.ports]]
     port = 443
-    handlers = ["tls", "http"]
-    tls_options = { "alpn" = ["h2", "http/1.1"] }
-
+    handlers = ["tls"]
 
   [[services.ports]]
+    handlers = ["h2c"]
     port = 8080
-
-  [services.ports.http_options]
-    h2_backend = true
 
 [[vm]]
   memory = '1gb'
