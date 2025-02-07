@@ -20,7 +20,6 @@ primary_region = 'lhr'
     handlers = ["tls"]
 
   [[services.ports]]
-    handlers = ["h2c"]
     port = 8080
 
 [[vm]]
