@@ -22,6 +22,9 @@ primary_region = 'lhr'
   [[services.ports]]
     port = 8080
 
+[http_service.http_options]
+  h2_backend = true
+
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
