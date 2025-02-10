@@ -16,13 +16,14 @@ primary_region = 'lhr'
   min_machines_running = 0
 
   [[services.ports]]
-    port = 443
     handlers = ["tls"]
+    port = 443
+    tls_options = { "alpn" = ["h2"] }
 
   [[services.ports]]
     port = 8080
 
-[http_service.http_options]
+[services.ports.http_options]
   h2_backend = true
 
 [[vm]]
