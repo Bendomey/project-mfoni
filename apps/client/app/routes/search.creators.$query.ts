@@ -1,22 +1,14 @@
 import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
-import { getCollectionContentsBySlug } from '@/api/collections/index.ts'
+import { getCreators } from '@/api/creators/index.ts'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
+import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
+import { getSocialMetas } from '@/lib/seo.ts'
+import { safeString } from '@/lib/strings.ts'
 import { SearchCreatorsModule } from '@/modules/index.ts'
-
-export const meta: MetaFunction = () => {
-	return [
-		{ title: 'Search Creators | mfoni' },
-		{
-			name: 'description',
-			content: 'Search for creators on mfoni',
-		},
-		{ name: 'keywords', content: 'mfoni, Mfoni' },
-	]
-}
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
 	const queryClient = new QueryClient()
@@ -28,20 +20,18 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 	const baseUrl = `${environmentVariables().API_ADDRESS}/api`
 
 	const query = {
-		pagination: { page: 0, per: 10 },
+		pagination: { page: 0, per: 50 },
 		filters: {},
-		populate: ['creator'],
+		populate: [],
+		search: {
+			query: safeString(loaderArgs.params.query),
+		},
 	}
 
 	await queryClient.prefetchQuery({
-		queryKey: [
-			QUERY_KEYS.COLLECTIONS,
-			'featured_creators',
-			'slug-contents',
-			query,
-		],
+		queryKey: [QUERY_KEYS.CREATORS, query],
 		queryFn: () =>
-			getCollectionContentsBySlug('featured_creators', query, {
+			getCreators(query, {
 				authToken: authCookie?.token,
 				baseUrl,
 			}),
@@ -50,6 +40,23 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 	const dehydratedState = dehydrate(queryClient)
 	return jsonWithCache({
 		dehydratedState,
+		origin: getDomainUrl(loaderArgs.request),
+	})
+}
+
+export const meta: MetaFunction<typeof loader> = ({
+	data,
+	params,
+	location,
+}) => {
+	return getSocialMetas({
+		title: `${params?.query} | mfoni`,
+		description: `Search results for ${params?.query} on mfoni. Download free, high-quality pictures`,
+		url: getDisplayUrl({
+			origin: data?.origin ?? 'https://mfoni.app',
+			path: location.pathname,
+		}),
+		keywords: 'search,creators',
 	})
 }
 

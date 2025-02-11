@@ -5,6 +5,7 @@ import { QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
+import { validateLicense, validateOrientation } from '@/lib/misc.ts'
 import { ContentsModule } from '@/modules/index.ts'
 
 export const meta: MetaFunction = () => {
@@ -17,16 +18,6 @@ export const meta: MetaFunction = () => {
 		},
 		{ name: 'keywords', content: 'mfoni, Mfoni' },
 	]
-}
-
-const validateLicense = (license: string) => {
-	const validLicenses = ['ALL', 'FREE', 'PREMIUM']
-	return validLicenses.includes(license) ? license : 'ALL'
-}
-
-const validateOrientation = (orientation: string) => {
-	const validOrientations = ['ALL', 'LANDSCAPE', 'PORTRAIT', 'SQUARE']
-	return validOrientations.includes(orientation) ? orientation : 'ALL'
 }
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {

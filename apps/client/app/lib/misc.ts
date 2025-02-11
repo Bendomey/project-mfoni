@@ -43,3 +43,13 @@ export const isALink = (url: string) => {
 		return false
 	}
 }
+
+export const validateLicense = (license: string) => {
+	const validLicenses = ['ALL', 'FREE', 'PREMIUM']
+	return validLicenses.includes(license) ? license : 'ALL'
+}
+
+export const validateOrientation = (orientation: string) => {
+	const validOrientations = ['ALL', 'LANDSCAPE', 'PORTRAIT', 'SQUARE']
+	return validOrientations.includes(orientation) ? orientation : 'ALL'
+}
