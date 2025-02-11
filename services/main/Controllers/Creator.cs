@@ -183,5 +183,101 @@ public class CreatorController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get creators
+    /// </summary>
+    /// <param name="search">search creators</param>
+    /// <param name="page">The page to be navigated to</param>
+    /// <param name="pageSize">The number of items on a page</param>
+    /// <param name="sort">To sort response data either by `asc` or `desc`</param>
+    /// <param name="sortBy">What field to sort by.</param>
+    /// <response code="200">Creators Retrieved Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [HttpGet()]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<EntityWithPagination<OutputCreatorEnhanced>>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> GetCreators(
+        [FromQuery] string? search,
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] string? sort,
+        [FromQuery] string sortBy = "created_at"
+    )
+    {
+        try
+        {
+            _logger.LogInformation("Get creators");
+            var queryFilter = HttpLib.GenerateFilterQuery<Creator>(
+               page,
+               pageSize,
+               sort,
+               sortBy,
+               ""
+           );
+
+            var creators = await _creatorService.GetCreators(queryFilter, new GetCreatorsInput
+            {
+                Query = search
+            });
+
+            var creatorsCount = await _creatorService.GetCreatorsCount(new GetCreatorsInput
+            {
+                Query = search
+            });
+
+            var creatorsTransformed = new List<OutputCreatorEnhanced>();
+            foreach (var creator in creators)
+            {
+                var creatorTransformed = await _creatorTransformer.TransformEnhancedCreator(creator);
+                creatorsTransformed.Add(creatorTransformed);
+            }
+
+            var response = HttpLib.GeneratePagination(
+                creatorsTransformed,
+                creatorsCount,
+                queryFilter
+            );
+
+            return new ObjectResult(
+                new GetEntityResponse<EntityWithPagination<OutputCreatorEnhanced>>(
+                    response,
+                    null
+                ).Result()
+            );
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = e.StatusCode ?? HttpStatusCode.BadRequest;
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result())
+            {
+                StatusCode = (int)statusCode
+            };
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"An error occured getting related creators {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Get creators"},
+                    {"search", StringLib.SafeString(search)},
+                    {"page", StringLib.SafeString(page.ToString())},
+                    {"pageSize", StringLib.SafeString(pageSize.ToString())},
+                    {"sort", StringLib.SafeString(sort)},
+                    {"sortBy", sortBy},
+                });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
 }
 

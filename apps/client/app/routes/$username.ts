@@ -31,10 +31,11 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 			queryFn: () => getCreatorByUsername(safeString(username), { baseUrl }),
 		})
 
-		return jsonWithCache({
-			creator,
-			origin: getDomainUrl(loaderArgs.request),
-		})
+		if (creator)
+			return jsonWithCache({
+				creator,
+				origin: getDomainUrl(loaderArgs.request),
+			})
 	} catch (error) {
 		return redirect(PAGES.NOT_FOUND)
 	}

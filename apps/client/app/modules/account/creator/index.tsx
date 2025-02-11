@@ -12,7 +12,7 @@ const CreatorContext = createContext<EnhancedCreator | null>(null)
 export function CreatorPage() {
 	const data = useLoaderData<typeof loader>()
 
-	if (!data.creator) return null
+	if (!data?.creator) return null
 
 	return (
 		<CreatorContext.Provider value={data.creator as unknown as EnhancedCreator}>

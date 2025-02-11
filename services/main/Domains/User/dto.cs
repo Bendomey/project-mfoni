@@ -58,3 +58,8 @@ public class GetUserInfoResponse
     public required Models.Creator Creator { get; set; }
     public required Models.CreatorSubscription CreatorSubscription { get; set; }
 }
+
+public class GetCreatorsInput
+{
+    public string? Query { get; set; }
+}

@@ -70,6 +70,50 @@ public class CreatorService
         return creator;
     }
 
+    public async Task<List<Models.Creator>> GetCreators(
+        FilterQuery<Models.Creator> queryFilter,
+        GetCreatorsInput input
+    )
+    {
+        var filters = FilterDefinition<Models.Creator>.Empty;
+        filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.Status, CreatorStatus.ACTIVE);
+        filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.WebsiteDisabledAt, null);
+
+        if (!string.IsNullOrEmpty(input.Query))
+        {
+            filters &= Builders<Models.Creator>.Filter.Regex(r => r.Username, new MongoDB.Bson.BsonRegularExpression(input.Query, "i"));
+        }
+
+        var creators = await __creatorCollection
+            .Find(filters)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return creators;
+    }
+
+    public async Task<long> GetCreatorsCount(
+        GetCreatorsInput input
+    )
+    {
+        var filters = FilterDefinition<Models.Creator>.Empty;
+        filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.Status, CreatorStatus.ACTIVE);
+        filters &= Builders<Models.Creator>.Filter.Eq(creator => creator.WebsiteDisabledAt, null);
+
+        if (!string.IsNullOrEmpty(input.Query))
+        {
+            filters &= Builders<Models.Creator>.Filter.Regex(r => r.Username, new MongoDB.Bson.BsonRegularExpression(input.Query, "i"));
+        }
+
+        var creatorsCount = await __creatorCollection
+            .Find(filters)
+            .CountDocumentsAsync();
+
+        return creatorsCount;
+    }
+
     public async Task<List<Models.Creator>> GetRelatedCreators(string username)
     {
         var filters = FilterDefinition<Models.Creator>.Empty;

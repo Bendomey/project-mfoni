@@ -69,3 +69,36 @@ export const useGetRelatedCreators = (
 		queryKey: [QUERY_KEYS.CREATORS, 'related', username, query],
 		queryFn: () => getRelatedCreators(username, query),
 	})
+
+export const getCreators = async (
+	props: FetchMultipleDataInputParams<unknown>,
+	apiConfig?: ApiConfigForServerConfig,
+) => {
+	try {
+		const removeAllNullableValues = getQueryParams<unknown>(props)
+		const params = new URLSearchParams(removeAllNullableValues)
+		const response = await fetchClient<
+			ApiResponse<FetchMultipleDataResponse<EnhancedCreator>>
+		>(`/v1/creators?${params.toString()}`, {
+			...(apiConfig ? apiConfig : {}),
+		})
+
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+
+		if (error instanceof Error) {
+			throw error
+		}
+	}
+}
+
+export const useGetCreators = (query: FetchMultipleDataInputParams<unknown>) =>
+	useQuery({
+		queryKey: [QUERY_KEYS.CREATORS, query],
+		queryFn: () => getCreators(query),
+	})
