@@ -1,5 +1,5 @@
 # base node image
-FROM node:18-bookworm-slim as base
+FROM node:20-bookworm-slim as base
 
 # install all node_modules, including dev
 FROM base as deps
