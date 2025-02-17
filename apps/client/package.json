@@ -6,8 +6,8 @@
   "description": "Where all users interact with the system.",
   "type": "module",
   "engines": {
-    "node": ">=18",
-    "npm": ">=8"
+    "node": ">=20",
+    "npm": ">=10"
   },
   "scripts": {
     "clean": "rimraf ./node_modules/.cache ./server/dist ./build ./public/build",
