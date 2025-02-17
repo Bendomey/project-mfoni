@@ -66,10 +66,10 @@ export function CollectionModule() {
 	}
 
 	if (isError) {
-		return (
+		content = (
 			<div className="flex h-[50vh] flex-1 items-center justify-center">
 				<ErrorState
-					message="An error occurred fetching collection's contents."
+					message="An error occurred fetching contents."
 					title="Something happened."
 				>
 					<Button

@@ -79,7 +79,7 @@ export function SearchCollectionsModule() {
 	if (data?.total) {
 		content = (
 			<FadeInStagger faster>
-				<div className="mt-8 min-h-[60vh] grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+				<div className="mt-8 grid min-h-[60vh] grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
 					{data.rows.map((collection) => (
 						<FadeIn key={collection.id}>
 							<CollectionCard collection={collection} />

@@ -7,6 +7,7 @@ export const GITHUB_REPO_URL = 'https://github.com/Bendomey/project-mfoni'
 export const MYLES_PUDO_URL = 'https://mylespudo.com'
 
 export const USER_CIPHER = 'mfoni-account'
+export const RECENT_SEARCHES_KEY = 'mfoni-recent-searches'
 
 export const QUERY_KEYS = {
 	CURRENT_USER: 'current-user',

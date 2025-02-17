@@ -61,25 +61,21 @@ const SearchModal = ({ isOpened, onClose, searchQuery }: Props) => {
 					<>
 						<DialogPanel
 							transition
-							className="mx-auto flex w-auto transform items-center justify-center divide-y divide-gray-100 overflow-hidden rounded-xl bg-zinc-100 shadow-2xl ring-1 ring-black/5 transition-all data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+							className="transition-all data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
 						>
 							<button
 								onClick={() => setActiveMenu(MENUS.TEXT_SEARCH)}
 								type="button"
-								className={`mx-10 p-4`}
+								className="mx-auto mt-5 flex w-auto transform items-center justify-center divide-y divide-gray-100 overflow-hidden rounded-xl bg-zinc-100 p-5 shadow-2xl ring-1 ring-black/5"
 							>
 								<MagnifyingGlassIcon className="size-20 text-zinc-400" />
 								<h1 className="text-lg font-bold">Textual Search</h1>
 							</button>
-						</DialogPanel>
-						<DialogPanel
-							transition
-							className="mx-auto mt-5 flex w-auto transform items-center justify-center divide-y divide-gray-100 overflow-hidden rounded-xl bg-zinc-100 shadow-2xl ring-1 ring-black/5 transition-all data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
-						>
+
 							<button
 								onClick={() => setActiveMenu(MENUS.VISUAL_SEARCH)}
 								type="button"
-								className={`mx-10 p-4`}
+								className="mx-auto mt-5 flex w-auto transform items-center justify-center divide-y divide-gray-100 overflow-hidden rounded-xl bg-zinc-100 p-5 shadow-2xl ring-1 ring-black/5"
 							>
 								<ViewfinderCircleIcon className="size-20 text-zinc-400" />
 								<h1 className="text-lg font-bold">Visual Search</h1>
