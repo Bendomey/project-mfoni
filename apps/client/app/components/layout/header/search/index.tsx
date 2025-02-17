@@ -4,6 +4,7 @@ import {
 	ViewfinderCircleIcon,
 } from '@heroicons/react/24/outline'
 import { Fragment, useState } from 'react'
+import { ClientOnly } from 'remix-utils/client-only'
 import { SearchPalette } from './search-palette/index.tsx'
 import { VisualSearch } from './visual/index.tsx'
 
@@ -42,11 +43,15 @@ export const SearchPhotos = ({
 							{searchQuery ?? 'Search for photos'}
 						</span>
 					</div>
-					<SearchPalette
-						searchQuery={searchQuery}
-						isOpened={isSearchFocused}
-						onClose={() => setIsSearchFocused(false)}
-					/>
+					<ClientOnly>
+						{() => (
+							<SearchPalette
+								searchQuery={searchQuery}
+								isOpened={isSearchFocused}
+								onClose={() => setIsSearchFocused(false)}
+							/>
+						)}
+					</ClientOnly>
 				</div>
 
 				<div className="inset-y-0 right-0 flex items-center pr-6">
