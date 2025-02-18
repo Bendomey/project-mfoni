@@ -172,7 +172,7 @@ func (client *Client) init(conn *amqp.Connection) error {
 	}
 	_, err = channel.QueueDeclare(
 		client.QueueName,
-		false, // Durable
+		true,  // Durable
 		false, // Delete when unused
 		false, // Exclusive
 		false, // No-wait
