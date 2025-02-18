@@ -6,6 +6,7 @@ using main.Lib;
 using main.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 
 public class EditContentService
 {
@@ -13,13 +14,15 @@ public class EditContentService
     private readonly PermissionService _permissionService;
     private readonly IMongoCollection<Content> _contentsCollection;
     private readonly CacheProvider _cacheProvider;
+    private readonly QueueHelper _processTextualSearchQueueHelper;
 
     public EditContentService(
         ILogger<EditContentService> logger,
         DatabaseSettings databaseConfig,
         IOptions<AppConstants> appConstants,
         CacheProvider cacheProvider,
-        PermissionService permissionService
+        PermissionService permissionService,
+        RabbitMQConnection rabbitMQChannel
     )
     {
         _logger = logger;
@@ -27,6 +30,11 @@ public class EditContentService
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
         _cacheProvider = cacheProvider;
         _permissionService = permissionService;
+
+        _processTextualSearchQueueHelper = new QueueHelper(
+            rabbitMQChannel.Channel, appConstants.Value.ProcessTextualSearchQueueName
+        );
+
 
         logger.LogDebug("EditContentService service initialized");
     }
@@ -85,6 +93,15 @@ public class EditContentService
 
         content.UpdatedAt = DateTime.UtcNow;
         _contentsCollection.ReplaceOne(filter, content);
+
+        // persist changes to search index
+        var message = new
+        {
+            type = "UPDATE_BASIC",
+            content_id = content.Id
+        };
+
+        _processTextualSearchQueueHelper.PublishMessage(JsonConvert.SerializeObject(message));
 
         _ = _cacheProvider.EntityChanged(new[] {
             $"{CacheProvider.CacheEntities["contents"]}.find*",
