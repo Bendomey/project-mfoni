@@ -140,28 +140,14 @@ public class IndexContent
         });
 
         // push to queue for image processing
-        using var channel = _rabbitMqChannel.CreateModel();
-
-        channel.QueueDeclare(
-            queue: _appConstantsConfiguration.ProcessImageQueueName,
-            durable: true,
-            exclusive: false,
-            autoDelete: false,
-            arguments: null
-        );
+        var processContentQueueHelper = new QueueHelper(_rabbitMqChannel, _appConstantsConfiguration.ProcessImageQueueName);
 
         contents.ToList().ForEach(content =>
         {
             _logger.LogInformation($"Sending message to queue: {content.Id}", content.Id);
             string message = content.Id;
-            var body = Encoding.UTF8.GetBytes(message);
 
-            channel.BasicPublish(
-                exchange: "",
-                routingKey: _appConstantsConfiguration.ProcessImageQueueName,
-                basicProperties: null,
-                body: body
-            );
+            processContentQueueHelper.PublishMessage(message);
         });
 
         return contents;

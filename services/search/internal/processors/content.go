@@ -175,6 +175,11 @@ func ProcessMessage(imessage []byte, svcs services.Services) error {
 		if updateErr != nil {
 			return updateErr
 		}
+	/**
+	* TODO: handle case where a tag was updated/deleted.
+	* This means we have to update all contents with that tag.
+	 */
+
 	case "UPDATE_COLLECTIONS":
 		contentCollections, contentCollectionsErr := svcs.ContentService.
 			FindCollections(context.Background(), message.ContentID)
@@ -187,6 +192,11 @@ func ProcessMessage(imessage []byte, svcs services.Services) error {
 		if updateErr != nil {
 			return updateErr
 		}
+
+	/**
+	* TODO: handle case where a collection was updated/deleted.
+	* This means we have to update all contents with that collection.
+	 */
 	case "DELETE":
 		_, deleteErr := svcs.ContentService.Purge(context.Background(), message.ContentID)
 

@@ -5,6 +5,7 @@ using main.DTOs;
 using main.Lib;
 using MongoDB.Bson;
 using main.Models;
+using Newtonsoft.Json;
 
 namespace main.Domains;
 
@@ -20,6 +21,7 @@ public class CollectionContentService
     private readonly IMongoCollection<Models.Tag> _tagCollection;
     private readonly CacheProvider _cacheProvider;
     private readonly AppConstants _appConstantsConfiguration;
+    private readonly QueueHelper _processTextualSearchQueueHelper;
 
     public CollectionContentService(
         ILogger<CollectionContentService> logger,
@@ -28,7 +30,8 @@ public class CollectionContentService
         CacheProvider cacheProvider,
         CollectionService collectionService,
         SearchTagService searchTagService,
-        SearchContentService searchContentService
+        SearchContentService searchContentService,
+        RabbitMQConnection rabbitMQChannel
     )
     {
         _logger = logger;
@@ -41,6 +44,11 @@ public class CollectionContentService
         _collectionService = collectionService;
         _searchTagService = searchTagService;
         _searchContentService = searchContentService;
+
+
+        _processTextualSearchQueueHelper = new QueueHelper(
+            rabbitMQChannel.Channel, appConstants.Value.ProcessTextualSearchQueueName
+        );
 
         logger.LogDebug("Collection Content service initialized");
     }
@@ -104,6 +112,18 @@ public class CollectionContentService
         _collectionContentCollection.InsertOne(collectionContent);
 
         _collectionService.UpdateCollectionContentsCount(input.CollectionId, 1);
+
+        if (!string.IsNullOrEmpty(input.ContentId))
+        {
+            // add collection from content
+            var message = new
+            {
+                type = "UPDATE_COLLECTIONS",
+                content_id = input.ContentId
+            };
+
+            _processTextualSearchQueueHelper.PublishMessage(JsonConvert.SerializeObject(message));
+        }
 
         _ = _cacheProvider.EntityChanged(new[] {
             $"{CacheProvider.CacheEntities["collections"]}.find*",
@@ -534,6 +554,18 @@ public class CollectionContentService
             }
             _collectionContentCollection.DeleteOne(collectionContentFilter);
             var collection = _collectionCollection.Find(Builders<Models.Collection>.Filter.Eq(r => r.Id, oldCollectionContent.CollectionId)).FirstOrDefault();
+
+            // remove collection from content
+            if (input.Type == "CONTENT")
+            {
+                var message = new
+                {
+                    type = "UPDATE_COLLECTIONS",
+                    content_id = contentId
+                };
+
+                _processTextualSearchQueueHelper.PublishMessage(JsonConvert.SerializeObject(message));
+            }
 
             _ = _cacheProvider.EntityChanged(new[] {
                 $"{CacheProvider.CacheEntities["collections"]}*{collection.Id}*",

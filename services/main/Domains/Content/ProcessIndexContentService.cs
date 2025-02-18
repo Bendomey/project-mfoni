@@ -8,6 +8,7 @@ using Amazon.Rekognition;
 using Amazon.Runtime;
 using main.Lib;
 using Amazon.Rekognition.Model;
+using Newtonsoft.Json;
 
 namespace main.Domains;
 
@@ -127,6 +128,19 @@ public class ProcessIndexContent
 
                 await SaveRekognitionContent(content.Id, faces);
             }
+
+            // index for textual search capabilities
+            var processTextualSearchQueueHelper = new QueueHelper(
+                _rabbitMqChannel, _appConstantsConfiguration.ProcessTextualSearchQueueName
+            );
+
+            var message = new
+            {
+                type = "CREATE",
+                content_id = content.Id
+            };
+
+            processTextualSearchQueueHelper.PublishMessage(JsonConvert.SerializeObject(message));
         }
         catch (HttpRequestException ex)
         {
