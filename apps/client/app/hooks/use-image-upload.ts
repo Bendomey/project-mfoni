@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { useSignS3UploadUrl } from '@/api/contents/index.ts'
+import { useSignS3UploadUrl } from '@/api/image/index.ts'
 
 interface UploadResults {
 	fileLink: string
+	key: string
 	eTag?: string | null
 }
 
@@ -37,6 +38,7 @@ const useImageUpload = () => {
 
 			const result: UploadResults = {
 				fileLink: signedUrl.fileLink,
+				key: signedUrl.key,
 			}
 
 			if (res.ok) {

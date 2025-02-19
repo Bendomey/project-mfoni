@@ -1,40 +1,8 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { getQueryParams } from '@/lib/get-param.ts'
 import { safeString } from '@/lib/strings.ts'
 import { fetchClient } from '@/lib/transport/index.ts'
-
-interface IGenerateSignedUrlInput {
-	filename: string
-	contentType: string
-	abortController: AbortController
-}
-
-interface IGenerateSignedUrlOutput {
-	fileLink: string
-	signedUrl: string
-}
-
-export const generateSignedUrl = async (props: IGenerateSignedUrlInput) => {
-	const res = await fetch('/api/s3', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			filename: props.filename,
-			contentType: props.contentType,
-		}),
-		signal: props.abortController.signal,
-	})
-	const data = await res.json()
-	return data as IGenerateSignedUrlOutput
-}
-
-export const useSignS3UploadUrl = () =>
-	useMutation({
-		mutationFn: generateSignedUrl,
-	})
 
 export type CreateContentInput = Array<{
 	title: string
