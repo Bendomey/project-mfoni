@@ -33,7 +33,7 @@ s3Router.post(
 		const signedUrl = await getSignedUrl(s3Client, command, {
 			expiresIn: 5 * 60,
 		})
-		return res.json({ fileLink, signedUrl })
+		return res.json({ fileLink, signedUrl, key })
 	},
 )
 
