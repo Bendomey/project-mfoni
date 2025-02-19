@@ -19,7 +19,7 @@ interface Props {
 export const VisualSearch = ({ onClose: handleClose, className }: Props) => {
 	const [imgSrc, setImgSrc] = useState<string | null>(null)
 	const webcamRef = useRef<WebcamProps | any>(null)
-	const cameraPermissionState = useGetPermissionState('camera')
+	const cameraPermissionState = useGetPermissionState('camera' as PermissionName)
 	const { isLoading: isUploadingPhoto, upload } = useImageUpload()
 	const navigate = useNavigate()
 
