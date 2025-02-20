@@ -336,6 +336,59 @@ export const useSearchTextualContents = ({
 		retry: retryQuery,
 	})
 
+export const searchVisualContents = async (
+	query: FetchMultipleDataInputParams<
+		FetchContentFilter & { mediaKey: string }
+	>,
+	apiConfig?: ApiConfigForServerConfig,
+) => {
+	try {
+		const removeAllNullableValues = getQueryParams<FetchContentFilter>(query)
+		const params = new URLSearchParams(removeAllNullableValues)
+		const response = await fetchClient<
+			ApiResponse<{
+				results: FetchMultipleDataResponse<Content>
+				imageUrl: string
+			}>
+		>(
+			`/v1/contents/search/visual/${query.filters
+				?.mediaKey}?${params.toString()}`,
+			{
+				...(apiConfig ? apiConfig : {}),
+			},
+		)
+
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
+
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
+
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}
+
+export const useSearchVisualContents = ({
+	query,
+	retryQuery,
+}: {
+	query: FetchMultipleDataInputParams<FetchContentFilter & { mediaKey: string }>
+	retryQuery?: boolean
+}) =>
+	useQuery({
+		queryKey: [QUERY_KEYS.CONTENTS, 'visual-search', query],
+		queryFn: () => searchVisualContents(query),
+		retry: retryQuery,
+	})
+
 interface UpdateContentInput {
 	title?: string
 	visibility?: string
