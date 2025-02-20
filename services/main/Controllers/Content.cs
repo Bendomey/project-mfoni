@@ -331,7 +331,8 @@ public class ContentController : ControllerBase
                 queryFilter
             );
 
-            var response = new {
+            var response = new
+            {
                 results = dataResponse,
                 imageUrl = $"https://${_appConstants.BucketName}.s3.${_appConstants.AWSRegion}.amazonaws.com/{media}"
             };
