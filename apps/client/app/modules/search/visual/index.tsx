@@ -1,5 +1,5 @@
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
-import { useParams } from "@remix-run/react";
+import { useParams, useSearchParams } from "@remix-run/react";
 import { FiltersDialog } from "../components/filters-dialog/index.tsx";
 import { VisualHeader } from "./components/header.tsx";
 import { useSearchVisualContents } from "@/api/contents/index.ts";
@@ -14,19 +14,23 @@ import { Loader } from "@/components/loader/index.tsx";
 import { NoSearchResultLottie } from "@/components/lotties/no-search-results.tsx";
 import { PAGES } from "@/constants/index.ts";
 import { useDisclosure } from "@/hooks/use-disclosure.tsx";
+import { validateLicense, validateOrientation } from "@/lib/misc.ts";
 import { safeString } from "@/lib/strings.ts";
 
 
 export function SearchVisualModule() {
     const filterModalState = useDisclosure()
     const { query: queryParam } = useParams()
+    const [searchParams] = useSearchParams();
     const searchQuery = safeString(queryParam)
 
     const { data, isPending, isError } = useSearchVisualContents({
         query: {
             pagination: { page: 0, per: 50 },
             filters: {
-                mediaKey: safeString(queryParam)
+                mediaKey: safeString(queryParam),
+                license: validateLicense(safeString(searchParams.get('license'))),
+                orientation: validateOrientation(safeString(searchParams.get('orientation'))),
             },
             populate: ['content.createdBy'],
         },
