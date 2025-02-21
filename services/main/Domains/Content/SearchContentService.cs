@@ -139,14 +139,18 @@ public class SearchContentService
         return contentsCount;
     }
 
-    public async Task<string[]> AskRekognitionForMatch(byte[] imageBytes)
+    public async Task<string[]> AskRekognitionForMatch(string s3ImageIdentifier)
     {
         var request = new SearchFacesByImageRequest
         {
             CollectionId = _appConstantsConfiguration.AWSRekognitionCollection,
             Image = new Image
             {
-                Bytes = new MemoryStream(imageBytes),
+                S3Object = new S3Object
+                {
+                    Bucket = _appConstantsConfiguration.BucketName,
+                    Name = s3ImageIdentifier,
+                }
             },
             FaceMatchThreshold = 70F,
         };
@@ -159,9 +163,8 @@ public class SearchContentService
         }
         catch (Exception e)
         {
-            _logger.LogError("Error: " + e.Message);
-            // TODO: send to sentry for triaging :) 
-            throw;
+            _logger.LogError("AskRekognitionForMatch Error: " + e.Message);
+            throw new HttpRequestException("CouldNotSearchFacesByImage");
         }
     }
 

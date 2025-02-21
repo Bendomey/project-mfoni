@@ -246,7 +246,7 @@ public class ContentController : ControllerBase
     /// <summary>
     /// Retrieves all contents from a visual search
     /// </summary>
-    /// <param name="media">Should be an image</param>
+    /// <param name="media">Should be an identifier for your image you uploaded to s3</param>
     /// <param name="license">Can be `ALL` or `FREE` or `PREMIUM`</param>
     /// <param name="orientation">Can be `ALL` or `LANDSCAPE` or `PORTRAIT` or `SQUARE`</param>
     /// <param name="populate">Comma separated values to populate fields</param>
@@ -257,17 +257,17 @@ public class ContentController : ControllerBase
     /// <response code="200">Contents Retrieved Successfully</response>
     /// <response code="500">An unexpected error occured</response>
     [AllowAnonymous]
-    [HttpGet("search/visual")]
+    [HttpGet("search/visual/{media}")]
     [ProducesResponseType(
         StatusCodes.Status200OK,
-        Type = typeof(ApiEntityResponse<EntityWithPagination<OutputContent>>)
+        Type = typeof(ApiEntityResponse<object>)
     )]
     [ProducesResponseType(
         StatusCodes.Status500InternalServerError,
         Type = typeof(StatusCodeResult)
     )]
     public async Task<IActionResult> VisualSearch(
-        [FromForm] IFormFile media,
+        string media,
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
@@ -292,14 +292,7 @@ public class ContentController : ControllerBase
             _logger.LogInformation("Getting contents by visual search");
             var queryFilter = HttpLib.GenerateFilterQuery<Models.Content>(page, pageSize, sort, sortBy, populate);
 
-            byte[] imageBytes;
-            using (var memoryStream = new MemoryStream())
-            {
-                await media.CopyToAsync(memoryStream);
-                imageBytes = memoryStream.ToArray();
-            }
-
-            var matches = await _searchContentService.AskRekognitionForMatch(imageBytes);
+            var matches = await _searchContentService.AskRekognitionForMatch(media);
 
             if (matches == null)
             {
@@ -332,13 +325,19 @@ public class ContentController : ControllerBase
                 outContents.Add(await _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
             }
 
-            var response = HttpLib.GeneratePagination(
+            var dataResponse = HttpLib.GeneratePagination(
                 outContents,
                 count,
                 queryFilter
             );
 
-            return new ObjectResult(new GetEntityResponse<EntityWithPagination<OutputContent>>(response, null).Result())
+            var response = new
+            {
+                results = dataResponse,
+                imageUrl = $"https://${_appConstants.BucketName}.s3.${_appConstants.AWSRegion}.amazonaws.com/{media}"
+            };
+
+            return new ObjectResult(new GetEntityResponse<object>(response, null).Result())
             {
                 StatusCode = StatusCodes.Status200OK
             };

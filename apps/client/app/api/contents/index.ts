@@ -1,40 +1,8 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { getQueryParams } from '@/lib/get-param.ts'
 import { safeString } from '@/lib/strings.ts'
 import { fetchClient } from '@/lib/transport/index.ts'
-
-interface IGenerateSignedUrlInput {
-	filename: string
-	contentType: string
-	abortController: AbortController
-}
-
-interface IGenerateSignedUrlOutput {
-	fileLink: string
-	signedUrl: string
-}
-
-export const generateSignedUrl = async (props: IGenerateSignedUrlInput) => {
-	const res = await fetch('/api/s3', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			filename: props.filename,
-			contentType: props.contentType,
-		}),
-		signal: props.abortController.signal,
-	})
-	const data = await res.json()
-	return data as IGenerateSignedUrlOutput
-}
-
-export const useSignS3UploadUrl = () =>
-	useMutation({
-		mutationFn: generateSignedUrl,
-	})
 
 export type CreateContentInput = Array<{
 	title: string
@@ -365,6 +333,59 @@ export const useSearchTextualContents = ({
 	useQuery({
 		queryKey: [QUERY_KEYS.CONTENTS, 'textual-search', query],
 		queryFn: () => searchTextualContents(query),
+		retry: retryQuery,
+	})
+
+export const searchVisualContents = async (
+	query: FetchMultipleDataInputParams<
+		FetchContentFilter & { mediaKey: string }
+	>,
+	apiConfig?: ApiConfigForServerConfig,
+) => {
+	try {
+		const removeAllNullableValues = getQueryParams<FetchContentFilter>(query)
+		const params = new URLSearchParams(removeAllNullableValues)
+		const response = await fetchClient<
+			ApiResponse<{
+				results: FetchMultipleDataResponse<Content>
+				imageUrl: string
+			}>
+		>(
+			`/v1/contents/search/visual/${query.filters
+				?.mediaKey}?${params.toString()}`,
+			{
+				...(apiConfig ? apiConfig : {}),
+			},
+		)
+
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
+
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
+
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}
+
+export const useSearchVisualContents = ({
+	query,
+	retryQuery,
+}: {
+	query: FetchMultipleDataInputParams<FetchContentFilter & { mediaKey: string }>
+	retryQuery?: boolean
+}) =>
+	useQuery({
+		queryKey: [QUERY_KEYS.CONTENTS, 'visual-search', query],
+		queryFn: () => searchVisualContents(query),
 		retry: retryQuery,
 	})
 

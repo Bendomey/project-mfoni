@@ -75,6 +75,7 @@ export const PAGES = {
 	COLLECTION: '/explore/collections/:collection',
 	CONTENTS: '/explore/contents',
 	SEARCH: {
+		VISUAL: '/search/visual/:query',
 		CREATORS: '/search/creators/:query',
 		PHOTOS: '/search/photos/:query',
 		COLLECTIONS: '/search/collections/:query',

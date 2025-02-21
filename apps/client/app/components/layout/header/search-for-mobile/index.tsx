@@ -22,15 +22,13 @@ const MENUS = {
 const SearchModal = ({ isOpened, onClose, searchQuery }: Props) => {
 	const [activeMenu, setActiveMenu] = useState<string>('')
 
+	const handleClose = () => {
+		onClose()
+		setActiveMenu('')
+	}
+
 	return (
-		<Dialog
-			className="relative z-50"
-			open={isOpened}
-			onClose={() => {
-				onClose()
-				setActiveMenu('')
-			}}
-		>
+		<Dialog className="relative z-50" open={isOpened} onClose={handleClose}>
 			<DialogBackdrop
 				transition
 				className="fixed inset-0 bg-black/20 backdrop-blur-sm transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
@@ -42,17 +40,14 @@ const SearchModal = ({ isOpened, onClose, searchQuery }: Props) => {
 						transition
 						className="mx-auto w-auto transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-zinc-100 p-3 shadow-2xl ring-1 ring-black/5 transition-all data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
 					>
-						<VisualSearch />
+						<VisualSearch onClose={handleClose} />
 					</DialogPanel>
 				) : null}
 
 				{activeMenu === MENUS.TEXT_SEARCH ? (
 					<SearchPalette
 						isOpened={true}
-						onClose={() => {
-							onClose()
-							setActiveMenu('')
-						}}
+						onClose={handleClose}
 						searchQuery={searchQuery}
 					/>
 				) : null}
