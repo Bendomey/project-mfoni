@@ -43,9 +43,8 @@ export const VisualSearch = ({ onClose: handleClose, className }: Props) => {
 	const onSubmit = async () => {
 		if (imgSrc) {
 			try {
-				const file = dataURLtoFile(imgSrc, 'captured_image')
+				const file = await dataURLtoFile(imgSrc, 'captured_image')
 				const result = await upload(file)
-				console.log({ result })
 				navigate(`/search/visual/${result.key}`)
 			} catch {
 				errorToast('Could not search with this email, try again later.', {

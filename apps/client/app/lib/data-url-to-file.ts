@@ -1,4 +1,5 @@
-export const dataURLtoFile = (dataUrl: string, filename: string) => {
+export const dataURLtoFile = async (dataUrl: string, filename: string) => {
+	dataUrl = await convertWebPtoJPEG(dataUrl)
 	const arr = dataUrl.split(',')
 
 	if (arr.length < 2) {
@@ -15,4 +16,23 @@ export const dataURLtoFile = (dataUrl: string, filename: string) => {
 	}
 	const extension = mime?.split('/')[1] ?? 'jpg'
 	return new File([u8arr], `${filename}.${extension}`, { type: mime })
+}
+
+const convertWebPtoJPEG = async (webpDataUrl: string): Promise<string> => {
+	return new Promise((resolve) => {
+		const img = new Image()
+		img.src = webpDataUrl
+		img.onload = () => {
+			const canvas = document.createElement('canvas')
+			canvas.width = img.width
+			canvas.height = img.height
+			const ctx = canvas.getContext('2d')
+			if (ctx) {
+				ctx.drawImage(img, 0, 0)
+			}
+
+			const jpegDataUrl = canvas.toDataURL('image/jpeg')
+			resolve(jpegDataUrl)
+		}
+	})
 }
