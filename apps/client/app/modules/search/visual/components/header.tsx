@@ -11,7 +11,11 @@ import { useDisclosure } from "@/hooks/use-disclosure.tsx";
 import { classNames } from '@/lib/classNames.ts';
 import { safeString } from '@/lib/strings.ts';
 
-export function VisualHeader() {
+interface Props {
+    itemsCount: number
+}
+
+export function VisualHeader({ itemsCount }: Props) {
     const { query: queryParam } = useParams()
     const location = useLocation()
     const filterModalState = useDisclosure()
@@ -70,16 +74,21 @@ export function VisualHeader() {
                                         )}
                                     />
                                     <span>{tab.name}</span>
-                                    <span
-											className={classNames(
-												tab.current
-													? 'bg-blue-100 text-blue-600'
-													: 'bg-gray-100 text-gray-900',
-												'ml-1 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
-											)}
-										>
-											1k
-										</span>
+                                    {
+                                        itemsCount > 0 ? (
+                                            <span
+                                                className={classNames(
+                                                    tab.current
+                                                        ? 'bg-blue-100 text-blue-600'
+                                                        : 'bg-gray-100 text-gray-900',
+                                                    'ml-1 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
+                                                )}
+                                            >
+                                                {itemsCount}
+                                            </span>
+                                        ) : null
+                                    }
+
                                 </Link>
                             ))}
                         </nav>

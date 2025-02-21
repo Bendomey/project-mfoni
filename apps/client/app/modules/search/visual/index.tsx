@@ -111,7 +111,7 @@ export function SearchVisualModule() {
         <>
             <Header isHeroSearchInVisible={false} />
             <div className="max-w-8xl mx-auto px-4 lg:px-8">
-                <VisualHeader />
+                <VisualHeader itemsCount={data?.results?.total ?? 0}  />
 
                 {
                     isPending || !data ? null : (
