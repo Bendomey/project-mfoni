@@ -257,12 +257,37 @@ public class CollectionContentService
            )
        ).ToArray();
 
+        // FOR CREATOR
+        pipeline = pipeline.Append(
+           new BsonDocument("$lookup", new BsonDocument
+           {
+                    { "from", "creators" },
+                    { "localField", "creator_id" },
+                    { "foreignField", "_id" },
+                    { "as", "creator" }
+           })
+       ).ToArray();
+        pipeline = pipeline.Append(
+           new BsonDocument("$unwind",
+               new BsonDocument
+               {
+                    { "path", "$creator" },
+                    { "preserveNullAndEmptyArrays", true }
+               }
+           )
+       ).ToArray();
+
 
         var matchOrArray = new BsonArray
         {
             new BsonDocument
             {
                 new BsonDocument("type", "TAG"),
+            },
+            new BsonDocument
+            {
+                new BsonDocument("type", new BsonDocument("$eq", "CREATOR")),
+                new BsonDocument("creator.status", new BsonDocument("$eq", "ACTIVE")),
             },
         };
 
@@ -302,6 +327,7 @@ public class CollectionContentService
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("tag", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("child_collection", 0))).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("creator", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$limit", queryFilter.Limit)).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$skip", queryFilter.Skip)).ToArray();
 
@@ -420,12 +446,37 @@ public class CollectionContentService
            )
        ).ToArray();
 
+        // FOR CREATOR
+        pipeline = pipeline.Append(
+           new BsonDocument("$lookup", new BsonDocument
+           {
+                    { "from", "creators" },
+                    { "localField", "creator_id" },
+                    { "foreignField", "_id" },
+                    { "as", "creator" }
+           })
+       ).ToArray();
+        pipeline = pipeline.Append(
+           new BsonDocument("$unwind",
+               new BsonDocument
+               {
+                    { "path", "$creator" },
+                    { "preserveNullAndEmptyArrays", true }
+               }
+           )
+       ).ToArray();
+
 
         var matchOrArray = new BsonArray
         {
             new BsonDocument
             {
                 new BsonDocument("type", new BsonDocument("$eq", "TAG")),
+            },
+            new BsonDocument
+            {
+                new BsonDocument("type", new BsonDocument("$eq", "CREATOR")),
+                new BsonDocument("creator.status", new BsonDocument("$eq", "ACTIVE")),
             },
         };
 
@@ -465,6 +516,7 @@ public class CollectionContentService
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("content", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("tag", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("child_collection", 0))).ToArray();
+        pipeline = pipeline.Append(new BsonDocument("$project", new BsonDocument("creator", 0))).ToArray();
         pipeline = pipeline.Append(new BsonDocument("$count", "totalCount")).ToArray();
 
         var result = await _collectionContentCollection.AggregateAsync<MongoAggregationGetCount>(pipeline);
