@@ -54,17 +54,16 @@ public class SearchContentService
         FilterDefinitionBuilder<Content> builder = Builders<Content>.Filter;
         var filter = builder.Empty;
 
+        var validIds = matches.Where(match => ObjectId.TryParse(match, out _)).ToList();
 
-        matches.ToList().ForEach(match =>
+        if (validIds.Count > 0)
         {
-            if (!ObjectId.TryParse(match, out _))
-            {
-                return;
-            }
+            var idFilter = Builders<Content>.Filter.Or(
+                validIds.ConvertAll(id => Builders<Content>.Filter.Eq(r => r.Id, id))
+            );
+            filter = idFilter;
+        }
 
-            var idFilter = builder.Eq(r => r.Id, match);
-            filter |= idFilter;
-        });
 
         if (filter == builder.Empty)
         {
@@ -100,14 +99,7 @@ public class SearchContentService
         GetContentsInput input
     )
     {
-        FilterDefinitionBuilder<Content> builder = Builders<Content>.Filter;
-
         var filter = filterLogicForVisualSearch(matches, input);
-        if (filter == builder.Empty)
-        {
-            return [];
-        }
-
 
         var contents = await _contentsCollection
             .Find(filter)

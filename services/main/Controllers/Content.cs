@@ -294,7 +294,7 @@ public class ContentController : ControllerBase
 
             var matches = await _searchContentService.AskRekognitionForMatch(media);
 
-            if (matches == null)
+            if (matches == null || matches.Length == 0)
             {
                 var res = HttpLib.GeneratePagination<OutputContent, Models.Content>(
                     [],
