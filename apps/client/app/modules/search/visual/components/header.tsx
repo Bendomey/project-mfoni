@@ -25,7 +25,6 @@ export function VisualHeader({ itemsCount }: Props) {
         () => [
             {
                 name: 'Photos',
-                href: PAGES.SEARCH.PHOTOS.replace(':query', safeString(queryParam)),
                 icon: PhotoIcon,
                 current:
                     encodeURI(
@@ -52,16 +51,11 @@ export function VisualHeader({ itemsCount }: Props) {
                     <div className="flex items-center justify-between border-b border-gray-200">
                         <nav aria-label="Tabs" className="-mb-px flex space-x-8">
                             {tabs.map((tab) => (
-                                <Link
-                                    prefetch="intent"
+                                <div
                                     key={tab.name}
-                                    to={tab.href}
                                     aria-current={tab.current ? 'page' : undefined}
                                     className={classNames(
-                                        tab.current
-                                            ? 'border-blue-500 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                                        'group inline-flex items-center border-b-2 px-1 py-3 text-sm font-medium',
+                                        'border-blue-500 text-blue-600 group inline-flex items-center border-b-2 px-1 py-3 text-sm font-medium',
                                     )}
                                 >
                                     <tab.icon
@@ -74,22 +68,18 @@ export function VisualHeader({ itemsCount }: Props) {
                                         )}
                                     />
                                     <span>{tab.name}</span>
-                                    {
-                                        itemsCount > 0 ? (
-                                            <span
-                                                className={classNames(
-                                                    tab.current
-                                                        ? 'bg-blue-100 text-blue-600'
-                                                        : 'bg-gray-100 text-gray-900',
-                                                    'ml-1 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
-                                                )}
-                                            >
-                                                {itemsCount}
-                                            </span>
-                                        ) : null
-                                    }
+                                    <span
+                                        className={classNames(
+                                            tab.current
+                                                ? 'bg-blue-100 text-blue-600'
+                                                : 'bg-gray-100 text-gray-900',
+                                            'ml-1 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
+                                        )}
+                                    >
+                                        {itemsCount ?? 0}
+                                    </span>
 
-                                </Link>
+                                </div>
                             ))}
                         </nav>
                         <div className="hidden flex-row items-center gap-3 lg:flex">

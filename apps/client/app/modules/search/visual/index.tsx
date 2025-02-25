@@ -76,7 +76,7 @@ export function SearchVisualModule() {
         content = (
             <div className="flex h-[60vh] flex-1 items-center justify-center">
                 <EmptyState
-                    message={`There are no photos found under "${queryParam}". Adjust your search query.`}
+                    message="There are no photos found. Use a different image."
                     title="Search results is empty"
                     svg={
                         <div className="mb-5">
