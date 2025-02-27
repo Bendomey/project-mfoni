@@ -29,3 +29,10 @@ public class GetContentLikesInput
     public string? Visibility { get; set; }
     public string? Orientation { get; set; }
 }
+
+public class DownloadContentInput
+{
+    public required string ContentId { get; set; }
+    public required string Size { get; set; }
+    public string? UserId { get; set; }
+}

@@ -162,6 +162,7 @@ builder.Services.AddSingleton<SaveTagsService>();
 builder.Services.AddSingleton<CollectionService>();
 builder.Services.AddSingleton<CollectionContentService>();
 builder.Services.AddSingleton<ContentLikeService>();
+builder.Services.AddSingleton<DownloadContentService>();
 
 builder.Services.AddSingleton<ExploreSectionService>();
 
