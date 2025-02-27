@@ -23,6 +23,7 @@ public class ContentController : ControllerBase
     private readonly ContentLikeService _contentLikeService;
     private readonly IndexContent _indexContentService;
     private readonly SearchContentService _searchContentService;
+    private readonly DownloadContentService _downloadContentService;
     private readonly ContentTransformer _contentTransformer;
     private readonly ContentLikeTransformer _contentLikeTransformer;
     private readonly SearchTagService _searchTagsService;
@@ -34,6 +35,7 @@ public class ContentController : ControllerBase
         ContentLikeService contentLikeService,
         IndexContent indexContentService,
         SearchContentService searchContentService,
+        DownloadContentService downloadContentService,
         EditContentService editContentService,
         ContentTransformer contentTransformer,
         ContentLikeTransformer contentLikeTransformer,
@@ -53,6 +55,7 @@ public class ContentController : ControllerBase
         _searchTagsService = searchTagsService;
         _collectionContentService = collectionContentService;
         _searchServiceRpcClient = searchServiceRpcClient;
+        _downloadContentService = downloadContentService;
         _appConstants = appConstants.Value;
     }
 
@@ -172,6 +175,75 @@ public class ContentController : ControllerBase
                      {"action", "Get Content By Id"},
                      {"contentId", id},
                      {"populate", populate},
+               });
+               SentrySdk.CaptureException(e);
+           });
+            return new StatusCodeResult(500);
+        }
+    }
+
+    /// <summary>
+    /// Download content
+    /// </summary>
+    /// <param name="id">Id of content</param>
+    /// <param name="input"></param>
+    [AllowAnonymous]
+    [HttpPost("{id}/download")]
+    [ProducesResponseType(typeof(OutputResponse<Models.S3MetaData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DownloadImageBySize(
+        string id,
+        [FromBody] DTOs.DownloadContentInput input
+    )
+    {
+        // Don't break the request if user is not authenticated
+        string? userId = null;
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            userId = currentUser.Id;
+        }
+        catch (Exception) { }
+
+        try
+        {
+            var res = await _downloadContentService.DownloadContent(new Domains.DownloadContentInput
+            {
+                ContentId = id,
+                Size = input.Size,
+                UserId = userId,
+            });
+
+            return new ObjectResult(
+                new GetEntityResponse<Models.S3MetaData>(res, null).Result()
+            )
+            {
+                StatusCode = StatusCodes.Status200OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<object>(null, e.Message).Result())
+            {
+                StatusCode = (int)statusCode
+            };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Download content. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                     {"action", "Download Content By Id"},
+                     {"contentId", id},
+                     {"size", input.Size},
                });
                SentrySdk.CaptureException(e);
            });

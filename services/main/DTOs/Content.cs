@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace main.DTOs;
 
 public class CreateCollectionInput
@@ -30,4 +32,14 @@ public class EditContentBasicDetailsInput
     public string? Title { get; set; }
     public string? Visibility { get; set; }
     public double? Amount { get; set; }
+}
+
+public class DownloadContentInput
+{
+    /// <summary>
+    /// Size
+    /// </summary>
+    /// <example>ORIGINAL | SMALL | MEDIUM | LARGE</example>
+    [Required]
+    public required string Size { get; set; }
 }

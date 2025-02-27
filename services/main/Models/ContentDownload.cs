@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace main.Models;
 
-public static class CollectionCreatedByType
+public static class ContentDownloadType
 {
     public static readonly string SMALL = "SMALL";
     public static readonly string MEDIUM = "MEDIUM";
