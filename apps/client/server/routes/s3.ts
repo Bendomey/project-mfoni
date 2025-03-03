@@ -1,4 +1,8 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import {
+	S3Client,
+	PutObjectCommand,
+	GetObjectCommand,
+} from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import * as express from 'express'
 
@@ -34,6 +38,23 @@ s3Router.post(
 			expiresIn: 5 * 60,
 		})
 		return res.json({ fileLink, signedUrl, key })
+	},
+)
+
+// download the file
+s3Router.post(
+	'/download',
+	async (req: express.Request<{}, {}, { key: string }>, res) => {
+		const key = req.body.key
+		const command = new GetObjectCommand({
+			Bucket: BUCKET_NAME,
+			Key: key,
+			ResponseContentDisposition: `attachment; filename="${key}"`,
+		})
+		const signedUrl = await getSignedUrl(s3Client, command, {
+			expiresIn: 5 * 60,
+		})
+		return res.json({ signedUrl })
 	},
 )
 

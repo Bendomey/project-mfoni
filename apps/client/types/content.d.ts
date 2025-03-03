@@ -41,6 +41,16 @@ interface ContentMediaSizes {
 	original: number
 }
 
+interface ContentMedia {
+	location: string
+	orientation: string
+	size: number
+	eTag: string
+	key: string
+	serverSideEncryption: string
+	bucket: string
+}
+
 interface ImageProcessingResponse {
 	status: IRekognitionMetaDataStatus
 	message?: string

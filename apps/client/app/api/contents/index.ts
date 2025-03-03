@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { type ContentSize } from '@/components/download-button.tsx'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { getQueryParams } from '@/lib/get-param.ts'
 import { safeString } from '@/lib/strings.ts'
@@ -88,6 +89,43 @@ export const unlikeContent = async (
 			`/v1/contents/${contentId}/likes`,
 			{
 				method: 'DELETE',
+				...apiConfig,
+			},
+		)
+
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
+
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
+
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}
+
+interface DownloadContentInput {
+	contentId: string
+	size: ContentSize
+}
+
+export const downloadContent = async (
+	downloadContentInput: DownloadContentInput,
+	apiConfig: ApiConfigForServerConfig,
+) => {
+	try {
+		const response = await fetchClient<ApiResponse<ContentMedia>>(
+			`/v1/contents/${downloadContentInput.contentId}/download`,
+			{
+				method: 'POST',
+				body: JSON.stringify({ size: downloadContentInput.size }),
 				...apiConfig,
 			},
 		)
