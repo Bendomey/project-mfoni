@@ -32,3 +32,24 @@ export const useSignS3UploadUrl = () =>
 	useMutation({
 		mutationFn: generateSignedUrl,
 	})
+
+interface IGenerateDownloadSignedUrlInput {
+	key: string
+}
+
+export const generateDownloadSignedUrl = async (
+	props: IGenerateDownloadSignedUrlInput,
+	origin: string,
+) => {
+	const res = await fetch(`${origin}/api/s3/download`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			key: props.key,
+		}),
+	})
+	const data = await res.json()
+	return data as IGenerateSignedUrlOutput
+}

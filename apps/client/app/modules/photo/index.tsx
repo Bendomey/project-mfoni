@@ -20,6 +20,10 @@ import { Image } from 'remix-image'
 import { EditTitleModal } from './components/edit-title-modal/index.tsx'
 import { RelatedContent } from './components/related-content.tsx'
 import { Button } from '@/components/button/index.tsx'
+import {
+	type ContentSize,
+	DownloadButtonApi,
+} from '@/components/download-button.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
 import { LikeButton } from '@/components/like-button.tsx'
@@ -27,6 +31,7 @@ import { ShareButton } from '@/components/share-button/index.tsx'
 import { UserImage } from '@/components/user-image.tsx'
 import { blurDataURL, PAGES } from '@/constants/index.ts'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
+import { classNames } from '@/lib/classNames.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
 import { getSizeStringForContent } from '@/lib/image-fns.ts'
 import { safeString } from '@/lib/strings.ts'
@@ -100,7 +105,10 @@ export const PhotoModule = () => {
 								)}
 							</div>
 							{isContentMine || content.amount === 0 ? (
-								<DownloadButton sizes={content.media.sizes} />
+								<DownloadButton
+									content={content as unknown as Content}
+									sizes={content.media.sizes}
+								/>
 							) : (
 								<Button color="success">
 									<LockClosedIcon className="mr-1 size-4 text-white" />
@@ -257,71 +265,104 @@ export const PhotoModule = () => {
 
 interface Props {
 	sizes: ContentMediaSizes
+	content: Content
 }
 
-export default function DownloadButton({ sizes }: Props) {
+export default function DownloadButton({ sizes, content }: Props) {
 	const items = [
 		{
 			name: 'Small',
 			size: getSizeStringForContent(sizes.small),
-			disabled: Boolean(sizes.small),
+			isAvailable: Boolean(sizes.small),
 		},
 		{
 			name: 'Medium',
 			size: getSizeStringForContent(sizes.medium),
-			disabled: Boolean(sizes.medium),
+			isAvailable: Boolean(sizes.medium),
 		},
 		{
 			name: 'Large',
 			size: getSizeStringForContent(sizes.large),
-			disabled: Boolean(sizes.large),
+			isAvailable: Boolean(sizes.large),
 		},
 	]
 
 	return (
-		<div className="inline-flex rounded-md shadow-sm">
-			<button
-				type="button"
-				className="relative inline-flex items-center rounded-l-md bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-800 focus:z-10"
-			>
-				Download
-			</button>
-			<Menu as="div" className="relative -ml-px block">
-				<MenuButton className="relative inline-flex items-center rounded-r-md border-l border-gray-200 bg-green-600 px-2 py-2 text-white hover:bg-green-800 focus:z-10">
-					<span className="sr-only">Open options</span>
-					<ChevronDownIcon aria-hidden="true" className="size-5" />
-				</MenuButton>
-				<MenuItems
-					transition
-					className="absolute right-0 z-10 -mr-1 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-				>
-					<div className="py-1">
-						{items.map((item) => (
-							<Fragment key={item.name}>
-								{item.disabled ? (
-									<MenuItem>
-										<button className="flex w-full px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none">
-											{item.name}{' '}
-											<span className="ml-1 text-xs text-gray-400">
-												({item.size})
-											</span>
-										</button>
-									</MenuItem>
-								) : null}
-							</Fragment>
-						))}
+		<DownloadButtonApi content={content}>
+			{({ isDisabled, onClick }) => (
+				<div className="inline-flex rounded-md shadow-sm">
+					<button
+						disabled={isDisabled}
+						onClick={() => onClick('MEDIUM')}
+						type="button"
+						className={classNames(
+							'relative inline-flex items-center rounded-l-md bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-800 focus:z-10',
+							{
+								'cursor-not-allowed bg-green-800/50 hover:bg-green-800/50':
+									isDisabled,
+							},
+						)}
+					>
+						Download
+					</button>
+					<Menu as="div" className="relative -ml-px block">
+						<MenuButton
+							disabled={isDisabled}
+							className={classNames(
+								'relative inline-flex items-center rounded-r-md border-l border-gray-200 bg-green-600 px-2 py-2 text-white hover:bg-green-800 focus:z-10',
+								{
+									'cursor-not-allowed bg-green-800/50 hover:bg-green-800/50':
+										isDisabled,
+								},
+							)}
+						>
+							<span className="sr-only">Open options</span>
+							<ChevronDownIcon aria-hidden="true" className="size-5" />
+						</MenuButton>
+						<MenuItems
+							transition
+							className="absolute right-0 z-10 -mr-1 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+						>
+							<div className="py-1">
+								{items.map((item) => (
+									<Fragment key={item.name}>
+										{item.isAvailable ? (
+											<MenuItem>
+												<button
+													onClick={() => {
+														onClick(item.name.toUpperCase() as ContentSize)
+													}}
+													disabled={isDisabled}
+													className="flex w-full px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
+												>
+													{item.name}{' '}
+													<span className="ml-1 text-xs text-gray-400">
+														({item.size})
+													</span>
+												</button>
+											</MenuItem>
+										) : null}
+									</Fragment>
+								))}
 
-						<MenuItem>
-							<button className="flex w-full items-center px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none">
-								Original{' '}
-								<span className="ml-1 text-xs text-gray-400">
-									({getSizeStringForContent(sizes.original)})
-								</span>
-							</button>
-						</MenuItem>
-					</div>
-				</MenuItems>
-			</Menu>
-		</div>
+								<MenuItem>
+									<button
+										disabled={isDisabled}
+										onClick={() => onClick('ORIGINAL')}
+										type="button"
+										className="flex w-full items-center px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
+									>
+										Original{' '}
+										<span className="ml-1 text-xs text-gray-400">
+											({getSizeStringForContent(sizes.original)})
+										</span>
+									</button>
+								</MenuItem>
+							</div>
+						</MenuItems>
+					</Menu>
+				</div>
+			)}
+		</DownloadButtonApi>
 	)
 }

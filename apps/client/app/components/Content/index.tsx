@@ -13,6 +13,7 @@ import { Link, useNavigate } from '@remix-run/react'
 import { Image } from 'remix-image'
 import { Button } from '../button/index.tsx'
 import { PhotographerCreatorCard } from '../creator-card/index.tsx'
+import { DownloadButtonApi } from '../download-button.tsx'
 import { FlyoutContainer } from '../flyout/flyout-container.tsx'
 import { LikeButton } from '@/components/like-button.tsx'
 import { blurDataURL, PAGES } from '@/constants/index.ts'
@@ -195,15 +196,21 @@ export const Content = ({ content, showCreator = true, className }: Props) => {
 
 							<div className="flex justify-end">
 								{content.amount === 0 || isContentMine ? (
-									<Button
-										variant="outlined"
-										onClick={(e) => {
-											e.preventDefault()
-										}}
-									>
-										<ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-										Download
-									</Button>
+									<DownloadButtonApi content={content}>
+										{({ isDisabled, onClick }) => (
+											<Button
+												disabled={isDisabled}
+												variant="outlined"
+												onClick={(e) => {
+													e.preventDefault()
+													onClick('MEDIUM')
+												}}
+											>
+												<ArrowDownTrayIcon className="mr-2 h-4 w-4" />
+												Download
+											</Button>
+										)}
+									</DownloadButtonApi>
 								) : (
 									<Button
 										variant={content.amount === 0 ? 'outlined' : 'solid'}
