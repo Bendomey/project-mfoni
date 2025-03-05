@@ -3,24 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace main.DTOs;
 
-public class Payment
-{
-    /// <summary>
-    /// Can be `GOOGLE` or `TWITTER` or `FACEBOOK`
-    /// </summary>
-    [Required]
-    public required string Provider { get; set; } // 'GOOGLE' | 'TWITTER' | 'FACEBOOK'
-
-    [Required]
-    public required string Uid { get; set; }
-
-    [Required]
-    public required string Name { get; set; }
-    public string? Email { get; set; }
-    public string? UserPhoto { get; set; }
-}
-
-
 public class PaystackWebhookInput
 {
     [JsonPropertyName("event")]
