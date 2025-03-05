@@ -335,4 +335,44 @@ The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
     ";
 
+    public static string SuccessfulContentPurchaseSubjectForBuyer = "Your Purchase is Confirmed! 🎉";
+
+    public static string SuccessfulContentPurchaseBodyForBuyer = @"
+Hello {name},
+
+Thank you for your purchase on Mfoni! Your transaction was successful, and the content is now available for you to download.
+
+🛍 Order Details:
+
+Item: {contentName}
+Creator: {creatorName}
+Price: {amount}
+Payment Method: {paymentMethod}
+📥 Download Link: {downloadLink}
+
+If you have any questions or issues, feel free to reach out to our support team.
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
+    public static string SuccessfulContentPurchaseSubjectForCreator = "You've Made a Sale! 🎉";
+
+    public static string SuccessfulContentPurchaseBodyForCreator = @"
+Hello {name},
+
+Great news! Someone just purchased your content on Mfoni. 🎉
+
+💰 Purchase Details:
+
+Item Sold: {contentName}
+Buyer: {buyerName}
+Earnings Credited: {amount}
+Your earnings have been added to your Mfoni wallet. You can check your balance and withdraw anytime from your dashboard.
+
+Keep creating amazing content! 🚀
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
 }

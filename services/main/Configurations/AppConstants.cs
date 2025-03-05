@@ -16,6 +16,7 @@ public class AppConstants
     public string ContentCollection { get; init; } = "contents";
     public string ContentLikeCollection { get; init; } = "content_likes";
     public string ContentDownloadCollection { get; init; } = "content_downloads";
+    public string ContentPurchaseCollection { get; init; } = "content_purchases";
     public string CreatorApplicatonCollection { get; init; } = "creator_applications";
     public string CreatorCollection { get; init; } = "creators";
     public string ExploreSectionCollection { get; init; } = "explore_sections";
@@ -45,4 +46,9 @@ public class AppConstants
     public string SentryDSN { get; set; } = null!;
     public string SearchServiceURL { get; set; } = null!;
     public string SearchServiceAuthToken { get; set; } = null!;
+    public string WebsiteUrl { get; set; } = "https://mfoni.app";
+    public string PaystackSecretKey { get; set; } = null!;
+
+    // TODO: work on mfoni gmail account.
+    public string MfoniPaymentEmail { get; set; } = "mfoni@gmail.com";
 }
