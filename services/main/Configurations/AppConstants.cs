@@ -48,7 +48,7 @@ public class AppConstants
     public string SearchServiceAuthToken { get; set; } = null!;
     public string WebsiteUrl { get; set; } = "https://mfoni.app";
     public string PaystackSecretKey { get; set; } = null!;
-    
+
     // TODO: work on mfoni gmail account.
     public string MfoniPaymentEmail { get; set; } = "mfoni@gmail.com";
 }
