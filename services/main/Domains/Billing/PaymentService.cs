@@ -79,6 +79,7 @@ public class PaymentService
                 WalletId = input.WalletId
             },
         };
+
         await _paymentCollection.InsertOneAsync(newPayment);
 
         return newPayment;
@@ -157,7 +158,7 @@ public class PaymentService
         }
         else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.WalletTopup && !string.IsNullOrEmpty(paymentRecord.MetaData.WalletId))
         {
-            // when it's related to wallet topup.
+            // TODO: when it's related to wallet topup.
 
         }
     }
@@ -173,6 +174,21 @@ public class PaymentService
         }
 
         return paymentRecord;
+    }
+
+    public async Task<bool> CancelPayment(string paymentId)
+    {
+        await _paymentCollection.UpdateOneAsync(
+             Builders<Payment>.Filter.Eq(payment => payment.Id, paymentId),
+             Builders<Payment>.Update
+                 .Set(payment => payment.Status, PaymentStatus.CANCELLED)
+                 .Unset(payment => payment.AuthorizationUrl)
+                 .Unset(payment => payment.AccessCode)
+                 .Set(payment => payment.CancelledAt, DateTime.UtcNow)
+                 .Set(payment => payment.UpdatedAt, DateTime.UtcNow)
+         );
+
+        return true;
     }
 
     private void SendNotification(Models.User user, string subject, string body)

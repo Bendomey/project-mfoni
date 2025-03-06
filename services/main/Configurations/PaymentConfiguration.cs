@@ -6,78 +6,78 @@ namespace main.Configurations;
 
 public class InitPaymentInput
 {
-    [JsonPropertyName("amount")]
+    [JsonProperty("amount")]
     public required Int64 Amount { get; set; }
 
-    [JsonPropertyName("email")]
+    [JsonProperty("email")]
     public required string Email { get; set; }
 
-    [JsonPropertyName("currency")]
+    [JsonProperty("currency")]
     public string? Currency { get; set; } = "GHS";
 
-    [JsonPropertyName("reference")]
+    [JsonProperty("reference")]
     public string? Reference { get; set; }
 
-    [JsonPropertyName("callback_url")]
+    [JsonProperty("callback_url")]
     public string? CallbackUrl { get; set; }
 
-    [JsonPropertyName("metadata")]
+    [JsonProperty("metadata")]
     public string? Metadata { get; set; }
 
-    [JsonPropertyName("channels")]
+    [JsonProperty("channels")]
     public string[]? Channels { get; set; }
 }
 
 public class InitPaymentMedataInput
 {
-    [JsonPropertyName("origin")]
+    [JsonProperty("origin")]
     public string? Origin { get; set; } // ContentPurchase | WalletTopup
 
-    [JsonPropertyName("content_purchase_id")]
+    [JsonProperty("content_purchase_id")]
     public string? ContentPurchaseId { get; set; }
 
-    [JsonPropertyName("wallet_id")]
+    [JsonProperty("wallet_id")]
     public string? WalletId { get; set; }
 
-    [JsonPropertyName("custom_field")]
+    [JsonProperty("custom_field")]
     public InitPaymentMedataCustomFieldsInput[]? CustomFields { get; set; }
 
 }
 
 public class InitPaymentMedataCustomFieldsInput
 {
-    [JsonPropertyName("display_name")]
+    [JsonProperty("display_name")]
     public string? DisplayName { get; set; }
 
-    [JsonPropertyName("variable_name")]
+    [JsonProperty("variable_name")]
     public string? VariableName { get; set; }
 
-    [JsonPropertyName("value")]
+    [JsonProperty("value")]
     public string? Value { get; set; }
 
 }
 
 public class InitPaymentResponse
 {
-    [JsonPropertyName("data")]
+    [JsonProperty("data")]
     public InitPaymentResponseData? Data { get; set; }
 
-    [JsonPropertyName("status")]
+    [JsonProperty("status")]
     public required bool Status { get; set; }
 
-    [JsonPropertyName("message")]
+    [JsonProperty("message")]
     public required string Message { get; set; }
 }
 
 public class InitPaymentResponseData
 {
-    [JsonPropertyName("authorization_url")]
+    [JsonProperty("authorization_url")]
     public required string AuthorizationUrl { get; set; }
 
-    [JsonPropertyName("access_code")]
+    [JsonProperty("access_code")]
     public required string AccessCode { get; set; }
 
-    [JsonPropertyName("reference")]
+    [JsonProperty("reference")]
     public required string Reference { get; set; }
 }
 
@@ -91,9 +91,12 @@ public class PaymentConfiguration
             {
                 string apiKey = ApiKey;
 
+                Console.WriteLine(apiKey);
+
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
 
                 var jsonContent = JsonConvert.SerializeObject(input);
+                Console.WriteLine(jsonContent);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                 var response = await client.PostAsync("https://api.paystack.co/transaction/initialize", content);

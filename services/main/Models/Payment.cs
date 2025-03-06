@@ -8,6 +8,7 @@ public static class PaymentStatus
     public static readonly string PENDING = "PENDING";
     public static readonly string SUCCESSFUL = "SUCCESSFUL";
     public static readonly string FAILED = "FAILED";
+    public static readonly string CANCELLED = "CANCELLED";
 }
 
 public static class PaymentMetaDataOrigin
@@ -26,13 +27,13 @@ public class Payment
     public required string Reference { get; init; }
 
     [BsonElement("access_code")]
-    public required string AccessCode { get; init; }
+    public string? AccessCode { get; init; }
 
     [BsonElement("channel")]
     public string? Channel { get; init; }
 
     [BsonElement("authorization_url")]
-    public required string AuthorizationUrl { get; init; }
+    public string? AuthorizationUrl { get; init; }
 
     [BsonElement("amount")]
     public required Int64 Amount { get; init; }
@@ -42,6 +43,9 @@ public class Payment
 
     [BsonElement("successful_at")]
     public DateTime SuccessfulAt { get; set; }
+
+    [BsonElement("cancelled_at")]
+    public DateTime CancelledAt { get; set; }
 
     [BsonElement("failed_at")]
     public DateTime FailedAt { get; set; }

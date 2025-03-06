@@ -55,11 +55,78 @@ public class PurchaseContentService
 
         if (content.Amount == 0)
         {
-            throw new HttpRequestException("Content is free", default, HttpStatusCode.BadRequest);
+            throw new HttpRequestException("Content is free");
         }
 
         var user = await _userService.GetUserById(input.UserId);
-        var creatorUser = await _userService.GetUserById(content.CreatedById);
+
+        var existingPurchase = await _contentPurchasesCollection.Find(p => p.ContentId == content.Id && p.UserId == input.UserId)
+            .SortByDescending(p => p.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (existingPurchase != null)
+        {
+            if (existingPurchase.Status == ContentPurchaseStatus.SUCCESSFUL)
+            {
+                throw new HttpRequestException("Content already purchased");
+            }
+
+            // pending cases are only going to be for ONE_TIME and SAVED_CARD scenarios
+            if (existingPurchase.Status == ContentPurchaseStatus.PENDING)
+            {
+
+                if (existingPurchase.Type == input.PaymentMethod)
+                {
+                    // check if payment is expired, if so, cancel that one and initiate a new one.
+                    if (existingPurchase.Type == ContentPurchaseType.ONE_TIME && existingPurchase.PaymentId != null)
+                    {
+                        var payment = await _paymentService.GetPaymentById(existingPurchase.PaymentId);
+                        var paymentHasExpired = DateTime.UtcNow.Subtract(payment.CreatedAt).TotalHours > 24; // paystack automatically expires after 24 hours.
+
+                        if (paymentHasExpired)
+                        {
+                            await _paymentService.CancelPayment(existingPurchase.PaymentId);
+                            var newContentPurchaseForOneTime = await PayWithOneTime(new PayWithWalletInput
+                            {
+                                Amount = content.Amount,
+                                User = user,
+                                CreatorId = content.CreatedById,
+                                ContentId = content.Id,
+                                ContentPurchase = existingPurchase
+                            });
+
+                            return newContentPurchaseForOneTime;
+                        }
+                        else
+                        {
+                            // purchase link is still active so user can proceed.
+                            return existingPurchase;
+                        }
+                    }
+                    else
+                    {
+                        // TODO: work on saved card payment.
+                    }
+                }
+                else
+                {
+                    if (existingPurchase.Type == ContentPurchaseType.ONE_TIME && existingPurchase.PaymentId != null)
+                    {
+                        await _paymentService.CancelPayment(existingPurchase.PaymentId);
+                    }
+
+                    // if it's a new type, then we cancel the current purchase record and start over(creating new purchase).
+                    await _contentPurchasesCollection.UpdateOneAsync(
+                        Builders<ContentPurchase>.Filter.Eq(p => p.Id, existingPurchase.Id),
+                        Builders<ContentPurchase>.Update
+                        .Set(p => p.Status, ContentPurchaseStatus.CANCELLED)
+                        .Set(p => p.UpdatedAt, DateTime.UtcNow)
+                    );
+                }
+            }
+
+            // if it's failed/canceled, continue with a new purchase.
+        }
 
         switch (input.PaymentMethod)
         {
@@ -82,6 +149,8 @@ public class PurchaseContentService
                     CreatorId = content.CreatedById,
                     ContentId = content.Id
                 });
+
+                var creatorUser = await _userService.GetUserById(content.CreatedById);
 
                 // send out notifications to creator and user for a successful purchase.
                 SendNotification(
@@ -173,22 +242,28 @@ public class PurchaseContentService
 
     private async Task<ContentPurchase?> PayWithOneTime(PayWithWalletInput input)
     {
+        var contentPurchaseForOneTime = input.ContentPurchase;
 
-        var newContentPurchaseForOneTime = new Models.ContentPurchase
+        if (contentPurchaseForOneTime == null)
         {
-            Amount = input.Amount,
-            ContentId = input.ContentId,
-            Type = ContentPurchaseType.ONE_TIME,
-            UserId = input.User.Id,
-            Status = ContentPurchaseStatus.PENDING,
-        };
-        await _contentPurchasesCollection.InsertOneAsync(newContentPurchaseForOneTime);
+            var newContentPurchaseForOneTime = new Models.ContentPurchase
+            {
+                Amount = input.Amount,
+                ContentId = input.ContentId,
+                Type = ContentPurchaseType.ONE_TIME,
+                UserId = input.User.Id,
+                Status = ContentPurchaseStatus.PENDING,
+            };
+            await _contentPurchasesCollection.InsertOneAsync(newContentPurchaseForOneTime);
+
+            contentPurchaseForOneTime = newContentPurchaseForOneTime;
+        }
 
         // initiate payment
         var paymentMetadata = new InitPaymentMedataInput
         {
             Origin = PaymentMetaDataOrigin.ContentPurchase,
-            ContentPurchaseId = newContentPurchaseForOneTime.Id,
+            ContentPurchaseId = contentPurchaseForOneTime.Id,
             CustomFields = new[]
             {
                 new InitPaymentMedataCustomFieldsInput
@@ -201,7 +276,7 @@ public class PurchaseContentService
                 {
                     DisplayName = "Content Purchase Id",
                     VariableName = "content_purchase_id",
-                    Value = newContentPurchaseForOneTime.Id
+                    Value = contentPurchaseForOneTime.Id
                 },
             }
         };
@@ -209,7 +284,7 @@ public class PurchaseContentService
         await _paymentService.InitiatePayment(new InitializePaymentInput
         {
             Origin = "ContentPurchase",
-            ContentPurchaseId = newContentPurchaseForOneTime.Id,
+            ContentPurchaseId = contentPurchaseForOneTime.Id,
             PaystackInput = new InitPaymentInput
             {
                 Amount = input.Amount,
@@ -218,7 +293,7 @@ public class PurchaseContentService
             }
         });
 
-        return newContentPurchaseForOneTime;
+        return contentPurchaseForOneTime;
     }
 
     private void SendNotification(Models.User user, string subject, string body)

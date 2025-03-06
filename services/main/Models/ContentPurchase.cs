@@ -7,6 +7,7 @@ public static class ContentPurchaseType
 {
     public static readonly string ONE_TIME = "ONE_TIME"; // using card/momo/any other instant payment method.
     public static readonly string WALLET = "WALLET";
+    public static readonly string SAVED_CARD = "SAVED_CARD";
 }
 
 public static class ContentPurchaseStatus
@@ -14,6 +15,7 @@ public static class ContentPurchaseStatus
     public static readonly string PENDING = "PENDING";
     public static readonly string SUCCESSFUL = "SUCCESSFUL";
     public static readonly string FAILED = "FAILED";
+    public static readonly string CANCELLED = "CANCELLED";
 }
 
 // On successful content purchase, save the deets of the purchase.

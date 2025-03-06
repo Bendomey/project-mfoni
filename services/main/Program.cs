@@ -190,6 +190,8 @@ builder.Services.AddSingleton<TagTransformer>();
 builder.Services.AddSingleton<ContentLikeTransformer>();
 builder.Services.AddSingleton<TagContentTransformer>();
 builder.Services.AddSingleton<ExploreSectionTransformer>();
+builder.Services.AddSingleton<ContentPurchaseTransformer>();
+builder.Services.AddSingleton<PaymentTransformer>();
 
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();

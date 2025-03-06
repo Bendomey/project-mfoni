@@ -50,4 +50,5 @@ public class PayWithWalletInput
     public required Models.User User { get; set; }
     public required string CreatorId { get; set; }
     public required string ContentId { get; set; }
+    public Models.ContentPurchase? ContentPurchase { get; set; }
 }

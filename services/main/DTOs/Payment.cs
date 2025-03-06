@@ -1,34 +1,33 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace main.DTOs;
 
 public class PaystackWebhookInput
 {
-    [JsonPropertyName("event")]
+    [JsonProperty("event")]
     public required string Event { get; set; }
 
-    [JsonPropertyName("data")]
+    [JsonProperty("data")]
     public required PaystackWebhookDataInput Data { get; set; }
 }
 
 public class PaystackWebhookDataInput
 {
-    [JsonPropertyName("id")]
+    [JsonProperty("id")]
     public required Int64 Id { get; set; }
 
-    [JsonPropertyName("status")]
+    [JsonProperty("status")]
     public required string Status { get; set; }
 
-    [JsonPropertyName("domain")]
+    [JsonProperty("domain")]
     public required string Domain { get; set; }
 
-    [JsonPropertyName("reference")]
+    [JsonProperty("reference")]
     public required string Reference { get; set; }
 
-    // [JsonPropertyName("metadata")]
+    // [JsonProperty("metadata")]
     // public required string Metadata { get; set; }
 
-    [JsonPropertyName("channel")]
+    [JsonProperty("channel")]
     public required string Channel { get; set; }
 }
