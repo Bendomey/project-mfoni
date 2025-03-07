@@ -40,6 +40,7 @@
     "@heroicons/react": "2.1.1",
     "@hookform/resolvers": "3.3.4",
     "@next-boost/hybrid-disk-cache": "0.2.1",
+    "@paystack/inline-js": "2.22.2",
     "@radix-ui/react-slot": "1.1.0",
     "@remix-run/css-bundle": "2.15.1",
     "@remix-run/express": "2.15.1",
