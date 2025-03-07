@@ -1,5 +1,3 @@
-// @ts-nocheck
-// import Paystack from '@paystack/inline-js';
 import { useFetcher, useSearchParams } from '@remix-run/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect } from 'react'
@@ -7,9 +5,15 @@ import { BuyModal } from './buy-modal/index.tsx'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
-import { isBrowser } from '@/lib/is-browser.ts';
 
 export type ContentSize = 'SMALL' | 'MEDIUM' | 'LARGE' | 'ORIGINAL'
+
+declare global {
+    interface Window {
+        // @TODO: type it later.
+        PaystackPop: any
+    }
+}
 
 interface Props {
     content: Content
@@ -55,11 +59,8 @@ export function BuyButtonApi({ children, content }: Props) {
     }, [fetcher?.data, fetcher.state])
 
     const initiateOneTimePayment = useCallback((accessCode: string) => {
-        if (isBrowser) {
-            console.log(accessCode)
-            // const popup = new Paystack()
-            // popup.resumeTransaction(accessCode)
-        }
+            const popup = new window.PaystackPop()
+            popup.resumeTransaction(accessCode);
     }, [])
 
     useEffect(() => {

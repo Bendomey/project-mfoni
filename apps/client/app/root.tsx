@@ -88,7 +88,7 @@ export async function loader(args: LoaderFunctionArgs) {
 						)
 					}
 				}
-			} catch (e: unknown) {
+			} catch {
 				if (url.pathname !== PAGES.LOGIN) {
 					return redirect(`${PAGES.LOGIN}?return_to=${getFullUrlPath(url)}`)
 				}
@@ -105,6 +105,7 @@ export async function loader(args: LoaderFunctionArgs) {
 			FACEBOOK_APP_ID: environmentVariables().FACEBOOK_APP_ID,
 		},
 		authUser: user,
+		cspNonce: args.context.cspNonce as string
 	})
 }
 
@@ -118,6 +119,7 @@ export default function App() {
 				MFONI_GOOGLE_AUTH_CLIENT_ID: data.ENV.MFONI_GOOGLE_AUTH_CLIENT_ID,
 				API_ADDRESS: data.ENV.API_ADDRESS,
 			}}
+			cspNonce={data.cspNonce}
 		>
 			<Providers authData={data.authUser as User | null}>
 				<RouteLoader />
@@ -133,9 +135,10 @@ interface DocumentProps {
 		FACEBOOK_APP_ID: string
 		API_ADDRESS: string
 	}
+	cspNonce: string;
 }
 
-function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
+function Document({ children, ENV, cspNonce }: PropsWithChildren<DocumentProps>) {
 	return (
 		<html lang="en">
 			<head>
@@ -165,17 +168,29 @@ function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
 						src="https://accounts.google.com/gsi/client"
 						async
 						defer
+						nonce={cspNonce}
 						data-nscript="afterInteractive"
 					/>
 					<script
 						suppressHydrationWarning
+						src="https://js.paystack.co/v2/inline.js"
+						async
+						defer
+						nonce={cspNonce}
+						data-nscript="afterInteractive"
+					/>
+					<script
+						suppressHydrationWarning
+						nonce={cspNonce}
 						dangerouslySetInnerHTML={{
 							__html: `window.ENV = ${JSON.stringify({
 								API_ADDRESS: ENV.API_ADDRESS,
 							})}`,
 						}}
 					/>
-					<Scripts />
+					<Scripts 
+						nonce={cspNonce}
+					/>
 				</EnvContext.Provider>
 			</body>
 		</html>

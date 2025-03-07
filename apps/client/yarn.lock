@@ -2290,11 +2290,6 @@
   dependencies:
     which "^3.0.0"
 
-"@paystack/inline-js@2.22.2":
-  version "2.22.2"
-  resolved "https://registry.yarnpkg.com/@paystack/inline-js/-/inline-js-2.22.2.tgz#6ad3522d6db803c1ec4c704dba8783e9ca60788a"
-  integrity sha512-/yiK/ehUgIWNmShdSbaiAZFzACGqNMLPzC8kdNN4Pgmus5TWaMewmkl2Se9BgCzgHNEEMh7uwIBr0ZSbzQTZDQ==
-
 "@pdf-lib/upng@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@pdf-lib/upng/-/upng-1.0.1.tgz#7dc9c636271aca007a9df4deaf2dd7e7960280cb"
@@ -6602,6 +6597,11 @@ hast-util-whitespace@^2.0.0:
   version "2.0.1"
   resolved "https://registry.npmjs.org/hast-util-whitespace/-/hast-util-whitespace-2.0.1.tgz"
   integrity sha512-nAxA0v8+vXSBDt3AnRUNjyRIQ0rD+ntpbAp4LnPkumc5M9yUbSMa4XDU9Q6etY4f1Wp4bNgvc1yjiZtsTTrSng==
+
+helmet@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/helmet/-/helmet-8.0.0.tgz#05370fb1953aa7b81bd0ddfa459221247be6ea5c"
+  integrity sha512-VyusHLEIIO5mjQPUI1wpOAEu+wl6Q0998jzTxqUYGE45xCIcAxy3MsbEK/yyJUJ3ADeMoB6MornPH6GMWAf+Pw==
 
 hosted-git-info@^2.1.4:
   version "2.8.9"
