@@ -1,3 +1,5 @@
+using main.Configurations;
+
 namespace main.Domains;
 
 
@@ -43,4 +45,12 @@ public class CalculateUpgradePricingOutput
 {
     public required Int64 Pricing { get; set; }
     public required Int64 RemainingAmount { get; set; }
+}
+
+public class InitializePaymentInput
+{
+    public required string Origin { get; set; }
+    public string? ContentPurchaseId { get; set; }
+    public string? WalletId { get; set; }
+    public required InitPaymentInput PaystackInput { get; set; }
 }

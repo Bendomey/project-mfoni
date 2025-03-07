@@ -151,6 +151,7 @@ builder.Services.AddSingleton<CreatorService>();
 // billing services
 builder.Services.AddSingleton<WalletService>();
 builder.Services.AddSingleton<SubscriptionService>();
+builder.Services.AddSingleton<PaymentService>();
 
 // search services
 builder.Services.AddSingleton<SearchTagService>();
@@ -163,6 +164,7 @@ builder.Services.AddSingleton<CollectionService>();
 builder.Services.AddSingleton<CollectionContentService>();
 builder.Services.AddSingleton<ContentLikeService>();
 builder.Services.AddSingleton<DownloadContentService>();
+builder.Services.AddSingleton<PurchaseContentService>();
 
 builder.Services.AddSingleton<ExploreSectionService>();
 
@@ -188,6 +190,8 @@ builder.Services.AddSingleton<TagTransformer>();
 builder.Services.AddSingleton<ContentLikeTransformer>();
 builder.Services.AddSingleton<TagContentTransformer>();
 builder.Services.AddSingleton<ExploreSectionTransformer>();
+builder.Services.AddSingleton<ContentPurchaseTransformer>();
+builder.Services.AddSingleton<PaymentTransformer>();
 
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();

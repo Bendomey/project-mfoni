@@ -36,3 +36,19 @@ public class DownloadContentInput
     public required string Size { get; set; }
     public string? UserId { get; set; }
 }
+
+public class PurchaseContentInput
+{
+    public required string PaymentMethod { get; set; } // WALLET, SAVED_CARD, ONE_TIME
+    public required string ContentId { get; set; }
+    public required string UserId { get; set; }
+}
+
+public class PayWithWalletInput
+{
+    public required Int64 Amount { get; set; }
+    public required Models.User User { get; set; }
+    public required string CreatorId { get; set; }
+    public required string ContentId { get; set; }
+    public Models.ContentPurchase? ContentPurchase { get; set; }
+}

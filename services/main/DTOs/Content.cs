@@ -43,3 +43,14 @@ public class DownloadContentInput
     [Required]
     public required string Size { get; set; }
 }
+
+
+public class PurchaseContentInput
+{
+    /// <summary>
+    /// Payment Method
+    /// </summary>
+    /// <example>WALLET | SAVED_CARD | ONE_TIME</example>
+    [Required]
+    public required string PaymentMethod { get; set; }
+}

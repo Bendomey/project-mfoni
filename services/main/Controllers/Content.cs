@@ -23,7 +23,9 @@ public class ContentController : ControllerBase
     private readonly ContentLikeService _contentLikeService;
     private readonly IndexContent _indexContentService;
     private readonly SearchContentService _searchContentService;
+    private readonly PurchaseContentService _purchaseContentService;
     private readonly DownloadContentService _downloadContentService;
+    private readonly ContentPurchaseTransformer _contentPurchaseTransformer;
     private readonly ContentTransformer _contentTransformer;
     private readonly ContentLikeTransformer _contentLikeTransformer;
     private readonly SearchTagService _searchTagsService;
@@ -36,9 +38,11 @@ public class ContentController : ControllerBase
         IndexContent indexContentService,
         SearchContentService searchContentService,
         DownloadContentService downloadContentService,
+        PurchaseContentService purchaseContentService,
         EditContentService editContentService,
         ContentTransformer contentTransformer,
         ContentLikeTransformer contentLikeTransformer,
+        ContentPurchaseTransformer contentPurchaseTransformer,
         SearchTagService searchTagsService,
         CollectionContentService collectionContentService,
         Searchcontent.SearchContentService.SearchContentServiceClient searchServiceRpcClient,
@@ -56,6 +60,8 @@ public class ContentController : ControllerBase
         _collectionContentService = collectionContentService;
         _searchServiceRpcClient = searchServiceRpcClient;
         _downloadContentService = downloadContentService;
+        _purchaseContentService = purchaseContentService;
+        _contentPurchaseTransformer = contentPurchaseTransformer;
         _appConstants = appConstants.Value;
     }
 
@@ -250,6 +256,76 @@ public class ContentController : ControllerBase
             return new StatusCodeResult(500);
         }
     }
+
+    /// <summary>
+    /// Buy content
+    /// </summary>
+    /// <param name="id">Id of content</param>
+    /// <param name="input"></param>
+    [Authorize]
+    [HttpPost("{id}/buy")]
+    [ProducesResponseType(typeof(OutputResponse<OutputContentPurchase>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> BuyContent(
+        string id,
+        [FromBody] DTOs.PurchaseContentInput input
+    )
+    {
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var res = await _purchaseContentService.PurchaseContent(new Domains.PurchaseContentInput
+            {
+                ContentId = id,
+                PaymentMethod = input.PaymentMethod,
+                UserId = currentUser.Id,
+            });
+
+            if (res == null)
+            {
+                throw new HttpRequestException("Failed to purchase content");
+            }
+
+            var outputContentPurchase = await _contentPurchaseTransformer.Transform(res, populate: [PopulateKeys.CONTENT_PURCHASE_PAYMENT], currentUser.Id);
+
+            return new ObjectResult(
+                new GetEntityResponse<OutputContentPurchase>(outputContentPurchase, null).Result()
+            )
+            {
+                StatusCode = StatusCodes.Status200OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<object>(null, e.Message).Result())
+            {
+                StatusCode = (int)statusCode
+            };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Purchase content. Exception: {e}");
+
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                     {"action", "Purchase Content With Id"},
+                     {"contentId", id},
+                     {"Payment Method", input.PaymentMethod},
+               });
+               SentrySdk.CaptureException(e);
+           });
+            return new StatusCodeResult(500);
+        }
+    }
+
 
     /// <summary>
     /// Retrieve content by slug
