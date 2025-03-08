@@ -30,7 +30,11 @@ export async function action({ request }: ActionFunctionArgs) {
 
 		console.log(response)
 		if (response) {
-			return { success: true, paymentMethod, accessCode: response.payment?.accessCode }
+			return {
+				success: true,
+				paymentMethod,
+				accessCode: response.payment?.accessCode,
+			}
 		}
 	} catch {
 		return { error: 'Buying image failed. Try again!' }

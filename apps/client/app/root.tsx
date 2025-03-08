@@ -105,7 +105,7 @@ export async function loader(args: LoaderFunctionArgs) {
 			FACEBOOK_APP_ID: environmentVariables().FACEBOOK_APP_ID,
 		},
 		authUser: user,
-		cspNonce: args.context.cspNonce as string
+		cspNonce: args.context.cspNonce as string,
 	})
 }
 
@@ -135,10 +135,14 @@ interface DocumentProps {
 		FACEBOOK_APP_ID: string
 		API_ADDRESS: string
 	}
-	cspNonce: string;
+	cspNonce: string
 }
 
-function Document({ children, ENV, cspNonce }: PropsWithChildren<DocumentProps>) {
+function Document({
+	children,
+	ENV,
+	cspNonce,
+}: PropsWithChildren<DocumentProps>) {
 	return (
 		<html lang="en">
 			<head>
@@ -162,7 +166,7 @@ function Document({ children, ENV, cspNonce }: PropsWithChildren<DocumentProps>)
 							duration: 500,
 						}}
 					/>
-					<ScrollRestoration />
+					<ScrollRestoration nonce={cspNonce} />
 					<script
 						suppressHydrationWarning
 						src="https://accounts.google.com/gsi/client"
@@ -188,9 +192,7 @@ function Document({ children, ENV, cspNonce }: PropsWithChildren<DocumentProps>)
 							})}`,
 						}}
 					/>
-					<Scripts 
-						nonce={cspNonce}
-					/>
+					<Scripts nonce={cspNonce} />
 				</EnvContext.Provider>
 			</body>
 		</html>

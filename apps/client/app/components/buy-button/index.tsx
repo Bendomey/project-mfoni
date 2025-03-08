@@ -9,85 +9,87 @@ import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
 export type ContentSize = 'SMALL' | 'MEDIUM' | 'LARGE' | 'ORIGINAL'
 
 declare global {
-    interface Window {
-        // @TODO: type it later.
-        PaystackPop: any
-    }
+	interface Window {
+		// @TODO: type it later.
+		PaystackPop: any
+	}
 }
 
 interface Props {
-    content: Content
-    children: (props: {
-        onClick: () => void
-    }) => React.ReactNode
+	content: Content
+	children: (props: { onClick: () => void }) => React.ReactNode
 }
 
 export function BuyButtonApi({ children, content }: Props) {
-    const fetcher = useFetcher<{
-        error?: string
-        paymentMethod?: string
-        accessCode?: string
-    }>()
-    const queryClient = useQueryClient()
-    const [searchParams] = useSearchParams()
-    const buyModalState = useDisclosure()
+	const fetcher = useFetcher<{
+		error?: string
+		paymentMethod?: string
+		accessCode?: string
+	}>()
+	const queryClient = useQueryClient()
+	const [searchParams] = useSearchParams()
+	const buyModalState = useDisclosure()
 
+	useEffect(() => {
+		const buyParam = searchParams.get('buy')
+		const isBuyModalOpened = Boolean(buyParam && buyParam !== 'false')
 
-    useEffect(() => {
-        const buyParam = searchParams.get(
-            'buy',
-        )
-        const isBuyModalOpened = Boolean(
-            buyParam &&
-            buyParam !== 'false',
-        )
+		if (isBuyModalOpened) {
+			buyModalState.onOpen()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
-        if (isBuyModalOpened) {
-            buyModalState.onOpen()
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+	// where there is an error in the action data, show an error toast
+	useEffect(() => {
+		if (fetcher.state === 'idle' && fetcher?.data?.error) {
+			errorToast(fetcher?.data.error, {
+				id: 'error-buying-content',
+			})
+		}
+	}, [fetcher?.data, fetcher.state])
 
+	const initiateOneTimePayment = useCallback((accessCode: string) => {
+		const popup = new window.PaystackPop()
+		popup.resumeTransaction(accessCode)
+	}, [])
 
-    // where there is an error in the action data, show an error toast
-    useEffect(() => {
-        if (fetcher.state === 'idle' && fetcher?.data?.error) {
-            errorToast(fetcher?.data.error, {
-                id: 'error-buying-content',
-            })
-        }
-    }, [fetcher?.data, fetcher.state])
+	useEffect(() => {
+		if (fetcher.state === 'idle' && fetcher.data?.paymentMethod) {
+			buyModalState.onClose()
+			queryClient.invalidateQueries({
+				queryKey: [QUERY_KEYS.CONTENTS, content.slug],
+			})
 
-    const initiateOneTimePayment = useCallback((accessCode: string) => {
-            const popup = new window.PaystackPop()
-            popup.resumeTransaction(accessCode);
-    }, [])
+			if (
+				fetcher.data?.paymentMethod === 'ONE_TIME' &&
+				fetcher.data?.accessCode
+			) {
+				initiateOneTimePayment(fetcher.data.accessCode)
+			} else if (fetcher.data?.paymentMethod === 'WALLET') {
+				successToast('Content bought successfully', {
+					id: 'success-buying-content',
+				})
+			}
+		}
+	}, [
+		buyModalState,
+		content.slug,
+		content.title,
+		fetcher.data,
+		fetcher.state,
+		initiateOneTimePayment,
+		queryClient,
+	])
 
-    useEffect(() => {
-        if (fetcher.state === 'idle' && fetcher.data?.paymentMethod) {
-            buyModalState.onClose()
-            queryClient.invalidateQueries({
-                queryKey: [QUERY_KEYS.CONTENTS, content.slug],
-            })
-
-            if (fetcher.data?.paymentMethod === 'ONE_TIME' && fetcher.data?.accessCode) {
-                initiateOneTimePayment(fetcher.data.accessCode)
-            } else if (fetcher.data?.paymentMethod === 'WALLET') {
-                successToast('Content bought successfully', {
-                    id: 'success-buying-content',
-                })
-            }
-        }
-    }, [buyModalState, content.slug, content.title, fetcher.data, fetcher.state, initiateOneTimePayment, queryClient])
-
-    return (
-        <>
-            {children({ onClick: buyModalState.onOpen })}
-            <BuyModal
-                closeModal={buyModalState.onClose}
-                isOpened={buyModalState.isOpened}
-                content={content as unknown as Content}
-            />
-        </>
-    )
+	return (
+		<>
+			{children({ onClick: buyModalState.onOpen })}
+			<BuyModal
+				closeModal={buyModalState.onClose}
+				isOpened={buyModalState.isOpened}
+				content={content as unknown as Content}
+			/>
+		</>
+	)
 }

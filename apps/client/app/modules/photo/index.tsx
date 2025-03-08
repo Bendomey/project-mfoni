@@ -119,7 +119,6 @@ export const PhotoModule = () => {
 										</Button>
 									)}
 								</BuyButtonApi>
-
 							)}
 						</div>
 					</div>

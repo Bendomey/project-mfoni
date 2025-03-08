@@ -83,96 +83,70 @@ app.use((req, res, next) => {
 	next()
 })
 
-// TODO: come back to this later - for security.
-// app.use(
-// 	helmet({
-// 		crossOriginEmbedderPolicy: false,
-// 		contentSecurityPolicy: {
-// 			// directives: {
-// 			// 	defaultSrc: ["'self'"],
-// 			// 	scriptSrc: [
-// 			// 		"'self'",
-// 			// 		'https://js.paystack.co',
-// 			// 		"'strict-dynamic'",
-// 			// 		"'unsafe-eval'",
-// 			// 		// @ts-expect-error middleware is the worst
-// 			// 		(req, res) => `'nonce-${res.locals.nonce}'`, // ✅ Add nonce dynamically
-// 			// 	],
-// 			// 	styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-// 			// 	imgSrc: [
-// 			// 		"'self'",
-// 			// 		'data:',
-// 			// 		'https://your-bucket-name.s3.amazonaws.com',
-// 			// 	],
-// 			// 	mediaSrc: ["'self'", 'https://your-bucket-name.s3.amazonaws.com'],
-// 			// 	frameSrc: ["'self'", 'https://paystack.com'],
-// 			// 	connectSrc: [
-// 			// 		"'self'",
-// 			// 		`${process.env.API_ADDRESS}`,
-// 			// 	],
-// 			// },
-// 			directives: {
-// 				'default-src': ["'self'"],
-// 				'connect-src': [
-// 					"'self'",
-// 					`${process.env.API_ADDRESS}`,
-// 					...(MODE === 'development' ? ['ws:'] : []),
-// 				].filter(Boolean),
-// 				'font-src': [
-// 					"'self'",
-// 					'https://fonts.gstatic.com',
-// 					'https://fonts.googleapis.com',
-// 				],
-// 				'frame-src': [
-// 					"'self'",
-// 					"paystack.com",
-// 				], // Prevents embedding in iframes
-// 				'img-src': [
-// 					"'self'",
-// 					'data:',
-// 					'res.cloudinary.com',
-// 					'www.gravatar.com',
-// 					`https://${process.env.S3_BUCKET}.s3.amazonaws.com`,
-// 				],
-// 				'media-src': [
-// 					"'self'",
-// 					'res.cloudinary.com',
-// 					'data:',
-// 					'blob:',
-// 					`https://${process.env.S3_BUCKET}.s3.amazonaws.com`,
-// 				],
-// 				'script-src': [
-// 					"'self'",
-// 					// "'unsafe-inline'",
-// 					"https://js.paystack.co",
-// 'https://checkout.paystack.com/assets/',
-// 'https://www.googletagmanager.com/gtag/js',
-// 					"'strict-dynamic'",
-// 					"'unsafe-eval'",
-// 					// @ts-expect-error middleware is the worst
-// 					(req, res) => `'nonce-${res.locals.cspNonce}'`,
-// 				],
-// 				'script-src-attr': [
-// 					"'unsafe-inline'",
-// 					"'self'",
-//           		"https://checkout.paystack.com/assets/",
-//           		"https://www.googletagmanager.com/gtag/js",
-// 					// @ts-expect-error middleware is the worst
-//           		(req, res) => `'nonce-${res.locals.cspNonce}'`,
-// 				],
-// 				'script-src-attr': [
-// 					"'unsafe-inline'",
-// 					// TODO: figure out how to make the nonce work instead of
-// 					// unsafe-inline. I tried adding a nonce attribute where we're using
-// 					// inline attributes, but that didn't work. I still got that it
-// 					// violated the CSP.
-// 				],
-// 				'upgrade-insecure-requests': [], // Enforce HTTPS,
-// 				'object-src': ["'none'"], // Blocks Flash and other plugins
-// 			},
-// 		},
-// 	}),
-// )
+app.use(
+	helmet({
+		contentSecurityPolicy: {
+			useDefaults: false,
+
+			// Use this to debug CSP issues.
+			reportOnly: false,
+			directives: {
+				'default-src': ["'self'"],
+				'frame-src': ["'self'", 'checkout.paystack.com'], // Prevents embedding in iframes
+				'font-src': ["'self'", 'fonts.gstatic.com', 'fonts.googleapis.com'],
+				'script-src': [
+					"'self'",
+					"'strict-dynamic'",
+					"'unsafe-eval'",
+					'accounts.google.com/gsi/client',
+					'js.paystack.co/v2/inline.js',
+
+					// @ts-expect-error - middlewarer is not typesafe.
+					(req, res) => `'nonce-${res.locals.cspNonce}'`,
+				],
+				'script-src-elem': [
+					"'self'",
+					"'unsafe-inline'",
+					"'unsafe-eval'",
+					'accounts.google.com/gsi/client',
+					'js.paystack.co/v2/inline.js',
+
+					// TODO: figure out how to make the nonce work instead of
+					// unsafe-inline. I tried adding a nonce attribute where we're using
+					// inline attributes, but that didn't work. I still got that it
+					// violated the CSP.
+				],
+				// TODO: figure out all css files and insert them. Remove unsafe-inline while you're at it.
+				'style-src': ["'self'", 'fonts.googleapis.com/css2', "'unsafe-inline'"],
+				'img-src': [
+					"'self'",
+					'data:',
+					'res.cloudinary.com',
+					'www.gravatar.com',
+					'*.googleusercontent.com',
+					`${process.env.S3_BUCKET}.s3.amazonaws.com`,
+					'images.unsplash.com',
+				],
+				'media-src': [
+					"'self'",
+					'res.cloudinary.com',
+					'data:',
+					'blob:',
+					'*.googleusercontent.com',
+					`${process.env.S3_BUCKET}.s3.amazonaws.com`,
+					'images.unsplash.com',
+				],
+				'connect-src': [
+					"'self'",
+					...(MODE === 'development' ? ['ws:'] : []),
+					'*',
+				].filter(Boolean),
+				'upgrade-insecure-requests': null,
+			},
+		},
+		crossOriginEmbedderPolicy: false,
+	}),
+)
 
 app.all(
 	'*',

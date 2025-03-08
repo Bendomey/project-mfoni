@@ -216,7 +216,12 @@ export const Content = ({ content, showCreator = true, className }: Props) => {
 										variant={content.amount === 0 ? 'outlined' : 'solid'}
 										onClick={(e) => {
 											e.preventDefault()
-											navigate(`${PAGES.PHOTO.replace(':slug', content.slug)}?buy=true`)
+											navigate(
+												`${PAGES.PHOTO.replace(
+													':slug',
+													content.slug,
+												)}?buy=true`,
+											)
 										}}
 									>
 										<LockClosedIcon className="mr-2 h-4 w-4" />
