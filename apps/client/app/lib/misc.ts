@@ -1,4 +1,4 @@
-function removeTrailingSlash(s: string) {
+export function removeTrailingSlash(s: string) {
 	return s.endsWith('/') ? s.slice(0, -1) : s
 }
 
@@ -10,6 +10,12 @@ function getUrl(requestInfo?: { origin: string; path: string }) {
 	return removeTrailingSlash(
 		`${getOrigin(requestInfo)}${requestInfo?.path ?? ''}`,
 	)
+}
+
+export function typedBoolean<T>(
+	value: T,
+): value is Exclude<T, '' | 0 | false | null | undefined> {
+	return Boolean(value)
 }
 
 export function getDisplayUrl(requestInfo?: { origin: string; path: string }) {
@@ -52,4 +58,8 @@ export const validateLicense = (license: string) => {
 export const validateOrientation = (orientation: string) => {
 	const validOrientations = ['ALL', 'LANDSCAPE', 'PORTRAIT', 'SQUARE']
 	return validOrientations.includes(orientation) ? orientation : 'ALL'
+}
+
+export function isEqual<T>(a: T, b: T): boolean {
+	return JSON.stringify(a) === JSON.stringify(b)
 }

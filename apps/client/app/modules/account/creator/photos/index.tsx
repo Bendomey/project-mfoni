@@ -2,7 +2,7 @@ import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { Fragment } from 'react'
 import { useCreator } from '../index.tsx'
 import { useGetCollectionContentsBySlug } from '@/api/collections/index.ts'
-import * as button from '@/components/button/index.tsx'
+import { Button } from '@/components/button/index.tsx'
 import { Content } from '@/components/Content/index.tsx'
 
 import { EmptyState } from '@/components/empty-state/index.tsx'
@@ -38,10 +38,10 @@ export function CreatorPhotosModule() {
 				message="An error occurred fetching creator's photos."
 				title="Something happened."
 			>
-				<button.Button onClick={() => refetch()} variant="outlined">
+				<Button onClick={() => refetch()} variant="outlined">
 					<ArrowPathIcon aria-hidden="true" className="-ml-0.5 mr-1.5 size-5" />
 					Reload
-				</button.Button>
+				</Button>
 			</ErrorState>
 		)
 	}
@@ -66,8 +66,8 @@ export function CreatorPhotosModule() {
 								showCreator={false}
 							/>
 							<div className="mt-1 flex items-center gap-2">
-								{collectionContent.content.tags?.map((tag) => (
-									<button.Button
+								{collectionContent.content.tags?.slice(0, 3)?.map((tag) => (
+									<Button
 										key={tag.id}
 										size="sm"
 										isLink
@@ -76,7 +76,7 @@ export function CreatorPhotosModule() {
 										className="rounded"
 									>
 										{tag.name}
-									</button.Button>
+									</Button>
 								))}
 							</div>
 						</div>

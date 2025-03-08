@@ -3,6 +3,10 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { createRequestHandler } from '@remix-run/express'
 import { type ServerBuild } from '@remix-run/node'
+import {
+	init as sentryInit,
+	// setContext as sentrySetContext,
+} from '@sentry/remix'
 import address from 'address'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
@@ -35,6 +39,20 @@ const getBuild = async (): Promise<ServerBuild> => {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const here = (...d: Array<string>) => path.join(__dirname, ...d)
+
+if (MODE === 'production' && process.env.SENTRY_DSN) {
+	void import('./utils/monitoring.js').then(({ init }) => init())
+}
+
+if (MODE === 'production' && Boolean(process.env.SENTRY_DSN)) {
+	sentryInit({
+		dsn: process.env.SENTRY_DSN,
+		tracesSampleRate: 0.3,
+		environment: process.env.NODE_ENV,
+	})
+	// TODO: once you scale, you'll want to add more context here.
+	// sentrySetContext('region', { name: process.env.FLY_INSTANCE ?? 'unknown' })
+}
 
 const app = express()
 
@@ -76,6 +94,22 @@ if (viteDevServer) {
 
 app.use(morgan('tiny'))
 
+app.get('/robots.txt', (req, res) => {
+	// Set content type
+	res.type('text/plain')
+
+	// Generate dynamic content based on environment or other factors
+	const content = `User-agent: *
+  Allow: /
+  Sitemap: ${
+		process.env.NODE_ENV === 'development'
+			? 'http://localhost:3000'
+			: `https://${req.hostname}`
+	}/sitemap.xml`
+
+	res.send(content)
+})
+
 app.use('/api', router)
 
 app.use((req, res, next) => {
@@ -92,14 +126,16 @@ app.use(
 			reportOnly: false,
 			directives: {
 				'default-src': ["'self'"],
-				'frame-src': ["'self'", 'checkout.paystack.com'], // Prevents embedding in iframes
+				'frame-src': ["'self'", 'checkout.paystack.com', 'accounts.google.com'], // Prevents embedding in iframes
 				'font-src': ["'self'", 'fonts.gstatic.com', 'fonts.googleapis.com'],
 				'script-src': [
 					"'self'",
 					"'strict-dynamic'",
 					"'unsafe-eval'",
 					'accounts.google.com/gsi/client',
+					'apis.google.com',
 					'js.paystack.co/v2/inline.js',
+					'connect.facebook.net/en_US/sdk.js',
 
 					// @ts-expect-error - middlewarer is not typesafe.
 					(req, res) => `'nonce-${res.locals.cspNonce}'`,
@@ -109,7 +145,9 @@ app.use(
 					"'unsafe-inline'",
 					"'unsafe-eval'",
 					'accounts.google.com/gsi/client',
+					'apis.google.com',
 					'js.paystack.co/v2/inline.js',
+					'connect.facebook.net/en_US/sdk.js',
 
 					// TODO: figure out how to make the nonce work instead of
 					// unsafe-inline. I tried adding a nonce attribute where we're using
@@ -117,7 +155,12 @@ app.use(
 					// violated the CSP.
 				],
 				// TODO: figure out all css files and insert them. Remove unsafe-inline while you're at it.
-				'style-src': ["'self'", 'fonts.googleapis.com/css2', "'unsafe-inline'"],
+				'style-src': [
+					"'self'",
+					'fonts.googleapis.com/css2',
+					"'unsafe-inline'",
+					'accounts.google.com/gsi/style',
+				],
 				'img-src': [
 					"'self'",
 					'data:',
@@ -145,6 +188,9 @@ app.use(
 			},
 		},
 		crossOriginEmbedderPolicy: false,
+		crossOriginOpenerPolicy: {
+			policy: 'same-origin-allow-popups',
+		},
 	}),
 )
 

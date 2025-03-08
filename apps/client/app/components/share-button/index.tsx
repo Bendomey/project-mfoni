@@ -2,7 +2,8 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ShareIcon } from '@heroicons/react/16/solid'
 import { LinkIcon } from '@heroicons/react/24/outline'
 import { useMemo } from 'react'
-import { Button, type ButtonProps } from '../button/index.tsx'
+import { Button, buttonVariants, type ButtonProps } from '../button/index.tsx'
+import { classNames } from '@/lib/classNames.ts'
 import { successToast } from '@/lib/custom-toast-functions.tsx'
 import { isBrowser } from '@/lib/is-browser.ts'
 
@@ -28,10 +29,19 @@ export function ShareButton({ button, link, text, buttonProps }: Props) {
 			<div>
 				<MenuButton className="w-full">
 					{button ?? (
-						<Button variant="outlined" {...buttonProps}>
+						<span
+							className={classNames(
+								buttonVariants({
+									variant: buttonProps?.variant ?? 'outlined',
+									className: buttonProps?.className,
+									size: buttonProps?.size,
+									color: buttonProps?.color,
+								}),
+							)}
+						>
 							<ShareIcon className="mr-2 size-4 fill-current" />
 							Share
-						</Button>
+						</span>
 					)}
 				</MenuButton>
 			</div>

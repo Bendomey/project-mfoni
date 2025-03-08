@@ -14,6 +14,7 @@ import {
 	isRouteErrorResponse,
 	useLoaderData,
 } from '@remix-run/react'
+import { withSentry } from '@sentry/remix'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat.js'
 import { type PropsWithChildren } from 'react'
@@ -26,6 +27,7 @@ import 'dayjs/locale/en-gb.js'
 import { environmentVariables } from './lib/actions/env.server.ts'
 import { extractAuthCookie } from './lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from './lib/actions/json-with-cache.server.ts'
+import { useNonce } from './lib/nonce-provider.ts'
 import { getFullUrlPath } from './lib/url-helpers.ts'
 import { EnvContext } from './providers/env/index.tsx'
 import { Providers } from './providers/index.tsx'
@@ -105,11 +107,10 @@ export async function loader(args: LoaderFunctionArgs) {
 			FACEBOOK_APP_ID: environmentVariables().FACEBOOK_APP_ID,
 		},
 		authUser: user,
-		cspNonce: args.context.cspNonce as string,
 	})
 }
 
-export default function App() {
+function App() {
 	const data = useLoaderData<typeof loader>()
 
 	return (
@@ -119,7 +120,6 @@ export default function App() {
 				MFONI_GOOGLE_AUTH_CLIENT_ID: data.ENV.MFONI_GOOGLE_AUTH_CLIENT_ID,
 				API_ADDRESS: data.ENV.API_ADDRESS,
 			}}
-			cspNonce={data.cspNonce}
 		>
 			<Providers authData={data.authUser as User | null}>
 				<RouteLoader />
@@ -129,20 +129,18 @@ export default function App() {
 	)
 }
 
+export default withSentry(App)
+
 interface DocumentProps {
 	ENV: {
 		MFONI_GOOGLE_AUTH_CLIENT_ID: string
 		FACEBOOK_APP_ID: string
 		API_ADDRESS: string
 	}
-	cspNonce: string
 }
 
-function Document({
-	children,
-	ENV,
-	cspNonce,
-}: PropsWithChildren<DocumentProps>) {
+function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
+	const cspNonce = useNonce()
 	return (
 		<html lang="en">
 			<head>

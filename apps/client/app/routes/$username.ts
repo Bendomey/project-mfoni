@@ -8,12 +8,19 @@ import { getCreatorByUsername } from '@/api/creators/index.ts'
 import { PAGES, QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
+import { pathedRoutes } from '@/lib/actions/other-routes.server.ts'
 import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
 import { getSocialMetas } from '@/lib/seo.ts'
 import { safeString } from '@/lib/strings.ts'
 import { CreatorPage } from '@/modules/index.ts'
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
+	// because this is our catch-all thing, we'll do an early return for anything
+	// that has a other route setup. The response will be handled there.
+	if (pathedRoutes[new URL(loaderArgs.request.url).pathname]) {
+		throw new Response('Use other route', { status: 404 })
+	}
+
 	const queryClient = new QueryClient()
 	let { username } = loaderArgs.params
 
