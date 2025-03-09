@@ -2381,7 +2381,7 @@
     unist-util-visit "^4.0.0"
     vfile "^5.0.0"
 
-"@nasa-gcn/remix-seo@^2.0.1":
+"@nasa-gcn/remix-seo@2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@nasa-gcn/remix-seo/-/remix-seo-2.0.1.tgz#236c53ed70aceff7632abcdfd21532e066b1f2fd"
   integrity sha512-g9biDdYfsdFBnOU7lM+7vPGEXSEMRnWmfVLDQ98pT0PnTT/O3pFuA+s3DA0Mj9IwnAq9IcLs2Wee/aL6fvEA+A==
