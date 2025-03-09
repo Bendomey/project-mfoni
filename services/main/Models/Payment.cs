@@ -42,17 +42,16 @@ public class Payment
     public string Status { get; init; } = PaymentStatus.PENDING;
 
     [BsonElement("successful_at")]
-    public DateTime SuccessfulAt { get; set; }
+    public DateTime? SuccessfulAt { get; set; }
 
     [BsonElement("cancelled_at")]
-    public DateTime CancelledAt { get; set; }
+    public DateTime? CancelledAt { get; set; }
 
     [BsonElement("failed_at")]
-    public DateTime FailedAt { get; set; }
+    public DateTime? FailedAt { get; set; }
 
-    // TODO: fix this
-    // [BsonElement("error_obj")]
-    // public an ErrorObj { get; init; }
+    [BsonElement("error_obj")]
+    public PaymentError? ErrorObj { get; init; }
 
     [BsonElement("metadata")]
     public required PaymentMetaData MetaData { get; init; }
@@ -71,8 +70,19 @@ public class PaymentMetaData
     public required string Origin { get; init; } // ContentPurchase | WalletTopup
 
     [BsonElement("content_purchase_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
     public string? ContentPurchaseId { get; init; }
 
     [BsonElement("wallet_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
     public string? WalletId { get; init; }
+}
+
+public class PaymentError
+{
+    [BsonElement("obj")]
+    public string? Obj { get; init; }
+
+    [BsonElement("message")]
+    public string? Message { get; init; }
 }

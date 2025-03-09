@@ -26,6 +26,7 @@ public class ContentController : ControllerBase
     private readonly PurchaseContentService _purchaseContentService;
     private readonly DownloadContentService _downloadContentService;
     private readonly ContentPurchaseTransformer _contentPurchaseTransformer;
+    private readonly PaymentTransformer _paymentTransformer;
     private readonly ContentTransformer _contentTransformer;
     private readonly ContentLikeTransformer _contentLikeTransformer;
     private readonly SearchTagService _searchTagsService;
@@ -43,6 +44,7 @@ public class ContentController : ControllerBase
         ContentTransformer contentTransformer,
         ContentLikeTransformer contentLikeTransformer,
         ContentPurchaseTransformer contentPurchaseTransformer,
+        PaymentTransformer paymentTransformer,
         SearchTagService searchTagsService,
         CollectionContentService collectionContentService,
         Searchcontent.SearchContentService.SearchContentServiceClient searchServiceRpcClient,
@@ -62,6 +64,7 @@ public class ContentController : ControllerBase
         _downloadContentService = downloadContentService;
         _purchaseContentService = purchaseContentService;
         _contentPurchaseTransformer = contentPurchaseTransformer;
+        _paymentTransformer = paymentTransformer;
         _appConstants = appConstants.Value;
     }
 
@@ -264,7 +267,7 @@ public class ContentController : ControllerBase
     /// <param name="input"></param>
     [Authorize]
     [HttpPost("{id}/buy")]
-    [ProducesResponseType(typeof(OutputResponse<OutputContentPurchase>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<DTOs.PurchaseContentOutput>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> BuyContent(
         string id,
@@ -274,22 +277,34 @@ public class ContentController : ControllerBase
         try
         {
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
-            var res = await _purchaseContentService.PurchaseContent(new Domains.PurchaseContentInput
+            var purchaseContentOutput = await _purchaseContentService.PurchaseContent(new Domains.PurchaseContentInput
             {
                 ContentId = id,
                 PaymentMethod = input.PaymentMethod,
                 UserId = currentUser.Id,
             });
 
-            if (res == null)
+            if (purchaseContentOutput == null)
             {
                 throw new HttpRequestException("Failed to purchase content");
             }
 
-            var outputContentPurchase = await _contentPurchaseTransformer.Transform(res, populate: [PopulateKeys.CONTENT_PURCHASE_PAYMENT], currentUser.Id);
+            DTOs.PurchaseContentOutput res = new();
+
+            if (purchaseContentOutput.ContentPurchase != null)
+            {
+                var outputContentPurchase = await _contentPurchaseTransformer.Transform(purchaseContentOutput.ContentPurchase, default, currentUser.Id);
+                res.ContentPurchase = outputContentPurchase;
+            }
+
+            if (purchaseContentOutput.Payment != null)
+            {
+                var outputPayment = _paymentTransformer.Transform(purchaseContentOutput.Payment, default);
+                res.Payment = outputPayment;
+            }
 
             return new ObjectResult(
-                new GetEntityResponse<OutputContentPurchase>(outputContentPurchase, null).Result()
+                new GetEntityResponse<DTOs.PurchaseContentOutput>(res, null).Result()
             )
             {
                 StatusCode = StatusCodes.Status200OK
@@ -348,7 +363,7 @@ public class ContentController : ControllerBase
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             userId = currentUser.Id;
         }
-        catch (Exception e) { }
+        catch (Exception) { }
 
         try
         {

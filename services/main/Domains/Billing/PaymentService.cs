@@ -102,13 +102,16 @@ public class PaymentService
                 .Set(payment => payment.SuccessfulAt, DateTime.UtcNow)
                 .Set(payment => payment.Channel, input.Data.Channel)
                 .Set(payment => payment.UpdatedAt, DateTime.UtcNow)
+                .Unset(payment => payment.AuthorizationUrl)
+                .Unset(payment => payment.AccessCode)
         );
 
         // when it's related to a content purchase.
         if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.ContentPurchase && !string.IsNullOrEmpty(paymentRecord.MetaData.ContentPurchaseId))
         {
-            var contentPurchase = await _contentPurchaseCollection.Find(contentPurchase => contentPurchase.Id == paymentRecord.MetaData.ContentPurchaseId)
-           .FirstOrDefaultAsync();
+            var contentPurchase = await _contentPurchaseCollection
+                .Find(contentPurchase => contentPurchase.Id == paymentRecord.MetaData.ContentPurchaseId)
+                .FirstOrDefaultAsync();
 
             if (contentPurchase is null)
             {
@@ -119,7 +122,7 @@ public class PaymentService
             var content = await _contentsCollection.Find(c => c.Id == contentPurchase.ContentId).FirstOrDefaultAsync();
             if (content == null)
             {
-                throw new HttpRequestException("Content not found");
+                throw new HttpRequestException("ContentNotfound");
             }
 
             var creatorUser = await _userService.GetUserById(content.CreatedById);
@@ -129,6 +132,7 @@ public class PaymentService
                 Builders<ContentPurchase>.Update
                     .Set(contentPurchase => contentPurchase.Status, ContentPurchaseStatus.SUCCESSFUL)
                     .Set(contentPurchase => contentPurchase.PaymentId, paymentRecord.Id)
+                    .Set(contentPurchase => contentPurchase.SuccessfulAt, DateTime.UtcNow)
                     .Set(contentPurchase => contentPurchase.UpdatedAt, DateTime.UtcNow)
             );
 
@@ -176,16 +180,17 @@ public class PaymentService
         return paymentRecord;
     }
 
-    public async Task<bool> CancelPayment(string paymentId)
+    public async Task<bool> CancelPayment(string paymentId, PaymentError paymentError)
     {
         await _paymentCollection.UpdateOneAsync(
              Builders<Payment>.Filter.Eq(payment => payment.Id, paymentId),
              Builders<Payment>.Update
-                 .Set(payment => payment.Status, PaymentStatus.CANCELLED)
-                 .Unset(payment => payment.AuthorizationUrl)
-                 .Unset(payment => payment.AccessCode)
-                 .Set(payment => payment.CancelledAt, DateTime.UtcNow)
-                 .Set(payment => payment.UpdatedAt, DateTime.UtcNow)
+                .Set(payment => payment.Status, PaymentStatus.CANCELLED)
+                .Unset(payment => payment.AuthorizationUrl)
+                .Unset(payment => payment.AccessCode)
+                .Set(payment => payment.ErrorObj, paymentError)
+                .Set(payment => payment.CancelledAt, DateTime.UtcNow)
+                .Set(payment => payment.UpdatedAt, DateTime.UtcNow)
          );
 
         return true;

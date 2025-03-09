@@ -45,7 +45,7 @@ public class PurchaseContentService
         _logger.LogDebug("PurchaseContentService initialized");
     }
 
-    public async Task<ContentPurchase?> PurchaseContent(PurchaseContentInput input)
+    public async Task<PurchaseContentOutput?> PurchaseContent(PurchaseContentInput input)
     {
         var content = await _contentsCollection.Find(c => c.Id == input.ContentId).FirstOrDefaultAsync();
         if (content == null)
@@ -85,7 +85,10 @@ public class PurchaseContentService
 
                         if (paymentHasExpired)
                         {
-                            await _paymentService.CancelPayment(existingPurchase.PaymentId);
+                            await _paymentService.CancelPayment(existingPurchase.PaymentId, new PaymentError
+                            {
+                                Message = "Payment link has expired"
+                            });
                             var newContentPurchaseForOneTime = await PayWithOneTime(new PayWithWalletInput
                             {
                                 Amount = content.Amount,
@@ -100,7 +103,11 @@ public class PurchaseContentService
                         else
                         {
                             // purchase link is still active so user can proceed.
-                            return existingPurchase;
+                            return new PurchaseContentOutput
+                            {
+                                Payment = payment,
+                                ContentPurchase = existingPurchase
+                            };
                         }
                     }
                     else
@@ -112,7 +119,10 @@ public class PurchaseContentService
                 {
                     if (existingPurchase.Type == ContentPurchaseType.ONE_TIME && existingPurchase.PaymentId != null)
                     {
-                        await _paymentService.CancelPayment(existingPurchase.PaymentId);
+                        await _paymentService.CancelPayment(existingPurchase.PaymentId, new PaymentError
+                        {
+                            Message = "Payment was cancelled because a new payment method was selected."
+                        });
                     }
 
                     // if it's a new type, then we cancel the current purchase record and start over(creating new purchase).
@@ -121,6 +131,11 @@ public class PurchaseContentService
                         Builders<ContentPurchase>.Update
                         .Set(p => p.Status, ContentPurchaseStatus.CANCELLED)
                         .Set(p => p.UpdatedAt, DateTime.UtcNow)
+                        .Set(p => p.CancelledAt, DateTime.UtcNow)
+                        .Set(p => p.ErrorObj, new ContentPurchaseError
+                        {
+                            Message = "Purchase was cancelled because a new payment method was selected."
+                        })
                     );
                 }
             }
@@ -131,7 +146,7 @@ public class PurchaseContentService
         switch (input.PaymentMethod)
         {
             case "ONE_TIME":
-                var newContentPurchaseForOneTime = await PayWithOneTime(new PayWithWalletInput
+                var payWithOneTimeRes = await PayWithOneTime(new PayWithWalletInput
                 {
                     Amount = content.Amount,
                     User = user,
@@ -139,7 +154,7 @@ public class PurchaseContentService
                     ContentId = content.Id,
                 });
 
-                return newContentPurchaseForOneTime;
+                return payWithOneTimeRes;
 
             case "WALLET":
                 var newContentPurchaseForWallet = await PayWithWallet(new PayWithWalletInput
@@ -175,7 +190,10 @@ public class PurchaseContentService
                        .Replace("{amount}", $"{MoneyLib.ConvertPesewasToCedis(content.Amount):0.00}")
                 );
 
-                return newContentPurchaseForWallet;
+                return new PurchaseContentOutput
+                {
+                    ContentPurchase = newContentPurchaseForWallet!
+                };
 
             case "SAVED_CARD":
                 // TODO: we don't support saved cards just yet. So FE should not send this.
@@ -240,7 +258,7 @@ public class PurchaseContentService
         return newContentPurchase;
     }
 
-    private async Task<ContentPurchase?> PayWithOneTime(PayWithWalletInput input)
+    private async Task<PurchaseContentOutput?> PayWithOneTime(PayWithWalletInput input)
     {
         var contentPurchaseForOneTime = input.ContentPurchase;
 
@@ -281,7 +299,7 @@ public class PurchaseContentService
             }
         };
 
-        await _paymentService.InitiatePayment(new InitializePaymentInput
+        var newPayment = await _paymentService.InitiatePayment(new InitializePaymentInput
         {
             Origin = "ContentPurchase",
             ContentPurchaseId = contentPurchaseForOneTime.Id,
@@ -293,7 +311,11 @@ public class PurchaseContentService
             }
         });
 
-        return contentPurchaseForOneTime;
+        return new PurchaseContentOutput
+        {
+            Payment = newPayment,
+            ContentPurchase = contentPurchaseForOneTime,
+        };
     }
 
     private void SendNotification(Models.User user, string subject, string body)
