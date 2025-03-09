@@ -39,30 +39,28 @@ dayjs.extend(localizedFormat)
 
 export const links: LinksFunction = () => {
 	return [
-		//@TODO: Include assets.
-		// {
-		//   rel: 'apple-touch-icon',
-		//   sizes: '180x180',
-		//   href: '/favicons/apple-touch-icon.png',
-		// },
-		// {
-		//   rel: 'icon',
-		//   type: 'image/png',
-		//   sizes: '32x32',
-		//   href: '/favicons/favicon-32x32.png',
-		// },
-		// {
-		//   rel: 'icon',
-		//   type: 'image/png',
-		//   sizes: '16x16',
-		//   href: '/favicons/favicon-16x16.png',
-		// },
-		{ rel: 'icon', href: '/favicon.ico' },
+		{
+		  rel: 'apple-touch-icon',
+		  sizes: '180x180',
+		  href: '/apple-touch-icon.png',
+		},
+		{
+		  rel: 'icon',
+		  type: 'image/png',
+		  sizes: '32x32',
+		  href: '/favicon-32x32.png',
+		},
+		{
+		  rel: 'icon',
+		  type: 'image/png',
+		  sizes: '16x16',
+		  href: '/favicon-16x16.png',
+		},
 		{
 			rel: 'manifest',
 			href: '/site.webmanifest',
-			crossOrigin: 'use-credentials',
-		} as const, // necessary to make typescript happy
+		},
+		{ rel: 'icon', href: '/favicon.ico' },
 		{ rel: 'stylesheet', href: tailwindStyles },
 		{ rel: 'stylesheet', href: remixImageStyles },
 		{ rel: 'stylesheet', href: globalStyles },
