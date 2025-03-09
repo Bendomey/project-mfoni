@@ -159,7 +159,7 @@ public class PaymentService
                     .Replace("{name}", user.Name)
                     .Replace("{contentName}", content.Title)
                     .Replace("{creatorName}", creatorUser.Name)
-                    .Replace("{paymentMethod}", StringLib.normalizePaystackChannel(StringLib.SafeString(paymentRecord.Channel)))
+                    .Replace("{paymentMethod}", StringLib.normalizePaystackChannel(input.Data.Channel))
                     .Replace("{downloadLink}", $"{_appConstantsConfiguration.WebsiteUrl}/photos/{content.Slug}?download=true")
                     .Replace("{amount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
             );
