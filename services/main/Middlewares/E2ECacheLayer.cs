@@ -66,7 +66,7 @@ public class E2ECacheLayer
 
                             // build the cache key from the request with structure like mfoni-entity.action:queryParameters
                             cacheKey = $"{entity}.{action}:{strigifiedQueryParameters}";
-                            
+
                             var userId = GetUserIdFromAuthorization(context);
                             if (!string.IsNullOrEmpty(userId))
                             {
