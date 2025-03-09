@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using System.Text.Json;
 using main.Configuratons;
 
@@ -65,6 +66,13 @@ public class E2ECacheLayer
 
                             // build the cache key from the request with structure like mfoni-entity.action:queryParameters
                             cacheKey = $"{entity}.{action}:{strigifiedQueryParameters}";
+                            
+                            var userId = GetUserIdFromAuthorization(context);
+                            if (!string.IsNullOrEmpty(userId))
+                            {
+                                cacheKey = $"{cacheKey}:{userId}";
+                            }
+
                             var cacheHitData = await _cacheProvider.GetFromCache<object>(cacheKey);
 
                             if (cacheHitData is not null)
@@ -131,5 +139,12 @@ public class E2ECacheLayer
             }
         }
 
+    }
+
+    private string? GetUserIdFromAuthorization(HttpContext context)
+    {
+        var user = context.User;
+        var userId = user.FindFirstValue("id");
+        return userId;
     }
 }
