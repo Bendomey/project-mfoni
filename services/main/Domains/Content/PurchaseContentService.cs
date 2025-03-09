@@ -51,12 +51,12 @@ public class PurchaseContentService
         var content = await _contentsCollection.Find(c => c.Id == input.ContentId).FirstOrDefaultAsync();
         if (content == null)
         {
-            throw new HttpRequestException("Content not found", default, HttpStatusCode.NotFound);
+            throw new HttpRequestException("ContentNotFound", default, HttpStatusCode.NotFound);
         }
 
         if (content.Amount == 0)
         {
-            throw new HttpRequestException("Content is free");
+            throw new HttpRequestException("ContentIsFree");
         }
 
         var user = await _userService.GetUserById(input.UserId);
@@ -72,7 +72,7 @@ public class PurchaseContentService
         {
             if (existingPurchase.Status == ContentPurchaseStatus.SUCCESSFUL)
             {
-                throw new HttpRequestException("Content already purchased");
+                throw new HttpRequestException("ContentAlreadyPurchased");
             }
 
             // pending cases are only going to be for ONE_TIME and SAVED_CARD scenarios
@@ -207,10 +207,10 @@ public class PurchaseContentService
 
             case "SAVED_CARD":
                 // TODO: we don't support saved cards just yet. So FE should not send this.
-                throw new HttpRequestException("Invalid payment method");
+                throw new HttpRequestException("InvalidPaymentMmethod");
 
             default:
-                throw new HttpRequestException("Invalid payment method");
+                throw new HttpRequestException("InvalidPaymentMmethod");
         }
     }
 
