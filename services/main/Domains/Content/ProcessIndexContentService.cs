@@ -197,10 +197,52 @@ public class ProcessIndexContent
     private async Task ResolveAllImages(Content content, SixLabors.ImageSharp.Image image)
     {
         // NOTE: cloning for different sizees because I don't want to download the image everytime.
+        var clonedImageForLarge = image;
+        var clonedImageForMedium = image;
+        var clonedImageForSmall = image;
+        var clonedImageForBlur = image;
+
+        // save for large
+        var imageResponseForLarge = await ProcessImage.UploadToS3(new IUploadToS3Input
+        {
+            AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
+            AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
+            BucketName = _appConstantsConfiguration.BucketName,
+            Image = clonedImageForLarge,
+            KeyName = $"large_{content.Media.Key}",
+            Orientation = content.Media.Orientation,
+            ImageQuality = 85,
+        });
+        await SaveToDb(content, imageResponseForLarge, "large_media");
+
+        // save for medium
+        var imageResponseForMedium = await ProcessImage.UploadToS3(new IUploadToS3Input
+        {
+            AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
+            AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
+            BucketName = _appConstantsConfiguration.BucketName,
+            Image = clonedImageForMedium,
+            KeyName = $"medium_{content.Media.Key}",
+            Orientation = content.Media.Orientation,
+            ImageQuality = 75,
+        });
+        await SaveToDb(content, imageResponseForMedium, "medium_media");
+
+        // save for small
+        var imageResponseForSmall = await ProcessImage.UploadToS3(new IUploadToS3Input
+        {
+            AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
+            AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
+            BucketName = _appConstantsConfiguration.BucketName,
+            Image = clonedImageForSmall,
+            KeyName = $"small_{content.Media.Key}",
+            Orientation = content.Media.Orientation,
+            ImageQuality = 65,
+        });
+        await SaveToDb(content, imageResponseForSmall, "small_media");
 
         if (content.Amount > 0)
         {
-            var clonedImageForBlur = image;
             var blurredImage = ProcessImage.AddTextWatermark(clonedImageForBlur);
             var imageResponse = await ProcessImage.UploadToS3(new IUploadToS3Input
             {
@@ -215,49 +257,6 @@ public class ProcessIndexContent
 
             await SaveToDb(content, imageResponse, "blurred_media");
         }
-
-
-        // save for small
-        var clonedImageForSmall = image;
-        var imageResponseForSmall = await ProcessImage.UploadToS3(new IUploadToS3Input
-        {
-            AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
-            AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
-            BucketName = _appConstantsConfiguration.BucketName,
-            Image = clonedImageForSmall,
-            KeyName = $"small_{content.Media.Key}",
-            Orientation = content.Media.Orientation,
-            ImageQuality = 65,
-        });
-        await SaveToDb(content, imageResponseForSmall, "small_media");
-
-        // save for medium
-        var clonedImageForMedium = image;
-        var imageResponseForMedium = await ProcessImage.UploadToS3(new IUploadToS3Input
-        {
-            AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
-            AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
-            BucketName = _appConstantsConfiguration.BucketName,
-            Image = clonedImageForMedium,
-            KeyName = $"medium_{content.Media.Key}",
-            Orientation = content.Media.Orientation,
-            ImageQuality = 75,
-        });
-        await SaveToDb(content, imageResponseForMedium, "medium_media");
-
-        // save for large
-        var clonedImageForLarge = image;
-        var imageResponseForLarge = await ProcessImage.UploadToS3(new IUploadToS3Input
-        {
-            AWSAccessKey = _appConstantsConfiguration.AWSAccessKey,
-            AWSSecretKey = _appConstantsConfiguration.AWSSecretKey,
-            BucketName = _appConstantsConfiguration.BucketName,
-            Image = clonedImageForLarge,
-            KeyName = $"large_{content.Media.Key}",
-            Orientation = content.Media.Orientation,
-            ImageQuality = 85,
-        });
-        await SaveToDb(content, imageResponseForLarge, "large_media");
     }
 
     public async Task CheckForNudity(Content content)
