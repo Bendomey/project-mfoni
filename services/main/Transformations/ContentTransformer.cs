@@ -89,7 +89,7 @@ public class ContentTransformer
 
         string media = content.Media.Location;
 
-        if (content.Amount > 0 && content.BlurredMedia is not null && contentPurchase is null)
+        if (content.Amount > 0 && content.BlurredMedia is not null && contentPurchase is null && content.CreatedById != userId)
         {
             media = content.BlurredMedia.Location;
         }
