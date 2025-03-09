@@ -1,10 +1,10 @@
-import { useFetcher, useSearchParams } from '@remix-run/react'
+import { useFetcher, useNavigate, useSearchParams } from '@remix-run/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect } from 'react'
 import { BuyModal } from './buy-modal/index.tsx'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
-import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
+import { errorToast } from '@/lib/custom-toast-functions.tsx'
 
 export type ContentSize = 'SMALL' | 'MEDIUM' | 'LARGE' | 'ORIGINAL'
 
@@ -26,6 +26,7 @@ export function BuyButtonApi({ children, content }: Props) {
 		paymentMethod?: string
 		accessCode?: string
 	}>()
+	const navigate = useNavigate()
 	const queryClient = useQueryClient()
 	const [searchParams] = useSearchParams()
 	const buyModalState = useDisclosure()
@@ -51,8 +52,12 @@ export function BuyButtonApi({ children, content }: Props) {
 
 	const initiateOneTimePayment = useCallback((accessCode: string) => {
 		const popup = new window.PaystackPop()
-		popup.resumeTransaction(accessCode)
-	}, [])
+		popup.resumeTransaction(accessCode, {
+			onSuccess: () => {
+				navigate('.', { replace: true })
+			},
+		})
+	}, [navigate])
 
 	useEffect(() => {
 		if (
@@ -71,9 +76,7 @@ export function BuyButtonApi({ children, content }: Props) {
 			) {
 				initiateOneTimePayment(fetcher.data.accessCode)
 			} else if (fetcher.data?.paymentMethod === 'WALLET') {
-				successToast('Content purchased successfully', {
-					id: 'success-purchased-content',
-				})
+				navigate('.', { replace: true })
 			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
