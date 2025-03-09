@@ -188,6 +188,23 @@ public class PaymentService
         return paymentRecord;
     }
 
+    public async Task<Payment> GetPaymentByContentPurchaseId(string contentPurchaseId)
+    {
+
+        var filter = Builders<Payment>.Filter.Eq(payment => payment.MetaData.ContentPurchaseId, contentPurchaseId);
+        filter = filter & Builders<Payment>.Filter.Eq(payment => payment.Status, PaymentStatus.PENDING);
+
+        var paymentRecord = await _paymentCollection.Find(filter)
+            .FirstOrDefaultAsync();
+
+        if (paymentRecord is null)
+        {
+            throw new HttpRequestException("PaymentNotFound");
+        }
+
+        return paymentRecord;
+    }
+
     public async Task<bool> CancelPayment(string paymentId, PaymentError paymentError)
     {
         await _paymentCollection.UpdateOneAsync(

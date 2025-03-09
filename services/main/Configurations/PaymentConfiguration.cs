@@ -91,12 +91,9 @@ public class PaymentConfiguration
             {
                 string apiKey = ApiKey;
 
-                Console.WriteLine(apiKey);
-
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
 
                 var jsonContent = JsonConvert.SerializeObject(input);
-                Console.WriteLine(jsonContent);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                 var response = await client.PostAsync("https://api.paystack.co/transaction/initialize", content);

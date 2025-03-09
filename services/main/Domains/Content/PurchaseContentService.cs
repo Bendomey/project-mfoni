@@ -82,14 +82,14 @@ public class PurchaseContentService
                 if (existingPurchase.Type == input.PaymentMethod)
                 {
                     // check if payment is expired, if so, cancel that one and initiate a new one.
-                    if (existingPurchase.Type == ContentPurchaseType.ONE_TIME && existingPurchase.PaymentId != null)
+                    if (existingPurchase.Type == ContentPurchaseType.ONE_TIME)
                     {
-                        var payment = await _paymentService.GetPaymentById(existingPurchase.PaymentId);
+                        var payment = await _paymentService.GetPaymentByContentPurchaseId(existingPurchase.Id);
                         var paymentHasExpired = DateTime.UtcNow.Subtract(payment.CreatedAt).TotalHours > 24; // paystack automatically expires after 24 hours.
 
                         if (paymentHasExpired)
                         {
-                            await _paymentService.CancelPayment(existingPurchase.PaymentId, new PaymentError
+                            await _paymentService.CancelPayment(payment.Id, new PaymentError
                             {
                                 Message = "Payment link has expired"
                             });
