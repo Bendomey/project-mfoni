@@ -158,14 +158,13 @@ export const buyContent = async (
 	apiConfig: ApiConfigForServerConfig,
 ) => {
 	try {
-		const response = await fetchClient<ApiResponse<{contentPurchase: ContentPurchase, payment: Payment}>>(
-			`/v1/contents/${buyContentInput.contentId}/buy`,
-			{
-				method: 'POST',
-				body: JSON.stringify({ paymentMethod: buyContentInput.paymentMethod }),
-				...apiConfig,
-			},
-		)
+		const response = await fetchClient<
+			ApiResponse<{ contentPurchase: ContentPurchase; payment: Payment }>
+		>(`/v1/contents/${buyContentInput.contentId}/buy`, {
+			method: 'POST',
+			body: JSON.stringify({ paymentMethod: buyContentInput.paymentMethod }),
+			...apiConfig,
+		})
 
 		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
 			throw new Error(response.parsedBody.errorMessage)

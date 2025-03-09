@@ -65,7 +65,7 @@ export function WalletTransactionsTable({ data, isError }: Props) {
 													>
 														<WalletIcon className="h-6 w-auto" />
 														<span className="capitalize">
-															{transaction.reasonForTransfer.toLowerCase()}
+															{getReason(transaction.reasonForTransfer)}
 														</span>
 														{transaction.type === 'DEPOSIT' ? (
 															<span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-700/10">
@@ -120,4 +120,19 @@ export function WalletTransactionsTable({ data, isError }: Props) {
 			{data ? <Pagination data={data} /> : null}
 		</div>
 	)
+}
+
+function getReason(reason: string) {
+	switch (reason) {
+		case 'SUBSCRIPTION':
+			return 'Subscription payment'
+		case 'SUBSCRIPTION_REFUND':
+			return 'Subscription refund'
+		case 'CONTENT_PURCHASE':
+			return 'Content purchase'
+		case 'TOPUP':
+			return 'Wallet top-up'
+		default:
+			return reason
+	}
 }

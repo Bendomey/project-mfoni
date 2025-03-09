@@ -55,7 +55,11 @@ export function BuyButtonApi({ children, content }: Props) {
 	}, [])
 
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data?.paymentMethod && fetcher.data?.accessCode) {
+		if (
+			fetcher.state === 'idle' &&
+			fetcher.data?.paymentMethod &&
+			fetcher.data?.accessCode
+		) {
 			buyModalState.onClose()
 			queryClient.invalidateQueries({
 				queryKey: [QUERY_KEYS.CONTENTS, content.slug],
@@ -72,13 +76,8 @@ export function BuyButtonApi({ children, content }: Props) {
 				})
 			}
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [
-		content.slug,
-		fetcher.data,
-		fetcher.state,
-		initiateOneTimePayment,
-	])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [content.slug, fetcher.data, fetcher.state, initiateOneTimePayment])
 
 	const handleSubmit = (paymentMethod: string) => {
 		fetcher.submit(

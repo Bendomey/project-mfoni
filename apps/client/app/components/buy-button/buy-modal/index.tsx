@@ -14,7 +14,13 @@ interface Props {
 	isLoading?: boolean
 }
 
-export function BuyModal({ isOpened, closeModal, content, onSubmit, isLoading = false }: Props) {
+export function BuyModal({
+	isOpened,
+	closeModal,
+	content,
+	onSubmit,
+	isLoading = false,
+}: Props) {
 	const [paymentMethod, setPaymentMethod] = useState<ContentPurchase['type']>()
 	const { currentUser } = useAuth()
 
@@ -47,7 +53,6 @@ export function BuyModal({ isOpened, closeModal, content, onSubmit, isLoading = 
 						<div className="flex items-center space-x-5">
 							<input
 								onChange={() => {
-									console.log('hello')
 									setPaymentMethod('WALLET')
 								}}
 								checked={paymentMethod === 'WALLET'}
@@ -63,7 +68,6 @@ export function BuyModal({ isOpened, closeModal, content, onSubmit, isLoading = 
 							<input
 								name="payment-method"
 								onChange={() => {
-									console.log('hello1')
 									setPaymentMethod('ONE_TIME')
 								}}
 								checked={paymentMethod === 'ONE_TIME'}

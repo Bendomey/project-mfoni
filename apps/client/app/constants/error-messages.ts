@@ -10,6 +10,8 @@ export const errorMessagesWrapper = (error: string) => {
 			return 'Phone number already verified.'
 		case 'CodeIsIncorrectOrHasExpired':
 			return 'Code is incorrect or has expired.'
+		case 'ContentAlreadyPurchased':
+			return 'Content is already purchased.'
 		default:
 			return 'Something went wrong. Please try again later.'
 	}
