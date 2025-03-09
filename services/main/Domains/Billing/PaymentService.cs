@@ -21,6 +21,7 @@ public class PaymentService
     private readonly UserService _userService;
     private readonly IMongoCollection<Models.AdminWallet> _adminWalletCollection;
     private readonly CacheProvider _cacheProvider;
+    private readonly WalletService _walletService;
 
     public PaymentService(
         ILogger<WalletService> logger,
@@ -28,7 +29,8 @@ public class PaymentService
         IOptions<AppConstants> appConstants,
         AdminWalletService adminWalletService,
         CacheProvider cacheProvider,
-        UserService userService
+        UserService userService,
+        WalletService walletService
        )
     {
         _logger = logger;
@@ -53,6 +55,7 @@ public class PaymentService
         );
 
         _adminWalletService = adminWalletService;
+        _walletService = walletService;
         _userService = userService;
         _cacheProvider = cacheProvider;
 
@@ -130,9 +133,18 @@ public class PaymentService
 
             var creatorUser = await _userService.GetUserById(content.CreatedById);
 
+            // deposit to creator
+            var walletTo = await _walletService.Deposit(new WalletDepositInput
+            {
+                Amount = contentPurchase.Amount,
+                UserId = content.CreatedById,
+                ReasonForTransfer = WalletTransactionReasonForTransfer.CONTENT_PURCHASE,
+            });
+
             await _contentPurchaseCollection.UpdateOneAsync(
                 Builders<ContentPurchase>.Filter.Eq(contentPurchase => contentPurchase.Id, contentPurchase.Id),
                 Builders<ContentPurchase>.Update
+                    .Set(contentPurchase => contentPurchase.WalletTo, walletTo.Id)
                     .Set(contentPurchase => contentPurchase.Status, ContentPurchaseStatus.SUCCESSFUL)
                     .Set(contentPurchase => contentPurchase.PaymentId, paymentRecord.Id)
                     .Set(contentPurchase => contentPurchase.SuccessfulAt, DateTime.UtcNow)
@@ -147,9 +159,9 @@ public class PaymentService
                     .Replace("{name}", user.Name)
                     .Replace("{contentName}", content.Title)
                     .Replace("{creatorName}", creatorUser.Name)
-                    .Replace("{paymentMethod}", input.Data.Channel)
+                    .Replace("{paymentMethod}", StringLib.normalizePaystackChannel(StringLib.SafeString(paymentRecord.Channel)))
                     .Replace("{downloadLink}", $"{_appConstantsConfiguration.WebsiteUrl}/photos/{content.Slug}?download=true")
-                    .Replace("{amount}", $"{MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
+                    .Replace("{amount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
             );
 
             SendNotification(
@@ -159,7 +171,7 @@ public class PaymentService
                    .Replace("{name}", creatorUser.Name)
                    .Replace("{contentName}", content.Title)
                    .Replace("{buyerName}", user.Name)
-                   .Replace("{amount}", $"{MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
+                   .Replace("{amount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
             );
 
             _ = _cacheProvider.EntityChanged(new[] {

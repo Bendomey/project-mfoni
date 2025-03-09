@@ -181,7 +181,7 @@ public class PurchaseContentService
                         .Replace("{creatorName}", creatorUser.Name)
                         .Replace("{paymentMethod}", "Wallet")
                         .Replace("{downloadLink}", $"{_appConstantsConfiguration.WebsiteUrl}/photos/{content.Slug}?download=true")
-                        .Replace("{amount}", $"{MoneyLib.ConvertPesewasToCedis(content.Amount):0.00}")
+                        .Replace("{amount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(content.Amount):0.00}")
                 );
 
                 SendNotification(
@@ -191,7 +191,7 @@ public class PurchaseContentService
                        .Replace("{name}", creatorUser.Name)
                        .Replace("{contentName}", content.Title)
                        .Replace("{buyerName}", user.Name)
-                       .Replace("{amount}", $"{MoneyLib.ConvertPesewasToCedis(content.Amount):0.00}")
+                       .Replace("{amount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(content.Amount):0.00}")
                 );
 
                 _ = _cacheProvider.EntityChanged(new[] {

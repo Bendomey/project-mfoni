@@ -25,4 +25,40 @@ public static class StringLib
     {
         return input ?? "";
     }
+
+    public static string normalizePaystackChannel(string channel)
+    {
+        if (channel == "ussd")
+        {
+            return "USSD";
+        }
+        else if (channel == "bank")
+        {
+            return "Bank";
+        }
+        else if (channel == "card")
+        {
+            return "Card";
+        }
+        else if (channel == "qr")
+        {
+            return "QR";
+        }
+        else if (channel == "mobile_money")
+        {
+            return "Mobile Money";
+        }
+        else if (channel == "bank_transfer")
+        {
+            return "Bank Transfer";
+        }
+        else if (channel == "wallet")
+        {
+            return "Wallet";
+        }
+        else
+        {
+            return "Unknown";
+        }
+    }
 }
