@@ -4,6 +4,7 @@ using main.Configuratons;
 using main.Lib;
 using main.Models;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 
@@ -60,7 +61,10 @@ public class PurchaseContentService
 
         var user = await _userService.GetUserById(input.UserId);
 
-        var existingPurchase = await _contentPurchasesCollection.Find(p => p.ContentId == content.Id && p.UserId == input.UserId)
+        var filter = Builders<ContentPurchase>.Filter.Eq(p => p.ContentId, content.Id);
+        filter &= Builders<ContentPurchase>.Filter.Eq(p => p.UserId, user.Id);
+
+        var existingPurchase = await _contentPurchasesCollection.Find(filter)
             .SortByDescending(p => p.CreatedAt)
             .FirstOrDefaultAsync();
 
