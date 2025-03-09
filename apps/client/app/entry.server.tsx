@@ -11,7 +11,6 @@ import chalk from 'chalk'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
 import { ensurePrimary } from '@/lib/actions/litefs-js.server.ts'
-import { routes as otherRoutes } from '@/lib/actions/other-routes.server.ts'
 import { NonceProvider } from '@/lib/nonce-provider.ts'
 
 const ABORT_DELAY = 5000
@@ -30,11 +29,6 @@ export default async function handleDocumentRequest(...args: DocRequestArgs) {
 		// if we had an error, let's just send this over to the primary and see
 		// if it can handle it.
 		await ensurePrimary()
-	}
-
-	for (const handler of otherRoutes) {
-		const otherRouteResponse = await handler(request, remixContext)
-		if (otherRouteResponse) return otherRouteResponse
 	}
 
 	if (process.env.NODE_ENV !== 'production') {

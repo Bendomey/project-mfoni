@@ -58,6 +58,11 @@ export const links: LinksFunction = () => {
 		//   href: '/favicons/favicon-16x16.png',
 		// },
 		{ rel: 'icon', href: '/favicon.ico' },
+		{
+			rel: 'manifest',
+			href: '/site.webmanifest',
+			crossOrigin: 'use-credentials',
+		} as const, // necessary to make typescript happy
 		{ rel: 'stylesheet', href: tailwindStyles },
 		{ rel: 'stylesheet', href: remixImageStyles },
 		{ rel: 'stylesheet', href: globalStyles },

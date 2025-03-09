@@ -39,6 +39,7 @@
     "@headlessui/react": "2.1.0",
     "@heroicons/react": "2.1.1",
     "@hookform/resolvers": "3.3.4",
+    "@nasa-gcn/remix-seo": "2.0.1",
     "@next-boost/hybrid-disk-cache": "0.2.1",
     "@radix-ui/react-slot": "1.1.0",
     "@remix-run/css-bundle": "2.15.1",

@@ -28,13 +28,19 @@ const viteDevServer =
 				}),
 			)
 
-const getBuild = async (): Promise<ServerBuild> => {
-	if (viteDevServer) {
-		return viteDevServer.ssrLoadModule('virtual:remix/server-build') as any
-	}
+async function getBuild() {
+	try {
+		const build = viteDevServer
+			? await viteDevServer.ssrLoadModule('virtual:remix/server-build')
+			: // @ts-expect-error - the file might not exist yet but it will
+				await import('../build/server/index.js')
 
-	// @ts-expect-error - this file may or may not exist yet
-	return import('../build/server/index.js') as Promise<ServerBuild>
+		return { build: build as unknown as ServerBuild, error: null }
+	} catch (error) {
+		// Catch error and return null to make express happy and avoid an unrecoverable crash
+		console.error('Error creating build:', error)
+		return { error: error, build: null as unknown as ServerBuild }
+	}
 }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -92,23 +98,14 @@ if (viteDevServer) {
 	)
 }
 
-app.use(morgan('tiny'))
-
-app.get('/robots.txt', (req, res) => {
-	// Set content type
-	res.type('text/plain')
-
-	// Generate dynamic content based on environment or other factors
-	const content = `User-agent: *
-  Allow: /
-  Sitemap: ${
-		process.env.NODE_ENV === 'development'
-			? 'http://localhost:3000'
-			: `https://${req.hostname}`
-	}/sitemap.xml`
-
-	res.send(content)
-})
+app.use(
+	morgan('tiny', {
+		skip: (req, res) =>
+			res.statusCode === 200 &&
+			(req.url?.startsWith('/resources/images') ||
+				req.url?.startsWith('/resources/healthcheck')),
+	}),
+)
 
 app.use('/api', router)
 
@@ -197,10 +194,20 @@ app.use(
 app.all(
 	'*',
 	createRequestHandler({
-		build: MODE === 'development' ? getBuild : await getBuild(),
+		build: async () => {
+			const { error, build } = await getBuild()
+			// gracefully "catch" the error
+			if (error) {
+				throw error
+			}
+			return build
+		},
 		mode: MODE,
 		getLoadContext(_, res) {
-			return { cspNonce: res.locals.cspNonce } // Pass nonce to Remix loaders
+			return {
+				cspNonce: res.locals.cspNonce, // Pass nonce to Remix loaders
+				serverBuild: getBuild(),
+			}
 		},
 	}),
 )
