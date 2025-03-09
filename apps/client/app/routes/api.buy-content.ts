@@ -28,7 +28,6 @@ export async function action({ request }: ActionFunctionArgs) {
 			},
 		)
 
-		console.log(response)
 		if (response) {
 			return {
 				success: true,

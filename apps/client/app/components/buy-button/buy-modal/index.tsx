@@ -1,4 +1,3 @@
-import { useFetcher } from '@remix-run/react'
 import { useState } from 'react'
 import paymentAssetPng from '@/assets/payment.png'
 import { Button } from '@/components/button/index.tsx'
@@ -11,17 +10,13 @@ interface Props {
 	isOpened: boolean
 	closeModal: () => void
 	content: Content
+	onSubmit: (paymentMethod: ContentPurchase['type']) => void
+	isLoading?: boolean
 }
 
-export function BuyModal({ isOpened, closeModal, content }: Props) {
+export function BuyModal({ isOpened, closeModal, content, onSubmit, isLoading = false }: Props) {
 	const [paymentMethod, setPaymentMethod] = useState<ContentPurchase['type']>()
 	const { currentUser } = useAuth()
-	const fetcher = useFetcher<{
-		error?: string
-		signedUrl?: string
-		size?: string
-	}>()
-	const isSubmitting = fetcher.state === 'submitting'
 
 	const handleSubmit = () => {
 		if (!paymentMethod) return
@@ -31,21 +26,10 @@ export function BuyModal({ isOpened, closeModal, content }: Props) {
 			return errorToast('Insufficient funds in wallet')
 		}
 
-		fetcher.submit(
-			{
-				contentId: content.id,
-				paymentMethod: paymentMethod,
-			},
-			{
-				action: `/api/buy-content`,
-				encType: 'multipart/form-data',
-				method: 'post',
-				preventScrollReset: true,
-			},
-		)
+		onSubmit(paymentMethod)
 	}
 
-	const isButtonDisabled = isSubmitting || !paymentMethod
+	const isButtonDisabled = isLoading || !paymentMethod
 
 	return (
 		<Modal
@@ -101,7 +85,7 @@ export function BuyModal({ isOpened, closeModal, content }: Props) {
 						className="mt-5"
 						color="primary"
 					>
-						{isSubmitting ? 'Processing...' : 'Buy Content'}
+						{isLoading ? 'Processing...' : 'Buy Content'}
 					</Button>
 					<Button variant="outlined" className="mt-5" onClick={closeModal}>
 						Close

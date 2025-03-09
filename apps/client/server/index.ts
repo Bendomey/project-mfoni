@@ -165,7 +165,10 @@ app.use(
 					'www.gravatar.com',
 					'*.googleusercontent.com',
 					`${process.env.S3_BUCKET}.s3.amazonaws.com`,
+
+					// TODO: remove this
 					'images.unsplash.com',
+					'flowbite.s3.amazonaws.com',
 				],
 				'media-src': [
 					"'self'",

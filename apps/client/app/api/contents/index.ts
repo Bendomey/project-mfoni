@@ -158,7 +158,7 @@ export const buyContent = async (
 	apiConfig: ApiConfigForServerConfig,
 ) => {
 	try {
-		const response = await fetchClient<ApiResponse<ContentPurchase>>(
+		const response = await fetchClient<ApiResponse<{contentPurchase: ContentPurchase, payment: Payment}>>(
 			`/v1/contents/${buyContentInput.contentId}/buy`,
 			{
 				method: 'POST',

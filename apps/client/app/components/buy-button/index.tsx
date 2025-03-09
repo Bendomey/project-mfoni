@@ -55,7 +55,7 @@ export function BuyButtonApi({ children, content }: Props) {
 	}, [])
 
 	useEffect(() => {
-		if (fetcher.state === 'idle' && fetcher.data?.paymentMethod) {
+		if (fetcher.state === 'idle' && fetcher.data?.paymentMethod && fetcher.data?.accessCode) {
 			buyModalState.onClose()
 			queryClient.invalidateQueries({
 				queryKey: [QUERY_KEYS.CONTENTS, content.slug],
@@ -67,20 +67,35 @@ export function BuyButtonApi({ children, content }: Props) {
 			) {
 				initiateOneTimePayment(fetcher.data.accessCode)
 			} else if (fetcher.data?.paymentMethod === 'WALLET') {
-				successToast('Content bought successfully', {
-					id: 'success-buying-content',
+				successToast('Content purchased successfully', {
+					id: 'success-purchased-content',
 				})
 			}
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
-		buyModalState,
 		content.slug,
-		content.title,
 		fetcher.data,
 		fetcher.state,
 		initiateOneTimePayment,
-		queryClient,
 	])
+
+	const handleSubmit = (paymentMethod: string) => {
+		fetcher.submit(
+			{
+				contentId: content.id,
+				paymentMethod: paymentMethod,
+			},
+			{
+				action: `/api/buy-content`,
+				encType: 'multipart/form-data',
+				method: 'post',
+				preventScrollReset: true,
+			},
+		)
+	}
+
+	const isLoading = fetcher.state === 'submitting'
 
 	return (
 		<>
@@ -89,6 +104,8 @@ export function BuyButtonApi({ children, content }: Props) {
 				closeModal={buyModalState.onClose}
 				isOpened={buyModalState.isOpened}
 				content={content as unknown as Content}
+				onSubmit={handleSubmit}
+				isLoading={isLoading}
 			/>
 		</>
 	)
