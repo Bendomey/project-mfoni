@@ -30,6 +30,7 @@ public class ContentPurchase
     public required string UserId { get; init; }
 
     [BsonElement("content_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
     public required string ContentId { get; init; }
 
     // Should hold the main content amount at the time of purchase.
@@ -63,9 +64,30 @@ public class ContentPurchase
     [BsonElement("status")]
     public string Status { get; init; } = ContentPurchaseStatus.PENDING;
 
+    [BsonElement("successful_at")]
+    public DateTime? SuccessfulAt { get; set; }
+
+    [BsonElement("cancelled_at")]
+    public DateTime? CancelledAt { get; set; }
+
+    [BsonElement("failed_at")]
+    public DateTime? FailedAt { get; set; }
+
+    [BsonElement("error_obj")]
+    public ContentPurchaseError? ErrorObj { get; init; }
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class ContentPurchaseError
+{
+    [BsonElement("obj")]
+    public string? Obj { get; init; }
+
+    [BsonElement("message")]
+    public string? Message { get; init; }
 }

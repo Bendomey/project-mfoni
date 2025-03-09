@@ -20,13 +20,17 @@ public class PaymentService
     private readonly AdminWalletService _adminWalletService;
     private readonly UserService _userService;
     private readonly IMongoCollection<Models.AdminWallet> _adminWalletCollection;
+    private readonly CacheProvider _cacheProvider;
+    private readonly WalletService _walletService;
 
     public PaymentService(
         ILogger<WalletService> logger,
         DatabaseSettings databaseConfig,
         IOptions<AppConstants> appConstants,
         AdminWalletService adminWalletService,
-        UserService userService
+        CacheProvider cacheProvider,
+        UserService userService,
+        WalletService walletService
        )
     {
         _logger = logger;
@@ -51,7 +55,9 @@ public class PaymentService
         );
 
         _adminWalletService = adminWalletService;
+        _walletService = walletService;
         _userService = userService;
+        _cacheProvider = cacheProvider;
 
         logger.LogDebug("Payment service initialized");
     }
@@ -102,13 +108,16 @@ public class PaymentService
                 .Set(payment => payment.SuccessfulAt, DateTime.UtcNow)
                 .Set(payment => payment.Channel, input.Data.Channel)
                 .Set(payment => payment.UpdatedAt, DateTime.UtcNow)
+                .Unset(payment => payment.AuthorizationUrl)
+                .Unset(payment => payment.AccessCode)
         );
 
         // when it's related to a content purchase.
         if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.ContentPurchase && !string.IsNullOrEmpty(paymentRecord.MetaData.ContentPurchaseId))
         {
-            var contentPurchase = await _contentPurchaseCollection.Find(contentPurchase => contentPurchase.Id == paymentRecord.MetaData.ContentPurchaseId)
-           .FirstOrDefaultAsync();
+            var contentPurchase = await _contentPurchaseCollection
+                .Find(contentPurchase => contentPurchase.Id == paymentRecord.MetaData.ContentPurchaseId)
+                .FirstOrDefaultAsync();
 
             if (contentPurchase is null)
             {
@@ -119,16 +128,26 @@ public class PaymentService
             var content = await _contentsCollection.Find(c => c.Id == contentPurchase.ContentId).FirstOrDefaultAsync();
             if (content == null)
             {
-                throw new HttpRequestException("Content not found");
+                throw new HttpRequestException("ContentNotfound");
             }
 
             var creatorUser = await _userService.GetUserById(content.CreatedById);
 
+            // deposit to creator
+            var walletTo = await _walletService.Deposit(new WalletDepositInput
+            {
+                Amount = contentPurchase.Amount,
+                UserId = content.CreatedById,
+                ReasonForTransfer = WalletTransactionReasonForTransfer.CONTENT_PURCHASE,
+            });
+
             await _contentPurchaseCollection.UpdateOneAsync(
                 Builders<ContentPurchase>.Filter.Eq(contentPurchase => contentPurchase.Id, contentPurchase.Id),
                 Builders<ContentPurchase>.Update
+                    .Set(contentPurchase => contentPurchase.WalletTo, walletTo.Id)
                     .Set(contentPurchase => contentPurchase.Status, ContentPurchaseStatus.SUCCESSFUL)
                     .Set(contentPurchase => contentPurchase.PaymentId, paymentRecord.Id)
+                    .Set(contentPurchase => contentPurchase.SuccessfulAt, DateTime.UtcNow)
                     .Set(contentPurchase => contentPurchase.UpdatedAt, DateTime.UtcNow)
             );
 
@@ -140,9 +159,9 @@ public class PaymentService
                     .Replace("{name}", user.Name)
                     .Replace("{contentName}", content.Title)
                     .Replace("{creatorName}", creatorUser.Name)
-                    .Replace("{paymentMethod}", input.Data.Channel)
+                    .Replace("{paymentMethod}", StringLib.normalizePaystackChannel(input.Data.Channel))
                     .Replace("{downloadLink}", $"{_appConstantsConfiguration.WebsiteUrl}/photos/{content.Slug}?download=true")
-                    .Replace("{amount}", $"{MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
+                    .Replace("{amount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
             );
 
             SendNotification(
@@ -152,9 +171,14 @@ public class PaymentService
                    .Replace("{name}", creatorUser.Name)
                    .Replace("{contentName}", content.Title)
                    .Replace("{buyerName}", user.Name)
-                   .Replace("{amount}", $"{MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
+                   .Replace("{amount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
             );
 
+            _ = _cacheProvider.EntityChanged(new[] {
+                $"{CacheProvider.CacheEntities["contents"]}.find*",
+                $"{CacheProvider.CacheEntities["contents"]}*{content.Id}*",
+                $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+            });
         }
         else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.WalletTopup && !string.IsNullOrEmpty(paymentRecord.MetaData.WalletId))
         {
@@ -176,16 +200,34 @@ public class PaymentService
         return paymentRecord;
     }
 
-    public async Task<bool> CancelPayment(string paymentId)
+    public async Task<Payment> GetPaymentByContentPurchaseId(string contentPurchaseId)
+    {
+
+        var filter = Builders<Payment>.Filter.Eq(payment => payment.MetaData.ContentPurchaseId, contentPurchaseId);
+        filter = filter & Builders<Payment>.Filter.Eq(payment => payment.Status, PaymentStatus.PENDING);
+
+        var paymentRecord = await _paymentCollection.Find(filter)
+            .FirstOrDefaultAsync();
+
+        if (paymentRecord is null)
+        {
+            throw new HttpRequestException("PaymentNotFound");
+        }
+
+        return paymentRecord;
+    }
+
+    public async Task<bool> CancelPayment(string paymentId, PaymentError paymentError)
     {
         await _paymentCollection.UpdateOneAsync(
              Builders<Payment>.Filter.Eq(payment => payment.Id, paymentId),
              Builders<Payment>.Update
-                 .Set(payment => payment.Status, PaymentStatus.CANCELLED)
-                 .Unset(payment => payment.AuthorizationUrl)
-                 .Unset(payment => payment.AccessCode)
-                 .Set(payment => payment.CancelledAt, DateTime.UtcNow)
-                 .Set(payment => payment.UpdatedAt, DateTime.UtcNow)
+                .Set(payment => payment.Status, PaymentStatus.CANCELLED)
+                .Unset(payment => payment.AuthorizationUrl)
+                .Unset(payment => payment.AccessCode)
+                .Set(payment => payment.ErrorObj, paymentError)
+                .Set(payment => payment.CancelledAt, DateTime.UtcNow)
+                .Set(payment => payment.UpdatedAt, DateTime.UtcNow)
          );
 
         return true;
