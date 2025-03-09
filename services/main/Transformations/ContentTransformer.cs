@@ -15,6 +15,8 @@ public class ContentTransformer
     private readonly UserService _userService;
     private readonly SearchTagService _searchTagService;
     private readonly UserTransformer _userTransformer;
+    private readonly PurchaseContentService _purchaseContentService;
+    private readonly ContentPurchaseTransformer _contentPurchaseTransformer;
     private readonly TagTransformer _tagTransformer;
     private readonly AdminService _adminService;
     private readonly AdminTransformer _adminTransformer;
@@ -27,6 +29,8 @@ public class ContentTransformer
         UserTransformer userTransformer,
         SearchTagService searchTagService,
         TagTransformer tagTransformer,
+        ContentPurchaseTransformer contentPurchaseTransformer,
+        PurchaseContentService purchaseContentService,
         SearchContentService searchContentService,
         CacheProvider cacheProvider
     )
@@ -38,13 +42,26 @@ public class ContentTransformer
         _userTransformer = userTransformer;
         _searchTagService = searchTagService;
         _tagTransformer = tagTransformer;
+        _contentPurchaseTransformer = contentPurchaseTransformer;
         _searchContentService = searchContentService;
+        _purchaseContentService = purchaseContentService;
         _cacheProvider = cacheProvider;
     }
 
     public async Task<OutputContent> Transform(Content content, string[]? populate = null, string? userId = null)
     {
         populate ??= Array.Empty<string>();
+
+        OutputContentPurchase? contentPurchase = null;
+        if (userId is not null)
+        {
+            var getPurchaseContent = await _cacheProvider.ResolveCache($"{CacheProvider.CacheEntities["contents"]}.{content.Id}.users.{userId}.purchases", () => _purchaseContentService.GetSuccessfulContentPurchaseByContentId(content.Id, userId));
+
+            if (getPurchaseContent is not null)
+            {
+                contentPurchase = await _contentPurchaseTransformer.Transform(getPurchaseContent);
+            }
+        }
 
         OutputBasicCreator? outputBasicCreator = null;
         if (content.CreatedById is not null && populate.Any(p => p.Contains(PopulateKeys.CONTENT_CREATED_BY)))
@@ -72,7 +89,7 @@ public class ContentTransformer
 
         string media = content.Media.Location;
 
-        if (content.Amount > 0 && content.BlurredMedia is not null)
+        if (content.Amount > 0 && content.BlurredMedia is not null && contentPurchase is null)
         {
             media = content.BlurredMedia.Location;
         }
@@ -140,6 +157,8 @@ public class ContentTransformer
                 Status = content.RekognitionMetaData?.Status ?? "PENDING",
                 Message = content.RekognitionMetaData?.Details?.Message
             },
+            ContentPurchaseId = contentPurchase?.Id,
+            ContentPurchase = populate.Any(p => p.Contains(PopulateKeys.CONTENT_PURCHASE)) ? contentPurchase : null,
             CreatedById = content.CreatedById!,
             CreatedBy = outputBasicCreator,
             RejectedAt = content.RejectedAt,

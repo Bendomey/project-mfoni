@@ -17,8 +17,8 @@ public class ContentPurchaseTransformer
     private readonly WalletTransactionTransformer _walletTransactionTransformer;
     private readonly PaymentService _paymentService;
     private readonly PaymentTransformer _paymentTransformer;
-    private readonly SearchContentService _contentService;
-    private readonly ContentTransformer _contentTransformer;
+    // private readonly SearchContentService _contentService;
+    // private readonly ContentTransformer _contentTransformer;
     private readonly CacheProvider _cacheProvider;
 
     public ContentPurchaseTransformer(
@@ -27,8 +27,8 @@ public class ContentPurchaseTransformer
         WalletTransactionTransformer walletTransformer,
         PaymentService paymentService,
         PaymentTransformer paymentTransformer,
-        SearchContentService contentService,
-        ContentTransformer contentTransformer,
+        // SearchContentService contentService,
+        // ContentTransformer contentTransformer,
         UserTransformer userTransformer,
         CacheProvider cacheProvider
     )
@@ -38,8 +38,8 @@ public class ContentPurchaseTransformer
         _walletTransactionTransformer = walletTransformer;
         _paymentService = paymentService;
         _paymentTransformer = paymentTransformer;
-        _contentService = contentService;
-        _contentTransformer = contentTransformer;
+        // _contentService = contentService;
+        // _contentTransformer = contentTransformer;
         _userTransformer = userTransformer;
         _cacheProvider = cacheProvider;
     }
@@ -49,15 +49,15 @@ public class ContentPurchaseTransformer
 
         populate ??= Array.Empty<string>();
 
-        OutputContent? content = null;
-        if (contentPurchase.ContentId is not null && populate.Any(p => p.Contains(PopulateKeys.CONTENT_PURCHASE_CONTENT)))
-        {
-            var contentData = await _contentService.GetContentById(contentPurchase.Id);
-            if (contentData is not null)
-            {
-                content = await _contentTransformer.Transform(contentData, populate, userId);
-            }
-        }
+        // OutputContent? content = null;
+        // if (contentPurchase.ContentId is not null && populate.Any(p => p.Contains(PopulateKeys.CONTENT_PURCHASE_CONTENT)))
+        // {
+        //     var contentData = await _contentService.GetContentById(contentPurchase.Id);
+        //     if (contentData is not null)
+        //     {
+        //         content = await _contentTransformer.Transform(contentData, populate, userId);
+        //     }
+        // }
 
         OutputPayment? payment = null;
         if (contentPurchase.PaymentId is not null && populate.Any(p => p.Contains(PopulateKeys.CONTENT_PURCHASE_PAYMENT)))
@@ -106,7 +106,7 @@ public class ContentPurchaseTransformer
             ContentId = contentPurchase.ContentId,
             Status = contentPurchase.Status,
             Type = contentPurchase.Type,
-            Content = content,
+            // Content = content,
             CreatedById = contentPurchase.UserId,
             CreatedBy = outputCreatedByUser,
             PaymentId = contentPurchase.PaymentId,

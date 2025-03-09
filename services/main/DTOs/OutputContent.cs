@@ -21,6 +21,8 @@ public class OutputContent
     public OutputContentLike? CurrentUserLike { get; set; }
     public required string CreatedById { get; set; }
     public OutputBasicCreator? CreatedBy { get; set; }
+    public string? ContentPurchaseId { get; set; }
+    public OutputContentPurchase? ContentPurchase { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public required ImageProcessingOutput ImageProcessingResponse { get; set; }

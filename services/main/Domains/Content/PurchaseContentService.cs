@@ -328,6 +328,15 @@ public class PurchaseContentService
         };
     }
 
+    public async Task<ContentPurchase> GetSuccessfulContentPurchaseByContentId(string contentId, string userId)
+    {
+        var filter = Builders<ContentPurchase>.Filter.Eq(p => p.ContentId, contentId);
+        filter &= Builders<ContentPurchase>.Filter.Eq(p => p.UserId, userId);
+        filter &= Builders<ContentPurchase>.Filter.Eq(p => p.Status, ContentPurchaseStatus.SUCCESSFUL);
+
+        return await _contentPurchasesCollection.Find(filter).FirstOrDefaultAsync();
+    }
+
     private void SendNotification(Models.User user, string subject, string body)
     {
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
