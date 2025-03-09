@@ -70,6 +70,10 @@ public class SearchContentService
             return filter;
         }
 
+        var processedFilter = builder.Eq(r => r.Status, ContentStatus.DONE);
+        filter &= processedFilter;
+
+
         if (input.Orientation != "ALL")
         {
             var orientationFilter = builder.Eq(r => r.Media.Orientation, input.Orientation);
