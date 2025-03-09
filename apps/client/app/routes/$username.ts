@@ -36,7 +36,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 				creator,
 				origin: getDomainUrl(loaderArgs.request),
 			})
-	} catch (error) {
+	} catch {
 		return redirect(PAGES.NOT_FOUND)
 	}
 }

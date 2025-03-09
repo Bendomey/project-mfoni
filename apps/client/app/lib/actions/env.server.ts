@@ -17,6 +17,7 @@ const environmentSchema = z.object({
 	FACEBOOK_APP_SECRET: z.string().min(1),
 	METRIC_CLIENT_ID: z.string().min(1),
 	METRIC_CLIENT_SECRET: z.string().min(1),
+	SENTRY_DSN: z.string().min(1).optional(),
 })
 
 const environmentVariables = () => environmentSchema.parse(process.env)

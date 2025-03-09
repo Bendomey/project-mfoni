@@ -1,13 +1,19 @@
+import crypto from 'crypto'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { createRequestHandler } from '@remix-run/express'
 import { type ServerBuild } from '@remix-run/node'
+import {
+	init as sentryInit,
+	// setContext as sentrySetContext,
+} from '@sentry/remix'
 import address from 'address'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
 import compression from 'compression'
 import express from 'express'
 import getPort, { portNumbers } from 'get-port'
+import helmet from 'helmet'
 import morgan from 'morgan'
 import { router } from './routes/index.js'
 
@@ -22,17 +28,37 @@ const viteDevServer =
 				}),
 			)
 
-const getBuild = async (): Promise<ServerBuild> => {
-	if (viteDevServer) {
-		return viteDevServer.ssrLoadModule('virtual:remix/server-build') as any
-	}
+async function getBuild() {
+	try {
+		const build = viteDevServer
+			? await viteDevServer.ssrLoadModule('virtual:remix/server-build')
+			: // @ts-expect-error - the file might not exist yet but it will
+				await import('../build/server/index.js')
 
-	// @ts-expect-error - this file may or may not exist yet
-	return import('../build/server/index.js') as Promise<ServerBuild>
+		return { build: build as unknown as ServerBuild, error: null }
+	} catch (error) {
+		// Catch error and return null to make express happy and avoid an unrecoverable crash
+		console.error('Error creating build:', error)
+		return { error: error, build: null as unknown as ServerBuild }
+	}
 }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const here = (...d: Array<string>) => path.join(__dirname, ...d)
+
+if (MODE === 'production' && process.env.SENTRY_DSN) {
+	void import('./utils/monitoring.js').then(({ init }) => init())
+}
+
+if (MODE === 'production' && Boolean(process.env.SENTRY_DSN)) {
+	sentryInit({
+		dsn: process.env.SENTRY_DSN,
+		tracesSampleRate: 0.3,
+		environment: process.env.NODE_ENV,
+	})
+	// TODO: once you scale, you'll want to add more context here.
+	// sentrySetContext('region', { name: process.env.FLY_INSTANCE ?? 'unknown' })
+}
 
 const app = express()
 
@@ -72,15 +98,120 @@ if (viteDevServer) {
 	)
 }
 
-app.use(morgan('tiny'))
+app.use(
+	morgan('tiny', {
+		skip: (req, res) =>
+			res.statusCode === 200 &&
+			(req.url?.startsWith('/resources/images') ||
+				req.url?.startsWith('/resources/healthcheck')),
+	}),
+)
 
 app.use('/api', router)
+
+app.use((req, res, next) => {
+	res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
+	next()
+})
+
+app.use(
+	helmet({
+		contentSecurityPolicy: {
+			useDefaults: false,
+
+			// Use this to debug CSP issues.
+			reportOnly: false,
+			directives: {
+				'default-src': ["'self'"],
+				'frame-src': ["'self'", 'checkout.paystack.com', 'accounts.google.com'], // Prevents embedding in iframes
+				'font-src': ["'self'", 'fonts.gstatic.com', 'fonts.googleapis.com'],
+				'script-src': [
+					"'self'",
+					"'strict-dynamic'",
+					"'unsafe-eval'",
+					'accounts.google.com/gsi/client',
+					'apis.google.com',
+					'js.paystack.co/v2/inline.js',
+					'connect.facebook.net/en_US/sdk.js',
+
+					// @ts-expect-error - middlewarer is not typesafe.
+					(req, res) => `'nonce-${res.locals.cspNonce}'`,
+				],
+				'script-src-elem': [
+					"'self'",
+					"'unsafe-inline'",
+					"'unsafe-eval'",
+					'accounts.google.com/gsi/client',
+					'apis.google.com',
+					'js.paystack.co/v2/inline.js',
+					'connect.facebook.net/en_US/sdk.js',
+
+					// TODO: figure out how to make the nonce work instead of
+					// unsafe-inline. I tried adding a nonce attribute where we're using
+					// inline attributes, but that didn't work. I still got that it
+					// violated the CSP.
+				],
+				// TODO: figure out all css files and insert them. Remove unsafe-inline while you're at it.
+				'style-src': [
+					"'self'",
+					'fonts.googleapis.com/css2',
+					"'unsafe-inline'",
+					'accounts.google.com/gsi/style',
+				],
+				'img-src': [
+					"'self'",
+					'data:',
+					'res.cloudinary.com',
+					'www.gravatar.com',
+					'*.googleusercontent.com',
+					`${process.env.S3_BUCKET}.s3.amazonaws.com`,
+
+					// TODO: remove this
+					'images.unsplash.com',
+					'flowbite.s3.amazonaws.com',
+				],
+				'media-src': [
+					"'self'",
+					'res.cloudinary.com',
+					'data:',
+					'blob:',
+					'*.googleusercontent.com',
+					`${process.env.S3_BUCKET}.s3.amazonaws.com`,
+					'images.unsplash.com',
+				],
+				'connect-src': [
+					"'self'",
+					...(MODE === 'development' ? ['ws:'] : []),
+					'*',
+				].filter(Boolean),
+				'upgrade-insecure-requests': null,
+			},
+		},
+		crossOriginEmbedderPolicy: false,
+		crossOriginOpenerPolicy: {
+			policy: 'same-origin-allow-popups',
+		},
+	}),
+)
 
 app.all(
 	'*',
 	createRequestHandler({
-		build: MODE === 'development' ? getBuild : await getBuild(),
+		build: async () => {
+			const { error, build } = await getBuild()
+			// gracefully "catch" the error
+			if (error) {
+				throw error
+			}
+			return build
+		},
 		mode: MODE,
+		getLoadContext(_, res) {
+			return {
+				cspNonce: res.locals.cspNonce, // Pass nonce to Remix loaders
+				serverBuild: getBuild(),
+			}
+		},
 	}),
 )
 

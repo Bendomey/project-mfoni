@@ -1,6 +1,7 @@
 import { Link } from '@remix-run/react'
 import { Fragment } from 'react'
 import { type JSX } from 'react/jsx-runtime'
+import paymentAssetPng from '@/assets/payment.png'
 import {
 	GITHUB_REPO_URL,
 	MYLES_PUDO_URL,
@@ -66,7 +67,7 @@ const navigation = [
 export const Footer = () => {
 	return (
 		<footer className="bg-white">
-			<div className="max-w-8xl mx-auto px-6 py-14 md:flex md:items-center md:justify-between lg:px-8">
+			<div className="max-w-8xl mx-auto px-6 pb-5 pt-14 md:flex md:items-center md:justify-between lg:px-8">
 				<div className="flex justify-center space-x-6 md:order-2">
 					{navigation.map((item) => (
 						<a
@@ -113,6 +114,11 @@ export const Footer = () => {
 							)
 						})}
 					</div>
+				</div>
+			</div>
+			<div className="mx-5 mb-5 flex justify-center">
+				<div className="w-1/3">
+					<img src={paymentAssetPng} className="w-full" />
 				</div>
 			</div>
 		</footer>

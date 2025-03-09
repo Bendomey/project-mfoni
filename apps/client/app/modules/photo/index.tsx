@@ -20,6 +20,7 @@ import { Image } from 'remix-image'
 import { EditTitleModal } from './components/edit-title-modal/index.tsx'
 import { RelatedContent } from './components/related-content.tsx'
 import { Button } from '@/components/button/index.tsx'
+import { BuyButtonApi } from '@/components/buy-button/index.tsx'
 import {
 	type ContentSize,
 	DownloadButtonApi,
@@ -110,10 +111,14 @@ export const PhotoModule = () => {
 									sizes={content.media.sizes}
 								/>
 							) : (
-								<Button color="success">
-									<LockClosedIcon className="mr-1 size-4 text-white" />
-									Buy {formatAmount(convertPesewasToCedis(content.amount))}
-								</Button>
+								<BuyButtonApi content={content as unknown as Content}>
+									{({ onClick }) => (
+										<Button onClick={onClick} color="success">
+											<LockClosedIcon className="mr-1 size-4 text-white" />
+											Buy {formatAmount(convertPesewasToCedis(content.amount))}
+										</Button>
+									)}
+								</BuyButtonApi>
 							)}
 						</div>
 					</div>
