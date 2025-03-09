@@ -17,12 +17,13 @@ interface Props {
 }
 
 export const VisualSearch = ({ onClose: handleClose, className }: Props) => {
+	const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
 	const [imgSrc, setImgSrc] = useState<string | null>(null)
 	const webcamRef = useRef<WebcamProps | any>(null)
 	const cameraPermissionState = useGetPermissionState(
 		'camera' as PermissionName,
 	)
-	const { isLoading: isUploadingPhoto, upload } = useImageUpload()
+	const { upload } = useImageUpload()
 	const navigate = useNavigate()
 
 	const handleCapture = useCallback(() => {
@@ -44,6 +45,7 @@ export const VisualSearch = ({ onClose: handleClose, className }: Props) => {
 
 	const onSubmit = async () => {
 		if (imgSrc) {
+			setIsUploadingPhoto(true)
 			try {
 				const file = await dataURLtoFile(imgSrc, 'captured_image')
 				const result = await upload(file)
@@ -52,6 +54,7 @@ export const VisualSearch = ({ onClose: handleClose, className }: Props) => {
 				errorToast('Could not search with this email, try again later.', {
 					id: 'error-uploading-photo',
 				})
+				setIsUploadingPhoto(false)
 			}
 		}
 	}
