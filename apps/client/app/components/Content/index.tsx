@@ -46,7 +46,7 @@ export const Content = ({ content, showCreator = true, className }: Props) => {
 			return true
 		}
 
-		if ((content?.amount && content?.amount > 0) && content?.contentPurchaseId) {
+		if (content?.amount && content?.amount > 0 && content?.contentPurchaseId) {
 			return true
 		}
 

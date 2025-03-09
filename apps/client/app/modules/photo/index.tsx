@@ -47,15 +47,15 @@ export const PhotoModule = () => {
 	const isContentMine = content?.createdBy?.id === currentUser?.id
 
 	const canUserDownload = useMemo(() => {
-		if(isContentMine) {
+		if (isContentMine) {
 			return true
 		}
 
-		if(content?.amount === 0) {
+		if (content?.amount === 0) {
 			return true
 		}
 
-		if((content?.amount && content?.amount > 0) && content?.contentPurchaseId) {
+		if (content?.amount && content?.amount > 0 && content?.contentPurchaseId) {
 			return true
 		}
 
@@ -253,7 +253,8 @@ export const PhotoModule = () => {
 							<div className="flex flex-row items-center gap-2">
 								<CalendarDaysIcon className="h-5 w-5 text-gray-500" />
 								<span className="text-sm font-medium text-gray-500">
-									{content.status === 'DONE' ? 'Published' : 'Uploaded'} on {dayjs(content.createdAt).format('LL')}
+									{content.status === 'DONE' ? 'Published' : 'Uploaded'} on{' '}
+									{dayjs(content.createdAt).format('LL')}
 								</span>
 							</div>
 

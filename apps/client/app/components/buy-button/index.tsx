@@ -5,6 +5,7 @@ import { BuyModal } from './buy-modal/index.tsx'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { errorToast } from '@/lib/custom-toast-functions.tsx'
+import { useAuth } from '@/providers/auth/index.tsx'
 
 export type ContentSize = 'SMALL' | 'MEDIUM' | 'LARGE' | 'ORIGINAL'
 
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export function BuyButtonApi({ children, content }: Props) {
+	const { currentUser } = useAuth()
 	const fetcher = useFetcher<{
 		error?: string
 		paymentMethod?: string
@@ -50,14 +52,17 @@ export function BuyButtonApi({ children, content }: Props) {
 		}
 	}, [fetcher?.data, fetcher.state])
 
-	const initiateOneTimePayment = useCallback((accessCode: string) => {
-		const popup = new window.PaystackPop()
-		popup.resumeTransaction(accessCode, {
-			onSuccess: () => {
-				navigate('.', { replace: true })
-			},
-		})
-	}, [navigate])
+	const initiateOneTimePayment = useCallback(
+		(accessCode: string) => {
+			const popup = new window.PaystackPop()
+			popup.resumeTransaction(accessCode, {
+				onSuccess: () => {
+					navigate('.', { replace: true })
+				},
+			})
+		},
+		[navigate],
+	)
 
 	useEffect(() => {
 		if (
@@ -99,9 +104,18 @@ export function BuyButtonApi({ children, content }: Props) {
 
 	const isLoading = fetcher.state === 'submitting'
 
+	const onClick = () => {
+		if (!currentUser) {
+			navigate(`/auth?return_to=/photos/${content.slug}?buy=true`)
+			return
+		}
+
+		buyModalState.onOpen()
+	}
+
 	return (
 		<>
-			{children({ onClick: buyModalState.onOpen })}
+			{children({ onClick })}
 			<BuyModal
 				closeModal={buyModalState.onClose}
 				isOpened={buyModalState.isOpened}
