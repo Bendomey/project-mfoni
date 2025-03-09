@@ -161,6 +161,7 @@ app.use(
 				'img-src': [
 					"'self'",
 					'data:',
+					'blob:',
 					'res.cloudinary.com',
 					'www.gravatar.com',
 					'*.googleusercontent.com',
