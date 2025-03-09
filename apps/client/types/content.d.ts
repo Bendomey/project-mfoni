@@ -15,6 +15,8 @@ interface Content {
 	visibility: IContentVisibility
 	amount: number
 	currentUserLike: Nullable<ContentLike>
+	contentPurchaseId: Nullable<string>
+	contentPurchase: Nullable<ContentPurchase>
 	createdById: string
 	imageProcessingResponse: ImageProcessingResponse
 	createdBy: Nullable<BasicCreator>

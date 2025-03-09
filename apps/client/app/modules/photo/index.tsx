@@ -15,7 +15,7 @@ import {
 } from '@heroicons/react/24/solid'
 import { Link, useLoaderData } from '@remix-run/react'
 import dayjs from 'dayjs'
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 import { Image } from 'remix-image'
 import { EditTitleModal } from './components/edit-title-modal/index.tsx'
 import { RelatedContent } from './components/related-content.tsx'
@@ -44,9 +44,26 @@ export const PhotoModule = () => {
 	const { content } = useLoaderData<typeof loader>()
 	const editTitleModalState = useDisclosure()
 
+	const isContentMine = content?.createdBy?.id === currentUser?.id
+
+	const canUserDownload = useMemo(() => {
+		if(isContentMine) {
+			return true
+		}
+
+		if(content?.amount === 0) {
+			return true
+		}
+
+		if((content?.amount && content?.amount > 0) && content?.contentPurchaseId) {
+			return true
+		}
+
+		return false
+	}, [content, isContentMine])
+
 	if (!content) return null
 
-	const isContentMine = content.createdBy?.id === currentUser?.id
 	return (
 		<>
 			<Header isHeroSearchInVisible={false} />
@@ -105,7 +122,7 @@ export const PhotoModule = () => {
 									</LikeButton>
 								)}
 							</div>
-							{isContentMine || content.amount === 0 ? (
+							{canUserDownload ? (
 								<DownloadButton
 									content={content as unknown as Content}
 									sizes={content.media.sizes}
@@ -183,7 +200,7 @@ export const PhotoModule = () => {
 							</div>
 							<div className="text-sm">
 								<h1 className="text-gray-500">Downloads</h1>
-								<p className="font-semibold">{content.meta.views}</p>
+								<p className="font-semibold">{content.meta.downloads}</p>
 							</div>
 							<div className="text-sm">
 								<h1 className="text-gray-500">Likes</h1>
@@ -236,7 +253,7 @@ export const PhotoModule = () => {
 							<div className="flex flex-row items-center gap-2">
 								<CalendarDaysIcon className="h-5 w-5 text-gray-500" />
 								<span className="text-sm font-medium text-gray-500">
-									Published on {dayjs(content.createdAt).format('LL')}
+									{content.status === 'DONE' ? 'Published' : 'Uploaded'} on {dayjs(content.createdAt).format('LL')}
 								</span>
 							</div>
 

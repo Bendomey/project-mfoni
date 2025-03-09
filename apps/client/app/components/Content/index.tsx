@@ -10,6 +10,7 @@ import {
 	XCircleIcon,
 } from '@heroicons/react/24/solid'
 import { Link, useNavigate } from '@remix-run/react'
+import { useMemo } from 'react'
 import { Image } from 'remix-image'
 import { Button } from '../button/index.tsx'
 import { PhotographerCreatorCard } from '../creator-card/index.tsx'
@@ -35,6 +36,22 @@ export const Content = ({ content, showCreator = true, className }: Props) => {
 	const navigate = useNavigate()
 
 	const isContentMine = content.createdById === currentUser?.id
+
+	const canUserDownload = useMemo(() => {
+		if (isContentMine) {
+			return true
+		}
+
+		if (content?.amount === 0) {
+			return true
+		}
+
+		if ((content?.amount && content?.amount > 0) && content?.contentPurchaseId) {
+			return true
+		}
+
+		return false
+	}, [content, isContentMine])
 	return (
 		<Link
 			to={PAGES.PHOTO.replace(':slug', content.slug)}
@@ -195,7 +212,7 @@ export const Content = ({ content, showCreator = true, className }: Props) => {
 							)}
 
 							<div className="flex justify-end">
-								{content.amount === 0 || isContentMine ? (
+								{canUserDownload ? (
 									<DownloadButtonApi content={content}>
 										{({ isDisabled, onClick }) => (
 											<Button
