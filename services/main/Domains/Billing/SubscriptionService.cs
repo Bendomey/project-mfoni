@@ -110,7 +110,7 @@ public class SubscriptionService
                         .Replace("{package}", pricingLib.GetPackageName())
                         .Replace("{renewalDate}", today.ToString("dd/MM/yyyy"))
                         .Replace("{nextRenewalDate}", nextRenewalDate.ToString("dd/MM/yyyy"))
-                        .Replace("{renewalAmount}", $"{MoneyLib.ConvertPesewasToCedis(pricingLib.GetPrice()):0.00}")
+                        .Replace("{renewalAmount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(pricingLib.GetPrice()):0.00}")
                 );
                 return;
             }
@@ -440,7 +440,7 @@ public class SubscriptionService
                     .Replace("{package}", pricingLib.GetPackageName())
                     .Replace("{startDate}", today.ToString("dd/MM/yyyy"))
                     .Replace("{renewalDate}", nextRenewalDate.ToString("dd/MM/yyyy"))
-                    .Replace("{renewalAmount}", $"{MoneyLib.ConvertPesewasToCedis(pricing):0.00}")
+                    .Replace("{renewalAmount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(pricing):0.00}")
             );
 
             return creatorSubscription;
@@ -542,7 +542,7 @@ public class SubscriptionService
                     EmailTemplates.SuccessfulSubscriptionImmediateUpgradeBody
                         .Replace("{name}", user.Name)
                         .Replace("{package}", pricingLib.GetPackageName())
-                        .Replace("{upgradeAmount}", $"{MoneyLib.ConvertPesewasToCedis(pricingForWhatToPayFor):0.00}")
+                        .Replace("{upgradeAmount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(pricingForWhatToPayFor):0.00}")
                         .Replace("{effectiveDate}", today.ToString("dd/MM/yyyy"))
                         .Replace("{renewalDate}", newUpgradeSubEndDate.ToString("dd/MM/yyyy"))
                 );
@@ -573,7 +573,7 @@ public class SubscriptionService
                         .Replace("{name}", user.Name)
                         .Replace("{package}", pricingLib.GetPackageName())
                         .Replace("{nextRenewalDate}", upgradeDeferNextRenewalDate.ToString("dd/MM/yyyy"))
-                        .Replace("{newMonthlyFee}", $"{MoneyLib.ConvertPesewasToCedis(pricingLib.GetPrice()):0.00}")
+                        .Replace("{newMonthlyFee}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(pricingLib.GetPrice()):0.00}")
                 );
 
                 return newUpgradeSub;

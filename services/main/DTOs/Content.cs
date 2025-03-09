@@ -54,3 +54,18 @@ public class PurchaseContentInput
     [Required]
     public required string PaymentMethod { get; set; }
 }
+
+public class PurchaseContentOutput
+{
+    /// <summary>
+    /// Payment
+    /// </summary>
+    [Required]
+    public OutputPayment? Payment { get; set; }
+
+    /// <summary>
+    /// Content Purchase
+    /// </summary>
+    [Required]
+    public OutputContentPurchase? ContentPurchase { get; set; }
+}
