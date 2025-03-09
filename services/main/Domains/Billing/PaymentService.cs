@@ -20,12 +20,14 @@ public class PaymentService
     private readonly AdminWalletService _adminWalletService;
     private readonly UserService _userService;
     private readonly IMongoCollection<Models.AdminWallet> _adminWalletCollection;
+    private readonly CacheProvider _cacheProvider;
 
     public PaymentService(
         ILogger<WalletService> logger,
         DatabaseSettings databaseConfig,
         IOptions<AppConstants> appConstants,
         AdminWalletService adminWalletService,
+        CacheProvider cacheProvider,
         UserService userService
        )
     {
@@ -52,6 +54,7 @@ public class PaymentService
 
         _adminWalletService = adminWalletService;
         _userService = userService;
+        _cacheProvider = cacheProvider;
 
         logger.LogDebug("Payment service initialized");
     }
@@ -159,6 +162,11 @@ public class PaymentService
                    .Replace("{amount}", $"{MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
             );
 
+            _ = _cacheProvider.EntityChanged(new[] {
+                $"{CacheProvider.CacheEntities["contents"]}.find*",
+                $"{CacheProvider.CacheEntities["contents"]}*{content.Id}*",
+                $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+            });
         }
         else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.WalletTopup && !string.IsNullOrEmpty(paymentRecord.MetaData.WalletId))
         {

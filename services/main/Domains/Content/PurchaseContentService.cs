@@ -190,6 +190,12 @@ public class PurchaseContentService
                        .Replace("{amount}", $"{MoneyLib.ConvertPesewasToCedis(content.Amount):0.00}")
                 );
 
+                _ = _cacheProvider.EntityChanged(new[] {
+                    $"{CacheProvider.CacheEntities["contents"]}.find*",
+                    $"{CacheProvider.CacheEntities["contents"]}*{input.ContentId}*",
+                    $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+                });
+
                 return new PurchaseContentOutput
                 {
                     ContentPurchase = newContentPurchaseForWallet!
