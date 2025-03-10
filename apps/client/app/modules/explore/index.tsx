@@ -1,16 +1,25 @@
-import { useLoaderData } from '@remix-run/react'
 import { useMemo, useRef } from 'react'
 import { ExploreSection } from './components/section/index.tsx'
+import { useGetExploreSections } from '@/api/explore/index.ts'
 import { EmptyState } from '@/components/empty-state/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
-import { type loader } from '@/routes/explore._index.ts'
 
 export const ExploreModule = () => {
 	const { isLoggedIn } = useAuth()
-	const { exploreSections } = useLoaderData<typeof loader>()
 	const containerRef = useRef<HTMLDivElement>(null)
+
+	const { data: exploreSections } = useGetExploreSections({
+		sorter: {
+			sort: 'asc',
+			sortBy: 'sort',
+		},
+		pagination: {
+			page: 0,
+			per: 50,
+		},
+	})
 
 	const contents = useMemo(() => {
 		return exploreSections?.rows?.map((section) => {

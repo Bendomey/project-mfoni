@@ -3,7 +3,7 @@ import {
 	type LoaderFunctionArgs,
 	type MetaFunction,
 } from '@remix-run/node'
-import { QueryClient } from '@tanstack/react-query'
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { getCreatorByUsername } from '@/api/creators/index.ts'
 import { PAGES, QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
@@ -31,8 +31,10 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 			queryFn: () => getCreatorByUsername(safeString(username), { baseUrl }),
 		})
 
+		const dehydratedState = dehydrate(queryClient)
 		if (creator)
 			return jsonWithCache({
+				dehydratedState,
 				creator,
 				origin: getDomainUrl(loaderArgs.request),
 			})

@@ -10,7 +10,7 @@ import * as Sentry from '@sentry/remix'
 import chalk from 'chalk'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
-import { ensurePrimary } from '@/lib/actions/litefs-js.server.ts'
+// import { ensurePrimary } from '@/lib/actions/litefs-js.server.ts'
 import { NonceProvider } from '@/lib/nonce-provider.ts'
 
 const ABORT_DELAY = 5000
@@ -28,7 +28,7 @@ export default async function handleDocumentRequest(...args: DocRequestArgs) {
 	if (responseStatusCode >= 500) {
 		// if we had an error, let's just send this over to the primary and see
 		// if it can handle it.
-		await ensurePrimary()
+		// await ensurePrimary()
 	}
 
 	if (process.env.NODE_ENV !== 'production') {
@@ -184,7 +184,7 @@ function serveBrowsers(...args: DocRequestArgs) {
 
 export async function handleDataRequest(response: Response) {
 	if (response.status >= 500) {
-		await ensurePrimary()
+		// await ensurePrimary()
 	}
 
 	return response

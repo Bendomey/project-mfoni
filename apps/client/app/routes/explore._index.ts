@@ -1,6 +1,7 @@
 import { redirect, type MetaFunction } from '@remix-run/node'
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { getExploreSections } from '@/api/explore/index.ts'
-import { PAGES } from '@/constants/index.ts'
+import { PAGES, QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
 import { ExploreModule } from '@/modules/index.ts'
@@ -18,32 +19,35 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader() {
+	const queryClient = new QueryClient()
 	const baseUrl = `${environmentVariables().API_ADDRESS}/api`
 
 	try {
-		const exploreSections = await getExploreSections(
-			{
-				sorter: {
-					sort: 'asc',
-					sortBy: 'sort',
-				},
-				pagination: {
-					page: 0,
-					per: 50,
-				},
-			},
-			{
-				baseUrl,
-			},
-		)
+		await queryClient.prefetchQuery({
+			queryKey: [QUERY_KEYS.EXPLORE],
+			queryFn: () =>
+				getExploreSections(
+					{
+						sorter: {
+							sort: 'asc',
+							sortBy: 'sort',
+						},
+						pagination: {
+							page: 0,
+							per: 50,
+						},
+					},
+					{
+						baseUrl,
+					},
+				),
+		})
 
-		if (exploreSections) {
-			return jsonWithCache({
-				exploreSections,
-			})
-		}
-		return redirect(PAGES.NOT_FOUND)
-	} catch (error: unknown) {
+		const dehydratedState = dehydrate(queryClient)
+		return jsonWithCache({
+			dehydratedState,
+		})
+	} catch {
 		return redirect(PAGES.NOT_FOUND)
 	}
 }

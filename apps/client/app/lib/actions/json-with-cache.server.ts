@@ -10,7 +10,7 @@ export const jsonWithCache: JsonFunction = <Data>(
 			? init
 			: {
 					headers: {
-						'Cache-Control': 'public, max-age=3600',
+						'Cache-Control': 'public, max-age=604800',
 						...(init?.headers ? init.headers : {}),
 					},
 					...(init ? init : {}),

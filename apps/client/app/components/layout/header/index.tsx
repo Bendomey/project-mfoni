@@ -85,6 +85,7 @@ export const Header = ({
 								{item ? (
 									<Link
 										to={item.href}
+										prefetch="intent"
 										className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-900"
 									>
 										{item.name}

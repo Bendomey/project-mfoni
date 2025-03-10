@@ -1,9 +1,11 @@
+import { useQuery } from '@tanstack/react-query'
+import { QUERY_KEYS } from '@/constants/index.ts'
 import { getQueryParams } from '@/lib/get-param.ts'
 import { fetchClient } from '@/lib/transport/index.ts'
 
 export const getExploreSections = async (
 	props: FetchMultipleDataInputParams<FetchExploreSectionFilter>,
-	apiConfig: ApiConfigForServerConfig,
+	apiConfig?: ApiConfigForServerConfig,
 ) => {
 	try {
 		const removeAllNullableValues =
@@ -28,3 +30,11 @@ export const getExploreSections = async (
 		}
 	}
 }
+
+export const useGetExploreSections = (
+	query: FetchMultipleDataInputParams<FetchExploreSectionFilter>,
+) =>
+	useQuery({
+		queryKey: [QUERY_KEYS.EXPLORE],
+		queryFn: () => getExploreSections(query),
+	})

@@ -95,6 +95,7 @@ export function Tabs() {
 								prefetch="intent"
 								key={tab.name}
 								to={tab.href}
+								preventScrollReset={true}
 								aria-current={tab.current ? 'page' : undefined}
 								className={classNames(
 									tab.current
