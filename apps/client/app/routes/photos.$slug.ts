@@ -25,17 +25,21 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 
 	let content: Content | undefined = undefined
 	try {
-		content = await getContentBySlug(
-			safeString(loaderArgs.params.slug),
-			{
-				filters: {},
-				populate: ['content.createdBy', 'content.tags'],
-			},
-			{
-				baseUrl,
-				authToken: authCookie?.token,
-			},
-		)
+		content = await queryClient.fetchQuery({
+			queryKey: ['contents', safeString(loaderArgs.params.slug), 'slug'],
+			queryFn: () =>
+				getContentBySlug(
+					safeString(loaderArgs.params.slug),
+					{
+						filters: {},
+						populate: ['content.createdBy', 'content.tags'],
+					},
+					{
+						baseUrl,
+						authToken: authCookie?.token,
+					},
+				),
+		})
 
 		// if content is private and user is not logged in, return 404
 		if (content?.visibility === 'PRIVATE') {
@@ -43,24 +47,10 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 				return redirect(PAGES.NOT_FOUND)
 			}
 		}
-	} catch (error) {
-		// if collection is not found, return 404
+	} catch {
+		// if content is not found, return 404
 		return redirect(PAGES.NOT_FOUND)
 	}
-
-	// await queryClient.prefetchQuery({
-	// 	queryKey: [
-	// 		QUERY_KEYS.CONTENTS,
-	// 		slug,
-	// 		'slug',
-	// 		query,
-	// 	],
-	// 	queryFn: () =>
-	// 		getCollectionContentsBySlug(slug, query, {
-	// 			authToken: authCookie?.token,
-	// 			baseUrl,
-	// 		}),
-	// })
 
 	const dehydratedState = dehydrate(queryClient)
 
