@@ -124,7 +124,12 @@ app.use(
 			directives: {
 				'default-src': ["'self'"],
 				'frame-src': ["'self'", 'checkout.paystack.com', 'accounts.google.com'], // Prevents embedding in iframes
-				'font-src': ["'self'", 'fonts.gstatic.com', 'fonts.googleapis.com'],
+				'font-src': [
+					"'self'",
+					'fonts.gstatic.com',
+					'fonts.googleapis.com',
+					'embed.tawk.to',
+				],
 				'script-src': [
 					"'self'",
 					"'strict-dynamic'",
@@ -132,7 +137,8 @@ app.use(
 					'accounts.google.com/gsi/client',
 					'apis.google.com',
 					'js.paystack.co/v2/inline.js',
-					'connect.facebook.net/en_US/sdk.js',
+					'embed.tawk.to',
+					'cdn.jsdelivr.net/emojione/2.2.7/lib/js/emojione.min.js',
 
 					// @ts-expect-error - middlewarer is not typesafe.
 					(req, res) => `'nonce-${res.locals.cspNonce}'`,
@@ -145,6 +151,8 @@ app.use(
 					'apis.google.com',
 					'js.paystack.co/v2/inline.js',
 					'connect.facebook.net/en_US/sdk.js',
+					'embed.tawk.to',
+					'cdn.jsdelivr.net/emojione/2.2.7/lib/js/emojione.min.js',
 
 					// TODO: figure out how to make the nonce work instead of
 					// unsafe-inline. I tried adding a nonce attribute where we're using
@@ -157,6 +165,7 @@ app.use(
 					'fonts.googleapis.com/css2',
 					"'unsafe-inline'",
 					'accounts.google.com/gsi/style',
+					'embed.tawk.to',
 				],
 				'img-src': [
 					"'self'",
@@ -166,6 +175,8 @@ app.use(
 					'www.gravatar.com',
 					'*.googleusercontent.com',
 					`${process.env.S3_BUCKET}.s3.amazonaws.com`,
+					'embed.tawk.to',
+					'cdn.jsdelivr.net',
 
 					// TODO: remove this
 					'images.unsplash.com',
