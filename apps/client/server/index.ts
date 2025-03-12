@@ -221,7 +221,7 @@ const portToUse = await getPort({
 	port: portNumbers(desiredPort, desiredPort + 100),
 })
 
-const server = app.listen(portToUse, () => {
+const server = app.listen(portToUse, '127.0.0.1', () => {
 	const addy = server.address()
 	const portUsed =
 		desiredPort === portToUse
