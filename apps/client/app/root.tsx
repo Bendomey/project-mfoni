@@ -104,10 +104,10 @@ export async function loader(args: LoaderFunctionArgs) {
 	return jsonWithCache({
 		ENV: {
 			API_ADDRESS: `${environmentVariables().API_ADDRESS}/api`,
-			BUCKET: environmentVariables().S3_BUCKET,
 			MFONI_GOOGLE_AUTH_CLIENT_ID:
 				environmentVariables().MFONI_GOOGLE_AUTH_CLIENT_ID,
 			FACEBOOK_APP_ID: environmentVariables().FACEBOOK_APP_ID,
+			TAWK_ID: environmentVariables().TAWK_ID,
 		},
 		authUser: user,
 	})
@@ -122,6 +122,7 @@ function App() {
 				FACEBOOK_APP_ID: data.ENV.FACEBOOK_APP_ID,
 				MFONI_GOOGLE_AUTH_CLIENT_ID: data.ENV.MFONI_GOOGLE_AUTH_CLIENT_ID,
 				API_ADDRESS: data.ENV.API_ADDRESS,
+				TAWK_ID: data.ENV.TAWK_ID,
 			}}
 		>
 			<Providers authData={data.authUser as User | null}>
@@ -139,6 +140,7 @@ interface DocumentProps {
 		MFONI_GOOGLE_AUTH_CLIENT_ID: string
 		FACEBOOK_APP_ID: string
 		API_ADDRESS: string
+		TAWK_ID: string
 	}
 }
 
@@ -183,6 +185,27 @@ function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
 						defer
 						nonce={cspNonce}
 						data-nscript="afterInteractive"
+					/>
+					<script
+						type="text/javascript"
+						nonce={cspNonce}
+						async
+						defer
+						data-nscript="afterInteractive"
+						suppressHydrationWarning
+						dangerouslySetInnerHTML={{
+							__html: `
+								var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+								(function(){
+									var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+									s1.async=true;
+									s1.src='https://embed.tawk.to/${ENV.TAWK_ID}/1im510led';
+									s1.charset='UTF-8';
+									s1.setAttribute('crossorigin','*');
+									s0.parentNode.insertBefore(s1,s0);
+								})();
+            				`,
+						}}
 					/>
 					<script
 						suppressHydrationWarning
