@@ -46,3 +46,4 @@ jobs:
               --build-arg FACEBOOK_APP_SECRET=${{ secrets.FACEBOOK_APP_SECRET }}
               --build-arg METRIC_CLIENT_ID=${{ secrets.METRIC_CLIENT_ID }}
               --build-arg METRIC_CLIENT_SECRET=${{ secrets.METRIC_CLIENT_SECRET }}
+              --build-arg TAWK_ID=${{ secrets.TAWK_ID }}
