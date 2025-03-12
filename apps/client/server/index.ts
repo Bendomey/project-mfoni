@@ -11,6 +11,7 @@ import address from 'address'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
 import compression from 'compression'
+import cors from 'cors'
 import express from 'express'
 import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
@@ -60,7 +61,19 @@ if (MODE === 'production' && Boolean(process.env.SENTRY_DSN)) {
 	// sentrySetContext('region', { name: process.env.FLY_INSTANCE ?? 'unknown' })
 }
 
+const desiredPort = Number(process.env.PORT ?? 3000)
+const portToUse = await getPort({
+	port: portNumbers(desiredPort, desiredPort + 100),
+})
+
 const app = express()
+
+app.use(
+	cors({
+		origin: `http://localhost:${portToUse}`,
+		credentials: true,
+	}),
+)
 
 app.use(compression())
 
@@ -227,12 +240,7 @@ app.all(
 	}),
 )
 
-const desiredPort = Number(process.env.PORT ?? 3000)
-const portToUse = await getPort({
-	port: portNumbers(desiredPort, desiredPort + 100),
-})
-
-const server = app.listen(portToUse, '0.0.0.0', () => {
+const server = app.listen(portToUse, () => {
 	const addy = server.address()
 	const portUsed =
 		desiredPort === portToUse
