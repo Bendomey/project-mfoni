@@ -1,9 +1,8 @@
-import { useNavigate, useSearchParams } from '@remix-run/react'
+import { useFetcher, useNavigate, useSearchParams } from '@remix-run/react'
 import { useEffect } from 'react'
 import { useLoginAuth } from '../context/index.tsx'
-import { useAuthenticate } from '@/api/auth/index.ts'
+import { type AuthenticateOutputProps } from '@/api/auth/index.ts'
 import { Button } from '@/components/button/index.tsx'
-import { errorMessagesWrapper } from '@/constants/error-messages.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 import { useEnvContext } from '@/providers/env/index.tsx'
 
@@ -16,12 +15,12 @@ declare global {
 }
 
 export const FacebookButton = () => {
-	const { mutate } = useAuthenticate()
 	const { setIsLoading, setErrorMessage } = useLoginAuth()
 	const { onSignin } = useAuth()
 	const navigate = useNavigate()
 	const env = useEnvContext()
 	const [params] = useSearchParams()
+	const fetcher = useFetcher<{ error: string; success: boolean; data: AuthenticateOutputProps }>()
 
 	useEffect(() => {
 		window.fbAsyncInit = function () {
@@ -43,10 +42,35 @@ export const FacebookButton = () => {
 		})(document, 'script', 'facebook-jssdk')
 	}, [env.FACEBOOK_APP_ID])
 
+	useEffect(() => {
+		if (fetcher?.data?.error && fetcher.state === 'idle') {
+			setIsLoading(false)
+			if (fetcher?.data?.error) {
+				setErrorMessage(fetcher?.data?.error)
+			}
+		}
+	}, [fetcher, setErrorMessage, setIsLoading])
+
+	useEffect(() => {
+		if (fetcher?.data?.success && fetcher.state === 'idle') {
+			const successRes = fetcher?.data?.data;
+			onSignin(successRes)
+
+			const returnTo = params.get('return_to')
+			if (successRes.user.role) {
+				navigate(returnTo ?? '/')
+			} else {
+				navigate(
+					`/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''
+					}`,
+				)
+			}
+		}
+	}, [fetcher, navigate, onSignin, params])
+
 	const handleLogin = (res: any) => {
 		setIsLoading(true)
-
-		mutate(
+		fetcher.submit(
 			{
 				provider: 'FACEBOOK',
 				facebook: {
@@ -54,28 +78,10 @@ export const FacebookButton = () => {
 				},
 			},
 			{
-				onError: (error) => {
-					if (error.message) {
-						setErrorMessage(errorMessagesWrapper(error.message))
-					}
-				},
-				onSuccess: (successRes) => {
-					if (successRes) {
-						onSignin(successRes)
-
-						const returnTo = params.get('return_to')
-						if (successRes.user.role) {
-							navigate(returnTo ?? '/')
-						} else {
-							navigate(
-								`/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''}`,
-							)
-						}
-					}
-				},
-				onSettled: () => {
-					setIsLoading(false)
-				},
+				action: `/api/auth`,
+				encType: 'multipart/form-data',
+				method: 'post',
+				preventScrollReset: true,
 			},
 		)
 	}

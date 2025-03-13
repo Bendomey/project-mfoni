@@ -1,3 +1,5 @@
+export const DEFAULT_ERROR_MESSAGE = 'Something went wrong. Please try again later.'
+
 export const errorMessagesWrapper = (error: string) => {
 	switch (error) {
 		case 'UserAlreadyExistsWithAnotherProvider':
@@ -13,6 +15,6 @@ export const errorMessagesWrapper = (error: string) => {
 		case 'ContentAlreadyPurchased':
 			return 'Content is already purchased.'
 		default:
-			return 'Something went wrong. Please try again later.'
+			return DEFAULT_ERROR_MESSAGE
 	}
 }

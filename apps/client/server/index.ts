@@ -17,6 +17,7 @@ import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import { router } from './routes/index.js'
+import { verifyJwt } from './utils/jwt.ts'
 
 const MODE = process.env.NODE_ENV
 
@@ -120,7 +121,20 @@ app.use(
 	}),
 )
 
-app.use('/api', router)
+app.use('/api', (req, res, next) => {
+	const authorizationHeader = req.headers['authorization']?.split(" ")[1];
+	if(!authorizationHeader){
+		return res.status(401).json({ error: "Unauthorized" });
+
+	}
+	const isVerified = verifyJwt(authorizationHeader);
+
+	if(!isVerified) {
+		return res.status(403).json({ error: "Forbidden" });
+	}
+
+	return router(req, res, next);
+})
 
 app.use((req, res, next) => {
 	res.locals.cspNonce = crypto.randomBytes(16).toString('hex')

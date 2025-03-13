@@ -15,24 +15,25 @@ export const initiateTwitterAuth = async () => {
 	return data
 }
 
-interface AuthenticateInputProps {
+export interface AuthenticateInputProps {
 	provider: 'GOOGLE' | 'TWITTER' | 'FACEBOOK'
 	google?: PossiblyUndefined<{ authToken: string }>
 	facebook?: PossiblyUndefined<{ accessToken: string }>
 	twitter?: PossiblyUndefined<{ oAuthToken: string; oAuthVerifier: string }>
 }
 
-interface AuthenticateOutputProps {
+export interface AuthenticateOutputProps {
 	user: User
 	token: string
 }
 
-export const authenticate = async (props: AuthenticateInputProps) => {
+export const authenticate = async (props: AuthenticateInputProps, remixServerJwt: string) => {
 	try {
 		const response = await fetch('/api/auth', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Bearer$ ${remixServerJwt}`
 			},
 			body: JSON.stringify(props),
 		})
@@ -49,11 +50,6 @@ export const authenticate = async (props: AuthenticateInputProps) => {
 		}
 	}
 }
-
-export const useAuthenticate = () =>
-	useMutation({
-		mutationFn: authenticate,
-	})
 
 interface SetupAccountInputProps {
 	role: 'CLIENT' | 'CREATOR'

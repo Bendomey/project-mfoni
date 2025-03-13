@@ -47,3 +47,6 @@ jobs:
               --build-arg METRIC_CLIENT_ID=${{ secrets.METRIC_CLIENT_ID }}
               --build-arg METRIC_CLIENT_SECRET=${{ secrets.METRIC_CLIENT_SECRET }}
               --build-arg TAWK_ID=${{ secrets.TAWK_ID }}
+              --build-arg REMIX_SERVER_JWT_SECRET=${{ secrets.STAGING_REMIX_SERVER_JWT_SECRET }}
+              --build-arg REMIX_SERVER_JWT_ISSUER=${{ secrets.STAGING_REMIX_SERVER_JWT_ISSUER }}
+              --build-arg REMIX_JWT=${{ secrets.STAGING_REMIX_JWT }}

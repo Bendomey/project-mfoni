@@ -1,20 +1,45 @@
-import { useSearchParams, useLocation, useNavigate } from '@remix-run/react'
+import { useSearchParams, useLocation, useNavigate, useFetcher } from '@remix-run/react'
 import { useCallback, useEffect } from 'react'
 import { useLoginAuth } from '../context/index.tsx'
-import { initiateTwitterAuth, useAuthenticate } from '@/api/auth/index.ts'
+import { type AuthenticateOutputProps, initiateTwitterAuth } from '@/api/auth/index.ts'
 import { Button } from '@/components/button/index.tsx'
-import { errorMessagesWrapper } from '@/constants/error-messages.ts'
 import { TWITTER_BASE_URL } from '@/constants/index.ts'
 import { errorToast } from '@/lib/custom-toast-functions.tsx'
 import { useAuth } from '@/providers/auth/index.tsx'
 
 export const TwitterButton = () => {
-	const { mutate } = useAuthenticate()
 	const { setErrorMessage, setIsLoading } = useLoginAuth()
 	const { onSignin } = useAuth()
 	const navigate = useNavigate()
 	const location = useLocation()
 	const [params] = useSearchParams()
+	const fetcher = useFetcher<{ error: string; success: boolean; data: AuthenticateOutputProps }>()
+
+	useEffect(() => {
+		if (fetcher?.data?.error && fetcher.state === 'idle') {
+			setIsLoading(false)
+			if (fetcher?.data?.error) {
+				setErrorMessage(fetcher?.data?.error)
+			}
+		}
+	}, [fetcher, setErrorMessage, setIsLoading])
+
+	useEffect(() => {
+		if (fetcher?.data?.success && fetcher.state === 'idle') {
+			const successRes = fetcher?.data?.data;
+			onSignin(successRes)
+
+			const returnTo = params.get('return_to')
+			if (successRes.user.role) {
+				navigate(returnTo ?? '/')
+			} else {
+				navigate(
+					`/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''
+					}`,
+				)
+			}
+		}
+	}, [fetcher, navigate, onSignin, params])
 
 	const checkForTwitterResponse = useCallback(() => {
 		const oAuthToken = params.get('oauth_token')
@@ -32,46 +57,21 @@ export const TwitterButton = () => {
 		} else if (oAuthToken?.length && oAuthVerifier?.length) {
 			setIsLoading(true)
 
-			mutate(
+			fetcher.submit(
 				{
 					provider: 'TWITTER',
 					twitter: { oAuthToken, oAuthVerifier },
 				},
 				{
-					onError: (error) => {
-						if (error.message) {
-							setErrorMessage(errorMessagesWrapper(error.message))
-						}
-					},
-					onSuccess: (successRes) => {
-						if (successRes) {
-							onSignin(successRes)
-
-							const returnTo = params.get('return_to')
-							if (successRes.user.role) {
-								navigate(returnTo ?? '/')
-							} else {
-								navigate(
-									`/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''}`,
-								)
-							}
-						}
-					},
-					onSettled: () => {
-						setIsLoading(false)
-					},
+					action: `/api/auth`,
+					encType: 'multipart/form-data',
+					method: 'post',
+					preventScrollReset: true,
 				},
 			)
+			
 		}
-	}, [
-		location,
-		mutate,
-		navigate,
-		onSignin,
-		params,
-		setErrorMessage,
-		setIsLoading,
-	])
+	}, [fetcher, location, navigate, params, setErrorMessage, setIsLoading])
 
 	useEffect(() => {
 		checkForTwitterResponse()

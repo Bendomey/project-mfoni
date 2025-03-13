@@ -1,6 +1,6 @@
 import { type ActionFunctionArgs } from '@remix-run/node'
 import { buyContent } from '@/api/contents/index.ts'
-import { errorMessagesWrapper } from '@/constants/error-messages.ts'
+import { DEFAULT_ERROR_MESSAGE, errorMessagesWrapper } from '@/constants/error-messages.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
 
@@ -42,7 +42,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		if (error instanceof Error) {
 			const newErrorResponse = errorMessagesWrapper(error.message)
 			if (
-				newErrorResponse !== 'Something went wrong. Please try again later.'
+				newErrorResponse !== DEFAULT_ERROR_MESSAGE
 			) {
 				errorMessage = newErrorResponse
 			}

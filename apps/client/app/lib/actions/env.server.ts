@@ -19,6 +19,10 @@ const environmentSchema = z.object({
 	METRIC_CLIENT_SECRET: z.string().min(1),
 	SENTRY_DSN: z.string().min(1).optional(),
 	TAWK_ID: z.string().min(1),
+	REMIX_SERVER_JWT_SECRET: z.string().min(1),
+	REMIX_SERVER_JWT_ISSUER: z.string().min(1),
+	REMIX_JWT: z.string().min(1),
+	
 })
 
 const environmentVariables = () => environmentSchema.parse(process.env)

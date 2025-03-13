@@ -1,8 +1,7 @@
-import { useNavigate, useSearchParams } from '@remix-run/react'
+import { useFetcher, useNavigate, useSearchParams } from '@remix-run/react'
 import { useCallback, useEffect, useRef } from 'react'
 import { useLoginAuth } from '../context/index.tsx'
-import { useAuthenticate } from '@/api/auth/index.ts'
-import { errorMessagesWrapper } from '@/constants/error-messages.ts'
+import { type AuthenticateOutputProps } from '@/api/auth/index.ts'
 import { useBreakpoint } from '@/hooks/tailwind.ts'
 import { classNames } from '@/lib/classNames.ts'
 import { isBrowser } from '@/lib/is-browser.ts'
@@ -17,21 +16,47 @@ declare global {
 }
 
 export const GoogleButton = () => {
-	const { mutate } = useAuthenticate()
 	const { setIsLoading, setErrorMessage } = useLoginAuth()
 	const { onSignin } = useAuth()
 	const navigate = useNavigate()
 	const env = useEnvContext()
 	const [params] = useSearchParams()
+	const fetcher = useFetcher<{ error: string; success: boolean; data: AuthenticateOutputProps }>()
 
 	const signInRef = useRef(null)
 	const isMobileBreakPoint = useBreakpoint('sm')
+
+	useEffect(() => {
+		if (fetcher?.data?.error && fetcher.state === 'idle') {
+			setIsLoading(false)
+			if (fetcher?.data?.error) {
+				setErrorMessage(fetcher?.data?.error)
+			}
+		}
+	}, [fetcher, setErrorMessage, setIsLoading])
+
+	useEffect(() => {
+		if (fetcher?.data?.success && fetcher.state === 'idle') {
+			const successRes = fetcher?.data?.data;
+			onSignin(successRes)
+
+			const returnTo = params.get('return_to')
+			if (successRes.user.role) {
+				navigate(returnTo ?? '/')
+			} else {
+				navigate(
+					`/auth/onboarding${returnTo ? `?return_to=${returnTo}` : ''
+					}`,
+				)
+			}
+		}
+	}, [fetcher, navigate, onSignin, params])
 
 	const onLoginWithGoogle = useCallback(
 		async (res: any) => {
 			if (res.credential) {
 				setIsLoading(true)
-				mutate(
+				fetcher.submit(
 					{
 						provider: 'GOOGLE',
 						google: {
@@ -39,35 +64,15 @@ export const GoogleButton = () => {
 						},
 					},
 					{
-						onError: (error) => {
-							if (error.message) {
-								setErrorMessage(errorMessagesWrapper(error.message))
-							}
-						},
-						onSuccess: (successRes) => {
-							if (successRes) {
-								onSignin(successRes)
-
-								const returnTo = params.get('return_to')
-								if (successRes.user.role) {
-									navigate(returnTo ?? '/')
-								} else {
-									navigate(
-										`/auth/onboarding${
-											returnTo ? `?return_to=${returnTo}` : ''
-										}`,
-									)
-								}
-							}
-						},
-						onSettled: () => {
-							setIsLoading(false)
-						},
+						action: `/api/auth`,
+						encType: 'multipart/form-data',
+						method: 'post',
+						preventScrollReset: true,
 					},
 				)
 			}
 		},
-		[mutate, navigate, onSignin, params, setErrorMessage, setIsLoading],
+		[fetcher, setIsLoading],
 	)
 
 	const init = useCallback(() => {
