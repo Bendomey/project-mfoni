@@ -3,8 +3,10 @@ import { Button } from '@/components/button/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
 import { classNames } from '@/lib/classNames.ts'
+import { useAuth } from '@/providers/auth/index.tsx'
 
 export function ReportContentsModule() {
+	const { isLoggedIn } = useAuth()
 	return (
 		<>
 			<Header isHeroSearchInVisible={false} />
@@ -113,59 +115,61 @@ export function ReportContentsModule() {
 						</div>
 					</div>
 
-					<div className="rounded-lg border border-gray-200 px-5 py-7 md:px-10">
-						<p className="font-bold">Contact Information</p>
-						<div className="mt-3">
-							<label className="text-sm" htmlFor="content-url">
-								Name
-							</label>
-							<div className="mt-2">
-								<input
-									name="name"
-									type="text"
-									className={classNames(
-										'block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-blue-300 sm:text-sm/6',
-									)}
-								/>
+					{isLoggedIn ? null : (
+						<div className="rounded-lg border border-gray-200 px-5 py-7 md:px-10">
+							<p className="font-bold">Contact Information</p>
+							<div className="mt-3">
+								<label className="text-sm" htmlFor="content-url">
+									Name
+								</label>
+								<div className="mt-2">
+									<input
+										name="name"
+										type="text"
+										className={classNames(
+											'block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-blue-300 sm:text-sm/6',
+										)}
+									/>
+								</div>
 							</div>
-						</div>
 
-						<div className="mt-3">
-							<label className="text-sm" htmlFor="content-url">
-								Phone Number
-							</label>
-							<div className="mt-2">
-								<input
-									name="phone"
-									type="text"
-									className={classNames(
-										'block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-blue-300 sm:text-sm/6',
-									)}
-								/>
-								<p
-									id="phone-description"
-									className="mt-2 text-xs text-gray-500"
-								>
-									Not a Ghanaian number? Provide internationalized format
-								</p>
+							<div className="mt-3">
+								<label className="text-sm" htmlFor="content-url">
+									Phone Number
+								</label>
+								<div className="mt-2">
+									<input
+										name="phone"
+										type="text"
+										className={classNames(
+											'block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-blue-300 sm:text-sm/6',
+										)}
+									/>
+									<p
+										id="phone-description"
+										className="mt-2 text-xs text-gray-500"
+									>
+										Not a Ghanaian number? Provide internationalized format
+									</p>
+								</div>
 							</div>
-						</div>
 
-						<div className="mt-3">
-							<label className="text-sm" htmlFor="content-url">
-								Email
-							</label>
-							<div className="mt-2">
-								<input
-									name="email"
-									type="email"
-									className={classNames(
-										'block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-blue-300 sm:text-sm/6',
-									)}
-								/>
+							<div className="mt-3">
+								<label className="text-sm" htmlFor="content-url">
+									Email
+								</label>
+								<div className="mt-2">
+									<input
+										name="email"
+										type="email"
+										className={classNames(
+											'block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-1 focus:-outline-offset-1 focus:outline-blue-300 sm:text-sm/6',
+										)}
+									/>
+								</div>
 							</div>
 						</div>
-					</div>
+					)}
 
 					<Button disabled className="w-full" size="lg">
 						Submit
