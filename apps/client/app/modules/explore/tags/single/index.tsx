@@ -1,5 +1,11 @@
 import { ArrowPathIcon, ChevronLeftIcon } from '@heroicons/react/24/outline'
-import { Link, useLoaderData, useNavigate, useParams } from '@remix-run/react'
+import {
+	Link,
+	useLoaderData,
+	useLocation,
+	useNavigate,
+	useParams,
+} from '@remix-run/react'
 import dayjs from 'dayjs'
 import { useGetTagContentsBySlug } from '@/api/tags/index.ts'
 import { FadeIn } from '@/components/animation/FadeIn.tsx'
@@ -17,8 +23,9 @@ import { type loader } from '@/routes/explore.tags.$tag.ts'
 
 export function TagModule() {
 	const navigate = useNavigate()
-	const { tag } = useLoaderData<typeof loader>()
+	const { tag, origin } = useLoaderData<typeof loader>()
 	const { tag: tagParam } = useParams()
+	const location = useLocation()
 	const { isPending, data, isError } = useGetTagContentsBySlug(
 		safeString(tagParam),
 		{
@@ -133,7 +140,7 @@ export function TagModule() {
 							) : null}
 							<Link
 								to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
-									`${window.location.origin}${window.location.pathname}`,
+									`${origin}${location.pathname}`,
 								)}`}
 							>
 								<Button color="dangerGhost">Report</Button>

@@ -13,7 +13,7 @@ import {
 	HeartIcon as HeartIconSolid,
 	PencilIcon,
 } from '@heroicons/react/24/solid'
-import { Link, useLoaderData } from '@remix-run/react'
+import { Link, useLoaderData, useLocation } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { Fragment, useMemo } from 'react'
 import { Image } from 'remix-image'
@@ -41,8 +41,9 @@ import { type loader } from '@/routes/photos.$slug.ts'
 
 export const PhotoModule = () => {
 	const { currentUser } = useAuth()
-	const { content } = useLoaderData<typeof loader>()
+	const { content, origin } = useLoaderData<typeof loader>()
 	const editTitleModalState = useDisclosure()
+	const location = useLocation()
 
 	const isContentMine = content?.createdBy?.id === currentUser?.id
 
@@ -219,7 +220,7 @@ export const PhotoModule = () => {
 							/>
 							<Link
 								to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
-									`${window.location.origin}${window.location.pathname}`,
+									`${origin}${location.pathname}`,
 								)}`}
 							>
 								<Button color="dangerGhost">Report</Button>

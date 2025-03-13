@@ -5,7 +5,13 @@ import {
 	EllipsisHorizontalIcon,
 	PencilIcon,
 } from '@heroicons/react/24/outline'
-import { Link, useLoaderData, useNavigate, useParams } from '@remix-run/react'
+import {
+	Link,
+	useLoaderData,
+	useLocation,
+	useNavigate,
+	useParams,
+} from '@remix-run/react'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { AddImageContentsModal } from './components/add-image-contents-modal.tsx'
@@ -30,9 +36,10 @@ import { useAuth } from '@/providers/auth/index.tsx'
 import { type loader } from '@/routes/explore.collections.$collection.ts'
 
 export function CollectionModule() {
-	const { collection } = useLoaderData<typeof loader>()
+	const { collection, origin } = useLoaderData<typeof loader>()
 	const addContentsModalState = useDisclosure()
 	const navigate = useNavigate()
+	const location = useLocation()
 	const { currentUser } = useAuth()
 	const { collection: collectionParam } = useParams()
 	const removeContentsModalState = useDisclosure()
@@ -243,7 +250,7 @@ export function CollectionModule() {
 							/>
 							<Link
 								to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
-									`${window.location.origin}${window.location.pathname}`,
+									`${origin}${location.pathname}`,
 								)}`}
 							>
 								<Button color="dangerGhost">Report</Button>
