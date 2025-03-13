@@ -243,7 +243,7 @@ export function CollectionModule() {
 							/>
 							<Link
 								to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
-									`${location.origin}${location.pathname}`,
+									`${window.location.origin}${window.location.pathname}`,
 								)}`}
 							>
 								<Button color="dangerGhost">Report</Button>
