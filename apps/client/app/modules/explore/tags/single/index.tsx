@@ -1,5 +1,5 @@
 import { ArrowPathIcon, ChevronLeftIcon } from '@heroicons/react/24/outline'
-import { useLoaderData, useNavigate, useParams } from '@remix-run/react'
+import { Link, useLoaderData, useNavigate, useParams } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { useGetTagContentsBySlug } from '@/api/tags/index.ts'
 import { FadeIn } from '@/components/animation/FadeIn.tsx'
@@ -131,7 +131,13 @@ export function TagModule() {
 									text={`Browse through the carefully curated contents around "${name}"`}
 								/>
 							) : null}
-							<Button color="dangerGhost">Report</Button>
+							<Link
+								to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
+									`${location.origin}${location.pathname}`,
+								)}`}
+							>
+								<Button color="dangerGhost">Report</Button>
+							</Link>
 						</div>
 					</div>
 				</div>

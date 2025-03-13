@@ -1,12 +1,50 @@
-import { Link } from '@remix-run/react'
+import { Link, useLoaderData, useSearchParams } from '@remix-run/react'
+import { useMemo } from 'react'
 import { Button } from '@/components/button/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
 import { classNames } from '@/lib/classNames.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
+import { type loader } from '@/routes/report.contents._index.ts'
 
 export function ReportContentsModule() {
+	const data = useLoaderData<typeof loader>()
 	const { isLoggedIn } = useAuth()
+	const [searchParams] = useSearchParams()
+
+	const contentUrl = useMemo(() => {
+		let url = searchParams.get('content_url')
+		if (url) {
+			url = decodeURIComponent(url)
+			const origin = data.origin
+			const isContentUrl =
+				url.includes('/photos') ||
+				url.includes('/tags') ||
+				url.includes('/collections')
+			if (url.startsWith(origin) && isContentUrl) {
+				return url
+			}
+		}
+
+		return ''
+	}, [searchParams, data.origin])
+
+	const contentType = useMemo(() => {
+		if (contentUrl.includes('/photos')) {
+			return 'Photo'
+		}
+
+		if (contentUrl.includes('/tags')) {
+			return 'Tag'
+		}
+
+		if (contentUrl.includes('/collections')) {
+			return 'Collections'
+		}
+
+		return ''
+	}, [contentUrl])
+
 	return (
 		<>
 			<Header isHeroSearchInVisible={false} />
@@ -43,6 +81,7 @@ export function ReportContentsModule() {
 							</label>
 							<div className="mt-2">
 								<input
+									defaultValue={contentUrl}
 									name="content-url"
 									type="text"
 									className={classNames(
@@ -50,6 +89,14 @@ export function ReportContentsModule() {
 									)}
 								/>
 							</div>
+
+							{contentUrl ? (
+								<div className="mt-2">
+									<span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1.5 text-sm font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+										{contentType}
+									</span>
+								</div>
+							) : null}
 						</div>
 					</div>
 

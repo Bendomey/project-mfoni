@@ -5,7 +5,7 @@ import {
 	EllipsisHorizontalIcon,
 	PencilIcon,
 } from '@heroicons/react/24/outline'
-import { useLoaderData, useNavigate, useParams } from '@remix-run/react'
+import { Link, useLoaderData, useNavigate, useParams } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { AddImageContentsModal } from './components/add-image-contents-modal.tsx'
@@ -241,7 +241,13 @@ export function CollectionModule() {
 							<ShareButton
 								text={`Check out this collection "${name}" on mfoni`}
 							/>
-							<Button color="dangerGhost">Report</Button>
+							<Link
+								to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
+									`${location.origin}${location.pathname}`,
+								)}`}
+							>
+								<Button color="dangerGhost">Report</Button>
+							</Link>
 						</div>
 					</div>
 				</div>

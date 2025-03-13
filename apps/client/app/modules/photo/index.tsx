@@ -217,7 +217,13 @@ export const PhotoModule = () => {
 							<ShareButton
 								text={`Check out this photo by ${content.createdBy?.name} on mfoni`}
 							/>
-							<Button color="dangerGhost">Report</Button>
+							<Link
+								to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
+									`${location.origin}${location.pathname}`,
+								)}`}
+							>
+								<Button color="dangerGhost">Report</Button>
+							</Link>
 						</div>
 					</div>
 
