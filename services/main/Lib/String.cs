@@ -61,4 +61,47 @@ public static class StringLib
             return "Unknown";
         }
     }
+
+    public static string NormalizeReportContentReason(string reason, string? details)
+    {
+        if (reason == "DATA_PROTECTION_AND_PRIVACY_VIOLATION")
+        {
+            return "Data Protection and Privacy Violation";
+        }
+        else if (reason == "PORNOGRAPHY_AND_SEXUALIZED_CONTENT")
+        {
+            return "Pornography and Sexualized Content";
+        }
+        else if (reason == "PROTECTION_OF_MINORS")
+        {
+            return "Protection of Minors";
+        }
+        else if (reason == "PUBLIC_SECURITY")
+        {
+            return "Public Security";
+        }
+        else if (reason == "SCAMS_AND_FRAUD")
+        {
+            return "Scams and Fraud";
+        }
+        else if (reason == "UNSAFE_AND_ILLEGAL")
+        {
+            return "Unsafe and Illegal";
+        }
+        else if (reason == "VIOLENCE")
+        {
+            return "Violence";
+        }
+        else if (reason == "OTHER")
+        {
+            if (details != null)
+            {
+                return $"Other - {details}";
+            }
+
+            return "Other";
+        }
+
+        return "Unknown";
+    }
 }

@@ -21,6 +21,7 @@ public class AppConstants
     public string CreatorCollection { get; init; } = "creators";
     public string ExploreSectionCollection { get; init; } = "explore_sections";
     public string TagCollection { get; init; } = "tags";
+    public string ContentReportCaseCollection { get; init; } = "content_report_cases";
     public string TagContentCollection { get; init; } = "tag_contents";
     public string WaitlistCollection { get; init; } = "waitlists";
     public string CreatorSubscriptionCollection { get; init; } = "creator_subscriptions";
