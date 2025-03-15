@@ -173,7 +173,9 @@ builder.Services.AddSingleton<IndexContent>();
 builder.Services.AddSingleton<ProcessIndexContent>();
 builder.Services.AddSingleton<EditContentService>();
 
+// carehub services
 builder.Services.AddSingleton<WaitlistService>();
+builder.Services.AddSingleton<ReportContentCaseService>();
 
 // inject transformers
 builder.Services.AddSingleton<AdminTransformer>();
@@ -192,6 +194,7 @@ builder.Services.AddSingleton<TagContentTransformer>();
 builder.Services.AddSingleton<ExploreSectionTransformer>();
 builder.Services.AddSingleton<ContentPurchaseTransformer>();
 builder.Services.AddSingleton<PaymentTransformer>();
+builder.Services.AddSingleton<ReportContentCaseTransformer>();
 
 // hosted services.
 builder.Services.AddHostedService<ConsumerHostedService>();

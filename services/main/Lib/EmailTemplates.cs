@@ -375,4 +375,71 @@ Keep creating amazing content! 🚀
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
     ";
+
+    public static string ContentReportedSubject = "Your Report Has Been Submitted – Case #{caseNumber}";
+
+    public static string ContentReportedBody = @"
+Hello {name},
+
+Thank you for submitting your report on Mfoni. We’ve received your request and assigned it the case number #{caseNumber} for tracking.
+
+📌 Report Details:
+
+Case Number: #{caseNumber}
+Content Reported: {contentName}
+Reason for Report: {reason}
+Date Submitted: {submissionDate}
+
+Our team will review your report and take the necessary action. You’ll receive an update once we’ve made a decision.
+
+If you have any additional details to share, feel free to reach out to us on our website with your case number.
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
+    public static string ContentReportAcknowledgedSubject = "Update on Your Report – Case #{caseNumber}";
+
+    public static string ContentReportAcknowledgedBody = @"
+Hello {name},
+
+We wanted to let you know that our moderation team has reviewed your report and is actively investigating it.
+
+📌 Report Details:
+
+Case Number: #{caseNumber}
+Content Reported: {contentName}
+Status: Under Review
+Date Submitted: {submissionDate}
+
+We aim to resolve reports as quickly as possible, but some cases may require more time. You’ll receive another update once a decision has been made.
+
+Thank you for helping keep Mfoni a safe and respectful platform.
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
+    public static string ContentReportResolvedSubject = "Case #{caseNumber} – Your Report Has Been Resolved";
+
+    public static string ContentReportResolvedBody = @"
+Hello {name},
+
+We have reviewed your report (Case #{caseNumber}) and taken the necessary action. Here are the details:
+
+📌 Report Resolution:
+
+Case Number: #{caseNumber}
+Content Reported: {contentName}
+Decision: {decision}
+Date Resolved: {resolutionDate}
+
+If the content was found to be in violation of our guidelines, appropriate actions have been taken. If we determined that the content did not violate our policies, no further action will be taken.
+
+We appreciate your help in making Mfoni a better place. If you have any questions, feel free to reach out to us on our website with your case number.
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
 }
