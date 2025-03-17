@@ -152,7 +152,9 @@ public class ReportContentCaseService
     private async Task<string> GenerateCaseNumber()
     {
         var today = DateTime.Now.ToString("yyyyMMdd");
-        var caseNumber = Nanoid.Generate("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
+        var randGen = Nanoid.Generate("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 10);
+
+        var caseNumber = $"{randGen}{today}";
 
         var caseNumberExist = await _reportContentCaseCollection.Find(x => x.CaseNumber == caseNumber).FirstOrDefaultAsync();
         if (caseNumberExist is not null)
@@ -170,7 +172,7 @@ public class ReportContentCaseService
         if (reportCase.Status != ReportContentCaseStatus.SUBMITTED)
         {
             string status = char.ToUpper(reportCase.Status[0]) + reportCase.Status.Substring(1).ToLower();
-            throw new HttpRequestException($"ReportCaseIs${status}");
+            throw new HttpRequestException($"ReportCaseIs{status}");
         }
 
         await _reportContentCaseCollection.UpdateOneAsync(
@@ -222,7 +224,7 @@ public class ReportContentCaseService
         if (reportCase.Status != ReportContentCaseStatus.ACKNOWLEDGED)
         {
             string status = char.ToUpper(reportCase.Status[0]) + reportCase.Status.Substring(1).ToLower();
-            throw new HttpRequestException($"ReportCaseIs${status}");
+            throw new HttpRequestException($"ReportCaseIs{status}");
         }
 
         var resolutionDate = DateTime.Now;
@@ -317,7 +319,7 @@ public class ReportContentCaseService
         {
             var _ = SmsConfiguration.SendSms(new SendSmsInput
             {
-                PhoneNumber = phone,
+                PhoneNumber = StringLib.NormalizePhoneNumber(phone),
                 Message = body,
                 AppId = _appConstantsConfiguration.SmsAppId,
                 AppSecret = _appConstantsConfiguration.SmsAppSecret
