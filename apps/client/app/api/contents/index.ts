@@ -14,6 +14,7 @@ export type CreateContentInput = Array<{
 		serverSideEncryption: string
 		bucket: string
 		orientation: IContentOrientation
+		backgroundColor?: string
 		size: number
 	}
 	tags?: string[]

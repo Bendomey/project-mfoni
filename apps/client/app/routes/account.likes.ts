@@ -32,7 +32,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 				visibility: 'ALL',
 			},
 		}
-		await queryClient.prefetchQuery({
+		queryClient.prefetchQuery({
 			queryKey: [QUERY_KEYS.CONTENT_LIKES, 'user', authCookie.id, query],
 			queryFn: () =>
 				getUserContentLikes(authCookie.id, query, {

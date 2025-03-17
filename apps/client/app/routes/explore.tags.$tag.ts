@@ -42,7 +42,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		populate: ['content', 'content.createdBy'],
 	}
 
-	await queryClient.prefetchQuery({
+	queryClient.prefetchQuery({
 		queryKey: [QUERY_KEYS.TAGS, slug, 'contents', query],
 		queryFn: () =>
 			getTagContentsBySlug(slug, query, {

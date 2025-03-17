@@ -141,6 +141,7 @@ public class ContentTransformer
             {
                 Url = media,
                 Orientation = content.Media.Orientation,
+                BackgroundColor = content.Media.BackgroundColor,
                 Sizes = new OutputContentMediaSizes
                 {
                     Small = content.SmallMedia is not null ? content.SmallMedia.Size : 0,

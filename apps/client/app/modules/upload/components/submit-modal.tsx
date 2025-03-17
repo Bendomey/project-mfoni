@@ -39,6 +39,7 @@ export const SubmitModal = ({ isOpen, onToggle }: Props) => {
 						eTag: safeString(content.eTag),
 						serverSideEncryption: 'AES256',
 						orientation: content.orientation,
+						backgroundColor: content.backgroundColor,
 						size: content.size,
 					},
 				}

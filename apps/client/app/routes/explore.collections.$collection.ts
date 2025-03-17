@@ -63,7 +63,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		},
 		populate: ['content'],
 	}
-	await queryClient.prefetchQuery({
+	queryClient.prefetchQuery({
 		queryKey: [QUERY_KEYS.COLLECTIONS, slug, 'slug-contents', query],
 		queryFn: () =>
 			getCollectionContentsBySlug(slug, query, {

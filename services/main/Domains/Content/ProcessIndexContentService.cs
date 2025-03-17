@@ -187,6 +187,7 @@ public class ProcessIndexContent
                 Location = imageResponse.Location,
                 ServerSideEncryption = imageResponse.ServerSideEncryption,
                 Orientation = imageResponse.Orientation,
+                BackgroundColor = imageResponse.BackgroundColor,
                 Size = imageResponse.Size,
             })
             .Set(r => r.UpdatedAt, DateTime.Now);
@@ -196,7 +197,7 @@ public class ProcessIndexContent
 
     private async Task ResolveAllImages(Content content, SixLabors.ImageSharp.Image image)
     {
-        // NOTE: cloning for different sizees because I don't want to download the image everytime.
+        // NOTE: cloning for different sizes because I don't want to download the image everytime.
         var clonedImageForLarge = image;
         var clonedImageForMedium = image;
         var clonedImageForSmall = image;
