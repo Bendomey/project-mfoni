@@ -23,7 +23,7 @@ export async function loader() {
 	const baseUrl = `${environmentVariables().API_ADDRESS}/api`
 
 	try {
-		queryClient.prefetchQuery({
+		await queryClient.prefetchQuery({
 			queryKey: [QUERY_KEYS.EXPLORE],
 			queryFn: () =>
 				getExploreSections(
