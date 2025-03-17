@@ -18,6 +18,7 @@ public class IUploadToS3Input
     public required Image Image { get; set; }
     public required string KeyName { get; set; }
     public required string Orientation { get; set; }
+    public string? BackgroundColor { get; set; }
     public int ImageQuality { get; set; } = 85;
 }
 

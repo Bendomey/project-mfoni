@@ -212,6 +212,7 @@ public class ProcessIndexContent
             Image = clonedImageForLarge,
             KeyName = $"large_{content.Media.Key}",
             Orientation = content.Media.Orientation,
+            BackgroundColor = content.Media.BackgroundColor,
             ImageQuality = 85,
         });
         await SaveToDb(content, imageResponseForLarge, "large_media");
@@ -225,6 +226,7 @@ public class ProcessIndexContent
             Image = clonedImageForMedium,
             KeyName = $"medium_{content.Media.Key}",
             Orientation = content.Media.Orientation,
+            BackgroundColor = content.Media.BackgroundColor,
             ImageQuality = 75,
         });
         await SaveToDb(content, imageResponseForMedium, "medium_media");
@@ -238,6 +240,7 @@ public class ProcessIndexContent
             Image = clonedImageForSmall,
             KeyName = $"small_{content.Media.Key}",
             Orientation = content.Media.Orientation,
+            BackgroundColor = content.Media.BackgroundColor,
             ImageQuality = 65,
         });
         await SaveToDb(content, imageResponseForSmall, "small_media");
@@ -253,6 +256,7 @@ public class ProcessIndexContent
                 Image = blurredImage,
                 KeyName = $"blurred_{content.Media.Key}",
                 Orientation = content.Media.Orientation,
+                BackgroundColor = content.Media.BackgroundColor,
                 ImageQuality = 85,
             });
 
