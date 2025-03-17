@@ -17,7 +17,7 @@ public class S3MetaData
 
     [BsonElement("orientation")]
     public required string Orientation { get; set; }
-    
+
     [BsonElement("background_color")]
     public string? BackgroundColor { get; set; }
 
