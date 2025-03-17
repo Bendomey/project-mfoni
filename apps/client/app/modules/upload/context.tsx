@@ -18,7 +18,11 @@ import { BlockNavigationDialog } from '@/components/block-navigation-dialog.tsx'
 import { Header } from '@/components/layout/index.ts'
 import { useBlocker } from '@/hooks/use-blocker.ts'
 import { errorToast } from '@/lib/custom-toast-functions.tsx'
-import { getImageOrientation, megabytesToBytes } from '@/lib/image-fns.ts'
+import {
+	getImageOrientation,
+	megabytesToBytes,
+	palettize,
+} from '@/lib/image-fns.ts'
 import { getPackageUploadLimit } from '@/lib/pricing-lib.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
@@ -39,9 +43,10 @@ export interface Content {
 	// other fields
 	tags?: string[]
 	amount?: string
-	title?: string
+	title: string
 	visibility: IContentVisibility
 	orientation: IContentOrientation
+	backgroundColor?: string
 	size: number
 }
 
@@ -113,22 +118,28 @@ export const ContentUploadProvider = () => {
 					const isDuplicate = Object.values(contents).find(
 						(content) => content.file.name === file.name,
 					)
+
 					if (isDuplicate) {
 						continue
 					}
 
 					const validationResponse = await acceptFile(file)
 					const orientation = await getImageOrientation(file)
+					const backgroundColor = await palettize(URL.createObjectURL(file))
 					const contentId = v4()
 					newContents[contentId] = {
 						...(validationResponse as Content),
 						visibility: 'PUBLIC',
 						orientation,
+						backgroundColor: backgroundColor[0]?.color,
 						size: file.size,
+						title: '',
+						amount: '',
+						tags: [],
 					}
 				}
 			}
-			setContents((prevContents) => ({ ...newContents, ...prevContents }))
+			setContents({ ...newContents, ...contents })
 
 			if (fileRejections.length) {
 				if (fileRejections[0]?.errors?.[0]?.code) {

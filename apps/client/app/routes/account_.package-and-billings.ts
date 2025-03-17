@@ -35,7 +35,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 				pagination: { page: Number(page), per: 50 },
 				populate: ['purchase', 'wallet'],
 			}
-			await queryClient.prefetchQuery({
+			queryClient.prefetchQuery({
 				queryKey: [QUERY_KEYS.CREATOR_SUBSCRIPTIONS, query],
 				queryFn: () =>
 					getCreatorSubscriptions(query, {

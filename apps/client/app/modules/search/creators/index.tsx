@@ -102,7 +102,8 @@ export function SearchCreatorsModule() {
 
 	return (
 		<div className="mt-5">
-			{featuredCreators?.total ? (
+			{/* Only show featured when search result is empty */}
+			{featuredCreators?.total && !data?.total ? (
 				<>
 					<div className="flex flex-row items-center justify-between gap-x-2">
 						<h2 className="flex items-center text-xl font-bold">Featured</h2>

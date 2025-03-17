@@ -32,6 +32,7 @@ public class OutputContentMedia
 {
     public required string Url { get; set; }
     public required string Orientation { get; set; }
+    public string? BackgroundColor { get; set; }
     public required OutputContentMediaSizes Sizes { get; set; }
 }
 

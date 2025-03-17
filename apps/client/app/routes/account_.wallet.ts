@@ -30,7 +30,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		const baseUrl = `${process.env.API_ADDRESS}/api`
 
 		if (authCookie) {
-			await queryClient.prefetchQuery({
+			queryClient.prefetchQuery({
 				queryKey: [
 					QUERY_KEYS.WALLET_TRANSACTIONS,
 					{ pagination: { page: Number(page), per: 50 } },

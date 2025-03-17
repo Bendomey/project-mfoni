@@ -28,7 +28,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		},
 	}
 
-	await queryClient.prefetchQuery({
+	queryClient.prefetchQuery({
 		queryKey: [QUERY_KEYS.CREATORS, query],
 		queryFn: () =>
 			getCreators(query, {

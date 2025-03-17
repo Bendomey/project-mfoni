@@ -12,6 +12,7 @@ interface Content {
 	media: ContentMedia
 	meta: ContentMeta
 	orientation: IContentOrientation
+	backgroundColor: Nullable<string>
 	visibility: IContentVisibility
 	amount: number
 	currentUserLike: Nullable<ContentLike>
