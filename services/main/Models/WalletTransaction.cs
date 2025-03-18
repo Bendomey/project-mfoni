@@ -17,6 +17,14 @@ public static class WalletTransactionReasonForTransfer
     public static readonly string TOPUP = "TOPUP";
 }
 
+public static class WalletTransactionStatus
+{
+    public static readonly string PENDING = "PENDING";
+    public static readonly string SUCCESSFUL = "SUCCESSFUL";
+    public static readonly string FAILED = "FAILED";
+    public static readonly string CANCELLED = "CANCELLED";
+}
+
 // Our own form of e wallet. Keeps track of all transations made by a user with their wallet.
 public class WalletTransaction
 {
@@ -41,6 +49,18 @@ public class WalletTransaction
     [BsonElement("payment_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? PaymentId { get; set; }
+
+    [BsonElement("status")]
+    public string Status { get; init; } = WalletTransactionStatus.PENDING;
+
+    [BsonElement("successful_at")]
+    public DateTime? SuccessfulAt { get; init; }
+
+    [BsonElement("cancelled_at")]
+    public DateTime? CancelledAt { get; set; }
+
+    [BsonElement("failed_at")]
+    public DateTime? FailedAt { get; set; }
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;

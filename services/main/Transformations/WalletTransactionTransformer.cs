@@ -27,6 +27,10 @@ public class WalletTransactionTransformer
             Type = transaction.Type,
             Amount = transaction.Amount,
             ReasonForTransfer = transaction.ReasonForTransfer,
+            Status = transaction.Status,
+            SuccessfulAt = transaction.SuccessfulAt,
+            CancelledAt = transaction.CancelledAt,
+            FailedAt = transaction.FailedAt,
             CreatedAt = transaction.CreatedAt,
             UpdatedAt = transaction.UpdatedAt,
         };

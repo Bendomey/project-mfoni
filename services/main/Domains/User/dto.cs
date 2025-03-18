@@ -63,3 +63,17 @@ public class GetCreatorsInput
 {
     public string? Query { get; set; }
 }
+
+
+public class InitiateWalletTopupInput
+{
+    public required Int64 Amount { get; set; }
+    public required string UserId { get; set; }
+}
+
+public class TopupWalletOutput
+{
+    public Models.Payment? Payment { get; set; }
+    public required Models.WalletTransaction WalletTransaction { get; set; }
+}
+

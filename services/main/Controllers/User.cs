@@ -25,8 +25,10 @@ public class UserController : ControllerBase
     private readonly CreatorApplicationTransformer _creatorApplicationTransformer;
     private readonly CreatorTransformer _creatorTransformer;
     private readonly CreatorSubscriptionTransformer _creatorSubscriptionTransformer;
+    private readonly WalletTransactionTransformer _walletTransactionTransformer;
     private readonly ContentLikeService _contentLikeService;
     private readonly ContentLikeTransformer _contentLikeTransformer;
+    private readonly PaymentTransformer _paymentTransformer;
 
     public UserController(
         ILogger<UserController> logger,
@@ -37,9 +39,11 @@ public class UserController : ControllerBase
         CreatorApplicationTransformer creatorApplicationTransformer,
         CreatorTransformer creatorTransformer,
         CreatorSubscriptionTransformer creatorSubscriptionTransformer,
+        WalletTransactionTransformer walletTransactionTransformer,
         UserTransformer userTransformer,
         ContentLikeService contentLikeService,
-        ContentLikeTransformer contentLikeTransformer
+        ContentLikeTransformer contentLikeTransformer,
+        PaymentTransformer paymentTransformer
     )
     {
         this.logger = logger;
@@ -53,6 +57,8 @@ public class UserController : ControllerBase
         this._userTransformer = userTransformer;
         this._contentLikeService = contentLikeService;
         this._contentLikeTransformer = contentLikeTransformer;
+        this._walletTransactionTransformer = walletTransactionTransformer;
+        this._paymentTransformer = paymentTransformer;
     }
 
     [Authorize]
@@ -797,6 +803,86 @@ public class UserController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
+
+    /// <summary>
+    /// Initiate wallet topup.
+    /// </summary>
+    /// <param name="input"></param>
+    [Authorize]
+    [HttpPost("users/wallets/topup")]
+    [ProducesResponseType(typeof(OutputResponse<DTOs.TopupWalletOutput>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> InitiateWalletTopup(
+        [FromBody] TopupWalletInput input
+    )
+    {
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var topupWalletOutput = await userService.InitiateWalletTopup(new Domains.InitiateWalletTopupInput
+            {
+                Amount = input.Amount,
+                UserId = currentUser.Id,
+            });
+
+            if (topupWalletOutput == null)
+            {
+                throw new HttpRequestException("Failed to initiate topup wallet");
+            }
+
+            DTOs.TopupWalletOutput res = new();
+
+            if (topupWalletOutput.WalletTransaction != null)
+            {
+                var outputWalletTransaction = await _walletTransactionTransformer.Transform(topupWalletOutput.WalletTransaction, default);
+                res.WalletTransaction = outputWalletTransaction;
+            }
+
+            if (topupWalletOutput.Payment != null)
+            {
+                var outputPayment = _paymentTransformer.Transform(topupWalletOutput.Payment, default);
+                res.Payment = outputPayment;
+            }
+
+            return new ObjectResult(
+                new GetEntityResponse<DTOs.TopupWalletOutput>(res, null).Result()
+            )
+            {
+                StatusCode = StatusCodes.Status200OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<object>(null, e.Message).Result())
+            {
+                StatusCode = (int)statusCode
+            };
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError($"Initiate wallet topup. Exception: {e}");
+
+            SentrySdk.ConfigureScope(scope =>
+           {
+               scope.SetTags(new Dictionary<string, string>
+               {
+                     {"action", "Initiate wallet topup"},
+                     {"amount", input.Amount.ToString()},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+               });
+               SentrySdk.CaptureException(e);
+           });
+            return new StatusCodeResult(500);
+        }
+    }
+
+
 
 }
 

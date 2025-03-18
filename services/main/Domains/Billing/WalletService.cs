@@ -59,16 +59,38 @@ public class WalletService
             userId = adminWallet.Id;
         }
 
-        var newWalletTransation = new WalletTransaction
-        {
-            Amount = input.Amount,
-            UserId = userId,
-            Type = WalletTransactionType.DEPOSIT,
-            ReasonForTransfer = input.ReasonForTransfer,
-            PaymentId = input.PaymentId,
-        };
+        WalletTransaction? walletTransation = null;
 
-        await _walletTransationCollection.InsertOneAsync(newWalletTransation);
+        if (input.WalletTransactionId is null)
+        {
+            var newWalletTransation = new WalletTransaction
+            {
+                Amount = input.Amount,
+                UserId = userId,
+                Type = WalletTransactionType.DEPOSIT,
+                ReasonForTransfer = input.ReasonForTransfer,
+                PaymentId = input.PaymentId,
+                Status = WalletTransactionStatus.SUCCESSFUL,
+                SuccessfulAt = DateTime.UtcNow
+            };
+
+            await _walletTransationCollection.InsertOneAsync(newWalletTransation);
+
+            walletTransation = newWalletTransation;
+        }
+        else
+        {
+            await _walletTransationCollection.UpdateOneAsync(
+                wallet => wallet.Id == input.WalletTransactionId,
+                Builders<WalletTransaction>.Update
+                    .Set(wallet => wallet.PaymentId, input.PaymentId)
+                    .Set(wallet => wallet.Status, WalletTransactionStatus.SUCCESSFUL)
+                    .Set(wallet => wallet.SuccessfulAt, DateTime.UtcNow)
+            );
+
+            walletTransation = await _walletTransationCollection.Find(wallet => wallet.Id == input.WalletTransactionId)
+                .FirstOrDefaultAsync();
+        }
 
         // increase user wallet.
         if (input.UserId == "SYSTEM")
@@ -92,7 +114,7 @@ public class WalletService
             }
         }
 
-        return newWalletTransation;
+        return walletTransation;
     }
 
     public async Task<WalletTransaction> Withdraw(WalletWithdrawInput input)
@@ -116,6 +138,8 @@ public class WalletService
             UserId = userId,
             Type = WalletTransactionType.WITHDRAW,
             ReasonForTransfer = input.ReasonForTransfer,
+            Status = WalletTransactionStatus.SUCCESSFUL,
+            SuccessfulAt = DateTime.UtcNow
         };
 
         await _walletTransationCollection.InsertOneAsync(newWalletTransation);

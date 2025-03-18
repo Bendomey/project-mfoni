@@ -442,4 +442,26 @@ The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
     ";
 
+    public static string SuccessfulWalletTopupSubject = "Wallet Top-Up Successful! 🎉";
+
+    public static string SuccessfulWalletTopupBody = @"
+Hello {name},
+
+Your wallet top-up on Mfoni was successful! 🎉 Your new balance is now available for purchases on the platform.
+
+📌 Transaction Details:
+
+Amount Added: {amount}
+Payment Method: {paymentMethod}
+Transaction Reference: {reference}
+Date: {transactionDate}
+
+You can view your updated balance and transaction history in your Mfoni Wallet.
+
+If you have any questions or need assistance, feel free to reach out to our support team.
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
 }
