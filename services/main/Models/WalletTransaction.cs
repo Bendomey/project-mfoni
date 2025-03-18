@@ -51,7 +51,7 @@ public class WalletTransaction
     public string? PaymentId { get; set; }
 
     [BsonElement("status")]
-    public string? Status { get; init; } = WalletTransactionStatus.PENDING;
+    public string Status { get; init; } = WalletTransactionStatus.PENDING;
 
     [BsonElement("successful_at")]
     public DateTime? SuccessfulAt { get; init; }
