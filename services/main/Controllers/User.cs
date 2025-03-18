@@ -816,12 +816,14 @@ public class UserController : ControllerBase
         [FromBody] TopupWalletInput input
     )
     {
+
+        var amount = MoneyLib.ConvertCedisToPesewas(input.Amount);
         try
         {
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var topupWalletOutput = await userService.InitiateWalletTopup(new Domains.InitiateWalletTopupInput
             {
-                Amount = input.Amount,
+                Amount = amount,
                 UserId = currentUser.Id,
             });
 
@@ -873,7 +875,7 @@ public class UserController : ControllerBase
                scope.SetTags(new Dictionary<string, string>
                {
                      {"action", "Initiate wallet topup"},
-                     {"amount", input.Amount.ToString()},
+                     {"amount", amount.ToString()},
                     {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
                });
                SentrySdk.CaptureException(e);
