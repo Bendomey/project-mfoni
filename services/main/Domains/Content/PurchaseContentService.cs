@@ -280,7 +280,6 @@ public class PurchaseContentService
                 ContentId = input.ContentId,
                 Type = ContentPurchaseType.ONE_TIME,
                 UserId = input.User.Id,
-                Status = ContentPurchaseStatus.PENDING,
             };
             await _contentPurchasesCollection.InsertOneAsync(newContentPurchaseForOneTime);
 
@@ -311,7 +310,7 @@ public class PurchaseContentService
 
         var newPayment = await _paymentService.InitiatePayment(new InitializePaymentInput
         {
-            Origin = "ContentPurchase",
+            Origin = PaymentMetaDataOrigin.ContentPurchase,
             ContentPurchaseId = contentPurchaseForOneTime.Id,
             PaystackInput = new InitPaymentInput
             {

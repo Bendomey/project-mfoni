@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NanoidDotNet;
+using Newtonsoft.Json;
 
 namespace main.Domains;
 
@@ -16,14 +17,17 @@ public class UserService
     private readonly ILogger<UserService> _logger;
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.CreatorApplication> _creatorApplicationCollection;
+    private readonly IMongoCollection<Models.WalletTransaction> _walletTransactionCollection;
     private readonly CacheProvider _cacheProvider;
     private readonly AppConstants _appConstantsConfiguration;
+    private readonly PaymentService _paymentService;
 
     public UserService(
         ILogger<UserService> logger,
         DatabaseSettings databaseConfig,
         IOptions<AppConstants> appConstants,
-        CacheProvider cacheProvider
+        CacheProvider cacheProvider,
+        PaymentService paymentService
     )
     {
         _logger = logger;
@@ -34,8 +38,13 @@ public class UserService
             databaseConfig.Database.GetCollection<Models.CreatorApplication>(
                 appConstants.Value.CreatorApplicatonCollection
             );
+        _walletTransactionCollection = databaseConfig.Database.GetCollection<Models.WalletTransaction>(
+            appConstants.Value.WalletTransactionCollection
+        );
         _cacheProvider = cacheProvider;
         _appConstantsConfiguration = appConstants.Value;
+
+        _paymentService = paymentService;
 
         logger.LogDebug("User service initialized");
     }
@@ -98,13 +107,8 @@ public class UserService
 
         await _userCollection.UpdateOneAsync(filter, updates);
 
-        var code = "12345";
-        // TODO: look into redis problem in staging.
-        // var code = Nanoid.Generate("1234567890", 5);
-        // await _cacheProvider.SetCache($"verify-{user.Id}", code, new DistributedCacheEntryOptions
-        // {
-        //     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-        // });
+        var code = Nanoid.Generate("1234567890", 5);
+        await _cacheProvider.SetCache($"verify-{user.Id}", code, TimeSpan.FromHours(1));
 
         await SmsConfiguration.SendSms(
             new SendSmsInput
@@ -134,9 +138,8 @@ public class UserService
             throw new HttpRequestException("PhoneNumberAlreadyVerified");
         }
 
-        // var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
-        // if (code != verificationCode)
-        if (code != "12345")
+        var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
+        if (code != verificationCode)
         {
             throw new HttpRequestException("CodeIsIncorrectOrHasExpired");
         }
@@ -145,7 +148,7 @@ public class UserService
         var updates = Builders<Models.User>.Update.Set(v => v.PhoneNumberVerifiedAt, DateTime.Now);
         await _userCollection.UpdateOneAsync(filter, updates);
 
-        // await _cacheProvider.ClearCache($"verify-{user.Id}");
+        await _cacheProvider.ClearCache($"verify-{user.Id}");
         return true;
     }
 
@@ -175,13 +178,8 @@ public class UserService
 
         await _userCollection.UpdateOneAsync(filter, updates);
 
-        var code = "12345";
-        // TODO: look into redis problem in staging.
-        // var code = Nanoid.Generate("1234567890", 5);
-        // await _cacheProvider.SetCache($"verify-{user.Id}", code, new DistributedCacheEntryOptions
-        // {
-        //     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-        // });
+        var code = Nanoid.Generate("1234567890", 5);
+        await _cacheProvider.SetCache($"verify-{user.Id}", code, TimeSpan.FromHours(1));
 
         var _ = EmailConfiguration.Send(
             new SendEmailInput
@@ -210,9 +208,8 @@ public class UserService
             throw new HttpRequestException("EmailAddressAlreadyVerified");
         }
 
-        // var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
-        // if (code != verificationCode)
-        if (code != "12345")
+        var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
+        if (code != verificationCode)
         {
             throw new HttpRequestException("CodeIsIncorrectOrHasExpired");
         }
@@ -221,7 +218,7 @@ public class UserService
         var updates = Builders<Models.User>.Update.Set(v => v.EmailVerifiedAt, DateTime.Now);
         await _userCollection.UpdateOneAsync(filter, updates);
 
-        // await _cacheProvider.ClearCache($"verify-{user.Id}");
+        await _cacheProvider.ClearCache($"verify-{user.Id}");
         return true;
     }
 
@@ -290,5 +287,60 @@ public class UserService
         }
 
         return user;
+    }
+
+    public async Task<TopupWalletOutput> InitiateWalletTopup(InitiateWalletTopupInput input)
+    {
+        var user = await GetUserById(input.UserId);
+
+        var walletTransaction = new WalletTransaction
+        {
+            UserId = input.UserId,
+            Type = WalletTransactionType.DEPOSIT,
+            Amount = input.Amount,
+            ReasonForTransfer = WalletTransactionReasonForTransfer.TOPUP,
+            Status = WalletTransactionStatus.PENDING,
+        };
+        await _walletTransactionCollection.InsertOneAsync(walletTransaction);
+
+        // initiate payment
+        var paymentMetadata = new InitPaymentMedataInput
+        {
+            Origin = PaymentMetaDataOrigin.WalletTopup,
+            WalletId = walletTransaction.Id,
+            CustomFields = new[]
+            {
+                new InitPaymentMedataCustomFieldsInput
+                {
+                    DisplayName = "Origin Type",
+                    VariableName = "origin",
+                    Value = PaymentMetaDataOrigin.WalletTopup
+                },
+                new InitPaymentMedataCustomFieldsInput
+                {
+                    DisplayName = "Wallet Id",
+                    VariableName = "wallet_id",
+                    Value = walletTransaction.Id
+                },
+            }
+        };
+
+        var newPayment = await _paymentService.InitiatePayment(new InitializePaymentInput
+        {
+            Origin = PaymentMetaDataOrigin.WalletTopup,
+            WalletId = walletTransaction.Id,
+            PaystackInput = new InitPaymentInput
+            {
+                Amount = input.Amount,
+                Email = user.Email != null && user.EmailVerifiedAt != null ? user.Email : _appConstantsConfiguration.MfoniPaymentEmail, // use defualt mfoni email to hold all paystack payments if user have no email.
+                Metadata = JsonConvert.SerializeObject(paymentMetadata)
+            }
+        });
+
+        return new TopupWalletOutput
+        {
+            Payment = newPayment,
+            WalletTransaction = walletTransaction,
+        };
     }
 }

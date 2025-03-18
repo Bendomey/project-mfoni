@@ -15,11 +15,9 @@ public class PaymentService
     private readonly AppConstants _appConstantsConfiguration;
     private readonly IMongoCollection<Payment> _paymentCollection;
     private readonly IMongoCollection<ContentPurchase> _contentPurchaseCollection;
+    private readonly IMongoCollection<WalletTransaction> _walletTransactionCollection;
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.Content> _contentsCollection;
-    private readonly AdminWalletService _adminWalletService;
-    private readonly UserService _userService;
-    private readonly IMongoCollection<Models.AdminWallet> _adminWalletCollection;
     private readonly CacheProvider _cacheProvider;
     private readonly WalletService _walletService;
 
@@ -29,7 +27,6 @@ public class PaymentService
         IOptions<AppConstants> appConstants,
         AdminWalletService adminWalletService,
         CacheProvider cacheProvider,
-        UserService userService,
         WalletService walletService
        )
     {
@@ -45,18 +42,15 @@ public class PaymentService
         _contentsCollection = databaseConfig.Database.GetCollection<Models.Content>(
             appConstants.Value.ContentCollection
         );
+        _walletTransactionCollection = databaseConfig.Database.GetCollection<WalletTransaction>(
+            appConstants.Value.WalletTransactionCollection
+        );
 
         _userCollection = databaseConfig.Database.GetCollection<Models.User>(
             appConstants.Value.UserCollection
         );
 
-        _adminWalletCollection = databaseConfig.Database.GetCollection<Models.AdminWallet>(
-            appConstants.Value.AdminWalletCollection
-        );
-
-        _adminWalletService = adminWalletService;
         _walletService = walletService;
-        _userService = userService;
         _cacheProvider = cacheProvider;
 
         logger.LogDebug("Payment service initialized");
@@ -124,14 +118,14 @@ public class PaymentService
                 throw new HttpRequestException("ContentPurchaseNotFound");
             }
 
-            var user = await _userService.GetUserById(contentPurchase.UserId);
+            var user = await GetUserById(contentPurchase.UserId);
             var content = await _contentsCollection.Find(c => c.Id == contentPurchase.ContentId).FirstOrDefaultAsync();
             if (content == null)
             {
                 throw new HttpRequestException("ContentNotfound");
             }
 
-            var creatorUser = await _userService.GetUserById(content.CreatedById);
+            var creatorUser = await GetUserById(content.CreatedById);
 
             // deposit to creator
             var walletTo = await _walletService.Deposit(new WalletDepositInput
@@ -182,8 +176,38 @@ public class PaymentService
         }
         else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.WalletTopup && !string.IsNullOrEmpty(paymentRecord.MetaData.WalletId))
         {
-            // TODO: when it's related to wallet topup.
+            var walletTransaction = await _walletTransactionCollection
+               .Find(walletTransaction => walletTransaction.Id == paymentRecord.MetaData.WalletId)
+               .FirstOrDefaultAsync();
 
+            if (walletTransaction is null)
+            {
+                throw new HttpRequestException("WalletTransactionNotFound");
+            }
+
+            var user = await GetUserById(walletTransaction.UserId);
+
+            // topup users wallet
+            await _walletService.Deposit(new WalletDepositInput
+            {
+                Amount = walletTransaction.Amount,
+                UserId = walletTransaction.UserId,
+                ReasonForTransfer = WalletTransactionReasonForTransfer.TOPUP,
+                WalletTransactionId = walletTransaction.Id,
+                PaymentId = paymentRecord.Id,
+            });
+
+            //  send out notifications to user for a successful topup.
+            SendNotification(
+                user,
+                EmailTemplates.SuccessfulWalletTopupSubject,
+                EmailTemplates.SuccessfulWalletTopupBody
+                    .Replace("{name}", user.Name)
+                    .Replace("{amount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(paymentRecord.Amount):0.00}")
+                    .Replace("{paymentMethod}", StringLib.normalizePaystackChannel(input.Data.Channel))
+                    .Replace("{reference}", paymentRecord.Reference)
+                    .Replace("{transactionDate}", paymentRecord.UpdatedAt.ToString("dd MMMM, yyyy"))
+            );
         }
     }
 
@@ -257,6 +281,17 @@ public class PaymentService
                 ApiKey = _appConstantsConfiguration.ResendApiKey
             });
         }
+    }
+
+    private async Task<Models.User> GetUserById(string userId)
+    {
+        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            throw new HttpRequestException("UserNotFound");
+        }
+
+        return user;
     }
 
 }

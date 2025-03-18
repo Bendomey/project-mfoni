@@ -17,6 +17,7 @@ public class WalletWithdrawInput : WalletBaseInput
 
 public class WalletDepositInput : WalletBaseInput
 {
+    public string? WalletTransactionId { get; set; }
     public string? PaymentId { get; set; }
 }
 
