@@ -24,7 +24,7 @@ export const CreatorAnalytics = () => {
 				name: 'My Wallet',
 				stat: formatAmount(convertPesewasToCedis(currentUser?.wallet ?? 0)),
 				previousStat: '56.14%',
-				change: '2.02%',
+				// change: '2.02%',
 				changeType: 'increase',
 				href: PAGES.AUTHENTICATED_PAGES.WALLET,
 			},

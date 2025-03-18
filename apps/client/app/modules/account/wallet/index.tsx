@@ -11,7 +11,7 @@ import { Header } from '@/components/layout/index.ts'
 const WalletPage = () => {
 	const [searchParams] = useSearchParams()
 	const page = searchParams.get('page') ?? '0'
-	const { data, isError } = useGetWalletTransactions({
+	const { data, isError, isLoading } = useGetWalletTransactions({
 		pagination: {
 			page: Number(page),
 			per: 50,
@@ -37,7 +37,11 @@ const WalletPage = () => {
 				</div>
 
 				<div className="mt-10">
-					<WalletTransactionsTable data={data} isError={isError} />
+					<WalletTransactionsTable
+						data={data}
+						isError={isError}
+						isLoading={isLoading}
+					/>
 				</div>
 			</div>
 			<Footer />
