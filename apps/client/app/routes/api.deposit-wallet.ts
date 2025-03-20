@@ -9,6 +9,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const formData = await request.formData()
 	const amount = formData.get('amount')
+	const transactionId = formData.get('transactionId')
 
 	if (!amount) {
 		return { error: 'Invalid request' }
@@ -20,6 +21,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		const response = await depositContent(
 			{
 				amount: Number(amount),
+				walletTransactionId: transactionId ? String(transactionId) : undefined,
 			},
 			{
 				authToken: authCookie ? authCookie.token : undefined,

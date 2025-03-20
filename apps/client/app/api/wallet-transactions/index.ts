@@ -41,6 +41,7 @@ export const useGetWalletTransactions = (
 
 interface DepositInput {
 	amount: number
+	walletTransactionId?: string
 }
 
 export const depositContent = async (
@@ -48,11 +49,16 @@ export const depositContent = async (
 	apiConfig: ApiConfigForServerConfig,
 ) => {
 	try {
+		const params = new URLSearchParams()
+		if(depositInput.walletTransactionId) {
+			params.append('walletTransactionId', depositInput.walletTransactionId)
+		}
+
 		const response = await fetchClient<
 			ApiResponse<{ walletTransaction: WalletTransaction; payment: Payment }>
-		>('/v1/users/wallets/topup', {
+		>(`/v1/users/wallets/topup?${params.toString()}`, {
 			method: 'POST',
-			body: JSON.stringify(depositInput),
+			body: JSON.stringify({amount: depositInput.amount}),
 			...apiConfig,
 		})
 

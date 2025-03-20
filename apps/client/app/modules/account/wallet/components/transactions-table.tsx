@@ -3,9 +3,8 @@ import {
 	FolderPlusIcon,
 	WalletIcon,
 } from '@heroicons/react/24/outline'
-import { BanknotesIcon } from '@heroicons/react/24/solid'
 import dayjs from 'dayjs'
-import { Button } from '@/components/button/index.tsx'
+import { ReinitiateDepositButton } from './reinitiate-deposit-button.tsx'
 import { Pagination } from '@/components/pagination/index.tsx'
 import { classNames } from '@/lib/classNames.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
@@ -127,15 +126,7 @@ export function WalletTransactionsTable({ data, isError, isLoading }: Props) {
 									</td>
 									<td className="flex whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
 										{transaction.reasonForTransfer === 'TOPUP' ? (
-											<Button
-												disabled={transaction.status !== 'PENDING'}
-												variant="outlined"
-												title="Download Receipt"
-												className=""
-											>
-												<BanknotesIcon className="mr-1 h-4 w-auto text-gray-600" />
-												Pay
-											</Button>
+											<ReinitiateDepositButton disabled={transaction.status !== 'PENDING'} transactionId={transaction.id} amount={convertPesewasToCedis(transaction.amount)} />
 										) : null}
 									</td>
 								</tr>
