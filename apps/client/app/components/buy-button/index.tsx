@@ -70,8 +70,7 @@ export function BuyButtonApi({ children, content }: Props) {
 	useEffect(() => {
 		if (
 			fetcher.state === 'idle' &&
-			fetcher.data?.paymentMethod &&
-			fetcher.data?.accessCode
+			fetcher.data?.paymentMethod
 		) {
 			buyModalState.onClose()
 			queryClient.invalidateQueries({
@@ -84,7 +83,7 @@ export function BuyButtonApi({ children, content }: Props) {
 			) {
 				initiateOneTimePayment(fetcher.data.accessCode)
 			} else if (fetcher.data?.paymentMethod === 'WALLET') {
-				navigate('.', { replace: true })
+				window.location.reload()
 			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
