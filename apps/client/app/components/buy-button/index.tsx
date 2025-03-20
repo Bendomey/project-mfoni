@@ -1,6 +1,7 @@
 import { useFetcher, useNavigate, useSearchParams } from '@remix-run/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect } from 'react'
+import { ProcessingPaymentDialog } from '../processing-payment-dialog.tsx'
 import { BuyModal } from './buy-modal/index.tsx'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
@@ -32,6 +33,7 @@ export function BuyButtonApi({ children, content }: Props) {
 	const queryClient = useQueryClient()
 	const [searchParams] = useSearchParams()
 	const buyModalState = useDisclosure()
+	const processingPaymentModalState = useDisclosure()
 
 	useEffect(() => {
 		const buyParam = searchParams.get('buy')
@@ -57,11 +59,12 @@ export function BuyButtonApi({ children, content }: Props) {
 			const popup = new window.PaystackPop()
 			popup.resumeTransaction(accessCode, {
 				onSuccess: () => {
-					navigate('.', { replace: true })
+					processingPaymentModalState.onOpen()
 				},
 			})
 		},
-		[navigate],
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[],
 	)
 
 	useEffect(() => {
@@ -122,6 +125,10 @@ export function BuyButtonApi({ children, content }: Props) {
 				content={content as unknown as Content}
 				onSubmit={handleSubmit}
 				isLoading={isLoading}
+			/>
+			<ProcessingPaymentDialog
+				isOpened={processingPaymentModalState.isOpened}
+				onClose={processingPaymentModalState.onClose}
 			/>
 		</>
 	)

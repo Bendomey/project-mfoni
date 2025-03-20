@@ -33,11 +33,11 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 			queryClient.prefetchQuery({
 				queryKey: [
 					QUERY_KEYS.WALLET_TRANSACTIONS,
-					{ pagination: { page: Number(page), per: 50 } },
+					{ pagination: { page: Number(page), per: 10 } },
 				],
 				queryFn: () =>
 					getWalletTransactions(
-						{ pagination: { page: Number(page), per: 50 } },
+						{ pagination: { page: Number(page), per: 10 } },
 						{
 							authToken: authCookie.token,
 							baseUrl,
