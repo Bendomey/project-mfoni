@@ -291,6 +291,14 @@ public class UserService
 
     public async Task<TopupWalletOutput> InitiateWalletTopup(InitiateWalletTopupInput input)
     {
+        if (input.WalletTransactionId is not null)
+        {
+            return await this.FullfilWalletTopup(new FullfilWalletTopup
+            {
+                WalletTransactionId = input.WalletTransactionId
+            });
+        }
+
         var user = await GetUserById(input.UserId);
 
         var walletTransaction = new WalletTransaction
@@ -303,11 +311,65 @@ public class UserService
         };
         await _walletTransactionCollection.InsertOneAsync(walletTransaction);
 
+        var newPayment = await InitiateWalletTopupPayment(walletTransaction.Id, input.Amount, user);
+
+        return new TopupWalletOutput
+        {
+            Payment = newPayment,
+            WalletTransaction = walletTransaction,
+        };
+    }
+
+    public async Task<TopupWalletOutput> FullfilWalletTopup(FullfilWalletTopup input)
+    {
+        var walletTransaction = await _walletTransactionCollection.Find(wt => wt.Id == input.WalletTransactionId).FirstOrDefaultAsync();
+        if (walletTransaction is null)
+        {
+            throw new HttpRequestException("WalletTransactionNotFound");
+        }
+
+        if (walletTransaction.Status != WalletTransactionStatus.PENDING)
+        {
+            throw new HttpRequestException("WalletTransactionAlreadyProcessed");
+        }
+
+        var payment = await _paymentService.GetPaymentByContentWalletId(walletTransaction.Id);
+        var paymentHasExpired = DateTime.UtcNow.Subtract(payment.CreatedAt).TotalHours > 24; // paystack automatically expires after 24 hours.
+
+        if (paymentHasExpired)
+        {
+            await _paymentService.CancelPayment(payment.Id, new PaymentError
+            {
+                Message = "Payment link has expired"
+            });
+
+            var user = await GetUserById(walletTransaction.UserId);
+            var newPayment = await InitiateWalletTopupPayment(walletTransaction.Id, payment.Amount, user);
+
+            return new TopupWalletOutput
+            {
+                Payment = newPayment,
+                WalletTransaction = walletTransaction,
+            };
+
+        }
+
+        // purchase link is still active so user can proceed.
+        return new TopupWalletOutput
+        {
+            Payment = payment,
+            WalletTransaction = walletTransaction,
+        };
+
+    }
+
+    private async Task<Payment> InitiateWalletTopupPayment(string walletTransactionId, long amount, Models.User user)
+    {
         // initiate payment
         var paymentMetadata = new InitPaymentMedataInput
         {
             Origin = PaymentMetaDataOrigin.WalletTopup,
-            WalletId = walletTransaction.Id,
+            WalletId = walletTransactionId,
             CustomFields = new[]
             {
                 new InitPaymentMedataCustomFieldsInput
@@ -320,7 +382,7 @@ public class UserService
                 {
                     DisplayName = "Wallet Id",
                     VariableName = "wallet_id",
-                    Value = walletTransaction.Id
+                    Value = walletTransactionId
                 },
             }
         };
@@ -328,19 +390,16 @@ public class UserService
         var newPayment = await _paymentService.InitiatePayment(new InitializePaymentInput
         {
             Origin = PaymentMetaDataOrigin.WalletTopup,
-            WalletId = walletTransaction.Id,
+            WalletId = walletTransactionId,
             PaystackInput = new InitPaymentInput
             {
-                Amount = input.Amount,
+                Amount = amount,
                 Email = user.Email != null && user.EmailVerifiedAt != null ? user.Email : _appConstantsConfiguration.MfoniPaymentEmail, // use defualt mfoni email to hold all paystack payments if user have no email.
                 Metadata = JsonConvert.SerializeObject(paymentMetadata)
             }
         });
 
-        return new TopupWalletOutput
-        {
-            Payment = newPayment,
-            WalletTransaction = walletTransaction,
-        };
+        return newPayment;
     }
+
 }

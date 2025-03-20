@@ -69,6 +69,12 @@ public class InitiateWalletTopupInput
 {
     public required Int64 Amount { get; set; }
     public required string UserId { get; set; }
+    public string? WalletTransactionId { get; set; }
+}
+
+public class FullfilWalletTopup
+{
+    public required string WalletTransactionId { get; set; }
 }
 
 public class TopupWalletOutput

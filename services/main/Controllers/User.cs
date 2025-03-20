@@ -808,12 +808,14 @@ public class UserController : ControllerBase
     /// Initiate wallet topup.
     /// </summary>
     /// <param name="input"></param>
+    /// <param name="walletTransactionId"></param>
     [Authorize]
     [HttpPost("users/wallets/topup")]
     [ProducesResponseType(typeof(OutputResponse<DTOs.TopupWalletOutput>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> InitiateWalletTopup(
-        [FromBody] TopupWalletInput input
+        [FromBody] TopupWalletInput input,
+        [FromQuery] string? walletTransactionId
     )
     {
 
@@ -825,6 +827,7 @@ public class UserController : ControllerBase
             {
                 Amount = amount,
                 UserId = currentUser.Id,
+                WalletTransactionId = walletTransactionId
             });
 
             if (topupWalletOutput == null)
