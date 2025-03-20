@@ -1,3 +1,4 @@
+import { useSearchParams } from '@remix-run/react'
 import { Button } from '../button/index.tsx'
 
 interface Props {
@@ -5,8 +6,22 @@ interface Props {
 }
 
 export function Pagination({ data }: Props) {
+	const [searchParams, setSearchParams] = useSearchParams()
 	const start = data.page * data.pageSize + 1
 	const end = data.page * data.pageSize + data.pageSize
+
+	const handleNext = () => {
+		const nextPage = data.page + 1
+		searchParams.set('page', nextPage.toString())
+		setSearchParams(searchParams, {
+			preventScrollReset: true,
+		})
+	}
+	const handlePrev = () => {
+		const prevPage = data.page - 1
+		searchParams.set('page', prevPage.toString())
+		setSearchParams(searchParams)
+	}
 
 	return (
 		<nav
@@ -23,10 +38,18 @@ export function Pagination({ data }: Props) {
 				</p>
 			</div>
 			<div className="flex flex-1 justify-between gap-2 sm:justify-end">
-				<Button variant="outlined" disabled={!Boolean(data.prevPage)}>
+				<Button
+					variant="outlined"
+					disabled={data.prevPage === null}
+					onClick={handlePrev}
+				>
 					Previous
 				</Button>
-				<Button variant="outlined" disabled={!Boolean(data.nextPage)}>
+				<Button
+					variant="outlined"
+					disabled={!Boolean(data.nextPage)}
+					onClick={handleNext}
+				>
 					Next
 				</Button>
 			</div>

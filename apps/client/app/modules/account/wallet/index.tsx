@@ -14,7 +14,7 @@ const WalletPage = () => {
 	const { data, isError, isLoading } = useGetWalletTransactions({
 		pagination: {
 			page: Number(page),
-			per: 50,
+			per: 10,
 		},
 	})
 

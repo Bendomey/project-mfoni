@@ -6,7 +6,6 @@ import {
 import { BanknotesIcon } from '@heroicons/react/24/solid'
 import dayjs from 'dayjs'
 import { Button } from '@/components/button/index.tsx'
-import { Loader } from '@/components/loader/index.tsx'
 import { Pagination } from '@/components/pagination/index.tsx'
 import { classNames } from '@/lib/classNames.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
@@ -22,8 +21,19 @@ export function WalletTransactionsTable({ data, isError, isLoading }: Props) {
 
 	if (isLoading) {
 		content = (
-			<div className="flex items-center justify-center py-20">
-				<Loader />
+			<div className="m-4 space-y-3">
+				{[1, 2, 3, 4, 5].map((_, index) => (
+					<div
+						className="flex w-full items-center justify-between bg-gray-50 p-2"
+						key={index}
+					>
+						<div className="h-8 w-1/4 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+					</div>
+				))}
 			</div>
 		)
 	} else if (isError) {
@@ -116,15 +126,17 @@ export function WalletTransactionsTable({ data, isError, isLoading }: Props) {
 										{dayjs(transaction.createdAt).format('L')}
 									</td>
 									<td className="flex whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-										<Button
-											disabled={transaction.status !== 'PENDING'}
-											variant="outlined"
-											title="Download Receipt"
-											className=""
-										>
-											<BanknotesIcon className="mr-1 h-4 w-auto text-gray-600" />
-											Pay
-										</Button>
+										{transaction.reasonForTransfer === 'TOPUP' ? (
+											<Button
+												disabled={transaction.status !== 'PENDING'}
+												variant="outlined"
+												title="Download Receipt"
+												className=""
+											>
+												<BanknotesIcon className="mr-1 h-4 w-auto text-gray-600" />
+												Pay
+											</Button>
+										) : null}
 									</td>
 								</tr>
 							))}
