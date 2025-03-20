@@ -10,7 +10,7 @@ import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { errorToast } from '@/lib/custom-toast-functions.tsx'
 
 interface Props {
-	disabled: boolean
+	disabled?: boolean
 	transactionId: string
 	amount: number
 }
@@ -70,7 +70,6 @@ export function ReinitiateDepositButton({ disabled, transactionId, amount }: Pro
 				initiateOneTimePayment(fetcher.data.accessCode)
 			}
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [fetcher.data, fetcher.state, initiateOneTimePayment, queryClient])
 
 	const isLoading = fetcher.state === 'submitting'
