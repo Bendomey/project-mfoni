@@ -9,7 +9,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const formData = await request.formData()
 	const amount = formData.get('amount')
-	const transactionId = formData.get('transactionId')
+	const transactionId = formData.get('walletTransactionId')
 
 	if (!amount) {
 		return { error: 'Invalid request' }
