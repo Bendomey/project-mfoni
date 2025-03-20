@@ -58,6 +58,7 @@ public class CollectionTransformer
                     {
                         Limit = contentItemsLimit,
                         Skip = 0,
+                        Page = 0,
                         Populate = populate,
                     }, new GetCollectionContentsInput
                     {
