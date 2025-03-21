@@ -1,5 +1,6 @@
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { useParams, useSearchParams } from '@remix-run/react'
+import { Image } from 'remix-image'
 import { FiltersDialog } from '../components/filters-dialog/index.tsx'
 import { VisualHeader } from './components/header.tsx'
 import { useSearchVisualContents } from '@/api/contents/index.ts'
@@ -10,7 +11,6 @@ import { EmptyState } from '@/components/empty-state/index.tsx'
 import { ErrorState } from '@/components/error-state/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
-import { Loader } from '@/components/loader/index.tsx'
 import { NoSearchResultLottie } from '@/components/lotties/no-search-results.tsx'
 import { PAGES } from '@/constants/index.ts'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
@@ -41,8 +41,17 @@ export function SearchVisualModule() {
 
 	if (isPending) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center">
-				<Loader />
+			<div className="mt-8 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4">
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
 			</div>
 		)
 	}
@@ -94,7 +103,7 @@ export function SearchVisualModule() {
 			<div className="mt-20">
 				<hr className="my-5" />
 				<FadeInStagger faster>
-					<div className="min-h-[60vh] columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3">
+					<div className="min-h-[60vh] columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4">
 						{data.results.rows.map((content) => (
 							<div className="mb-5" key={content.id}>
 								<FadeIn>
@@ -125,9 +134,10 @@ export function SearchVisualModule() {
 						</p>
 						{data?.imageUrl ? (
 							<div className="mb-1 mt-8">
-								<img
+								<Image
 									src={data?.imageUrl}
-									className="h-36 w-auto rounded-sm p-1 ring-2 ring-black"
+									width={200}
+									className="h-36 rounded-sm p-1 ring-2 ring-black"
 									alt="captured_image"
 								/>
 							</div>

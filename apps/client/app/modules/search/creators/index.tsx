@@ -6,7 +6,6 @@ import { FadeIn, FadeInStagger } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
 import { ErrorState } from '@/components/error-state/index.tsx'
-import { Loader } from '@/components/loader/index.tsx'
 import { NoSearchResultLottie } from '@/components/lotties/no-search-results.tsx'
 import { PAGES } from '@/constants/index.ts'
 import { safeString } from '@/lib/strings.ts'
@@ -38,8 +37,17 @@ export function SearchCreatorsModule() {
 
 	if (isPending) {
 		content = (
-			<div className="flex h-[40vh] flex-1 items-center justify-center">
-				<Loader />
+			<div className="mt-8 grid min-h-[60vh] grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+				{[...new Array(12)].map((_, index) => (
+					<div
+						key={index}
+						className="flex animate-pulse flex-col items-center gap-3"
+					>
+						<div className="h-24 w-24 rounded-full bg-zinc-100" />
+						<div className="h-3 w-36 rounded bg-zinc-100" />
+						<div className="h-3 w-20 rounded bg-zinc-100" />
+					</div>
+				))}
 			</div>
 		)
 	}
