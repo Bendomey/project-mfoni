@@ -125,8 +125,12 @@ export function WalletTransactionsTable({ data, isError, isLoading }: Props) {
 										{dayjs(transaction.createdAt).format('L')}
 									</td>
 									<td className="flex whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-										{transaction.reasonForTransfer === 'TOPUP' && transaction.status === 'PENDING' ? (
-											<ReinitiateDepositButton transactionId={transaction.id} amount={convertPesewasToCedis(transaction.amount)} />
+										{transaction.reasonForTransfer === 'TOPUP' &&
+										transaction.status === 'PENDING' ? (
+											<ReinitiateDepositButton
+												transactionId={transaction.id}
+												amount={convertPesewasToCedis(transaction.amount)}
+											/>
 										) : null}
 									</td>
 								</tr>

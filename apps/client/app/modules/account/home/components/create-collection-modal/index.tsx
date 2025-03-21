@@ -60,7 +60,7 @@ export function CreateCollectionModal({ isOpened, onToggle }: Props) {
 				<h1 className="font-bold">Create Collection</h1>
 			</div>
 
-			<form onSubmit={handleSubmit(onSubmit)} className="m-3 space-y-4">
+			<form onSubmit={handleSubmit(onSubmit)} className="m-5 space-y-4">
 				<div>
 					<label
 						htmlFor="name"

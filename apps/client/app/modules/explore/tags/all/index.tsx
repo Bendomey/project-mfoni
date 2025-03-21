@@ -7,7 +7,6 @@ import { EmptyState } from '@/components/empty-state/index.tsx'
 import { ErrorState } from '@/components/error-state/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
-import { Loader } from '@/components/loader/index.tsx'
 import { PAGES } from '@/constants/index.ts'
 
 export function TagsModule() {
@@ -22,8 +21,13 @@ export function TagsModule() {
 
 	if (isPending) {
 		content = (
-			<div className="flex h-[50vh] flex-1 items-center justify-center">
-				<Loader />
+			<div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+				{[...new Array(18)].map((_, index) => (
+					<div
+						key={index}
+						className="h-16 w-full animate-pulse rounded bg-gray-100"
+					/>
+				))}
 			</div>
 		)
 	}

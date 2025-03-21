@@ -68,10 +68,7 @@ export function BuyButtonApi({ children, content }: Props) {
 	)
 
 	useEffect(() => {
-		if (
-			fetcher.state === 'idle' &&
-			fetcher.data?.paymentMethod
-		) {
+		if (fetcher.state === 'idle' && fetcher.data?.paymentMethod) {
 			buyModalState.onClose()
 			queryClient.invalidateQueries({
 				queryKey: [QUERY_KEYS.CONTENTS, content.slug],

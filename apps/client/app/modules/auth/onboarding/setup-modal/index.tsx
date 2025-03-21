@@ -2,7 +2,7 @@ import { Transition, Dialog } from '@headlessui/react'
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useSearchParams } from '@remix-run/react'
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Image } from 'remix-image'
 import * as Yup from 'yup'
@@ -35,7 +35,8 @@ const schema = Yup.object().shape({
 })
 
 export const SetupAccountModal = ({ onClose, open, selectedType }: Props) => {
-	const { isPending, mutate } = useSetupAccount()
+	const [isPending, setIsPending] = useState(false)
+	const { mutate } = useSetupAccount()
 	const { currentUser } = useAuth()
 	const [searchParams] = useSearchParams()
 	const isProfilePhotoValid = useValidateImage(currentUser?.photo ?? '')
@@ -60,6 +61,7 @@ export const SetupAccountModal = ({ onClose, open, selectedType }: Props) => {
 	}, [currentUser, selectedType, setValue])
 
 	const onSubmit = (data: FormValues) => {
+		setIsPending(true)
 		mutate(
 			{
 				...data,
@@ -71,6 +73,7 @@ export const SetupAccountModal = ({ onClose, open, selectedType }: Props) => {
 					window.location.href = searchParams.get('return_to') ?? '/'
 				},
 				onError: (error) => {
+					setIsPending(false)
 					errorToast(errorMessagesWrapper(error.message), {
 						id: 'account-setup-error',
 					})

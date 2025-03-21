@@ -26,7 +26,6 @@ import { EmptyState } from '@/components/empty-state/index.tsx'
 import { ErrorState } from '@/components/error-state/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
-import { Loader } from '@/components/loader/index.tsx'
 import { ShareButton } from '@/components/share-button/index.tsx'
 import { UserImage } from '@/components/user-image.tsx'
 import { PAGES } from '@/constants/index.ts'
@@ -66,8 +65,17 @@ export function CollectionModule() {
 
 	if (isPending) {
 		content = (
-			<div className="flex h-[50vh] flex-1 items-center justify-center">
-				<Loader />
+			<div className="mt-8 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4">
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
 			</div>
 		)
 	}

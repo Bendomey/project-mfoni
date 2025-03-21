@@ -5,7 +5,6 @@ import { Button } from '@/components/button/index.tsx'
 import { CollectionCard } from '@/components/CollectionCard/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
 import { ErrorState } from '@/components/error-state/index.tsx'
-import { Loader } from '@/components/loader/index.tsx'
 import { PAGES } from '@/constants/index.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
@@ -22,8 +21,14 @@ export function AccountCollectionsModule() {
 
 	if (isPending) {
 		return (
-			<div className="my-16 flex justify-center">
-				<Loader />
+			<div className="grid grid-cols-2 gap-8 md:grid-cols-3">
+				{[...new Array(12)].map((_, index) => (
+					<div key={index} className="animate-pulse space-y-2">
+						<div className="h-60 w-full rounded-md bg-zinc-100" />
+						<div className="h-3 w-2/3 rounded bg-zinc-100" />
+						<div className="h-2 w-1/2 rounded bg-zinc-100" />
+					</div>
+				))}
 			</div>
 		)
 	}

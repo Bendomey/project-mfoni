@@ -22,10 +22,10 @@ export function CollectionSection({ collectionId }: Props) {
 
 export function CollectionShimmer() {
 	return (
-		<Link to="" preventScrollReset className="animate-pulse space-y-2">
+		<div className="animate-pulse space-y-2">
 			<div className="h-60 w-80 rounded-md bg-zinc-100" />
 			<div className="h-3 w-56 rounded bg-zinc-100" />
 			<div className="h-2 w-40 rounded bg-zinc-100" />
-		</Link>
+		</div>
 	)
 }

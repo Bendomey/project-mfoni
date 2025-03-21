@@ -50,7 +50,7 @@ export const depositContent = async (
 ) => {
 	try {
 		const params = new URLSearchParams()
-		if(depositInput.walletTransactionId) {
+		if (depositInput.walletTransactionId) {
 			params.append('walletTransactionId', depositInput.walletTransactionId)
 		}
 
@@ -58,7 +58,7 @@ export const depositContent = async (
 			ApiResponse<{ walletTransaction: WalletTransaction; payment: Payment }>
 		>(`/v1/users/wallets/topup?${params.toString()}`, {
 			method: 'POST',
-			body: JSON.stringify({amount: depositInput.amount}),
+			body: JSON.stringify({ amount: depositInput.amount }),
 			...apiConfig,
 		})
 

@@ -15,7 +15,11 @@ interface Props {
 	amount: number
 }
 
-export function ReinitiateDepositButton({ disabled, transactionId, amount }: Props) {
+export function ReinitiateDepositButton({
+	disabled,
+	transactionId,
+	amount,
+}: Props) {
 	const queryClient = useQueryClient()
 	const processingPaymentModalState = useDisclosure()
 	const fetcher = useFetcher<{
@@ -36,7 +40,7 @@ export function ReinitiateDepositButton({ disabled, transactionId, amount }: Pro
 		fetcher.submit(
 			{
 				amount,
-				walletTransactionId: transactionId
+				walletTransactionId: transactionId,
 			},
 			{
 				action: `/api/deposit-wallet`,
@@ -82,14 +86,14 @@ export function ReinitiateDepositButton({ disabled, transactionId, amount }: Pro
 				title="Pay Wallet"
 				className=""
 			>
-				{
-					isLoading ? <Loader size='5' /> : (
-						<>
-							<BanknotesIcon className="mr-1 h-4 w-auto text-gray-600" />
-							Pay
-						</>
-					)
-				}
+				{isLoading ? (
+					<Loader size="5" />
+				) : (
+					<>
+						<BanknotesIcon className="mr-1 h-4 w-auto text-gray-600" />
+						Pay
+					</>
+				)}
 			</Button>
 			<ProcessingPaymentDialog
 				isOpened={processingPaymentModalState.isOpened}
