@@ -12,7 +12,6 @@ import dayjs from 'dayjs'
 import { Fragment, useState } from 'react'
 import { useGetCreatorSubscriptions } from '@/api/subscriptions/index.ts'
 import { Button } from '@/components/button/index.tsx'
-import { Loader } from '@/components/loader/index.tsx'
 import { Pagination } from '@/components/pagination/index.tsx'
 import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
 import { classNames } from '@/lib/classNames.ts'
@@ -37,8 +36,19 @@ export function BillingsTable() {
 
 	if (isLoading) {
 		content = (
-			<div className="flex items-center justify-center py-20">
-				<Loader />
+			<div className="m-4 space-y-3">
+				{[1, 2, 3, 4, 5].map((_, index) => (
+					<div
+						className="flex w-full items-center justify-between bg-gray-50 p-2"
+						key={index}
+					>
+						<div className="h-8 w-1/4 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+						<div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+					</div>
+				))}
 			</div>
 		)
 	} else if (isError) {
