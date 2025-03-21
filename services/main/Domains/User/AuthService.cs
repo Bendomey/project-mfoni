@@ -6,7 +6,8 @@ using System.Text;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
-using main.Models;
+using main.Configurations;
+using main.Lib;
 
 namespace main.Domains;
 
@@ -59,6 +60,24 @@ public class UserAuth
             };
 
             _usersCollection.InsertOne(__user);
+
+            // if email exists send them verification email
+            if (input.Email is not null)
+            {
+                // send verification email
+                _logger.LogInformation("Sending Verification Email");
+                var _ = EmailConfiguration.Send(new SendEmailInput
+                {
+                    From = _appConstantsConfiguration.EmailFrom,
+                    Email = input.Email,
+                    Subject = EmailTemplates.VerificationEmailSubject,
+                    Message = EmailTemplates.VerificationEmailBody
+                        .Replace("{name}", input.Name)
+                        .Replace("{verificationLink}", $"{_appConstantsConfiguration.WebsiteUrl}/account/verify"),
+                    ApiKey = _appConstantsConfiguration.ResendApiKey
+                });
+            }
+
         }
 
         if (__user is not null)

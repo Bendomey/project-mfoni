@@ -4,6 +4,27 @@ namespace main.Lib;
 public class EmailTemplates
 {
 
+    public static string VerificationEmailSubject = @"Verify Your Account to Complete Your mfoni Signup";
+
+    public static string VerificationEmailBody = @"
+Hello {name},
+
+Welcome to Mfoni! 🎉 To complete your registration and start exploring, please verify your email address.
+
+🔹 Click the link below to verify your email:
+
+{verificationLink}
+
+If the link doesn’t work, you can also verify your email by copying and pasting the link below into your browser.
+
+If you didn’t sign up for Mfoni, please ignore this email.
+
+Looking forward to having you on board! 🚀
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
     public static string VerifyAccountSubject = @"Verify Account";
 
     public static string VerifyPhoneNumberBody = @"Hello {name},
