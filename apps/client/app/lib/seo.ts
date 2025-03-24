@@ -1,14 +1,14 @@
 import { safeString } from './strings.ts'
 
-const MAX_LENGTH_META_DESCRIPTION = 150
+const MAX_LENGTH_META_DESCRIPTION = 200
 
 const baseKeywords =
 	'mfoni, marketplace, buy images, sell content, digital content, visual search, facial search, content discovery, creative marketplace, Mfoni, digital assets, AI-powered search'
 
 export function getSocialMetas({
 	url,
-	title = 'mfoni',
-	description = 'A digital marketplace where users can buy and sell creative content, with powerful facial search for easy discovery. 🚀',
+	title = 'Buy and Sell Creative Content with Advanced Visual Search | mfoni',
+	description = 'A digital marketplace where users can buy and sell creative content seamlessly. With advanced facial search, discovering the perfect content is easier than ever. 🚀',
 	images = [],
 	keywords = '',
 	origin,

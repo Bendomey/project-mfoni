@@ -19,6 +19,9 @@ import morgan from 'morgan'
 import { router } from './routes/index.js'
 
 const MODE = process.env.NODE_ENV
+const getHost = (req: { get: (key: string) => string | undefined }) =>
+	req.get('X-Forwarded-Host') ?? req.get('host') ?? ''
+
 
 const viteDevServer =
 	process.env.NODE_ENV === 'production'
@@ -74,6 +77,41 @@ app.use(
 		credentials: true,
 	}),
 )
+
+// redirect from www to non-www
+app.use((req, res, next) => {
+	const host = getHost(req)
+	if (host.startsWith('www.')) {
+		return res.redirect(301, `https://${host.slice(4)}${req.url}`)
+	} else {
+		next()
+	}
+})
+
+app.set('trust proxy', true)
+
+app.use((req, res, next) => {
+	const proto = req.get('X-Forwarded-Proto')
+	const host = getHost(req)
+	if (proto === 'http') {
+		res.set('X-Forwarded-Proto', 'https')
+		res.redirect(`https://${host}${req.originalUrl}`)
+		return
+	}
+	next()
+})
+
+
+// no ending slashes for SEO reasons
+app.get('*', (req, res, next) => {
+	if (req.path.endsWith('/') && req.path.length > 1) {
+		const query = req.url.slice(req.path.length)
+		const safepath = req.path.slice(0, -1).replace(/\/+/g, '/')
+		res.redirect(302, safepath + query)
+	} else {
+		next()
+	}
+})
 
 app.use(compression())
 
