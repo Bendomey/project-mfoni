@@ -2,12 +2,14 @@ import { safeString } from './strings.ts'
 
 const MAX_LENGTH_META_DESCRIPTION = 150
 
+const baseKeywords = 'mfoni, marketplace, buy images, sell content, digital content, visual search, facial search, content discovery, creative marketplace, Mfoni, digital assets, AI-powered search';
+
 export function getSocialMetas({
 	url,
-	title = 'mfoni Gallery',
-	description = 'The best photo gallery shared by creators in Ghana.',
+	title = 'mfoni',
+	description = 'A digital marketplace where users can buy and sell creative content, with powerful facial search for easy discovery. 🚀',
 	images = [],
-	keywords = 'mfoni, Mfoni',
+	keywords = '',
 }: {
 	images?: Array<string>
 	url: string
@@ -15,6 +17,17 @@ export function getSocialMetas({
 	description?: string
 	keywords?: string
 }) {
+
+	if (keywords.length) {
+		keywords = keywords.concat(`, ${baseKeywords}`)
+	} else {
+		keywords = baseKeywords
+	}
+
+	if(!images.length) {
+		images = [`${resolveOrigin(url)}/logo.png`]
+	}
+
 	const ogImages = images.map((image) => {
 		return { name: 'og:image', content: image }
 	})
@@ -57,4 +70,9 @@ export function getSocialMetas({
 	}
 
 	return metas
+}
+
+function resolveOrigin(url: string) {
+	const urlObject = new URL(url)
+	return urlObject.origin
 }
