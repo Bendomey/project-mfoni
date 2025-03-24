@@ -41,11 +41,8 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 	})
 }
 
-export const meta: MetaFunction<typeof loader> = ({
-	data,
-	location,
-}) => {
-	const meta =  getSocialMetas({
+export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
+	const meta = getSocialMetas({
 		title: 'Home | mfoni',
 		url: getDisplayUrl({
 			origin: data?.origin ?? 'https://mfoni.app',
@@ -53,8 +50,7 @@ export const meta: MetaFunction<typeof loader> = ({
 		}),
 	})
 
-	return meta;
+	return meta
 }
-
 
 export default LandingPageModule
