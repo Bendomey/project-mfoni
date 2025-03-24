@@ -7,8 +7,8 @@ const baseKeywords =
 
 export function getSocialMetas({
 	url,
-	title = 'Buy and Sell Creative Content with Advanced Visual Search | mfoni',
-	description = 'A digital marketplace where users can buy and sell creative content seamlessly. With advanced facial search, discovering the perfect content is easier than ever. 🚀',
+	title = 'Buy and Sell Photographs/Creative Contents with Advanced Visual Search | mfoni',
+	description = 'A digital marketplace where users can buy and sell photographs/creative contents seamlessly. With advanced facial search, discovering the perfect content is easier than ever. 🚀',
 	images = [],
 	keywords = '',
 	origin,
