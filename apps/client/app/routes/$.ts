@@ -17,6 +17,7 @@ export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,
 		}),
+		origin: data?.origin,
 	})
 
 	return meta

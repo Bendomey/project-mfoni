@@ -66,12 +66,13 @@ export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
 		title: data?.content
 			? `${data?.content?.title} | mfoni`
 			: '404: Content Not Found',
-		description: '',
+		description: `Photo uploaded by ${data?.content?.createdBy?.name}`,
 		images: data?.content?.media?.url ? [data?.content?.media?.url] : [],
 		url: getDisplayUrl({
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,
 		}),
+		origin: data?.origin,
 		keywords: data?.content?.tags?.map((tag) => tag.name).join(', '),
 	})
 }

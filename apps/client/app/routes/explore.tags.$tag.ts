@@ -29,7 +29,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 			baseUrl,
 			authToken: authCookie?.token,
 		})
-	} catch (error) {
+	} catch {
 		// if tag is not found, return 404
 		return redirect(PAGES.NOT_FOUND)
 	}
@@ -72,6 +72,10 @@ export const meta: MetaFunction<typeof loader> = ({
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,
 		}),
+		origin: data?.origin,
+		keywords: 'tags, digital tags, curated tags, '.concat(
+			safeString(data?.tag?.name),
+		),
 	})
 }
 

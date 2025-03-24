@@ -6,18 +6,9 @@ import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
 import { protectCreatorRouteLoader } from '@/lib/actions/protect-creator-route-loader.ts'
+import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
+import { getSocialMetas } from '@/lib/seo.ts'
 import { PackageAndBillingsModule } from '@/modules/index.ts'
-
-export const meta: MetaFunction = () => {
-	return [
-		{ title: 'Package And Billings | mfoni' },
-		{
-			name: 'description',
-			content: 'Manage your package and billings on mfoni',
-		},
-		{ name: 'keywords', content: 'mfoni' },
-	]
-}
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
 	const res = await protectCreatorRouteLoader(loaderArgs)
@@ -48,10 +39,25 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		const dehydratedState = dehydrate(queryClient)
 		return jsonWithCache({
 			dehydratedState,
+			origin: getDomainUrl(loaderArgs.request),
 		})
 	}
 
 	return res
+}
+
+export const meta: MetaFunction<any> = ({ data, location }) => {
+	const meta = getSocialMetas({
+		title: 'Package And Billings | mfoni',
+		description: 'Manage your package and billings on mfoni',
+		url: getDisplayUrl({
+			origin: data?.origin ?? 'https://mfoni.app',
+			path: location.pathname,
+		}),
+		origin: data?.origin,
+	})
+
+	return meta
 }
 
 export default PackageAndBillingsModule

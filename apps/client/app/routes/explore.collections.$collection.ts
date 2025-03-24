@@ -49,7 +49,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 				return redirect(PAGES.NOT_FOUND)
 			}
 		}
-	} catch (error) {
+	} catch {
 		// if collection is not found, return 404
 		return redirect(PAGES.NOT_FOUND)
 	}
@@ -100,6 +100,8 @@ export const meta: MetaFunction<typeof loader> = ({
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,
 		}),
+		origin: data?.origin,
+		keywords: 'collections, digital collections, curated collections',
 	})
 }
 

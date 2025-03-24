@@ -53,12 +53,13 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
 	return getSocialMetas({
 		title: `Visual search | mfoni`,
-		description: `Download free, high-quality pictures.`,
+		description: 'Search for content by scanning your face',
 		url: getDisplayUrl({
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,
 		}),
-		keywords: 'search,visual,photos,',
+		origin: data?.origin,
+		keywords: 'search, visual, photos',
 	})
 }
 

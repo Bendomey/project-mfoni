@@ -60,6 +60,7 @@ export const meta: MetaFunction<typeof loader> = ({
 			path: location.pathname,
 		}),
 		images: data?.creator?.photo ? [data?.creator?.photo] : [],
+		origin: data?.origin,
 		keywords:
 			data?.creator?.interests?.map((interest) => interest).join(', ') ?? '',
 	})

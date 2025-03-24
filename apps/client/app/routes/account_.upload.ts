@@ -12,14 +12,9 @@ import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
 import { protectRouteLoader } from '@/lib/actions/protect-route-loader.ts'
+import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
+import { getSocialMetas } from '@/lib/seo.ts'
 import { UploadModule } from '@/modules/index.ts'
-
-export const meta: MetaFunction = () => {
-	return [
-		{ title: 'Upload | mfoni' },
-		{ name: 'description', content: 'Upload your contents to the world' },
-	]
-}
 
 export async function action({ request }: ActionFunctionArgs) {
 	const authCookie = await extractAuthCookie(request.headers.get('cookie'))
@@ -93,10 +88,25 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		const dehydratedState = dehydrate(queryClient)
 		return jsonWithCache({
 			dehydratedState,
+			origin: getDomainUrl(loaderArgs.request),
 		})
 	}
 
 	return res
+}
+
+export const meta: MetaFunction<any> = ({ data, location }) => {
+	const meta = getSocialMetas({
+		title: 'Upload | mfoni',
+		description: 'Upload your contents to the world',
+		url: getDisplayUrl({
+			origin: data?.origin ?? 'https://mfoni.app',
+			path: location.pathname,
+		}),
+		origin: data?.origin,
+	})
+
+	return meta
 }
 
 export default UploadModule

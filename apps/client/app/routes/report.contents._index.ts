@@ -10,19 +10,16 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 	})
 }
 
-export const meta: MetaFunction<typeof loader> = ({
-	data,
-	params,
-	location,
-}) => {
+export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
 	return getSocialMetas({
-		title: 'Report Content - Help Keep Our Platform Safe | mfoni',
-		description: `Search results for ${params?.query} on mfoni. Download free, high-quality pictures`,
+		title: 'Report Content | mfoni',
+		description: 'Help Keep Our Platform Safe',
 		url: getDisplayUrl({
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,
 		}),
-		keywords: 'mfoni, Mfoni, report, report content',
+		origin: data?.origin,
+		keywords: 'report, report content',
 	})
 }
 

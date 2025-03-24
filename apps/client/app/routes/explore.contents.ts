@@ -5,20 +5,14 @@ import { QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
-import { validateLicense, validateOrientation } from '@/lib/misc.ts'
+import {
+	getDisplayUrl,
+	getDomainUrl,
+	validateLicense,
+	validateOrientation,
+} from '@/lib/misc.ts'
+import { getSocialMetas } from '@/lib/seo.ts'
 import { ContentsModule } from '@/modules/index.ts'
-
-export const meta: MetaFunction = () => {
-	return [
-		{ title: 'Contents | mfoni' },
-		{
-			name: 'description',
-			content:
-				'mfoni offers millions of free, high-quality pictures. All pictures are free to download and use under the mfoni license.',
-		},
-		{ name: 'keywords', content: 'mfoni, Mfoni' },
-	]
-}
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
 	const queryClient = new QueryClient()
@@ -49,7 +43,24 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 	const dehydratedState = dehydrate(queryClient)
 	return jsonWithCache({
 		dehydratedState,
+		origin: getDomainUrl(loaderArgs.request),
 	})
+}
+
+export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
+	const meta = getSocialMetas({
+		title: 'Contents | mfoni',
+		description:
+			'mfoni offers millions of free, high-quality pictures. All pictures are free to download and use under the mfoni license.',
+		url: getDisplayUrl({
+			origin: data?.origin ?? 'https://mfoni.app',
+			path: location.pathname,
+		}),
+		origin: data?.origin,
+		keywords: 'contents, explore contents, digital contents',
+	})
+
+	return meta
 }
 
 export default ContentsModule

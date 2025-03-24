@@ -43,7 +43,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 
 export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
 	const meta = getSocialMetas({
-		title: 'Home | mfoni',
+		title: 'Welcome to mfoni',
 		url: getDisplayUrl({
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,

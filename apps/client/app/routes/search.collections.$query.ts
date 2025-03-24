@@ -55,7 +55,8 @@ export const meta: MetaFunction<typeof loader> = ({
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,
 		}),
-		keywords: 'search,collections',
+		origin: data?.origin,
+		keywords: 'collections, explore collections, digital collections',
 	})
 }
 
