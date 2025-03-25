@@ -1,12 +1,9 @@
-using Amazon.S3.Model;
 using main.Configurations;
 using main.Configuratons;
 using main.Lib;
 using main.Models;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
-using NanoidDotNet;
 
 namespace main.Domains;
 
@@ -155,7 +152,7 @@ public class CreatorService
         {
             CreatorApplicationId = creatorApplication.Id,
             UserId = creatorApplication.UserId,
-            Username = $"{user.Name.ToLower().Replace(" ", "")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 5)}",
+            Username = StringLib.GenerateSlug(user.Name),
         };
 
         await __creatorCollection.InsertOneAsync(creator);

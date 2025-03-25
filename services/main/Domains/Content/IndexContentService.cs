@@ -3,11 +3,7 @@ using main.Models;
 using main.Configuratons;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using System.Text;
-using RabbitMQ.Client;
 using main.Lib;
-using NanoidDotNet;
-using System.Net;
 
 namespace main.Domains;
 
@@ -87,7 +83,7 @@ public class IndexContent
             var content = new Content
             {
                 Title = media.Title,
-                Slug = $"{media.Title.ToLower().Replace(" ", "_")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}",
+                Slug = StringLib.GenerateSlug(media.Title),
                 IntendedVisibility = media.Visibility,
                 Amount = MoneyLib.ConvertCedisToPesewas(media.Amount),
                 Media = media.Content,

@@ -8,7 +8,6 @@ using System.Security.Claims;
 using Microsoft.OpenApi.Any;
 using main.Lib;
 using main.Transformations;
-using NanoidDotNet;
 using main.Models;
 
 namespace main.Controllers;
@@ -58,7 +57,7 @@ public class CollectionsController : ControllerBase
             var collection = _collectionService.SaveCollection(new Domains.SaveCollection
             {
                 Name = input.Name,
-                Slug = $"{input.Name.ToLower().Replace(" ", "_")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}",
+                Slug = StringLib.GenerateSlug(input.Name),
                 Description = input.Description,
                 CreatedById = currentUser.Id,
                 CreatedByRole = CollectionCreatedByRole.USER,
@@ -114,7 +113,7 @@ public class CollectionsController : ControllerBase
             var collection = _collectionService.SaveCollection(new Domains.SaveCollection
             {
                 Name = input.Name,
-                Slug = $"{input.Name.ToLower().Replace(" ", "_")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}",
+                Slug = StringLib.GenerateSlug(input.Name),
                 Description = input.Description,
                 CreatedByRole = CollectionCreatedByRole.SYSTEM,
                 Visibility = input.Visibility,

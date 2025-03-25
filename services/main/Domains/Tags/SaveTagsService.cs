@@ -2,8 +2,7 @@ using main.Configuratons;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using main.DTOs;
-using NanoidDotNet;
-using main.Models;
+using main.Lib;
 
 namespace main.Domains;
 
@@ -48,7 +47,7 @@ public class SaveTagsService
         var tagToSave = new Models.Tag
         {
             Name = tag.Name,
-            Slug = $"{tag.Name.ToLower().Replace(" ", "_")}_{Nanoid.Generate("abcdefghijklmnopqrstuvwxyz", 10)}",
+            Slug = StringLib.GenerateSlug(tag.Name),
             Description = tag.Description,
             CreatedByUserId = userInput.Id,
         };
