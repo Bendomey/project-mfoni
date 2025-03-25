@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -69,4 +70,48 @@ public class User
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<User> collection)
+    {
+        var indexModels = new List<CreateIndexModel<User>>
+        {
+            // Unique index on Email
+            new CreateIndexModel<User>(
+                Builders<User>.IndexKeys.Ascending(x => x.Email),
+                new CreateIndexOptions { Unique = true }
+            ),
+
+            // Index on Name for fast lookups
+            new CreateIndexModel<User>(
+                Builders<User>.IndexKeys.Ascending(x => x.Name)
+            ),
+
+            // Index on OAuthId for fast lookups
+            new CreateIndexModel<User>(
+                Builders<User>.IndexKeys.Ascending(x => x.OAuthId)
+            ),
+
+            // Index on Provider for fast lookups
+            new CreateIndexModel<User>(
+                Builders<User>.IndexKeys.Ascending(x => x.Provider)
+            ),
+
+            // Index on Status for fast lookups
+            new CreateIndexModel<User>(
+                Builders<User>.IndexKeys.Ascending(x => x.Status)
+            ),
+
+            // Index on Role for fast lookups
+            new CreateIndexModel<User>(
+                Builders<User>.IndexKeys.Ascending(x => x.Role)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<User>(
+                Builders<User>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

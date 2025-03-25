@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -81,6 +82,62 @@ public class ContentPurchase
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<ContentPurchase> collection)
+    {
+        var indexModels = new List<CreateIndexModel<ContentPurchase>>
+        {
+            // Index on UserId for fast lookups
+            new CreateIndexModel<ContentPurchase>(
+                Builders<ContentPurchase>.IndexKeys.Ascending(x => x.UserId)
+            ),
+
+            // Index on ContentId for fast lookups
+            new CreateIndexModel<ContentPurchase>(
+                Builders<ContentPurchase>.IndexKeys.Ascending(x => x.ContentId)
+            ),
+
+            // Index on Status for fast lookups
+            new CreateIndexModel<ContentPurchase>(
+                Builders<ContentPurchase>.IndexKeys.Ascending(x => x.Status)
+            ),
+
+            // Index on Type for fast lookups
+            new CreateIndexModel<ContentPurchase>(
+                Builders<ContentPurchase>.IndexKeys.Ascending(x => x.Type)
+            ),
+
+            // Index on WalletFrom for fast lookups
+            new CreateIndexModel<ContentPurchase>(
+                Builders<ContentPurchase>.IndexKeys.Ascending(x => x.WalletFrom)
+            ),
+
+            // Index on WalletTo for fast lookups
+            new CreateIndexModel<ContentPurchase>(
+                Builders<ContentPurchase>.IndexKeys.Ascending(x => x.WalletTo)
+            ),
+
+            // Index on PaymentId for fast lookups
+            new CreateIndexModel<ContentPurchase>(
+                Builders<ContentPurchase>.IndexKeys.Ascending(x => x.PaymentId)
+            ),
+
+            // Compound index on UserId, ContentId
+            new CreateIndexModel<ContentPurchase>(
+                Builders<ContentPurchase>.IndexKeys.Combine(
+                    Builders<ContentPurchase>.IndexKeys.Ascending(x => x.UserId),
+                    Builders<ContentPurchase>.IndexKeys.Ascending(x => x.ContentId)
+                )
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<ContentPurchase>(
+                Builders<ContentPurchase>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }
 
 public class ContentPurchaseError

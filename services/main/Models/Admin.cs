@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -28,4 +28,28 @@ public class Admin
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<Admin> collection)
+    {
+        var indexModels = new List<CreateIndexModel<Admin>>
+        {
+            // Unique index on Email
+            new CreateIndexModel<Admin>(
+                Builders<Admin>.IndexKeys.Ascending(x => x.Email),
+                new CreateIndexOptions { Unique = true }
+            ),
+
+            // Index on Name for fast lookups
+            new CreateIndexModel<Admin>(
+                Builders<Admin>.IndexKeys.Ascending(x => x.Name)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<Admin>(
+                Builders<Admin>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

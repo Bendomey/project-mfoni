@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -99,4 +100,53 @@ public class Content
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<Content> collection)
+    {
+        var indexModels = new List<CreateIndexModel<Content>>
+        {
+            // Unique index on Slug
+            new CreateIndexModel<Content>(
+                Builders<Content>.IndexKeys.Ascending(x => x.Slug),
+                new CreateIndexOptions { Unique = true }
+            ),
+
+            // Index on CreatedById for fast lookups
+            new CreateIndexModel<Content>(
+                Builders<Content>.IndexKeys.Ascending(x => x.CreatedById)
+            ),
+
+            // Index on Type for fast lookups
+            new CreateIndexModel<Content>(
+                Builders<Content>.IndexKeys.Ascending(x => x.Type)
+            ),
+
+            // Index on Status for fast lookups
+            new CreateIndexModel<Content>(
+                Builders<Content>.IndexKeys.Ascending(x => x.Status)
+            ),
+
+            // Index on Visibility for fast lookups
+            new CreateIndexModel<Content>(
+                Builders<Content>.IndexKeys.Ascending(x => x.Visibility)
+            ),
+
+            // Index on IsFeatured for filtering
+            new CreateIndexModel<Content>(
+                Builders<Content>.IndexKeys.Ascending(x => x.IsFeatured)
+            ),
+
+            // Index on IsSearchable for filtering
+            new CreateIndexModel<Content>(
+                Builders<Content>.IndexKeys.Ascending(x => x.IsSearchable)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<Content>(
+                Builders<Content>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -33,4 +34,32 @@ public class ContentDownload
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<ContentDownload> collection)
+    {
+        var indexModels = new List<CreateIndexModel<ContentDownload>>
+        {
+            // Index on ContentId for fast lookups
+            new CreateIndexModel<ContentDownload>(
+                Builders<ContentDownload>.IndexKeys.Ascending(x => x.ContentId)
+            ),
+
+            // Index on UserId for fast lookups
+            new CreateIndexModel<ContentDownload>(
+                Builders<ContentDownload>.IndexKeys.Ascending(x => x.UserId)
+            ),
+
+            // Index on Type for fast lookups
+            new CreateIndexModel<ContentDownload>(
+                Builders<ContentDownload>.IndexKeys.Ascending(x => x.Type)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<ContentDownload>(
+                Builders<ContentDownload>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

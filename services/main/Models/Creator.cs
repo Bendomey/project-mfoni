@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -52,6 +53,45 @@ public class Creator
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<Creator> collection)
+    {
+        var indexModels = new List<CreateIndexModel<Creator>>
+        {
+            // Unique index on Username
+            new CreateIndexModel<Creator>(
+                Builders<Creator>.IndexKeys.Ascending(x => x.Username),
+                new CreateIndexOptions { Unique = true }
+            ),
+
+            // Index on UserId for fast lookups
+            new CreateIndexModel<Creator>(
+                Builders<Creator>.IndexKeys.Ascending(x => x.UserId)
+            ),
+
+            // Index on CreatorApplicationId for fast lookups
+            new CreateIndexModel<Creator>(
+                Builders<Creator>.IndexKeys.Ascending(x => x.CreatorApplicationId)
+            ),
+
+            // Index on Status for fast lookups
+            new CreateIndexModel<Creator>(
+                Builders<Creator>.IndexKeys.Ascending(x => x.Status)
+            ),
+
+            // Index on Followers for sorting
+            new CreateIndexModel<Creator>(
+                Builders<Creator>.IndexKeys.Descending(x => x.Followers)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<Creator>(
+                Builders<Creator>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }
 
 public class SocialMedia

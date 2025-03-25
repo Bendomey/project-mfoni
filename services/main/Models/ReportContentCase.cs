@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -100,4 +101,67 @@ public class ReportContentCase
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<ReportContentCase> collection)
+    {
+        var indexModels = new List<CreateIndexModel<ReportContentCase>>
+        {
+            // Index on ContentId for fast lookups
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Ascending(x => x.ContentId)
+            ),
+
+            // Index on CaseNumber for fast lookups
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Ascending(x => x.CaseNumber)
+            ),
+
+            // Index on ContentType for fast lookups
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Ascending(x => x.ContentType)
+            ),
+
+            // Index on AcknowledgedById for fast lookups
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Ascending(x => x.AcknowledgedById)
+            ),
+
+            // Index on ResolvedById for fast lookups
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Ascending(x => x.ResolvedById)
+            ),
+
+            // Index on CreatedById for fast lookups
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Ascending(x => x.CreatedById)
+            ),
+
+            // Index on Status for fast lookups
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Ascending(x => x.Status)
+            ),
+
+            // Index on ReasonForReport for fast lookups
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Ascending(x => x.ReasonForReport)
+            ),
+
+            // Index on AcknowledgedAt for sorting
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Descending(x => x.AcknowledgedAt)
+            ),
+
+            // Index on ResolvedAt for sorting
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Descending(x => x.ResolvedAt)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<ReportContentCase>(
+                Builders<ReportContentCase>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -38,4 +39,37 @@ public class CreatorSubscription
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<CreatorSubscription> collection)
+    {
+        var indexModels = new List<CreateIndexModel<CreatorSubscription>>
+        {
+            // Index on CreatorId for fast lookups
+            new CreateIndexModel<CreatorSubscription>(
+                Builders<CreatorSubscription>.IndexKeys.Ascending(x => x.CreatorId)
+            ),
+
+            // Index on PackageType for fast lookups
+            new CreateIndexModel<CreatorSubscription>(
+                Builders<CreatorSubscription>.IndexKeys.Ascending(x => x.PackageType)
+            ),
+
+            // Index on StartedAt for sorting
+            new CreateIndexModel<CreatorSubscription>(
+                Builders<CreatorSubscription>.IndexKeys.Descending(x => x.StartedAt)
+            ),
+
+            // Index on EndedAt for sorting
+            new CreateIndexModel<CreatorSubscription>(
+                Builders<CreatorSubscription>.IndexKeys.Descending(x => x.EndedAt)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<CreatorSubscription>(
+                Builders<CreatorSubscription>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

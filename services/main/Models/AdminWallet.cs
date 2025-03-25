@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -20,4 +21,17 @@ public class AdminWallet
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<AdminWallet> collection)
+    {
+        var indexModels = new List<CreateIndexModel<AdminWallet>>
+        {
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<AdminWallet>(
+                Builders<AdminWallet>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -62,4 +63,22 @@ public class SavedCard
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<SavedCard> collection)
+    {
+        var indexModels = new List<CreateIndexModel<SavedCard>>
+        {
+            // Index on UserId for fast lookups
+            new CreateIndexModel<SavedCard>(
+                Builders<SavedCard>.IndexKeys.Ascending(x => x.UserId)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<SavedCard>(
+                Builders<SavedCard>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }
