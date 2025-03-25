@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -52,4 +53,42 @@ public class ExploreSection
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<ExploreSection> collection)
+    {
+        var indexModels = new List<CreateIndexModel<ExploreSection>>
+        {
+            // Index on Visibility for fast lookups
+            new CreateIndexModel<ExploreSection>(
+                Builders<ExploreSection>.IndexKeys.Ascending(x => x.Visibility)
+            ),
+
+            // Index on Title for fast lookups
+            new CreateIndexModel<ExploreSection>(
+                Builders<ExploreSection>.IndexKeys.Ascending(x => x.Title)
+            ),
+
+            // Index on Type for fast lookups
+            new CreateIndexModel<ExploreSection>(
+                Builders<ExploreSection>.IndexKeys.Ascending(x => x.Type)
+            ),
+
+            // Index on CreatedById for fast lookups
+            new CreateIndexModel<ExploreSection>(
+                Builders<ExploreSection>.IndexKeys.Ascending(x => x.CreatedById)
+            ),
+
+            // Index on Sort for sorting
+            new CreateIndexModel<ExploreSection>(
+                Builders<ExploreSection>.IndexKeys.Ascending(x => x.Sort)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<ExploreSection>(
+                Builders<ExploreSection>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

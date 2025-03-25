@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -67,4 +68,37 @@ public class WalletTransaction
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<WalletTransaction> collection)
+    {
+        var indexModels = new List<CreateIndexModel<WalletTransaction>>
+        {
+            // Index on UserId for fast lookups
+            new CreateIndexModel<WalletTransaction>(
+                Builders<WalletTransaction>.IndexKeys.Ascending(x => x.UserId)
+            ),
+
+            // Index on Type for fast lookups
+            new CreateIndexModel<WalletTransaction>(
+                Builders<WalletTransaction>.IndexKeys.Ascending(x => x.Type)
+            ),
+
+            // Index on ReasonForTransfer for fast lookups
+            new CreateIndexModel<WalletTransaction>(
+                Builders<WalletTransaction>.IndexKeys.Ascending(x => x.ReasonForTransfer)
+            ),
+
+            // Index on PaymentId for fast lookups
+            new CreateIndexModel<WalletTransaction>(
+                Builders<WalletTransaction>.IndexKeys.Ascending(x => x.PaymentId)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<WalletTransaction>(
+                Builders<WalletTransaction>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

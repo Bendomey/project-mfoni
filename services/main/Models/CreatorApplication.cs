@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -71,4 +72,42 @@ public class CreatorApplication
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<CreatorApplication> collection)
+    {
+        var indexModels = new List<CreateIndexModel<CreatorApplication>>
+        {
+            // Index on UserId for fast lookups
+            new CreateIndexModel<CreatorApplication>(
+                Builders<CreatorApplication>.IndexKeys.Ascending(x => x.UserId)
+            ),
+
+            // Index on Status for fast lookups
+            new CreateIndexModel<CreatorApplication>(
+                Builders<CreatorApplication>.IndexKeys.Ascending(x => x.Status)
+            ),
+
+            // Index on IntendedPricingPackage for fast lookups
+            new CreateIndexModel<CreatorApplication>(
+                Builders<CreatorApplication>.IndexKeys.Ascending(x => x.IntendedPricingPackage)
+            ),
+
+            // Index on SubmittedAt for sorting
+            new CreateIndexModel<CreatorApplication>(
+                Builders<CreatorApplication>.IndexKeys.Descending(x => x.SubmittedAt)
+            ),
+
+            // Index on RejectedAt for sorting
+            new CreateIndexModel<CreatorApplication>(
+                Builders<CreatorApplication>.IndexKeys.Descending(x => x.RejectedAt)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<CreatorApplication>(
+                Builders<CreatorApplication>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

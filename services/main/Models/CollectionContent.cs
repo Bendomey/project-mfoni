@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -45,4 +46,47 @@ public class CollectionContent
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<CollectionContent> collection)
+    {
+        var indexModels = new List<CreateIndexModel<CollectionContent>>
+        {
+            // Index on CollectionId for fast lookups
+            new CreateIndexModel<CollectionContent>(
+                Builders<CollectionContent>.IndexKeys.Ascending(x => x.CollectionId)
+            ),
+
+            // Index on Type for fast lookups
+            new CreateIndexModel<CollectionContent>(
+                Builders<CollectionContent>.IndexKeys.Ascending(x => x.Type)
+            ),
+
+            // Index on TagId for fast lookups
+            new CreateIndexModel<CollectionContent>(
+                Builders<CollectionContent>.IndexKeys.Ascending(x => x.TagId)
+            ),
+
+            // Index on ContentId for fast lookups
+            new CreateIndexModel<CollectionContent>(
+                Builders<CollectionContent>.IndexKeys.Ascending(x => x.ContentId)
+            ),
+
+            // Index on CreatorId for fast lookups
+            new CreateIndexModel<CollectionContent>(
+                Builders<CollectionContent>.IndexKeys.Ascending(x => x.CreatorId)
+            ),
+
+            // Index on ChildCollectionId for fast lookups
+            new CreateIndexModel<CollectionContent>(
+                Builders<CollectionContent>.IndexKeys.Ascending(x => x.ChildCollectionId)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<CollectionContent>(
+                Builders<CollectionContent>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

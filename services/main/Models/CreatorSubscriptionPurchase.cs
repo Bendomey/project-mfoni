@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -41,4 +42,37 @@ public class CreatorSubscriptionPurchase
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<CreatorSubscriptionPurchase> collection)
+    {
+        var indexModels = new List<CreateIndexModel<CreatorSubscriptionPurchase>>
+        {
+            // Index on CreatorSubscriptionId for fast lookups
+            new CreateIndexModel<CreatorSubscriptionPurchase>(
+                Builders<CreatorSubscriptionPurchase>.IndexKeys.Ascending(x => x.CreatorSubscriptionId)
+            ),
+
+            // Index on Type for fast lookups
+            new CreateIndexModel<CreatorSubscriptionPurchase>(
+                Builders<CreatorSubscriptionPurchase>.IndexKeys.Ascending(x => x.Type)
+            ),
+
+            // Index on SavedCardId for fast lookups
+            new CreateIndexModel<CreatorSubscriptionPurchase>(
+                Builders<CreatorSubscriptionPurchase>.IndexKeys.Ascending(x => x.SavedCardId)
+            ),
+
+            // Index on WalletId for fast lookups
+            new CreateIndexModel<CreatorSubscriptionPurchase>(
+                Builders<CreatorSubscriptionPurchase>.IndexKeys.Ascending(x => x.WalletId)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<CreatorSubscriptionPurchase>(
+                Builders<CreatorSubscriptionPurchase>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

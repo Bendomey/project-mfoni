@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -54,4 +55,53 @@ public class Collection
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<Collection> collection)
+    {
+        var indexModels = new List<CreateIndexModel<Collection>>
+        {
+            // Unique index on Slug
+            new CreateIndexModel<Collection>(
+                Builders<Collection>.IndexKeys.Ascending(x => x.Slug),
+                new CreateIndexOptions { Unique = true }
+            ),
+
+            // Index on Name for fast lookups
+            new CreateIndexModel<Collection>(
+                Builders<Collection>.IndexKeys.Ascending(x => x.Name)
+            ),
+
+            // Index on CreatedByRole for filtering
+            new CreateIndexModel<Collection>(
+                Builders<Collection>.IndexKeys.Ascending(x => x.CreatedByRole)
+            ),
+
+            // Index on IsFeatured for filtering
+            new CreateIndexModel<Collection>(
+                Builders<Collection>.IndexKeys.Ascending(x => x.IsFeatured)
+            ),
+
+            // Index on IsCustom for filtering
+            new CreateIndexModel<Collection>(
+                Builders<Collection>.IndexKeys.Ascending(x => x.IsCustom)
+            ),
+
+            // Index on Visibility for filtering
+            new CreateIndexModel<Collection>(
+                Builders<Collection>.IndexKeys.Ascending(x => x.Visibility)
+            ),
+
+            // Index on CreatedById for filtering
+            new CreateIndexModel<Collection>(
+                Builders<Collection>.IndexKeys.Ascending(x => x.CreatedById)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<Collection>(
+                Builders<Collection>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }

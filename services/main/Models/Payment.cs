@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -61,6 +62,44 @@ public class Payment
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<Payment> collection)
+    {
+        var indexModels = new List<CreateIndexModel<Payment>>
+        {
+            // Index on Reference for fast lookups
+            new CreateIndexModel<Payment>(
+                Builders<Payment>.IndexKeys.Ascending(x => x.Reference),
+                new CreateIndexOptions { Unique = true }
+            ),
+
+            // Index on Status for fast lookups
+            new CreateIndexModel<Payment>(
+                Builders<Payment>.IndexKeys.Ascending(x => x.Status)
+            ),
+
+            // Index on MetaData.Origin for fast lookups
+            new CreateIndexModel<Payment>(
+                Builders<Payment>.IndexKeys.Ascending(x => x.MetaData.Origin)
+            ),
+
+            // Index on MetaData.ContentPurchaseId for fast lookups
+            new CreateIndexModel<Payment>(
+                Builders<Payment>.IndexKeys.Ascending(x => x.MetaData.ContentPurchaseId)
+            ),
+
+            // Index on MetaData.WalletId for fast lookups
+            new CreateIndexModel<Payment>(
+                Builders<Payment>.IndexKeys.Ascending(x => x.MetaData.WalletId)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<Payment>(
+                Builders<Payment>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }
 
 

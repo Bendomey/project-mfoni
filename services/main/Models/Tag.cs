@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace main.Models;
 
@@ -34,4 +35,43 @@ public class Tag
     [BsonElement("created_by_user_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? CreatedByUserId { get; set; }
+
+    public static async Task EnsureIndexesAsync(IMongoCollection<Tag> collection)
+    {
+        var indexModels = new List<CreateIndexModel<Tag>>
+        {
+            // Unique index on Slug
+            new CreateIndexModel<Tag>(
+                Builders<Tag>.IndexKeys.Ascending(x => x.Slug),
+                new CreateIndexOptions { Unique = true }
+            ),
+
+            // Index on Name for fast lookups
+            new CreateIndexModel<Tag>(
+                Builders<Tag>.IndexKeys.Ascending(x => x.Name)
+            ),
+
+            // Index on IsFeatured for filtering
+            new CreateIndexModel<Tag>(
+                Builders<Tag>.IndexKeys.Ascending(x => x.IsFeatured)
+            ),
+
+            // Index on CreatedByAdminId for filtering
+            new CreateIndexModel<Tag>(
+                Builders<Tag>.IndexKeys.Ascending(x => x.CreatedByAdminId)
+            ),
+
+            // Index on CreatedByUserId for filtering
+            new CreateIndexModel<Tag>(
+                Builders<Tag>.IndexKeys.Ascending(x => x.CreatedByUserId)
+            ),
+
+            // Index on CreatedAt for sorting
+            new CreateIndexModel<Tag>(
+                Builders<Tag>.IndexKeys.Descending(x => x.CreatedAt)
+            )
+        };
+
+        await collection.Indexes.CreateManyAsync(indexModels);
+    }
 }
