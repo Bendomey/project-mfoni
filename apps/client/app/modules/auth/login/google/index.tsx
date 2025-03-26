@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams } from '@remix-run/react'
 import { useCallback, useEffect, useRef } from 'react'
+import { ClientOnly } from 'remix-utils/client-only'
 import { useLoginAuth } from '../context/index.tsx'
 import { useAuthenticate } from '@/api/auth/index.ts'
 import { errorMessagesWrapper } from '@/constants/error-messages.ts'
@@ -87,6 +88,8 @@ export const GoogleButton = () => {
 				width: isMobileBreakPoint ? '355' : '385',
 				locale: 'en-GB',
 			})
+
+			window.google.accounts.id.prompt()
 		}
 	}, [env.MFONI_GOOGLE_AUTH_CLIENT_ID, isMobileBreakPoint, onLoginWithGoogle])
 

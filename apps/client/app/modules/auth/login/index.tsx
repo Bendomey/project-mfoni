@@ -3,6 +3,7 @@ import { Transition } from '@headlessui/react'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { Fragment, useEffect } from 'react'
 import { Image } from 'remix-image'
+import { ClientOnly } from 'remix-utils/client-only'
 import { LoginAuthProvider, useLoginAuth } from './context/index.tsx'
 import { FacebookButton } from './facebook/index.tsx'
 import { GoogleButton } from './google/index.tsx'
@@ -94,10 +95,14 @@ export const LoginComponent = () => {
 								<span className="font-bold">Go Back</span>
 							</Button>
 						</div>
-						<TypewriterEffectSmooth
-							words={words}
-							wordClassName=" text-3xl md:text-4xl font-bold leading-9 tracking-tight text-gray-900"
-						/>
+						<ClientOnly>
+							{() => (
+								<TypewriterEffectSmooth
+									words={words}
+									wordClassName=" text-3xl md:text-4xl font-bold leading-9 tracking-tight text-gray-900"
+								/>
+							)}
+						</ClientOnly>
 						<p className="ml-2 leading-6 text-gray-500">
 							Continue with your favorite social media platform.
 						</p>

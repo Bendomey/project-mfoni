@@ -252,6 +252,9 @@ app.use(
 		crossOriginOpenerPolicy: {
 			policy: 'same-origin-allow-popups',
 		},
+		referrerPolicy: {
+			policy: 'no-referrer-when-downgrade',
+		},
 	}),
 )
 
