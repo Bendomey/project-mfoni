@@ -1,6 +1,6 @@
 import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
-import { getCollectionContentsBySlug } from '@/api/collections/index.ts'
+import { getContentPurchases } from '@/api/purchases/index.ts'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
@@ -18,32 +18,29 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 
 	const baseUrl = `${environmentVariables().API_ADDRESS}/api`
 
-	// if (authCookie) {
-	// 	const query = {
-	// 		pagination: { page: 0, per: 50 },
-	// 		populate: ['content', 'content.tags'],
-	// 	}
-	// 	const slug = `${authCookie.id}_personal`
-	// 	await queryClient.prefetchQuery({
-	// 		queryKey: [
-	// 			QUERY_KEYS.COLLECTIONS,
-	// 			slug,
-	// 			'slug-contents',
-	// 			query,
-	// 		],
-	// 		queryFn: () =>
-	// 			getCollectionContentsBySlug(slug, query, {
-	// 				authToken: authCookie.token,
-	// 				baseUrl,
-	// 			}),
-	// 	})
+	if (authCookie) {
+		const query = {
+			filters: {
+				userId: authCookie.id,
+			},
+			pagination: { page: 0, per: 50 },
+			populate: ['contentPurchase.content', 'content.createdBy'],
+		}
+		queryClient.prefetchQuery({
+			queryKey: [QUERY_KEYS.CONTENT_PURCHASES, query],
+			queryFn: () =>
+				getContentPurchases(query, {
+					authToken: authCookie.token,
+					baseUrl,
+				}),
+		})
 
-	const dehydratedState = dehydrate(queryClient)
-	return jsonWithCache({
-		dehydratedState,
-		origin: getDomainUrl(loaderArgs.request),
-	})
-	// }
+		const dehydratedState = dehydrate(queryClient)
+		return jsonWithCache({
+			dehydratedState,
+			origin: getDomainUrl(loaderArgs.request),
+		})
+	}
 
 	// this should never happen but just in case
 	return null
