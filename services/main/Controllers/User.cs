@@ -841,9 +841,9 @@ public class UserController : ControllerBase
         [FromQuery] int? page,
         [FromQuery] int? pageSize,
         [FromQuery] string? sort,
-        [FromQuery] string contentId,
-        [FromQuery] string type,
-        [FromQuery] string status,
+        [FromQuery] string? contentId,
+        [FromQuery] string? type,
+        [FromQuery] string? status,
         [FromQuery] string populate = "",
         [FromQuery] string sortBy = "created_at"
     )
