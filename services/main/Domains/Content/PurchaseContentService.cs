@@ -404,7 +404,7 @@ public class PurchaseContentService
     {
         FilterDefinitionBuilder<Models.ContentPurchase> builder = Builders<Models.ContentPurchase>.Filter;
         var filter = builder.Empty;
-        
+
         if (!string.IsNullOrEmpty(input.ContentId))
         {
             filter = builder.Eq(r => r.ContentId, input.ContentId);
