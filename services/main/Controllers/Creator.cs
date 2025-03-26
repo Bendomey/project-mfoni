@@ -290,7 +290,7 @@ public class CreatorController : ControllerBase
     [ProducesResponseType(typeof(OutputResponse<Models.Creator>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> UpdateCreatorBasicDetails([FromBody] Domains.UpdateCreatorBasicDetails input)
+    public async Task<IActionResult> UpdateCreatorBasicDetails([FromBody] DTOs.UpdateCreatorBasicDetails input)
     {
         try
         {
