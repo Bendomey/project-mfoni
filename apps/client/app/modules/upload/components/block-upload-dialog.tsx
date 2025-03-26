@@ -2,6 +2,7 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/solid'
 import { Button } from '@/components/button/index.tsx'
 import { Modal } from '@/components/modal/index.tsx'
 import { useAuth } from '@/providers/auth/index.tsx'
+import { useNavigate } from '@remix-run/react'
 
 interface Props {
 	isOpened: boolean
@@ -15,6 +16,7 @@ const hasExhaustedUploadLimitMessage = 'Upgrade to upload more!'
 
 export function BlockUploadDialog({ isOpened }: Props) {
 	const { currentUser } = useAuth()
+	const navigate = useNavigate()
 
 	const isUserNoCreator = currentUser?.role !== 'CREATOR'
 
@@ -27,7 +29,7 @@ export function BlockUploadDialog({ isOpened }: Props) {
 
 	return (
 		<Modal
-			onClose={() => {}}
+			onClose={() => { }}
 			canBeClosedWithBackdrop={false}
 			className="w-full md:w-1/2 lg:w-1/3"
 			isOpened={isOpened}
@@ -43,6 +45,11 @@ export function BlockUploadDialog({ isOpened }: Props) {
 				<div className="mt-5">
 					<Button isLink href="/#pricing">
 						{isUserNoCreator ? 'Apply Now' : 'Upgrade Now'}
+					</Button>
+				</div>
+				<div className="mt-5 md:mt-3">
+					<Button onClick={() => navigate(-1)} className='hover:underline' size='sm' variant='unstyled'>
+						Go Back
 					</Button>
 				</div>
 			</div>
