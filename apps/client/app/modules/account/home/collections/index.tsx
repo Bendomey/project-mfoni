@@ -1,6 +1,5 @@
 import { ArrowPathIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { useGetCollections } from '@/api/collections/index.ts'
-import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { CollectionCard } from '@/components/CollectionCard/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
@@ -69,12 +68,10 @@ export function AccountCollectionsModule() {
 	}
 
 	return (
-		<FadeIn>
-			<div className="grid grid-cols-2 gap-8 md:grid-cols-3">
-				{data.rows.map((collection) => (
-					<CollectionCard key={collection.id} collection={collection} />
-				))}
-			</div>
-		</FadeIn>
+		<div className="grid grid-cols-2 gap-8 md:grid-cols-3">
+			{data.rows.map((collection) => (
+				<CollectionCard key={collection.id} collection={collection} />
+			))}
+		</div>
 	)
 }

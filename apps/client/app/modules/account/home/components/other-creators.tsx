@@ -110,11 +110,11 @@ function CreatorCard({ data }: { data: BasicCreator }) {
 				) : (
 					<span className="h-20 w-20 rounded-md bg-zinc-100" />
 				)}
-				<div>
+				<div className="w-2/3">
 					<h3 className="text-base font-semibold leading-7 tracking-tight">
 						{data.name}
 					</h3>
-					<span className="text-sm leading-6 text-gray-400">
+					<span className="line-clamp-2 text-sm leading-6 text-gray-400">
 						{data.username}
 					</span>
 				</div>

@@ -109,3 +109,5 @@ export const imageUrls = [
 	'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-10.jpg',
 	'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-11.jpg',
 ]
+
+export const DEFAULT_USERNAME_FOR_FETCHING_CREATORS = 'default-creator'

@@ -16,7 +16,6 @@ public class ContentTransformer
     private readonly SearchTagService _searchTagService;
     private readonly UserTransformer _userTransformer;
     private readonly PurchaseContentService _purchaseContentService;
-    private readonly ContentPurchaseTransformer _contentPurchaseTransformer;
     private readonly TagTransformer _tagTransformer;
     private readonly AdminService _adminService;
     private readonly AdminTransformer _adminTransformer;
@@ -29,7 +28,6 @@ public class ContentTransformer
         UserTransformer userTransformer,
         SearchTagService searchTagService,
         TagTransformer tagTransformer,
-        ContentPurchaseTransformer contentPurchaseTransformer,
         PurchaseContentService purchaseContentService,
         SearchContentService searchContentService,
         CacheProvider cacheProvider
@@ -42,7 +40,6 @@ public class ContentTransformer
         _userTransformer = userTransformer;
         _searchTagService = searchTagService;
         _tagTransformer = tagTransformer;
-        _contentPurchaseTransformer = contentPurchaseTransformer;
         _searchContentService = searchContentService;
         _purchaseContentService = purchaseContentService;
         _cacheProvider = cacheProvider;
@@ -52,15 +49,10 @@ public class ContentTransformer
     {
         populate ??= Array.Empty<string>();
 
-        OutputContentPurchase? contentPurchase = null;
+        ContentPurchase? contentPurchase = null;
         if (userId is not null)
         {
-            var getPurchaseContent = await _cacheProvider.ResolveCache($"{CacheProvider.CacheEntities["contents"]}.{content.Id}.users.{userId}.purchases", () => _purchaseContentService.GetSuccessfulContentPurchaseByContentId(content.Id, userId));
-
-            if (getPurchaseContent is not null)
-            {
-                contentPurchase = await _contentPurchaseTransformer.Transform(getPurchaseContent);
-            }
+            contentPurchase = await _cacheProvider.ResolveCache($"{CacheProvider.CacheEntities["contents"]}.{content.Id}.users.{userId}.purchases", () => _purchaseContentService.GetSuccessfulContentPurchaseByContentId(content.Id, userId));
         }
 
         OutputBasicCreator? outputBasicCreator = null;
@@ -158,8 +150,7 @@ public class ContentTransformer
                 Status = content.RekognitionMetaData?.Status ?? "PENDING",
                 Message = content.RekognitionMetaData?.Details?.Message
             },
-            ContentPurchaseId = contentPurchase?.Id,
-            ContentPurchase = populate.Any(p => p.Contains(PopulateKeys.CONTENT_PURCHASE)) ? contentPurchase : null,
+            IsPurchased = !string.IsNullOrEmpty(contentPurchase?.Id),
             CreatedById = content.CreatedById!,
             CreatedBy = outputBasicCreator,
             RejectedAt = content.RejectedAt,

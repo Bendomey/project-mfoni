@@ -361,4 +361,73 @@ public class PurchaseContentService
             });
         }
     }
+
+    public async Task<List<Models.ContentPurchase>> GetContentPurchases(
+        FilterQuery<Models.ContentPurchase> queryFilter,
+        GetContentPurchasesInput input
+    )
+    {
+        FilterDefinitionBuilder<Models.ContentPurchase> builder = Builders<Models.ContentPurchase>.Filter;
+        var filter = builder.Empty;
+
+        if (!string.IsNullOrEmpty(input.ContentId))
+        {
+            filter = builder.Eq(r => r.ContentId, input.ContentId);
+        }
+
+        if (!string.IsNullOrEmpty(input.Type))
+        {
+            filter = builder.Eq(r => r.Type, input.Type);
+        }
+
+        if (!string.IsNullOrEmpty(input.Status))
+        {
+            filter = builder.Eq(r => r.Status, input.Status);
+        }
+
+        if (!string.IsNullOrEmpty(input.UserId))
+        {
+            filter &= builder.Eq(r => r.UserId, input.UserId);
+        }
+
+        var purchases = await _contentPurchasesCollection
+            .Find(filter)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return purchases ?? [];
+    }
+
+    public async Task<long> CountContentPurchases(GetContentPurchasesInput input)
+    {
+        FilterDefinitionBuilder<Models.ContentPurchase> builder = Builders<Models.ContentPurchase>.Filter;
+        var filter = builder.Empty;
+        
+        if (!string.IsNullOrEmpty(input.ContentId))
+        {
+            filter = builder.Eq(r => r.ContentId, input.ContentId);
+        }
+
+        if (!string.IsNullOrEmpty(input.Type))
+        {
+            filter = builder.Eq(r => r.Type, input.Type);
+        }
+
+        if (!string.IsNullOrEmpty(input.Status))
+        {
+            filter = builder.Eq(r => r.Status, input.Status);
+        }
+
+        if (!string.IsNullOrEmpty(input.UserId))
+        {
+            filter &= builder.Eq(r => r.UserId, input.UserId);
+        }
+
+        var count = await _contentPurchasesCollection.CountDocumentsAsync(filter);
+
+        return count;
+    }
+
 }

@@ -29,6 +29,8 @@ public class UserController : ControllerBase
     private readonly ContentLikeService _contentLikeService;
     private readonly ContentLikeTransformer _contentLikeTransformer;
     private readonly PaymentTransformer _paymentTransformer;
+    private readonly PurchaseContentService _purchaseContentService;
+    private readonly ContentPurchaseTransformer _contentPurchaseTransformer;
 
     public UserController(
         ILogger<UserController> logger,
@@ -42,7 +44,9 @@ public class UserController : ControllerBase
         WalletTransactionTransformer walletTransactionTransformer,
         UserTransformer userTransformer,
         ContentLikeService contentLikeService,
+        ContentPurchaseTransformer contentPurchaseTransformer,
         ContentLikeTransformer contentLikeTransformer,
+        PurchaseContentService purchaseContentService,
         PaymentTransformer paymentTransformer
     )
     {
@@ -59,6 +63,8 @@ public class UserController : ControllerBase
         this._contentLikeTransformer = contentLikeTransformer;
         this._walletTransactionTransformer = walletTransactionTransformer;
         this._paymentTransformer = paymentTransformer;
+        this._contentPurchaseTransformer = contentPurchaseTransformer;
+        this._purchaseContentService = purchaseContentService;
     }
 
     [Authorize]
@@ -803,6 +809,116 @@ public class UserController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
+
+
+    /// <summary>
+    /// Retrieves all user's purchases on the platform
+    /// </summary>
+    /// <param name="userId">user's Id</param>
+    /// <param name="contentId">if you'd want to retrieve by content.</param>
+    /// <param name="type">can be `ONE_TIME`, `WALLET`, `SAVED_CARD`</param>
+    /// <param name="status">can be `PENDING`, ``SUCCESSFUL, ``FAILED, `CANCELLED`</param>
+    /// <param name="populate">Comma separated values to populate fields</param>
+    /// <param name="page">The page to be navigated to</param>
+    /// <param name="pageSize">The number of items on a page</param>
+    /// <param name="sort">To sort response data either by `asc` or `desc`</param>
+    /// <param name="sortBy">What field to sort by.</param>
+    /// <response code="200">Content Likes Retrieved Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [AllowAnonymous]
+    [HttpGet("users/{userId}/purchases")]
+    [Authorize]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<EntityWithPagination<OutputContentPurchase>>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> GetUserContentPurchases(
+        string userId,
+        [FromQuery] int? page,
+        [FromQuery] int? pageSize,
+        [FromQuery] string? sort,
+        [FromQuery] string contentId,
+        [FromQuery] string type,
+        [FromQuery] string status,
+        [FromQuery] string populate = "",
+        [FromQuery] string sortBy = "created_at"
+    )
+    {
+        try
+        {
+            logger.LogInformation("Getting all user's content purchases");
+            var queryFilter = HttpLib.GenerateFilterQuery<Models.ContentPurchase>(page, pageSize, sort, sortBy, populate);
+            var contents = await _purchaseContentService.GetContentPurchases(queryFilter, new GetContentPurchasesInput
+            {
+                UserId = userId,
+                ContentId = contentId,
+                Status = status,
+                Type = type
+            });
+            long count = await _purchaseContentService.CountContentPurchases(new GetContentPurchasesInput
+            {
+                UserId = userId,
+                ContentId = contentId,
+                Status = status,
+                Type = type
+            });
+
+            var outContent = new List<OutputContentPurchase>();
+            foreach (var content in contents)
+            {
+                outContent.Add(await _contentPurchaseTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
+            }
+            var response = HttpLib.GeneratePagination(
+                outContent,
+                count,
+                queryFilter
+            );
+
+            return new ObjectResult(
+                new GetEntityResponse<EntityWithPagination<OutputContentPurchase>>(response, null).Result()
+            )
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError($"Failed to get user's content purchases. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+          {
+              scope.SetTags(new Dictionary<string, string>
+              {
+                    {"action", "Get user's content purchases"},
+                    {"userId", userId},
+                    {"populate", StringLib.SafeString(populate)},
+                    {"page", StringLib.SafeString(page.ToString())},
+                    {"pageSize", StringLib.SafeString(pageSize.ToString())},
+                    {"sort", StringLib.SafeString(sort)},
+                    {"sortBy", sortBy},
+                    {"type", type},
+                    {"status", status},
+                    {"contentId", contentId},
+              });
+              SentrySdk.CaptureException(e);
+          });
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
 
     /// <summary>
     /// Initiate wallet topup.

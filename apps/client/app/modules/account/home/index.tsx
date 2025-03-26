@@ -9,6 +9,7 @@ import { Tabs } from './components/tabs.tsx'
 import { UserTimeline } from './components/timeline.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
+import { DEFAULT_USERNAME_FOR_FETCHING_CREATORS } from '@/constants/index.ts'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
@@ -53,7 +54,10 @@ export const AccountModule = () => {
 					<QuickActions />
 					<UserTimeline />
 					<OtherCreators
-						username={safeString(currentUser?.creator?.username)}
+						username={
+							currentUser?.creator?.username ??
+							DEFAULT_USERNAME_FOR_FETCHING_CREATORS
+						}
 					/>
 				</div>
 			</div>
