@@ -25,7 +25,7 @@ const VerifyAccount = () => {
 	return (
 		<div className="flex h-screen flex-1">
 			<div className="relative hidden w-1/3 lg:block">
-				<div className="z-1 absolute top-0 h-full w-full p-5">
+				<div className="absolute top-0 h-full w-full p-5">
 					<div className="flex h-full flex-col justify-between rounded-2xl bg-zinc-50 px-7 py-5">
 						<div>
 							<Button

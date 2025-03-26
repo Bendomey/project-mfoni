@@ -56,7 +56,7 @@ export const LoginComponent = () => {
 					src="https://images.unsplash.com/photo-1496917756835-20cb06e75b4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1908&q=80"
 					alt="auth page background"
 				/>
-				<div className="z-1 absolute top-0 h-full w-full bg-black/70 p-10">
+				<div className="absolute top-0 h-full w-full bg-black/70 p-10">
 					<div className="flex h-full flex-col justify-between">
 						<div />
 
@@ -78,7 +78,7 @@ export const LoginComponent = () => {
 			</div>
 			<div className="relative flex w-2/3 flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
 				{isLoading ? (
-					<div className="absolute left-0 top-0 z-10 flex h-full w-full items-center justify-center bg-black/70">
+					<div className="absolute left-0 top-0 z-2 flex h-full w-full items-center justify-center bg-black/70">
 						<Loader color="fill-white" />
 					</div>
 				) : null}

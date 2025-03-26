@@ -8,7 +8,7 @@ interface Props {
 
 export function CookiesPolicyBanner({ onClose }: Props) {
 	return (
-		<div className="pointer-events-none fixed inset-x-0 bottom-0 sm:flex sm:justify-center sm:px-6 sm:pb-5 lg:px-8">
+		<div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 sm:flex sm:justify-center sm:px-6 sm:pb-5 lg:px-8">
 			<div className="pointer-events-auto bg-blue-600 px-6 py-4 sm:rounded-xl sm:px-6 sm:py-6">
 				<div className="flex items-center justify-between gap-x-6">
 					<p className="items-center text-lg text-white md:flex">

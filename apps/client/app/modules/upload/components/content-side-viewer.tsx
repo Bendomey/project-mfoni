@@ -50,10 +50,10 @@ export const ContentSideViewer = ({
 			}}
 		>
 			{isUploading ? (
-				<div className="z-1 absolute top-0 h-full w-full animate-pulse rounded-lg bg-black bg-opacity-50" />
+				<div className="absolute top-0 h-full w-full animate-pulse rounded-lg bg-black bg-opacity-50" />
 			) : null}
 			{isRejected ? (
-				<div className="z-1 absolute top-0 h-full w-full rounded-lg bg-red-600 bg-opacity-90">
+				<div className="absolute top-0 h-full w-full rounded-lg bg-red-600 bg-opacity-90">
 					<div className="flex h-full w-full items-center justify-center">
 						<ExclamationTriangleIcon className="h-10 w-auto text-white" />
 					</div>
