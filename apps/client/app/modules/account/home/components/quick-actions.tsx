@@ -1,31 +1,47 @@
 import { Link } from '@remix-run/react'
+import { useMemo } from 'react'
 import { classNames } from '@/lib/classNames.ts'
-
-const teams = [
-	{
-		id: 1,
-		name: 'Purchases',
-		href: '/account/purchases',
-		initial: 'P',
-		current: false,
-	},
-	{
-		id: 2,
-		name: 'Saved Cards',
-		href: '/account/saved-cards',
-		initial: 'C',
-		current: false,
-	},
-]
+import { useAuth } from '@/providers/auth/index.tsx'
 
 export function QuickActions() {
+	const { isACreator } = useAuth()
+
+	const actions = useMemo(() => {
+		const actions = [];
+
+		if(isACreator){
+			actions.push({
+				name: 'Purchases',
+				href: '/account/purchases',
+				initial: 'P',
+				current: false,
+			})
+		} else {
+			actions.push({
+				name: 'Manage your Wallet',
+				href: '/account/wallet',
+				initial: 'W',
+				current: false,
+			})
+		}
+
+		// TODO: bring this back after implmenting save cards.
+		// actions.push({
+		// 	name: 'Saved Cards',
+		// 	href: '/account/saved-cards',
+		// 	initial: 'C',
+		// 	current: false,
+		// })
+		return actions;
+	}, [isACreator])
+
 	return (
 		<div>
 			<div className="text-xs font-semibold leading-6 text-gray-400">
 				Quick Actions
 			</div>
 			<ul className="-mx-2 mt-2 space-y-1">
-				{teams.map((team) => (
+				{actions.map((team) => (
 					<li key={team.name}>
 						<Link
 							prefetch="intent"

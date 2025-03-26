@@ -12,6 +12,7 @@ import { auth } from '@/lib/cookies.config.ts'
 interface AuthContextProps {
 	isLoading: boolean
 	isLoggedIn: boolean
+	isACreator: boolean
 	currentUser: User | null
 	getToken: () => Nullable<string>
 	onUpdateUser: (user: User) => void
@@ -24,6 +25,7 @@ interface AuthContextProps {
 
 export const AuthContext = createContext<AuthContextProps>({
 	isLoading: false,
+	isACreator: false,
 	isLoggedIn: false,
 	onSignin: () => {},
 	onSignout: () => {},
@@ -81,6 +83,7 @@ export const AuthProvider = ({
 			value={{
 				...authController,
 				isLoading: false,
+				isACreator: Boolean(currentUser?.creator),
 				currentUser,
 				isLoggedIn: Boolean(authCipher),
 				isNotVerified:
