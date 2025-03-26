@@ -38,35 +38,42 @@ export function AccountContentsModule() {
 
 	if (isError) {
 		return (
-			<ErrorState
-				message="An error occurred fetching your contents."
-				title="Something happened."
-			>
-				<Button
-					isLink
-					variant="outlined"
-					href={PAGES.AUTHENTICATED_PAGES.ACCOUNT}
-					linkProps={{
-						reloadDocument: true,
-					}}
+			<div className="my-20">
+				<ErrorState
+					message="An error occurred fetching your contents."
+					title="Something happened."
 				>
-					<ArrowPathIcon aria-hidden="true" className="-ml-0.5 mr-1.5 size-5" />
-					Reload
-				</Button>
-			</ErrorState>
+					<Button
+						isLink
+						variant="outlined"
+						href={PAGES.AUTHENTICATED_PAGES.ACCOUNT}
+						linkProps={{
+							reloadDocument: true,
+						}}
+					>
+						<ArrowPathIcon
+							aria-hidden="true"
+							className="-ml-0.5 mr-1.5 size-5"
+						/>
+						Reload
+					</Button>
+				</ErrorState>
+			</div>
 		)
 	}
 
 	if (!data?.total) {
 		return (
-			<EmptyState
-				message="You could start by exploring some contents."
-				title="You have no contents purchased"
-			>
-				<Button isLink href={PAGES.EXPLORE}>
-					Explore
-				</Button>
-			</EmptyState>
+			<div className="my-20">
+				<EmptyState
+					message="You could start by exploring some contents."
+					title="You have no contents purchased"
+				>
+					<Button isLink href={PAGES.EXPLORE}>
+						Explore
+					</Button>
+				</EmptyState>
+			</div>
 		)
 	}
 

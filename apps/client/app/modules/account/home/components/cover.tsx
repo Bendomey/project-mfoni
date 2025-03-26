@@ -167,9 +167,9 @@ export function AccountCover() {
 						<h1 className="truncate text-2xl font-bold text-gray-900">
 							{currentUser?.name}
 						</h1>
-						{currentUser?.role ? (
+						{currentUser?.role === 'CREATOR' ? (
 							<span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-700/10">
-								{currentUser.role === 'CLIENT' ? 'User' : 'Creator'}
+								Creator
 							</span>
 						) : null}
 					</div>

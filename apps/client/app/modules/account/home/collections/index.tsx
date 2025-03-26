@@ -34,36 +34,43 @@ export function AccountCollectionsModule() {
 
 	if (isError) {
 		return (
-			<ErrorState
-				message="An error occurred fetching your collections."
-				title="Something happened."
-			>
-				<Button
-					isLink
-					variant="outlined"
-					href={PAGES.AUTHENTICATED_PAGES.ACCOUNT}
-					linkProps={{
-						reloadDocument: true,
-					}}
+			<div className="my-20">
+				<ErrorState
+					message="An error occurred fetching your collections."
+					title="Something happened."
 				>
-					<ArrowPathIcon aria-hidden="true" className="-ml-0.5 mr-1.5 size-5" />
-					Reload
-				</Button>
-			</ErrorState>
+					<Button
+						isLink
+						variant="outlined"
+						href={PAGES.AUTHENTICATED_PAGES.ACCOUNT}
+						linkProps={{
+							reloadDocument: true,
+						}}
+					>
+						<ArrowPathIcon
+							aria-hidden="true"
+							className="-ml-0.5 mr-1.5 size-5"
+						/>
+						Reload
+					</Button>
+				</ErrorState>
+			</div>
 		)
 	}
 
 	if (!data?.total) {
 		return (
-			<EmptyState
-				message="There are no collections found yet. You could create one now."
-				title="No collections found"
-			>
-				<Button isLink href={PAGES.AUTHENTICATED_PAGES.UPLOAD}>
-					<PlusIcon aria-hidden="true" className="-ml-0.5 mr-1.5 size-5" />
-					Create Collection
-				</Button>
-			</EmptyState>
+			<div className="my-20">
+				<EmptyState
+					message="There are no collections found yet. You could create one now."
+					title="No collections found"
+				>
+					<Button isLink href={PAGES.AUTHENTICATED_PAGES.UPLOAD}>
+						<PlusIcon aria-hidden="true" className="-ml-0.5 mr-1.5 size-5" />
+						Create Collection
+					</Button>
+				</EmptyState>
+			</div>
 		)
 	}
 

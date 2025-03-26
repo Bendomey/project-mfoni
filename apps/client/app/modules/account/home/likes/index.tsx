@@ -40,31 +40,38 @@ export function AccountLikesModule() {
 
 	if (isError) {
 		return (
-			<ErrorState
-				message="An error occurred fetching your likes."
-				title="Something happened."
-			>
-				<Button
-					isLink
-					variant="outlined"
-					href={PAGES.AUTHENTICATED_PAGES.ACCOUNT_LIKES}
-					linkProps={{
-						reloadDocument: true,
-					}}
+			<div className="my-20">
+				<ErrorState
+					message="An error occurred fetching your likes."
+					title="Something happened."
 				>
-					<ArrowPathIcon aria-hidden="true" className="-ml-0.5 mr-1.5 size-5" />
-					Reload
-				</Button>
-			</ErrorState>
+					<Button
+						isLink
+						variant="outlined"
+						href={PAGES.AUTHENTICATED_PAGES.ACCOUNT_LIKES}
+						linkProps={{
+							reloadDocument: true,
+						}}
+					>
+						<ArrowPathIcon
+							aria-hidden="true"
+							className="-ml-0.5 mr-1.5 size-5"
+						/>
+						Reload
+					</Button>
+				</ErrorState>
+			</div>
 		)
 	}
 
 	if (!data?.total) {
 		return (
-			<EmptyState
-				message="There are no likes found yet. Start liking content you love and they'll be added here."
-				title="No likes found"
-			/>
+			<div className="my-20">
+				<EmptyState
+					message="There are no likes found yet. Start liking content you love and they'll be added here."
+					title="No likes found"
+				/>
+			</div>
 		)
 	}
 

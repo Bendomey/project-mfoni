@@ -83,7 +83,9 @@ export const AuthProvider = ({
 			value={{
 				...authController,
 				isLoading: false,
-				isACreator: Boolean(currentUser?.creator),
+				isACreator: Boolean(
+					currentUser?.role === 'CREATOR' && currentUser?.creator,
+				),
 				currentUser,
 				isLoggedIn: Boolean(authCipher),
 				isNotVerified:

@@ -7,9 +7,9 @@ export function QuickActions() {
 	const { isACreator } = useAuth()
 
 	const actions = useMemo(() => {
-		const actions = [];
+		const actions = []
 
-		if(isACreator){
+		if (isACreator) {
 			actions.push({
 				name: 'Purchases',
 				href: '/account/purchases',
@@ -32,7 +32,7 @@ export function QuickActions() {
 		// 	initial: 'C',
 		// 	current: false,
 		// })
-		return actions;
+		return actions
 	}, [isACreator])
 
 	return (
