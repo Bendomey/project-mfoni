@@ -1,4 +1,3 @@
-
 interface ContentPurchase {
 	id: string
 	amount: number
@@ -22,7 +21,7 @@ interface ContentPurchase {
 
 interface FetchContentPurchaseFilter {
 	type?: 'ONE_TIME' | 'WALLET' | 'SAVED_CARD'
-    status?: 'PENDING' | 'SUCCESSFUL' | 'FAILED' | 'CANCELLED'
-    contentId?: string
-    userId: string
+	status?: 'PENDING' | 'SUCCESSFUL' | 'FAILED' | 'CANCELLED'
+	contentId?: string
+	userId: string
 }

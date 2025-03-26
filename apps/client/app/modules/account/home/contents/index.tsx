@@ -14,7 +14,7 @@ export function AccountContentsModule() {
 	const { data, isError, isPending } = useGetContentPurchases({
 		filters: {
 			userId: safeString(currentUser?.id),
-		},	
+		},
 		pagination: { page: 0, per: 50 },
 		populate: ['contentPurchase.CONTENT', 'content.createdBy'],
 	})
@@ -75,11 +75,9 @@ export function AccountContentsModule() {
 			{data?.rows.map((contentPurchase, index) => (
 				<Fragment key={index}>
 					<div className="mb-5 break-inside-avoid">
-						{
-							contentPurchase.content ? (
-								<Content content={contentPurchase.content} />
-							) : null
-						}
+						{contentPurchase.content ? (
+							<Content content={contentPurchase.content} />
+						) : null}
 					</div>
 				</Fragment>
 			))}

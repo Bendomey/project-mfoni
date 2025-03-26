@@ -90,4 +90,3 @@ interface FetchContentFilter {
 	license?: string
 	is_featured?: boolean
 }
-
