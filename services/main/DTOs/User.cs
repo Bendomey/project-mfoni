@@ -16,3 +16,12 @@ public class TopupWalletInput
     [Required]
     public required Int64 Amount { get; set; }
 }
+
+
+public class UpdateCreatorBasicDetails
+{
+    public Models.SocialMedia[] SocialMedia { get; set; } = [];
+    public string[] Interests { get; set; } = [];
+    public string? About { get; set; }
+    public string? Address { get; set; }
+}

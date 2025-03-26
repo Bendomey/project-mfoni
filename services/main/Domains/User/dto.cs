@@ -83,3 +83,12 @@ public class TopupWalletOutput
     public required Models.WalletTransaction WalletTransaction { get; set; }
 }
 
+
+public class UpdateCreatorBasicDetails
+{
+    public required string CreatorId { get; set; }
+    public Models.SocialMedia[] SocialMedia { get; set; } = [];
+    public string[] Interests { get; set; } = [];
+    public string? About { get; set; }
+    public string? Address { get; set; }
+}

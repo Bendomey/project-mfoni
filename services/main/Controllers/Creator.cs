@@ -279,5 +279,171 @@ public class CreatorController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Update creator basic details
+    /// </summary>
+    /// <response code="200">Creator Updated Successfully</response>
+    /// <response code="401">Unauthorize</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize]
+    [HttpPatch]
+    [ProducesResponseType(typeof(OutputResponse<Models.Creator>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateCreatorBasicDetails([FromBody] Domains.UpdateCreatorBasicDetails input)
+    {
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+
+            _logger.LogInformation("Updating creator: " + input);
+            var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
+            var creatorUpdates = await _creatorService.UpdateCreatorBasicInfo(new Domains.UpdateCreatorBasicDetails
+            {
+                CreatorId = creator.Id,
+                About = input.About,
+                Address = input.Address,
+                Interests = input.Interests,
+                SocialMedia = input.SocialMedia
+            });
+
+            return new ObjectResult(new GetEntityResponse<Models.Creator>(creatorUpdates, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<Models.ReportContentCase>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to update creator. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Update creator"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                    {"body", StringLib.SafeString(input.ToString())},
+                });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
+
+    /// <summary>
+    /// Enable creator website
+    /// </summary>
+    /// <response code="200">Creator Updated Successfully</response>
+    /// <response code="401">Unauthorize</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize]
+    [HttpPatch("website/enable")]
+    [ProducesResponseType(typeof(OutputResponse<Models.Creator>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> EnableCreatorWebsite()
+    {
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+
+            var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
+            _logger.LogInformation("Enabling creator website: " + creator.Id);
+            if (creator.WebsiteDisabledAt is null)
+            {
+                throw new HttpRequestException("CreatorWebsiteAlreadyEnabled");
+            }
+
+            var creatorUpdates = await _creatorService.ToggleWebsiteViewing(currentUser.Id);
+
+            return new ObjectResult(new GetEntityResponse<Models.Creator>(creatorUpdates, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<Models.ReportContentCase>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to enable creator website. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "enable creator website"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
+    /// <summary>
+    /// Disable creator website
+    /// </summary>
+    /// <response code="200">Creator Updated Successfully</response>
+    /// <response code="401">Unauthorize</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize]
+    [HttpPatch("website/disable")]
+    [ProducesResponseType(typeof(OutputResponse<Models.Creator>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DisableCreatorWebsite()
+    {
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+
+            var creator = await _creatorService.GetCreatorByUserId(currentUser.Id);
+            _logger.LogInformation("Disabling creator website: " + creator.Id);
+            if (creator.WebsiteDisabledAt is not null)
+            {
+                throw new HttpRequestException("CreatorWebsiteAlreadyDisabled");
+            }
+
+            var creatorUpdates = await _creatorService.ToggleWebsiteViewing(currentUser.Id);
+
+            return new ObjectResult(new GetEntityResponse<Models.Creator>(creatorUpdates, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<Models.ReportContentCase>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to disable creator website. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "disable creator website"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
 }
 

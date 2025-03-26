@@ -225,6 +225,38 @@ public class CreatorService
         };
     }
 
+    public async Task<Creator> UpdateCreatorBasicInfo(UpdateCreatorBasicDetails input)
+    {
+        var creator = await GetCreatorById(input.CreatorId);
+
+        creator.About = input.About;
+        creator.Interests = input.Interests;
+        creator.SocialMedia = input.SocialMedia;
+        creator.UpdatedAt = DateTime.UtcNow;
+
+        await __creatorCollection.ReplaceOneAsync(creator => creator.Id == creator.Id, creator);
+
+        return creator;
+    }
+
+    public async Task<Creator> ToggleWebsiteViewing(string creatorId)
+    {
+        var creator = await GetCreatorById(creatorId);
+
+        if (creator.WebsiteDisabledAt is null)
+        {
+            creator.WebsiteDisabledAt = DateTime.UtcNow;
+        }
+        else
+        {
+            creator.WebsiteDisabledAt = null;
+        }
+
+        await __creatorCollection.ReplaceOneAsync(creator => creator.Id == creator.Id, creator);
+
+        return creator;
+    }
+
     private void SendNotification(Models.User user, string subject, string body)
     {
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
