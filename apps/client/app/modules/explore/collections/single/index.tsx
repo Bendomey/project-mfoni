@@ -133,22 +133,20 @@ export function CollectionModule() {
 							{collectionContent.content ? (
 								<>
 									<Content content={collectionContent.content} />
-									{
-										isCollectionMine ? (
-											<div className="mt-2 flex justify-end">
-												<Button
-													onClick={() => {
-														setSelectedCollectionContent(collectionContent)
-														removeContentsModalState.onToggle()
-													}}
-													size="sm"
-													color="dangerGhost"
-												>
-													Remove
-												</Button>
-											</div>
-										) : null
-									}
+									{isCollectionMine ? (
+										<div className="mt-2 flex justify-end">
+											<Button
+												onClick={() => {
+													setSelectedCollectionContent(collectionContent)
+													removeContentsModalState.onToggle()
+												}}
+												size="sm"
+												color="dangerGhost"
+											>
+												Remove
+											</Button>
+										</div>
+									) : null}
 								</>
 							) : null}
 						</div>

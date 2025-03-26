@@ -48,6 +48,7 @@ export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
 			path: location.pathname,
 		}),
 		origin: data?.origin,
+		keywords: 'images, portfolio, upload, pricing',
 	})
 
 	return meta

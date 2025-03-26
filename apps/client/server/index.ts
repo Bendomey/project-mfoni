@@ -22,7 +22,6 @@ const MODE = process.env.NODE_ENV
 const getHost = (req: { get: (key: string) => string | undefined }) =>
 	req.get('X-Forwarded-Host') ?? req.get('host') ?? ''
 
-
 const viteDevServer =
 	process.env.NODE_ENV === 'production'
 		? undefined
@@ -100,7 +99,6 @@ app.use((req, res, next) => {
 	}
 	next()
 })
-
 
 // no ending slashes for SEO reasons
 app.get('*', (req, res, next) => {

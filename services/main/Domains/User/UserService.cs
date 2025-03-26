@@ -138,8 +138,9 @@ public class UserService
             throw new HttpRequestException("PhoneNumberAlreadyVerified");
         }
 
-        var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
-        if (code != verificationCode)
+        var verificationCode = await _cacheProvider.GetFromCache<Int64>($"verify-{user.Id}");
+
+        if (code != verificationCode.ToString())
         {
             throw new HttpRequestException("CodeIsIncorrectOrHasExpired");
         }
@@ -187,7 +188,10 @@ public class UserService
                 From = _appConstantsConfiguration.EmailFrom,
                 Email = emailAddress,
                 Subject = EmailTemplates.VerifyAccountSubject,
-                Message = EmailTemplates.VerifyPhoneNumberBody.Replace("{code}", code).Replace("{name}", user.Name),
+                Message = EmailTemplates.VerifyPhoneNumberBody
+                    .Replace("{code}", code)
+                    .Replace("{name}", user.Name)
+                    .Replace("{validity}", "1 hour"),
                 ApiKey = _appConstantsConfiguration.ResendApiKey
             }
         );
@@ -208,8 +212,8 @@ public class UserService
             throw new HttpRequestException("EmailAddressAlreadyVerified");
         }
 
-        var verificationCode = await _cacheProvider.GetFromCache<string>($"verify-{user.Id}");
-        if (code != verificationCode)
+        var verificationCode = await _cacheProvider.GetFromCache<Int64>($"verify-{user.Id}");
+        if (code != verificationCode.ToString())
         {
             throw new HttpRequestException("CodeIsIncorrectOrHasExpired");
         }
