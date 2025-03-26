@@ -16,7 +16,7 @@ export function AccountContentsModule() {
 			userId: safeString(currentUser?.id),
 		},
 		pagination: { page: 0, per: 50 },
-		populate: ['contentPurchase.CONTENT', 'content.createdBy'],
+		populate: ['contentPurchase.content', 'content.createdBy'],
 	})
 
 	if (isPending) {
