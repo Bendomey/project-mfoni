@@ -1,6 +1,5 @@
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { useGetUserContentLikes } from '@/api/users/index.ts'
-import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Content } from '@/components/Content/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
@@ -70,16 +69,14 @@ export function AccountLikesModule() {
 	}
 
 	return (
-		<FadeIn>
-			<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8">
-				{data.rows.map((contentLike, index) => (
-					<div className="mb-5" key={index}>
-						{contentLike.content ? (
-							<Content content={contentLike.content} showCreator={false} />
-						) : null}
-					</div>
-				))}
-			</div>
-		</FadeIn>
+		<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8">
+			{data.rows.map((contentLike, index) => (
+				<div className="mb-5" key={index}>
+					{contentLike.content ? (
+						<Content content={contentLike.content} showCreator={false} />
+					) : null}
+				</div>
+			))}
+		</div>
 	)
 }

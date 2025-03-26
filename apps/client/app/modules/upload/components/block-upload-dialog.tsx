@@ -1,8 +1,8 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/24/solid'
+import { useNavigate } from '@remix-run/react'
 import { Button } from '@/components/button/index.tsx'
 import { Modal } from '@/components/modal/index.tsx'
 import { useAuth } from '@/providers/auth/index.tsx'
-import { useNavigate } from '@remix-run/react'
 
 interface Props {
 	isOpened: boolean
@@ -29,7 +29,7 @@ export function BlockUploadDialog({ isOpened }: Props) {
 
 	return (
 		<Modal
-			onClose={() => { }}
+			onClose={() => {}}
 			canBeClosedWithBackdrop={false}
 			className="w-full md:w-1/2 lg:w-1/3"
 			isOpened={isOpened}
@@ -48,7 +48,12 @@ export function BlockUploadDialog({ isOpened }: Props) {
 					</Button>
 				</div>
 				<div className="mt-5 md:mt-3">
-					<Button onClick={() => navigate(-1)} className='hover:underline' size='sm' variant='unstyled'>
+					<Button
+						onClick={() => navigate(-1)}
+						className="hover:underline"
+						size="sm"
+						variant="unstyled"
+					>
 						Go Back
 					</Button>
 				</div>

@@ -4,6 +4,7 @@ interface Content {
 	slug: string
 	type: 'IMAGE'
 	isFeatured: boolean
+	isPurchased: boolean
 	status: IContentStatus
 	rejectedAt: Nullable<Date>
 	doneAt: Nullable<Date>
@@ -16,8 +17,6 @@ interface Content {
 	visibility: IContentVisibility
 	amount: number
 	currentUserLike: Nullable<ContentLike>
-	contentPurchaseId: Nullable<string>
-	contentPurchase: Nullable<ContentPurchase>
 	createdById: string
 	imageProcessingResponse: ImageProcessingResponse
 	createdBy: Nullable<BasicCreator>

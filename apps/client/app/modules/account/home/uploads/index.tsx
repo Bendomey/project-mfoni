@@ -1,7 +1,6 @@
 import { ArrowPathIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { Fragment } from 'react'
 import { useGetCollectionContentsBySlug } from '@/api/collections/index.ts'
-import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Content } from '@/components/Content/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
@@ -76,35 +75,33 @@ export function AccountUploadsModule() {
 	}
 
 	return (
-		<FadeIn>
-			<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8">
-				{data.rows.map((collectionContent, index) => (
-					<Fragment key={index}>
-						{collectionContent.content ? (
-							<div className="mb-5 break-inside-avoid">
-								<Content
-									content={collectionContent.content}
-									showCreator={false}
-								/>
-								<div className="mt-1 flex items-center gap-2">
-									{collectionContent.content.tags?.map((tag) => (
-										<Button
-											key={tag.id}
-											size="sm"
-											isLink
-											href={PAGES.TAG.replace(':tag', tag.slug)}
-											variant="outlined"
-											className="rounded"
-										>
-											{tag.name}
-										</Button>
-									))}
-								</div>
+		<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8">
+			{data.rows.map((collectionContent, index) => (
+				<Fragment key={index}>
+					{collectionContent.content ? (
+						<div className="mb-5 break-inside-avoid">
+							<Content
+								content={collectionContent.content}
+								showCreator={false}
+							/>
+							<div className="mt-1 flex items-center gap-2">
+								{collectionContent.content.tags?.map((tag) => (
+									<Button
+										key={tag.id}
+										size="sm"
+										isLink
+										href={PAGES.TAG.replace(':tag', tag.slug)}
+										variant="outlined"
+										className="rounded"
+									>
+										{tag.name}
+									</Button>
+								))}
 							</div>
-						) : null}
-					</Fragment>
-				))}
-			</div>
-		</FadeIn>
+						</div>
+					) : null}
+				</Fragment>
+			))}
+		</div>
 	)
 }

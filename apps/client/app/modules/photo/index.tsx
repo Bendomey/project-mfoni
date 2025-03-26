@@ -56,7 +56,7 @@ export const PhotoModule = () => {
 			return true
 		}
 
-		if (content?.amount && content?.amount > 0 && content?.contentPurchaseId) {
+		if (content?.amount && content?.amount > 0 && content?.isPurchased) {
 			return true
 		}
 

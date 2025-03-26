@@ -58,3 +58,11 @@ public class PurchaseContentOutput
     public Models.Payment? Payment { get; set; }
     public required Models.ContentPurchase ContentPurchase { get; set; }
 }
+
+public class GetContentPurchasesInput
+{
+    public string? ContentId { get; set; }
+    public string? Type { get; set; }
+    public string? Status { get; set; }
+    public string? UserId { get; set; }
+}
