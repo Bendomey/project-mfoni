@@ -12,6 +12,7 @@ export const RECENT_SEARCHES_KEY = 'mfoni-recent-searches'
 export const QUERY_KEYS = {
 	CURRENT_USER: 'current-user',
 	TAGS: 'tags',
+	CONTENT_PURCHASES: 'content-purchases',
 	WALLET_TRANSACTIONS: 'wallet-transactions',
 	CREATOR_SUBSCRIPTIONS: 'creator-subscriptions',
 	CREATOR_APPLICATIONS: 'creator-applications',

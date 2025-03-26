@@ -23,7 +23,7 @@ public class PopulateKeys
     public static readonly string CONTENT_PURCHASE_PAYMENT = "contentPurchase.payment";
     public static readonly string CONTENT_PURCHASE_SAVED_CARD = "contentPurchase.savedCard";
     public static readonly string CONTENT_PURCHASE_CREATED_BY = "contentPurchase.createdBy";
-    public static readonly string CONTENT_PURCHASE_CONTENT = "contentPurchase.CONTENT";
+    public static readonly string CONTENT_PURCHASE_CONTENT = "contentPurchase.content";
     public static readonly string CONTENT_PURCHASE_WALLET_FROM = "contentPurchase.wallet.from";
     public static readonly string CONTENT_PURCHASE_WALLET_TO = "contentPurchase.wallet.to";
 }
