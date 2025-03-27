@@ -71,7 +71,11 @@ export const AccountCover = ({ data }: { data: EnhancedCreator }) => {
           <h1 className="truncate text-2xl font-bold text-gray-900">
             {data.name}
           </h1>
-          <p>{data.about}</p>
+          {
+            data.about ? (
+              <p className="text-sm mt-1">{data.about}</p>
+            ) : null
+          }
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-x-4">
           <div className="flex items-center gap-1">

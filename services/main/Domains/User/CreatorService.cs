@@ -240,7 +240,7 @@ public class CreatorService
         await __creatorCollection.ReplaceOneAsync(creator => creator.Id == creator.Id, creator);
 
         _ = _cacheProvider.EntityChanged(new[] {
-            $"users.{creator.UserId}",
+            $"{CacheProvider.CacheEntities["creators"]}.*",
         });
 
         return creator;
@@ -262,7 +262,7 @@ public class CreatorService
         await __creatorCollection.ReplaceOneAsync(creator => creator.Id == creator.Id, creator);
 
         _ = _cacheProvider.EntityChanged(new[] {
-            $"users.{creator.UserId}",
+            $"{CacheProvider.CacheEntities["creators"]}.*",
         });
 
         return creator;

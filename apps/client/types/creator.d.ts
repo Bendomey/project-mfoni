@@ -22,6 +22,9 @@ interface Creator {
   status: "ACTIVE" | "SUSPENDED";
   userId: string;
   username: string;
+  address?: string;
+  about: Nullable<string>;
+  interests: Array<string>;
   socialMedia: Array<CreatorSocialMedia>;
   subscription: CreatorSubscription;
   createdAt: Date;
