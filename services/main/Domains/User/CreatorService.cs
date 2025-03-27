@@ -16,13 +16,15 @@ public class CreatorService
     private readonly UserService _userService;
     private readonly SubscriptionService _subscriptionService;
     private readonly AppConstants _appConstantsConfiguration;
+    private readonly CacheProvider _cacheProvider;
 
     public CreatorService(
        ILogger<CreatorService> logger,
        DatabaseSettings databaseConfig,
        IOptions<AppConstants> appConstants,
         UserService userService,
-        SubscriptionService subscriptionService
+        SubscriptionService subscriptionService,
+        CacheProvider cacheProvider
    )
     {
         _logger = logger;
@@ -41,6 +43,7 @@ public class CreatorService
         _userService = userService;
         _subscriptionService = subscriptionService;
         _appConstantsConfiguration = appConstants.Value;
+        _cacheProvider = cacheProvider;
 
         logger.LogDebug("Creator service initialized");
     }
@@ -236,6 +239,10 @@ public class CreatorService
 
         await __creatorCollection.ReplaceOneAsync(creator => creator.Id == creator.Id, creator);
 
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"users.{creator.UserId}",
+        });
+
         return creator;
     }
 
@@ -253,6 +260,10 @@ public class CreatorService
         }
 
         await __creatorCollection.ReplaceOneAsync(creator => creator.Id == creator.Id, creator);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"users.{creator.UserId}",
+        });
 
         return creator;
     }
