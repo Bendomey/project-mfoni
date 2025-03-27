@@ -1,1 +1,1 @@
-export * from './FadeIn.tsx'
+export * from "./FadeIn.tsx";

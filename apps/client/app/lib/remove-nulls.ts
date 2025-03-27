@@ -2,7 +2,7 @@
  * @module RemoveNulls
  */
 
-export type ObjectT = Record<string, string | undefined | null | number>
+export type ObjectT = Record<string, string | undefined | null | number>;
 
 /**
  * Remove all falsy keys(null/undefined).
@@ -10,13 +10,13 @@ export type ObjectT = Record<string, string | undefined | null | number>
  * @returns {object} - Keys with values.
  */
 export function removeNulls(obj: ObjectT): Partial<ObjectT> {
-	const nonNullableObject: Partial<ObjectT> = {}
-	Object.keys(obj).forEach((instance) => {
-		if (obj[instance] !== null && obj[instance] !== undefined) {
-			nonNullableObject[instance] = obj[instance]
-		}
-	})
-	return nonNullableObject
+  const nonNullableObject: Partial<ObjectT> = {};
+  Object.keys(obj).forEach((instance) => {
+    if (obj[instance] !== null && obj[instance] !== undefined) {
+      nonNullableObject[instance] = obj[instance];
+    }
+  });
+  return nonNullableObject;
 }
 
 /**
@@ -25,12 +25,12 @@ export function removeNulls(obj: ObjectT): Partial<ObjectT> {
  * @returns {object} - Keys with stringified values.
  */
 export function stringifyValues(obj: Partial<ObjectT>): Record<string, string> {
-	const stringifiedObject: Record<string, string> = {}
-	Object.keys(obj).forEach((instance) => {
-		stringifiedObject[instance] = String(obj[instance])
-	})
+  const stringifiedObject: Record<string, string> = {};
+  Object.keys(obj).forEach((instance) => {
+    stringifiedObject[instance] = String(obj[instance]);
+  });
 
-	return stringifiedObject
+  return stringifiedObject;
 }
 
 /**
@@ -39,5 +39,5 @@ export function stringifyValues(obj: Partial<ObjectT>): Record<string, string> {
  * @returns {object} - Keys with stringified values.
  */
 export function cleanParams(obj: ObjectT): Record<string, string> {
-	return stringifyValues(removeNulls(obj))
+  return stringifyValues(removeNulls(obj));
 }
