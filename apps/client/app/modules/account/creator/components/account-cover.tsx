@@ -21,6 +21,8 @@ export const AccountCover = ({ data }: { data: EnhancedCreator }) => {
 
   const isYourOwnAccount = currentUser?.id === data.userId;
 
+  console.log(data);
+
   return (
     <div className="rounded-md border border-gray-200 bg-white pb-5">
       <div>
