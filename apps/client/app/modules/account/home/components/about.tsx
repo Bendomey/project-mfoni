@@ -8,7 +8,7 @@ import { errorToast, successToast } from "@/lib/custom-toast-functions.tsx";
 import { safeString } from "@/lib/strings.ts";
 import { useAuth } from "@/providers/auth/index.tsx";
 
-const defaulIinterests = [
+const defaultInterests = [
   "set",
   "your",
   "interests",
@@ -84,7 +84,7 @@ export function CreatorAbout() {
 
   if (mode === "VIEW") {
     const ints =
-      watch("interests").length > 0 ? watch("interests") : defaulIinterests;
+      watch("interests").length > 0 ? watch("interests") : defaultInterests;
     interestsContent = (
       <>
         {ints.map((interest, index) => (
