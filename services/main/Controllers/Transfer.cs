@@ -312,7 +312,7 @@ public class TransferController : ControllerBase
           {
               scope.SetTags(new Dictionary<string, string>
               {
-                    {"action", "Get user's content purchases"},
+                    {"action", "Get user's transfer recipients"},
                     {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
                     {"populate", StringLib.SafeString(populate)},
                     {"page", StringLib.SafeString(page.ToString())},
