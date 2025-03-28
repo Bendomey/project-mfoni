@@ -192,7 +192,7 @@ public class TransferService
         {
             Reference = input.Reference,
             Recipient = recipient.RecipientCode,
-            Reason = input.Reason ?? "Transfering from my mfoni wallet",
+            Reason = input.Reason ?? "Transferring from my mfoni wallet",
             Amount = input.Amount,
         });
 
@@ -221,7 +221,7 @@ public class TransferService
             Reference = response.Reference,
             RecipientCode = recipient.RecipientCode,
             TransferCode = response.TransferCode,
-            Reason = input.Reason ?? "Transfering from my mfoni wallet",
+            Reason = input.Reason ?? "Transferring from my mfoni wallet",
             MetaData = new Models.TransferMetaData
             {
                 WalletTransactionId = walletTransaction.Id,
