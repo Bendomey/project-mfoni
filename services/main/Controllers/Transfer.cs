@@ -174,7 +174,7 @@ public class TransferController : ControllerBase
     [HttpDelete("recipients/{recipientId}")]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(OutputResponse<AnyType?>), StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> CreateRecipient(
+    public async Task<IActionResult> DeleteRecipient(
         [FromRoute] string recipientId
     )
     {
