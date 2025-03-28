@@ -17,7 +17,6 @@ public class TransferRecipient
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
 
-    [BsonId]
     [BsonElement("created_by_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public required string CreatedById { get; set; } // user id
@@ -48,6 +47,9 @@ public class TransferRecipient
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    [BsonElement("deleted_at")]
+    public DateTime? DeletedAt { get; set; }
 
     public static async Task EnsureIndexesAsync(IMongoCollection<TransferRecipient> collection)
     {

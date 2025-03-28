@@ -55,3 +55,29 @@ public class InitializePaymentInput
     public string? WalletId { get; set; }
     public required InitPaymentInput PaystackInput { get; set; }
 }
+
+public class CreateTransferRecipientInput
+{
+    public required string CreatedById { get; set; }
+    public required string Type { get; set; }
+    public required string RecipientCode { get; set; }
+    public string? Currency { get; set; }
+    public required string AccountNumber { get; set; }
+    public required string AccountName { get; set; }
+    public required string BankName { get; set; }
+    public required string BankCode { get; set; }
+}
+
+
+public class DeleteTransferRecipientInput
+{
+    public required string CreatedById { get; set; }
+    public required string TransferRecipientId { get; set; }
+}
+
+
+public class GetTransferRecipienstInput
+{
+    public string? CreatedById { get; set; }
+    public string? BankCode { get; set; }
+}

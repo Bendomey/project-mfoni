@@ -909,9 +909,9 @@ public class UserController : ControllerBase
                     {"pageSize", StringLib.SafeString(pageSize.ToString())},
                     {"sort", StringLib.SafeString(sort)},
                     {"sortBy", sortBy},
-                    {"type", type},
-                    {"status", status},
-                    {"contentId", contentId},
+                    {"type", StringLib.SafeString(type)},
+                    {"status", StringLib.SafeString(status)},
+                    {"contentId", StringLib.SafeString(contentId)},
               });
               SentrySdk.CaptureException(e);
           });

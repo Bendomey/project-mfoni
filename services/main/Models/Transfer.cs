@@ -12,14 +12,12 @@ public static class TransferStatus
     public static readonly string REVERSED = "REVERSED";
 }
 
-
 public class Transfer
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
 
-    [BsonId]
     [BsonElement("transfer_recipient_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public required string TransferRecipientId { get; set; }

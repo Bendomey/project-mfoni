@@ -152,6 +152,7 @@ builder.Services.AddSingleton<CreatorService>();
 builder.Services.AddSingleton<WalletService>();
 builder.Services.AddSingleton<SubscriptionService>();
 builder.Services.AddSingleton<PaymentService>();
+builder.Services.AddSingleton<TransferService>();
 
 // search services
 builder.Services.AddSingleton<SearchTagService>();

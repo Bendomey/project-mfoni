@@ -3,7 +3,6 @@ using main.Configuratons;
 using main.Lib;
 using main.Models;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace main.Domains;
