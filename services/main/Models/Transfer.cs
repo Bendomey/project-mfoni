@@ -18,12 +18,19 @@ public class Transfer
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
 
+    [BsonElement("created_by_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public required string CreatedById { get; set; }
+
     [BsonElement("transfer_recipient_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public required string TransferRecipientId { get; set; }
 
     [BsonElement("reference")]
     public required string Reference { get; set; }
+
+    [BsonElement("amount")]
+    public required Int64 Amount { get; set; }
 
     [BsonElement("recipient_code")]
     public required string RecipientCode { get; set; }

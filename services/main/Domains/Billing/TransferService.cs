@@ -220,6 +220,8 @@ public class TransferService
             TransferRecipientId = recipient.Id,
             Reference = response.Reference,
             RecipientCode = recipient.RecipientCode,
+            Amount = input.Amount,
+            CreatedById = input.CreatedById,
             TransferCode = response.TransferCode,
             Reason = input.Reason ?? "Transferring from my mfoni wallet",
             MetaData = new Models.TransferMetaData
@@ -233,4 +235,100 @@ public class TransferService
         return transfer;
 
     }
+
+    public async Task VerifySuccessTransfer(string Reference)
+    {
+        // find transfer by reference
+        var transfer = await _transferCollection.Find(x => x.Reference == Reference).FirstOrDefaultAsync();
+
+        if (transfer is null)
+        {
+            throw new Exception("TransferNotFound");
+        }
+
+        // find wallet transaction by id
+        var walletTransaction = await _walletTransactionCollection.Find(x => x.Id == transfer.MetaData.WalletTransactionId).FirstOrDefaultAsync();
+
+        if (walletTransaction is null)
+        {
+            throw new Exception("WalletTransactionNotFound");
+        }
+
+        // update wallet transaction status
+        await _walletTransactionCollection.UpdateOneAsync(
+            x => x.Id == walletTransaction.Id,
+            Builders<Models.WalletTransaction>.Update
+                .Set(x => x.TransferId, transfer.Id)
+                .Set(x => x.Status, Models.WalletTransactionStatus.SUCCESSFUL)
+                .Set(x => x.SuccessfulAt, DateTime.UtcNow)
+                .Set(x => x.UpdatedAt, DateTime.UtcNow)
+        );
+
+        var user = await _userCollection.Find(x => x.Id == walletTransaction.UserId).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            throw new Exception("UserNotFound");
+        }
+
+        user.Wallet -= transfer.Amount;
+        await _userCollection.ReplaceOneAsync(user => user.Id == transfer.CreatedById, user);
+
+        await _transferCollection.UpdateOneAsync(
+            x => x.Id == transfer.Id,
+            Builders<Models.Transfer>.Update
+                .Set(x => x.Status, Models.TransferStatus.SUCCESSFUL)
+                .Set(x => x.SuccessfulAt, DateTime.UtcNow)
+                .Set(x => x.UpdatedAt, DateTime.UtcNow)
+        );
+    }
+
+    public async Task VerifyFailedTransfer(string Reference)
+    {
+        // find transfer by reference
+        var transfer = await _transferCollection.Find(x => x.Reference == Reference).FirstOrDefaultAsync();
+
+        if (transfer is null)
+        {
+            throw new Exception("TransferNotFound");
+        }
+
+        // find wallet transaction by id
+        var walletTransaction = await _walletTransactionCollection.Find(x => x.Id == transfer.MetaData.WalletTransactionId).FirstOrDefaultAsync();
+
+        if (walletTransaction is null)
+        {
+            throw new Exception("WalletTransactionNotFound");
+        }
+
+        // update wallet transaction status
+        await _walletTransactionCollection.UpdateOneAsync(
+            x => x.Id == walletTransaction.Id,
+            Builders<Models.WalletTransaction>.Update
+                .Set(x => x.TransferId, transfer.Id)
+                .Set(x => x.Status, Models.WalletTransactionStatus.FAILED)
+                .Set(x => x.FailedAt, DateTime.UtcNow)
+                .Set(x => x.UpdatedAt, DateTime.UtcNow)
+        );
+
+        var user = await _userCollection.Find(x => x.Id == walletTransaction.UserId).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            throw new Exception("UserNotFound");
+        }
+
+        user.BookWallet += transfer.Amount;
+        await _userCollection.ReplaceOneAsync(user => user.Id == transfer.CreatedById, user);
+
+
+        await _transferCollection.UpdateOneAsync(
+            x => x.Id == transfer.Id,
+            Builders<Models.Transfer>.Update
+                .Set(x => x.Status, Models.TransferStatus.FAILED)
+                .Set(x => x.FailedAt, DateTime.UtcNow)
+                .Set(x => x.UpdatedAt, DateTime.UtcNow)
+        );
+    }
+
+    public async Task VerifyReverseTransfer(string Reference)
+    { }
 }
