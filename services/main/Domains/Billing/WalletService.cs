@@ -3,7 +3,6 @@ using main.Configuratons;
 using main.Lib;
 using main.Models;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace main.Domains;
@@ -86,6 +85,7 @@ public class WalletService
                     .Set(wallet => wallet.PaymentId, input.PaymentId)
                     .Set(wallet => wallet.Status, WalletTransactionStatus.SUCCESSFUL)
                     .Set(wallet => wallet.SuccessfulAt, DateTime.UtcNow)
+                    .Set(wallet => wallet.UpdatedAt, DateTime.UtcNow)
             );
 
             walletTransation = await _walletTransationCollection.Find(wallet => wallet.Id == input.WalletTransactionId)

@@ -16,6 +16,8 @@ public static class WalletTransactionReasonForTransfer
     public static readonly string SUBSCRIPTION_REFUND = "SUBSCRIPTION_REFUND";
     public static readonly string CONTENT_PURCHASE = "CONTENT_PURCHASE";
     public static readonly string TOPUP = "TOPUP";
+    public static readonly string TRANSFER_TO_BANK_OR_MOMO = "TRANSFER_TO_BANK_OR_MOMO";
+    public static readonly string TRANSFER_BETWEEN_USERS = "TRANSFER_BETWEEN_USERS";
 }
 
 public static class WalletTransactionStatus
@@ -50,6 +52,11 @@ public class WalletTransaction
     [BsonElement("payment_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? PaymentId { get; set; }
+
+    // pass this when you withdraw with your momo/card successfully
+    [BsonElement("transfer_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? TransferId { get; set; }
 
     [BsonElement("status")]
     public string Status { get; init; } = WalletTransactionStatus.PENDING;
@@ -91,6 +98,11 @@ public class WalletTransaction
             // Index on PaymentId for fast lookups
             new CreateIndexModel<WalletTransaction>(
                 Builders<WalletTransaction>.IndexKeys.Ascending(x => x.PaymentId)
+            ),
+
+            // Index on TransferId for fast lookups
+            new CreateIndexModel<WalletTransaction>(
+                Builders<WalletTransaction>.IndexKeys.Ascending(x => x.TransferId)
             ),
 
             // Index on CreatedAt for sorting

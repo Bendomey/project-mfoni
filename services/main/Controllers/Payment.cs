@@ -15,16 +15,19 @@ public class PaymentController : ControllerBase
 {
     private readonly ILogger<PaymentController> _logger;
     private readonly PaymentService _paymentService;
+    private readonly TransferService _transferService;
     private readonly AppConstants _appConstantsConfiguration;
 
     public PaymentController(
         ILogger<PaymentController> logger,
         IOptions<AppConstants> appConstants,
-        PaymentService paymentService
+        PaymentService paymentService,
+        TransferService transferService
     )
     {
         _logger = logger;
         _paymentService = paymentService;
+        _transferService = transferService;
         _appConstantsConfiguration = appConstants.Value;
     }
 
@@ -61,6 +64,60 @@ public class PaymentController : ControllerBase
                                 scope.SetTags(new Dictionary<string, string>
                                 {
                                         {"action", "Verify Payment"},
+                                        {"reference", eventData.Data.Reference},
+                                });
+                                SentrySdk.CaptureException(e);
+                            });
+                        }
+                        break;
+                    case "transfer.success":
+                        try
+                        {
+                            await _transferService.VerifySuccessTransfer(eventData.Data.Reference);
+                        }
+                        catch (System.Exception e)
+                        {
+                            SentrySdk.ConfigureScope(scope =>
+                            {
+                                scope.SetTags(new Dictionary<string, string>
+                                {
+                                        {"action", "Verify Success Transfer"},
+                                        {"reference", eventData.Data.Reference},
+                                });
+                                SentrySdk.CaptureException(e);
+                            });
+                        }
+                        break;
+                    case "transfer.failed":
+                        try
+                        {
+                            await _transferService.VerifyFailedTransfer(eventData.Data.Reference);
+                        }
+                        catch (System.Exception e)
+                        {
+                            SentrySdk.ConfigureScope(scope =>
+                            {
+                                scope.SetTags(new Dictionary<string, string>
+                                {
+                                        {"action", "Verify Failed Transfer"},
+                                        {"reference", eventData.Data.Reference},
+                                });
+                                SentrySdk.CaptureException(e);
+                            });
+                        }
+                        break;
+                    case "transfer.reversed":
+                        try
+                        {
+                            await _transferService.VerifyReverseTransfer(eventData.Data.Reference);
+                        }
+                        catch (System.Exception e)
+                        {
+                            SentrySdk.ConfigureScope(scope =>
+                            {
+                                scope.SetTags(new Dictionary<string, string>
+                                {
+                                        {"action", "Verify Reversed Transfer"},
                                         {"reference", eventData.Data.Reference},
                                 });
                                 SentrySdk.CaptureException(e);

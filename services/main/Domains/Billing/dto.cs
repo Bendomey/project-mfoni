@@ -55,3 +55,40 @@ public class InitializePaymentInput
     public string? WalletId { get; set; }
     public required InitPaymentInput PaystackInput { get; set; }
 }
+
+public class CreateTransferRecipientInput
+{
+    public required string CreatedById { get; set; }
+    public required string Type { get; set; }
+    public required string RecipientCode { get; set; }
+    public string? Currency { get; set; }
+    public required string AccountNumber { get; set; }
+    public required string AccountName { get; set; }
+    public required string BankName { get; set; }
+    public required string BankCode { get; set; }
+}
+
+
+public class DeleteTransferRecipientInput
+{
+    public required string CreatedById { get; set; }
+    public required string TransferRecipientId { get; set; }
+}
+
+
+public class GetTransferRecipientInput
+{
+    public string? CreatedById { get; set; }
+    public string? BankCode { get; set; }
+}
+
+
+public class InitiateTransferInput
+{
+    public required string CreatedById { get; set; }
+    public required Int64 Amount { get; set; }
+    public string? Reason { get; set; }
+    public required string TransferRecipientId { get; set; }
+    // when there's a reference then it means the transfer is already initiated. we just retrying.
+    public string? Reference { get; set; }
+}
