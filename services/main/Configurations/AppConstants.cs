@@ -29,6 +29,8 @@ public class AppConstants
     public string PaymentCollection { get; init; } = "payments";
     public string SavedCardCollection { get; init; } = "saved_cards";
     public string WalletTransactionCollection { get; init; } = "wallet_transations";
+    public string TransferRecipientCollection { get; init; } = "transfer_recipients";
+    public string TransferCollection { get; init; } = "transfers";
     public string AWSRegion { get; set; } = null!;
     public string BucketName { get; set; } = null!;
     public string AWSRekognitionCollection { get; set; } = null!;

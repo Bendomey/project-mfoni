@@ -63,6 +63,8 @@ namespace main.HostedServices
             var userCollection = _databaseConfig.Database.GetCollection<Models.User>(_appConstantsConfiguration.UserCollection);
             var waitlistCollection = _databaseConfig.Database.GetCollection<Models.Waitlist>(_appConstantsConfiguration.WaitlistCollection);
             var walletTransactionCollection = _databaseConfig.Database.GetCollection<Models.WalletTransaction>(_appConstantsConfiguration.WalletTransactionCollection);
+            var transferRecipientCollection = _databaseConfig.Database.GetCollection<Models.TransferRecipient>(_appConstantsConfiguration.TransferRecipientCollection);
+            var transferCollection = _databaseConfig.Database.GetCollection<Models.Transfer>(_appConstantsConfiguration.TransferCollection);
 
             await Models.Admin.EnsureIndexesAsync(adminCollection);
             await Models.AdminWallet.EnsureIndexesAsync(adminWalletCollection);
@@ -85,6 +87,8 @@ namespace main.HostedServices
             await Models.User.EnsureIndexesAsync(userCollection);
             await Models.Waitlist.EnsureIndexesAsync(waitlistCollection);
             await Models.WalletTransaction.EnsureIndexesAsync(walletTransactionCollection);
+            await Models.TransferRecipient.EnsureIndexesAsync(transferRecipientCollection);
+            await Models.Transfer.EnsureIndexesAsync(transferCollection);
         }
     }
 }
