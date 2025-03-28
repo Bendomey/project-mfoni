@@ -14,6 +14,7 @@ public class TransferService
     private readonly IMongoCollection<Models.TransferRecipient> _transferRecipientCollection;
     private readonly IMongoCollection<Models.Transfer> _transferCollection;
     private readonly IMongoCollection<Models.User> _userCollection;
+    private readonly IMongoCollection<Models.WalletTransaction> _walletTransactionCollection;
 
     public TransferService(
         ILogger<TransferService> logger,
@@ -34,6 +35,10 @@ public class TransferService
 
         _userCollection = databaseConfig.Database.GetCollection<Models.User>(
             appConstants.Value.UserCollection
+        );
+
+        _walletTransactionCollection = databaseConfig.Database.GetCollection<Models.WalletTransaction>(
+            appConstants.Value.WalletTransactionCollection
         );
 
         logger.LogDebug("Transfer service initialized");
@@ -196,7 +201,19 @@ public class TransferService
             throw new HttpRequestException("TransferFailed");
         }
 
-        // TODO: update user book balance
+        // update user book balance
+        var walletTransaction = new Models.WalletTransaction
+        {
+            UserId = input.CreatedById,
+            Type = Models.WalletTransactionType.WITHDRAW,
+            Amount = input.Amount,
+            ReasonForTransfer = Models.WalletTransactionReasonForTransfer.TRANSFER_TO_BANK_OR_MOMO,
+            Status = Models.WalletTransactionStatus.PENDING,
+        };
+        await _walletTransactionCollection.InsertOneAsync(walletTransaction);
+
+        user.BookWallet -= input.Amount;
+        await _userCollection.ReplaceOneAsync(user => user.Id == input.CreatedById, user);
 
         var transfer = new Models.Transfer
         {
@@ -207,8 +224,7 @@ public class TransferService
             Reason = input.Reason ?? "Transfering from my mfoni wallet",
             MetaData = new Models.TransferMetaData
             {
-                // Todo: save wallet transaction here.
-                WalletTransactionId = "",
+                WalletTransactionId = walletTransaction.Id,
             }
         };
 
