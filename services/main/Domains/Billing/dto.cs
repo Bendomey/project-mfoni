@@ -76,7 +76,7 @@ public class DeleteTransferRecipientInput
 }
 
 
-public class GetTransferRecipienstInput
+public class GetTransferRecipientInput
 {
     public string? CreatedById { get; set; }
     public string? BankCode { get; set; }

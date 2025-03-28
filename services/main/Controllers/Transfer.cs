@@ -260,13 +260,13 @@ public class TransferController : ControllerBase
             _logger.LogInformation("Getting all user's transfer recipients");
             var userId = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id;
             var queryFilter = HttpLib.GenerateFilterQuery<Models.TransferRecipient>(page, pageSize, sort, sortBy, populate);
-            var contents = await _transferService.GetTransferRecipients(queryFilter, new GetTransferRecipienstInput
+            var contents = await _transferService.GetTransferRecipients(queryFilter, new GetTransferRecipientInput
             {
                 CreatedById = userId,
                 BankCode = bankCode
             });
 
-            long count = await _transferService.CountTransferRecipients(new GetTransferRecipienstInput
+            long count = await _transferService.CountTransferRecipients(new GetTransferRecipientInput
             {
                 CreatedById = userId,
                 BankCode = bankCode

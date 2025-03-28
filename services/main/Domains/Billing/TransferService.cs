@@ -78,7 +78,7 @@ public class TransferService
     public async Task DeleteTransferRecipient(DeleteTransferRecipientInput input)
     {
         var recipient = await _transferRecipientCollection
-            .Find(x => x.Id == input.TransferRecipientId && x.CreatedById == input.CreatedById & x.DeletedAt == null)
+            .Find(x => x.Id == input.TransferRecipientId && x.CreatedById == input.CreatedById && x.DeletedAt == null)
             .FirstOrDefaultAsync();
 
         if (recipient is null)
@@ -95,7 +95,7 @@ public class TransferService
 
     public async Task<List<Models.TransferRecipient>> GetTransferRecipients(
         FilterQuery<Models.TransferRecipient> queryFilter,
-        GetTransferRecipienstInput input
+        GetTransferRecipientInput input
     )
     {
         FilterDefinitionBuilder<Models.TransferRecipient> builder = Builders<Models.TransferRecipient>.Filter;
@@ -124,7 +124,7 @@ public class TransferService
     }
 
     public async Task<long> CountTransferRecipients(
-        GetTransferRecipienstInput input
+        GetTransferRecipientInput input
     )
     {
         FilterDefinitionBuilder<Models.TransferRecipient> builder = Builders<Models.TransferRecipient>.Filter;
