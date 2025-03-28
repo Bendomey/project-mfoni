@@ -44,13 +44,22 @@ public class TransferController : ControllerBase
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(OutputResponse<Models.Transfer>), StatusCodes.Status201Created)]
     public async Task<IActionResult> InitiateTransfer(
-        [FromBody] DTOs.CreateTransferRecipientInput input
+        [FromBody] DTOs.InitiateTransferInput input
     )
     {
+        var updatedAmount = MoneyLib.ConvertCedisToPesewas(input.Amount);
+
         try
         {
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
-            var transfer = await _transferService.InitiateTransfer();
+            var transfer = await _transferService.InitiateTransfer(new Domains.InitiateTransferInput
+            {
+                Amount = updatedAmount,
+                TransferRecipientId = input.TransferRecipientId,
+                Reason = input.Reason,
+                CreatedById = currentUser.Id,
+                Reference = input.Reference
+            });
 
             if (transfer == null)
             {

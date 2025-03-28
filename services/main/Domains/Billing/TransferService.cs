@@ -13,6 +13,7 @@ public class TransferService
     private readonly AppConstants _appConstantsConfiguration;
     private readonly IMongoCollection<Models.TransferRecipient> _transferRecipientCollection;
     private readonly IMongoCollection<Models.Transfer> _transferCollection;
+    private readonly IMongoCollection<Models.User> _userCollection;
 
     public TransferService(
         ILogger<TransferService> logger,
@@ -29,6 +30,10 @@ public class TransferService
 
         _transferCollection = databaseConfig.Database.GetCollection<Models.Transfer>(
             appConstants.Value.TransferCollection
+        );
+
+        _userCollection = databaseConfig.Database.GetCollection<Models.User>(
+            appConstants.Value.UserCollection
         );
 
         logger.LogDebug("Transfer service initialized");
@@ -148,8 +153,68 @@ public class TransferService
         return recipientsCount;
     }
 
-    public async Task InitiateTransfer()
+    public async Task<Models.TransferRecipient> GetRecipientById(string id)
     {
-        throw new NotImplementedException();
+        var recipient = await _transferRecipientCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+        if (recipient is null)
+        {
+            throw new Exception("TransferRecipientNotFound");
+        }
+
+        return recipient;
+    }
+
+    public async Task<Models.Transfer> InitiateTransfer(InitiateTransferInput input)
+    {
+        // check if you have enough balance
+        var user = await _userCollection.Find(x => x.Id == input.CreatedById).FirstOrDefaultAsync();
+        if (user is null)
+        {
+            throw new Exception("UserNotFound");
+        }
+
+        bool canIPay = user.BookWallet >= input.Amount;
+        if (!canIPay)
+        {
+            throw new Exception("InsufficientBalance");
+        }
+
+        // check if transfer recipient exists
+        var recipient = await GetRecipientById(input.TransferRecipientId);
+
+        // initiate transfer
+        var response = await PaystackTransferConfiguration.Initiate(_appConstantsConfiguration.PaystackSecretKey, new CreateTransferInput
+        {
+            Reference = input.Reference,
+            Recipient = recipient.RecipientCode,
+            Reason = input.Reason ?? "Transfering from my mfoni wallet",
+            Amount = input.Amount,
+        });
+
+        if (response is null)
+        {
+            throw new HttpRequestException("TransferFailed");
+        }
+
+        // TODO: update user book balance
+
+        var transfer = new Models.Transfer
+        {
+            TransferRecipientId = recipient.Id,
+            Reference = response.Reference,
+            RecipientCode = recipient.RecipientCode,
+            TransferCode = response.TransferCode,
+            Reason = input.Reason ?? "Transfering from my mfoni wallet",
+            MetaData = new Models.TransferMetaData
+            {
+                // Todo: save wallet transaction here.
+                WalletTransactionId = "",
+            }
+        };
+
+        await _transferCollection.InsertOneAsync(transfer);
+
+        return transfer;
+
     }
 }

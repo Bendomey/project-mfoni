@@ -39,7 +39,7 @@ public class CreateRecipientResponseData
     public required bool Active { get; set; }
 
     [JsonProperty("currency")]
-    public string Currency { get; set; } = "GHS";
+    public required string Currency { get; set; }
 
     [JsonProperty("description")]
     public string? Description { get; set; }

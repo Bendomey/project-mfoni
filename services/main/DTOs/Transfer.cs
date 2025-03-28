@@ -33,3 +33,13 @@ public class DeleteTransferRecipientInput
     [Required]
     public required string TransferRecipientId { get; set; }
 }
+
+
+public class InitiateTransferInput
+{
+    public required Int64 Amount { get; set; }
+    public string? Reason { get; set; }
+    public required string TransferRecipientId { get; set; }
+    // when there's a reference then it means the transfer is already initiated. we just retrying.
+    public string? Reference { get; set; }
+}

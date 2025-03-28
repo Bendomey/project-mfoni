@@ -47,7 +47,7 @@ public class Transfer
     public DateTime? ReversedAt { get; set; }
 
     [BsonElement("metadata")]
-    public required PaymentMetaData MetaData { get; init; }
+    public required TransferMetaData MetaData { get; init; }
 
     [BsonElement("error_obj")]
     public TransferError? ErrorObj { get; init; }

@@ -81,3 +81,14 @@ public class GetTransferRecipientInput
     public string? CreatedById { get; set; }
     public string? BankCode { get; set; }
 }
+
+
+public class InitiateTransferInput
+{
+    public required string CreatedById { get; set; }
+    public required Int64 Amount { get; set; }
+    public string? Reason { get; set; }
+    public required string TransferRecipientId { get; set; }
+    // when there's a reference then it means the transfer is already initiated. we just retrying.
+    public string? Reference { get; set; }
+}
