@@ -3,8 +3,6 @@ import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { useNavigate } from "@remix-run/react";
 import { useCallback, useEffect, useState } from "react";
 import { SetupAccountModal } from "./setup-modal/index.tsx";
-import creatorImage from "@/assets/creator.jpg";
-import userImage from "@/assets/user.jpeg";
 import { TypewriterEffectSmooth } from "@/components/animation/TypeWriteEffect.tsx";
 import { Button } from "@/components/button/index.tsx";
 import { APP_NAME } from "@/constants/index.ts";
@@ -98,7 +96,7 @@ export const OnboardingModule = () => {
               >
                 <img
                   className="hidden h-auto max-w-full rounded-lg md:block"
-                  src={userImage}
+                  src='/images/user.jpeg'
                   alt="I'm here to download photos and videos"
                 />
                 <div className="mt-0 md:mt-4">
@@ -119,7 +117,7 @@ export const OnboardingModule = () => {
               >
                 <img
                   className="hidden h-auto max-w-full rounded-lg md:block"
-                  src={creatorImage}
+                  src='/images/creator.jpg'
                   alt="I'm here to share my photos with the world"
                 />
                 <div className="mt-0 md:mt-4">

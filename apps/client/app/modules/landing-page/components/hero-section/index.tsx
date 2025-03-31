@@ -1,5 +1,4 @@
 import { Link } from "@remix-run/react";
-import heroBg from "@/assets/hero-bg.jpeg";
 import { FadeIn } from "@/components/animation/FadeIn.tsx";
 
 import { SearchPhotos } from "@/components/layout/header/search/index.tsx";
@@ -10,7 +9,7 @@ export const HeroSection = () => {
   return (
     <div
       style={{
-        backgroundImage: `url(${heroBg})`,
+        backgroundImage: `url(/images/hero-bg.jpeg)`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
         backgroundPosition: "left",

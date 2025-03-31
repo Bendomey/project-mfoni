@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react";
 import { Fragment } from "react";
 import { type JSX } from "react/jsx-runtime";
-import paymentAssetPng from "@/assets/payment.png";
+import { Image } from "../Image.tsx";
 import {
   GITHUB_REPO_URL,
   MYLES_PUDO_URL,
@@ -117,10 +117,11 @@ export const Footer = () => {
         </div>
       </div>
       <div className="mx-5 mb-5 flex justify-center">
-        <img
-          src={paymentAssetPng}
-          className="w-full md:w-1/3"
-          height={100}
+        <Image
+          alt="Payment supported on mfoni"
+          src="/images/payment.png"
+          className="w-full"
+          height={80}
           width={400}
         />
       </div>

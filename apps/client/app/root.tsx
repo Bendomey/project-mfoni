@@ -1,4 +1,3 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
 import {
   type LoaderFunctionArgs,
   type LinksFunction,
@@ -62,7 +61,6 @@ export const links: LinksFunction = () => {
     { rel: "icon", href: "/favicon.ico" },
     { rel: "stylesheet", href: tailwindStyles },
     { rel: "stylesheet", href: globalStyles },
-    ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
   ];
 };
 

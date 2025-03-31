@@ -37,18 +37,3 @@
 .scrollContainerForSidebar::-webkit-scrollbar-thumb:hover {
   background: #4f6cc4;
 }
-
-@keyframes blurIn {
-  0% {
-    filter: blur(5px);
-  }
-
-  50% {
-    filter: blur(3px);
-  }
-
-  100% {
-    filter: blur(0px);
-    background: white;
-  }
-}

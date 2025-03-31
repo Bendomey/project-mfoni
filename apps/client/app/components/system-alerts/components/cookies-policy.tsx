@@ -1,6 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import cookiesImage from "@/assets/cookies.png";
 import { Button } from "@/components/button/index.tsx";
+import { Image } from "@/components/Image.tsx";
 
 interface Props {
   onClose: () => void;
@@ -12,12 +12,14 @@ export function CookiesPolicyBanner({ onClose }: Props) {
       <div className="pointer-events-auto bg-blue-600 px-6 py-4 sm:rounded-xl sm:px-6 sm:py-6">
         <div className="flex items-center justify-between gap-x-6">
           <p className="items-center text-lg text-white md:flex">
-            <img
-              src={cookiesImage}
-              height={25}
-              width={25}
-              className="mr-3 hidden sm:block"
-            />
+            <div className="mr-3 hidden sm:block">
+              <Image
+                src='/images/cookies.png'
+                alt="Cookies banner"
+                height={25}
+                width={25}
+              />
+            </div>
             <strong className="font-semibold">
               mfoni, {new Date().getFullYear()}
             </strong>

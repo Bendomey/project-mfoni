@@ -20,7 +20,6 @@ import {
   useSubmitCreatorApplication,
   useUpdateCreatorApplication,
 } from "@/api/creator-applications/index.ts";
-import creatorSvg from "@/assets/creator-svg.png";
 import { Button } from "@/components/button/index.tsx";
 import { Loader } from "@/components/loader/index.tsx";
 import { Modal } from "@/components/modal/index.tsx";
@@ -237,7 +236,7 @@ export function CreatorApplicationModal({ isOpened }: Props) {
         {activeCreatorApplication &&
         activeCreatorApplication.status == "APPROVED" ? (
           <>
-            <img src={creatorSvg} className="mb-2 h-20 w-auto" alt="" />
+            <img src='/images/creator-svg.png' className="mb-2 h-20 w-auto" alt="" />
             <h1 className="text-lg font-bold">You are a creator!</h1>
             <p className="mt-1 text-sm">
               You can always change your package you&apos;re on{" "}
