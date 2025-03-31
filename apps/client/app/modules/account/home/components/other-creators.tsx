@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react";
-import { Image } from "remix-image";
 import { useGetRelatedCreators } from "@/api/creators/index.ts";
 import { Button } from "@/components/button/index.tsx";
+import { Image } from "@/components/Image.tsx";
 import { useValidateImage } from "@/hooks/use-validate-image.tsx";
 import { safeString } from "@/lib/strings.ts";
 

@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import { Image } from "remix-image";
+import { Image } from "@/components/Image.tsx";
 import { PAGES } from "@/constants/index.ts";
 import { useValidateImage } from "@/hooks/use-validate-image.tsx";
 import { getNameInitials } from "@/lib/misc.ts";

@@ -1,6 +1,5 @@
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useParams, useSearchParams } from "@remix-run/react";
-import { Image } from "remix-image";
 import { FiltersDialog } from "../components/filters-dialog/index.tsx";
 import { VisualHeader } from "./components/header.tsx";
 import { useSearchVisualContents } from "@/api/contents/index.ts";
@@ -10,6 +9,7 @@ import { Content } from "@/components/Content/index.tsx";
 import { EmptyState } from "@/components/empty-state/index.tsx";
 import { ErrorState } from "@/components/error-state/index.tsx";
 import { Footer } from "@/components/footer/index.tsx";
+import { Image } from "@/components/Image.tsx";
 import { Header } from "@/components/layout/index.ts";
 import { NoSearchResultLottie } from "@/components/lotties/no-search-results.tsx";
 import { PAGES } from "@/constants/index.ts";

@@ -91,8 +91,6 @@
     "react-intersection-observer": "9.5.3",
     "react-pin-field": "3.1.5",
     "react-webcam": "7.2.0",
-    "remix-image": "1.4.0",
-    "remix-image-sharp": "0.1.4",
     "remix-utils": "8.1.0",
     "sharp": "0.33.5",
     "spin-delay": "2.0.1",

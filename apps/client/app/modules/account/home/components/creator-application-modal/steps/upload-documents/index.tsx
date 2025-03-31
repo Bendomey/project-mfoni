@@ -1,5 +1,4 @@
 import { PhotoIcon } from "@heroicons/react/24/outline";
-import { Image } from "remix-image";
 import { type IImageType } from "../../index.tsx";
 import { Button } from "@/components/button/index.tsx";
 import { UploadDialog } from "@/components/upload-dialog/index.tsx";
@@ -101,7 +100,7 @@ function UploadItem({ image, setImage }: UploadItemProps) {
           <div className="flex flex-row items-center gap-x-2">
             {image ? (
               <>
-                <Image
+                <img
                   src={image.url}
                   alt={image.name}
                   className="h-10 w-auto rounded-md"

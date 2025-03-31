@@ -2,7 +2,7 @@ import { Dialog } from "@headlessui/react";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useMemo, useState } from "react";
 import { type FileRejection, useDropzone } from "react-dropzone-esm";
-import { Image } from "remix-image";
+import { Image } from "../Image.tsx";
 import { Loader } from "../loader/index.tsx";
 import { Button } from "@/components/button/index.tsx";
 import { Modal } from "@/components/modal/index.tsx";
@@ -76,8 +76,8 @@ export const UploadDialog = ({ isOpened, onClose, onSave }: Props) => {
         {imageUrl ? (
           <div className="relative flex h-60 w-full items-center justify-center">
             <Image
+              alt={selectedFile?.name ?? "uploaded-image"}
               src={imageUrl}
-              alt={selectedFile?.name}
               className="h-60 w-auto rounded-md"
             />
             {isLoading ? (

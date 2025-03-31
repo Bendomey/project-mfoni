@@ -2,7 +2,7 @@ import { useInView } from "react-intersection-observer";
 import { HeroSection } from "./components/hero-section/index.tsx";
 import { Pricing } from "./components/pricing/index.tsx";
 import { useGetContents } from "@/api/contents/index.ts";
-import { FadeIn, FadeInStagger } from "@/components/animation/FadeIn.tsx";
+import { FadeIn } from "@/components/animation/FadeIn.tsx";
 import { Button } from "@/components/button/index.tsx";
 import { Content } from "@/components/Content/index.tsx";
 import { Footer } from "@/components/footer/index.tsx";
@@ -60,7 +60,7 @@ export const LandingPageModule = () => {
 
   if (data?.total) {
     content = (
-      <FadeInStagger faster>
+      <>
         <div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
           {data.rows.map((content) => (
             <div className="mb-5" key={content.id}>
@@ -71,7 +71,7 @@ export const LandingPageModule = () => {
           ))}
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-10">
           <Button
             isLink
             href={PAGES.CONTENTS}
@@ -82,7 +82,7 @@ export const LandingPageModule = () => {
             See More Contents
           </Button>
         </div>
-      </FadeInStagger>
+      </>
     );
   }
 

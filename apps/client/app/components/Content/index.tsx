@@ -11,13 +11,13 @@ import {
 } from "@heroicons/react/24/solid";
 import { Link, useNavigate } from "@remix-run/react";
 import { useMemo } from "react";
-import { Image } from "remix-image";
 import { Button } from "../button/index.tsx";
 import { PhotographerCreatorCard } from "../creator-card/index.tsx";
 import { DownloadButtonApi } from "../download-button.tsx";
 import { FlyoutContainer } from "../flyout/flyout-container.tsx";
+import { Image } from "@/components/Image.tsx";
 import { LikeButton } from "@/components/like-button.tsx";
-import { blurDataURL, PAGES } from "@/constants/index.ts";
+import { PAGES } from "@/constants/index.ts";
 import { useValidateImage } from "@/hooks/use-validate-image.tsx";
 import { classNames } from "@/lib/classNames.ts";
 import { getNameInitials } from "@/lib/misc.ts";
@@ -52,18 +52,40 @@ export const Content = ({ content, showCreator = true, className }: Props) => {
 
     return false;
   }, [content, isContentMine]);
+
+  const size = useMemo(() => {
+    if (content?.media.orientation === "LANDSCAPE") {
+      return {
+        height: 250,
+      };
+    }
+
+    if (content?.media.orientation === "PORTRAIT") {
+      return {
+        height: 400,
+      };
+    }
+
+    return {
+      height: 300,
+    };
+  }, [content]);
+
   return (
     <Link
       to={PAGES.PHOTO.replace(":slug", content.slug)}
       state={{ modal: true }}
     >
       <div className={classNames("relative cursor-zoom-in", className)}>
-        <Image
-          src={content.media.url}
-          className="h-full w-full rounded-lg object-cover"
-          blurDataURL={blurDataURL}
-          alt={content.title}
-        />
+        <div className="aspect-w-4 aspect-h-3 w-full">
+          <Image
+            height={size.height}
+            src={content.media.url}
+            loadingColor={content.backgroundColor ?? undefined}
+            className="h-full w-full rounded-lg object-cover"
+            alt={content.title}
+          />
+        </div>
         <div className="group absolute top-0 h-full w-full rounded-lg hover:bg-black/50">
           <div className="flex h-full w-full flex-col justify-between p-4">
             <div className="flex flex-row items-center justify-between">

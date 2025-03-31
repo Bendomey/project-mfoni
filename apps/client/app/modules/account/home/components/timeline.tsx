@@ -1,5 +1,4 @@
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
-import { Image } from "remix-image";
 import { classNames } from "@/lib/classNames.ts";
 
 const activity = [
@@ -72,11 +71,14 @@ export function UserTimeline() {
             </div>
             {activityItem.type === "commented" ? (
               <>
-                <Image
-                  alt=""
-                  src={activityItem.person.imageUrl}
-                  className="relative mt-3 h-6 w-6 flex-none rounded-full bg-gray-50"
-                />
+                {activityItem.person.imageUrl ? (
+                  <img
+                    alt={activityItem.person.name}
+                    src={activityItem.person.imageUrl}
+                    className="relative mt-3 h-6 w-6 flex-none rounded-full bg-gray-50"
+                  />
+                ) : null}
+
                 <div className="flex-auto rounded-md p-3 ring-1 ring-inset ring-gray-200">
                   <div className="flex justify-between gap-x-4">
                     <div className="py-0.5 text-xs leading-5 text-gray-500">

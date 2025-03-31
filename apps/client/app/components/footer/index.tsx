@@ -117,9 +117,12 @@ export const Footer = () => {
         </div>
       </div>
       <div className="mx-5 mb-5 flex justify-center">
-        <div className="w-1/3">
-          <img src={paymentAssetPng} className="w-full" />
-        </div>
+        <img
+          src={paymentAssetPng}
+          className="w-full md:w-1/3"
+          height={100}
+          width={400}
+        />
       </div>
     </footer>
   );

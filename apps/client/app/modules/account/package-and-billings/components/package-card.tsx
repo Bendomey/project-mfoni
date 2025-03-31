@@ -1,11 +1,11 @@
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { ArrowUpRightIcon } from "@heroicons/react/24/solid";
-import { Image } from "remix-image";
 import { usePackageAndBillingsContext } from "../context/index.tsx";
 import { CancelSubscriptionDialog } from "./cancel-subscription-dialog.tsx";
 import { ReactivateSubscriptionDialog } from "./reactivate-subscription-dialog.tsx";
 import { useIsSubscriptionPendingDowngrade } from "@/api/subscriptions/index.ts";
 import { Button } from "@/components/button/index.tsx";
+import { Image } from "@/components/Image.tsx";
 import { useDisclosure } from "@/hooks/use-disclosure.tsx";
 import { convertPesewasToCedis, formatAmount } from "@/lib/format-amount.ts";
 import { safeString } from "@/lib/strings.ts";

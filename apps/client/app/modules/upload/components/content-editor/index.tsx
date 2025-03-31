@@ -1,10 +1,10 @@
 import { TrashIcon } from "@heroicons/react/24/solid";
 import { useEffect, useMemo } from "react";
-import { Image } from "remix-image";
 import { useContentUpload } from "../../context.tsx";
 import { TagsPicker } from "./tags-picker.tsx";
 import { VisibilityPicker } from "./visibility-picker.tsx";
 import { Button } from "@/components/button/index.tsx";
+import { Image } from "@/components/Image.tsx";
 import { Loader } from "@/components/loader/index.tsx";
 import useImageUpload from "@/hooks/use-image-upload.ts";
 
@@ -63,7 +63,7 @@ export const ContentEditor = ({ contentId }: { contentId: string }) => {
         <div className="flex justify-center md:hidden">
           <Image
             src={imageUrl}
-            alt={content?.file.name}
+            alt={content?.file.name ?? "uploaded-image"}
             className="rounded-2xl"
           />
         </div>
@@ -86,7 +86,7 @@ export const ContentEditor = ({ contentId }: { contentId: string }) => {
             <div className="relative col-span-1 hidden w-full md:block">
               <Image
                 src={imageUrl}
-                alt={content?.file.name}
+                alt={content?.file.name ?? "uploaded-image"}
                 className="rounded-2xl"
               />
               {isLoading ? (
