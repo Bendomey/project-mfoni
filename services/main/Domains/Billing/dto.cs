@@ -60,7 +60,6 @@ public class CreateTransferRecipientInput
 {
     public required string CreatedById { get; set; }
     public required string Type { get; set; }
-    public required string RecipientCode { get; set; }
     public string? Currency { get; set; }
     public required string AccountNumber { get; set; }
     public required string AccountName { get; set; }

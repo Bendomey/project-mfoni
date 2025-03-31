@@ -14,7 +14,7 @@ export function CookiesPolicyBanner({ onClose }: Props) {
           <p className="items-center text-lg text-white md:flex">
             <div className="mr-3 hidden sm:block">
               <Image
-                src='/images/cookies.png'
+                src="/images/cookies.png"
                 alt="Cookies banner"
                 height={25}
                 width={25}

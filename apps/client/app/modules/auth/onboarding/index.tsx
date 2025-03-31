@@ -96,7 +96,7 @@ export const OnboardingModule = () => {
               >
                 <img
                   className="hidden h-auto max-w-full rounded-lg md:block"
-                  src='/images/user.jpeg'
+                  src="/images/user.jpeg"
                   alt="I'm here to download photos and videos"
                 />
                 <div className="mt-0 md:mt-4">
@@ -117,7 +117,7 @@ export const OnboardingModule = () => {
               >
                 <img
                   className="hidden h-auto max-w-full rounded-lg md:block"
-                  src='/images/creator.jpg'
+                  src="/images/creator.jpg"
                   alt="I'm here to share my photos with the world"
                 />
                 <div className="mt-0 md:mt-4">

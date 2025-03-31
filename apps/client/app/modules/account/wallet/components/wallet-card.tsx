@@ -1,9 +1,11 @@
+import { lazy } from "react";
 import { DepositButton } from "./deposit-button.tsx";
-import { WithdrawModal } from "./withdraw-modal.tsx";
 import { Button } from "@/components/button/index.tsx";
 import { useDisclosure } from "@/hooks/use-disclosure.tsx";
 import { convertPesewasToCedis, formatAmount } from "@/lib/format-amount.ts";
 import { useAuth } from "@/providers/auth/index.tsx";
+
+const WithdrawDrawer = lazy(() => import("./withdraw-drawer/index.tsx"));
 
 export function WalletCard() {
   const { currentUser } = useAuth();
@@ -41,7 +43,7 @@ export function WalletCard() {
           </Button>
         </div>
       </div>
-      <WithdrawModal
+      <WithdrawDrawer
         isOpened={walletModalState.isOpened}
         onClose={walletModalState.onClose}
       />

@@ -101,3 +101,22 @@ type Handle = {
         | null)
     | null;
 };
+
+interface PaystackBank {
+  name: string;
+  slug: string;
+  code: string;
+  active: true;
+  country: "Ghana";
+  currency: "GHS";
+  type: "ghipss" | "mobile_money";
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface PaystackBankVerify {
+  account_number: string;
+  account_name: string;
+  bank_id: number;
+}
