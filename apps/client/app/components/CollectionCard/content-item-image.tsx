@@ -1,6 +1,5 @@
 import { PhotoIcon } from "@heroicons/react/24/outline";
-import { Image } from "remix-image";
-import { blurDataURL } from "@/constants/index.ts";
+import { Image } from "../Image.tsx";
 import { useValidateImage } from "@/hooks/use-validate-image.tsx";
 import { classNames } from "@/lib/classNames.ts";
 import { safeString } from "@/lib/strings.ts";
@@ -36,7 +35,7 @@ export function ContentItemImage({
   return (
     <Image
       alt={contentAlt}
-      blurDataURL={blurDataURL}
+      loadingColor={content.backgroundColor}
       className={styles}
       src={content.media.url}
     />

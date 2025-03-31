@@ -16,7 +16,6 @@ import {
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
 import dayjs from "dayjs";
 import { Fragment, useMemo } from "react";
-import { Image } from "remix-image";
 import { EditTitleModal } from "./components/edit-title-modal/index.tsx";
 import { RelatedContent } from "./components/related-content.tsx";
 import { Button } from "@/components/button/index.tsx";
@@ -26,11 +25,12 @@ import {
   DownloadButtonApi,
 } from "@/components/download-button.tsx";
 import { Footer } from "@/components/footer/index.tsx";
+import { Image } from "@/components/Image.tsx";
 import { Header } from "@/components/layout/index.ts";
 import { LikeButton } from "@/components/like-button.tsx";
 import { ShareButton } from "@/components/share-button/index.tsx";
 import { UserImage } from "@/components/user-image.tsx";
-import { blurDataURL, PAGES } from "@/constants/index.ts";
+import { PAGES } from "@/constants/index.ts";
 import { useDisclosure } from "@/hooks/use-disclosure.tsx";
 import { classNames } from "@/lib/classNames.ts";
 import { convertPesewasToCedis, formatAmount } from "@/lib/format-amount.ts";
@@ -62,6 +62,27 @@ export const PhotoModule = () => {
 
     return false;
   }, [content, isContentMine]);
+
+  const size = useMemo(() => {
+    if (content?.media.orientation === "LANDSCAPE") {
+      return {
+        width: 700,
+        height: 500,
+      };
+    }
+
+    if (content?.media.orientation === "PORTRAIT") {
+      return {
+        width: 500,
+        height: 700,
+      };
+    }
+
+    return {
+      width: 400,
+      height: 400,
+    };
+  }, [content]);
 
   if (!content) return null;
 
@@ -181,15 +202,18 @@ export const PhotoModule = () => {
             ) : null
           ) : null}
 
-          <div className="my-10 flex justify-center md:mx-40 lg:mx-64">
+          <div
+            className={classNames(
+              "my-10 flex justify-center md:mx-40 lg:mx-64",
+            )}
+          >
             <Image
+              width={size.width}
+              height={size.height}
               src={content.media.url}
               alt={content.title}
-              className="object-cover"
-              blurDataURL={blurDataURL}
-              options={{
-                fit: "cover",
-              }}
+              className="object-cover w-full h-full"
+              loadingColor={content.backgroundColor ?? undefined}
             />
           </div>
 

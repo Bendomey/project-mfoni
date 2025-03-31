@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import { Image } from "remix-image";
+import { Image } from "@/components/Image.tsx";
 import { APP_NAME } from "@/constants/index.ts";
 
 export const NotFoundModule = () => {

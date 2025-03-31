@@ -19,7 +19,6 @@ import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat.js";
 import { type PropsWithChildren } from "react";
 import { Toaster } from "react-hot-toast";
-import remixImageStyles from "remix-image/remix-image.css?url";
 import { getCurrentUser } from "./api/auth/index.ts";
 import { RouteLoader } from "./components/loader/route-loader.tsx";
 import { PAGES } from "./constants/index.ts";
@@ -62,7 +61,6 @@ export const links: LinksFunction = () => {
     },
     { rel: "icon", href: "/favicon.ico" },
     { rel: "stylesheet", href: tailwindStyles },
-    { rel: "stylesheet", href: remixImageStyles },
     { rel: "stylesheet", href: globalStyles },
     ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
   ];

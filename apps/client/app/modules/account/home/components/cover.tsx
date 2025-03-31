@@ -6,8 +6,8 @@ import {
   MapPinIcon,
   GlobeAltIcon,
 } from "@heroicons/react/24/outline";
-import { Image } from "remix-image";
 import { Button } from "@/components/button/index.tsx";
+import { Image } from "@/components/Image.tsx";
 import { ShareButton } from "@/components/share-button/index.tsx";
 import { MFONI_PACKAGES_DETAILED } from "@/constants/index.ts";
 import { useValidateImage } from "@/hooks/use-validate-image.tsx";
@@ -88,7 +88,7 @@ export function AccountCover() {
                 className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
               />
             ) : (
-              <span className="inline-flex h-32 w-32 items-center justify-center rounded-full bg-blue-600 text-white ring-4 ring-white">
+              <span className="inline-flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-full bg-blue-600 text-white ring-4 ring-white">
                 <span className="text-4xl font-medium leading-none">
                   {initials}
                 </span>

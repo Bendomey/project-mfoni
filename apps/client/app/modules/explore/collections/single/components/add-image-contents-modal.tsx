@@ -6,7 +6,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import { Image } from "remix-image";
 import {
   useAddContentsToCollection,
   useGetCollectionContentsBySlug,
@@ -15,9 +14,10 @@ import { FadeIn, FadeInStagger } from "@/components/animation/FadeIn.tsx";
 import { Button } from "@/components/button/index.tsx";
 import { EmptyState } from "@/components/empty-state/index.tsx";
 import { ErrorState } from "@/components/error-state/index.tsx";
+import { Image } from "@/components/Image.tsx";
 import { Loader } from "@/components/loader/index.tsx";
 import { Modal } from "@/components/modal/index.tsx";
-import { blurDataURL, PAGES, QUERY_KEYS } from "@/constants/index.ts";
+import { PAGES, QUERY_KEYS } from "@/constants/index.ts";
 import { classNames } from "@/lib/classNames.ts";
 import { errorToast } from "@/lib/custom-toast-functions.tsx";
 import { safeString } from "@/lib/strings.ts";
@@ -269,7 +269,7 @@ function Content({
       <Image
         src={content.media.url}
         className="h-auto max-w-full"
-        blurDataURL={blurDataURL}
+        loadingColor={content.backgroundColor}
         alt={content.title}
       />
       <div

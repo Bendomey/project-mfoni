@@ -4,8 +4,8 @@ import {
   GlobeAltIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "@remix-run/react";
-import { Image } from "remix-image";
 import { Button } from "@/components/button/index.tsx";
+import { Image } from "@/components/Image.tsx";
 import { ShareButton } from "@/components/share-button/index.tsx";
 import { PAGES } from "@/constants/index.ts";
 import { useValidateImage } from "@/hooks/use-validate-image.tsx";
@@ -40,7 +40,7 @@ export const AccountCover = ({ data }: { data: EnhancedCreator }) => {
                 className="size-24 rounded-full ring-4 ring-white sm:size-32"
               />
             ) : (
-              <span className="inline-flex size-[8rem] items-center justify-center rounded-full bg-blue-600 text-white ring-4 ring-white">
+              <span className="inline-flex size-24 sm:size-32 items-center justify-center rounded-full bg-blue-600 text-white ring-4 ring-white">
                 <span className="text-4xl font-medium leading-none">
                   {getNameInitials(data.name)}
                 </span>
@@ -71,11 +71,7 @@ export const AccountCover = ({ data }: { data: EnhancedCreator }) => {
           <h1 className="truncate text-2xl font-bold text-gray-900">
             {data.name}
           </h1>
-          {
-            data.about ? (
-              <p className="text-sm mt-1">{data.about}</p>
-            ) : null
-          }
+          {data.about ? <p className="text-sm mt-1">{data.about}</p> : null}
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-x-4">
           <div className="flex items-center gap-1">

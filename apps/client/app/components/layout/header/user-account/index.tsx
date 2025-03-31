@@ -1,7 +1,7 @@
 import { Menu, Transition } from "@headlessui/react";
 import { Link } from "@remix-run/react";
 import { Fragment } from "react";
-import { Image } from "remix-image";
+import { Image } from "@/components/Image.tsx";
 import { useValidateImage } from "@/hooks/use-validate-image.tsx";
 import { classNames } from "@/lib/classNames.ts";
 import { getNameInitials } from "@/lib/misc.ts";

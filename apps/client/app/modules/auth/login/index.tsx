@@ -2,7 +2,6 @@
 import { Transition } from "@headlessui/react";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { Fragment, useEffect } from "react";
-import { Image } from "remix-image";
 import { ClientOnly } from "remix-utils/client-only";
 import { LoginAuthProvider, useLoginAuth } from "./context/index.tsx";
 import { FacebookButton } from "./facebook/index.tsx";
@@ -10,6 +9,7 @@ import { GoogleButton } from "./google/index.tsx";
 import { TwitterButton } from "./twitter/index.tsx";
 import { TypewriterEffectSmooth } from "@/components/animation/TypeWriteEffect.tsx";
 import { Button } from "@/components/button/index.tsx";
+import { Image } from "@/components/Image.tsx";
 import { Loader } from "@/components/loader/index.tsx";
 import { APP_NAME } from "@/constants/index.ts";
 import { useAuth } from "@/providers/auth/index.tsx";

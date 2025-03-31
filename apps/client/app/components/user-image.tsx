@@ -1,4 +1,4 @@
-import { Image } from "remix-image";
+import { Image } from "./Image.tsx";
 import { useValidateImage } from "@/hooks/use-validate-image.tsx";
 import { classNames } from "@/lib/classNames.ts";
 import { getNameInitials } from "@/lib/misc.ts";

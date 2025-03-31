@@ -13,7 +13,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Image } from "remix-image";
 import { SelectPackage } from "./steps/select-package.tsx";
 import { UploadDocuments } from "./steps/upload-documents/index.tsx";
 import {
@@ -238,7 +237,7 @@ export function CreatorApplicationModal({ isOpened }: Props) {
         {activeCreatorApplication &&
         activeCreatorApplication.status == "APPROVED" ? (
           <>
-            <Image src={creatorSvg} className="mb-2 h-20 w-auto" alt="" />
+            <img src={creatorSvg} className="mb-2 h-20 w-auto" alt="" />
             <h1 className="text-lg font-bold">You are a creator!</h1>
             <p className="mt-1 text-sm">
               You can always change your package you&apos;re on{" "}

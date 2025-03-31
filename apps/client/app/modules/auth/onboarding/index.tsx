@@ -2,7 +2,6 @@ import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { useNavigate } from "@remix-run/react";
 import { useCallback, useEffect, useState } from "react";
-import { Image } from "remix-image";
 import { SetupAccountModal } from "./setup-modal/index.tsx";
 import creatorImage from "@/assets/creator.jpg";
 import userImage from "@/assets/user.jpeg";
@@ -97,7 +96,7 @@ export const OnboardingModule = () => {
                     : "border-dashed border-zinc-300"
                 } rounded-lg p-5`}
               >
-                <Image
+                <img
                   className="hidden h-auto max-w-full rounded-lg md:block"
                   src={userImage}
                   alt="I'm here to download photos and videos"
@@ -118,7 +117,7 @@ export const OnboardingModule = () => {
                     : "border-dashed border-zinc-300"
                 } cursor-pointer rounded-lg p-5`}
               >
-                <Image
+                <img
                   className="hidden h-auto max-w-full rounded-lg md:block"
                   src={creatorImage}
                   alt="I'm here to share my photos with the world"

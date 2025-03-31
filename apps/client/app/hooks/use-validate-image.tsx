@@ -51,7 +51,7 @@ export const useValidateImage = (imageUrl: string) => {
           if (res) {
             setImageIsValid(res);
           }
-        } catch (error: unknown) {
+        } catch {
           setImageIsValid(false);
         }
       })();
