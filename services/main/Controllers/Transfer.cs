@@ -194,12 +194,7 @@ public class TransferController : ControllerBase
                 CreatedById = currentUser.Id
             });
 
-            return new ObjectResult(
-                new GetEntityResponse<AnyType?>(null, null).Result()
-            )
-            {
-                StatusCode = StatusCodes.Status204NoContent
-            };
+            return NoContent();
         }
         catch (HttpRequestException e)
         {
