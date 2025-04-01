@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react'
 
 type IAsyncImage = (
-  /**
-   * Image url to be loaded.
-   */
-  url?: string | null,
+	/**
+	 * Image url to be loaded.
+	 */
+	url?: string | null,
 ) => {
-  pending: boolean;
-  ready: boolean | null;
-  error: string | Event | null;
-};
+	pending: boolean
+	ready: boolean | null
+	error: string | Event | null
+}
 
 /**
  * Hook that serves as a simple api to deliver the
@@ -29,58 +29,58 @@ type IAsyncImage = (
  * Finally, render the image and it'll pull from cache.
  */
 export const useAsyncImage: IAsyncImage = (url) => {
-  const [pending, setPending] = React.useState<boolean>(true);
-  const [ready, setIsReady] = React.useState<boolean | null>(null);
-  const [error, setError] = React.useState<string | Event | null>(null);
+	const [pending, setPending] = React.useState<boolean>(true)
+	const [ready, setIsReady] = React.useState<boolean | null>(null)
+	const [error, setError] = React.useState<string | Event | null>(null)
 
-  const onLoad = () => {
-    setIsReady(true);
-    setPending(false);
-  };
+	const onLoad = () => {
+		setIsReady(true)
+		setPending(false)
+	}
 
-  const onError = (e: string | Event) => {
-    setError(e);
-    setPending(false);
-  };
+	const onError = (e: string | Event) => {
+		setError(e)
+		setPending(false)
+	}
 
-  /* Cancel subscription if component unmounts https://juliangaramendy.dev/use-promise-subscription/ */
-  React.useEffect(() => {
-    function resetStateOnUrlChange() {
-      setPending(true);
-      setIsReady(null);
-      setError(null);
-    }
+	/* Cancel subscription if component unmounts https://juliangaramendy.dev/use-promise-subscription/ */
+	React.useEffect(() => {
+		function resetStateOnUrlChange() {
+			setPending(true)
+			setIsReady(null)
+			setError(null)
+		}
 
-    let isSubscribed = true;
-    resetStateOnUrlChange();
+		let isSubscribed = true
+		resetStateOnUrlChange()
 
-    if (url) {
-      try {
-        const image = new Image();
-        image.onload = () => {
-          if (isSubscribed) {
-            onLoad();
-          }
-        };
-        image.onerror = (e) => {
-          if (isSubscribed) {
-            onError(e);
-          }
-        };
-        image.src = url;
-      } catch (e: unknown) {
-        onError(e as string);
-      }
-    }
+		if (url) {
+			try {
+				const image = new Image()
+				image.onload = () => {
+					if (isSubscribed) {
+						onLoad()
+					}
+				}
+				image.onerror = (e) => {
+					if (isSubscribed) {
+						onError(e)
+					}
+				}
+				image.src = url
+			} catch (e: unknown) {
+				onError(e as string)
+			}
+		}
 
-    return () => {
-      isSubscribed = false;
-    };
-  }, [url]);
+		return () => {
+			isSubscribed = false
+		}
+	}, [url])
 
-  return {
-    pending,
-    ready,
-    error,
-  };
-};
+	return {
+		pending,
+		ready,
+		error,
+	}
+}

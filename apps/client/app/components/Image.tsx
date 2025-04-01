@@ -1,41 +1,41 @@
 // Image.tsx
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { validateImage } from "@/hooks/use-validate-image.tsx";
-import { classNames } from "@/lib/classNames.ts";
+import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { validateImage } from '@/hooks/use-validate-image.tsx'
+import { classNames } from '@/lib/classNames.ts'
 
-type ImageStatus = "loading" | "loaded" | "error";
+type ImageStatus = 'loading' | 'loaded' | 'error'
 
 interface ImageProps
-  extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "children"> {
-  src: string;
-  alt: string;
-  width?: number | string;
-  height?: number | string;
-  className?: string;
-  loadingColor?: string | null;
-  blurDataURL?: string;
-  intersectionObserverThreshold?: number;
-  intersectionObserverRootMargin?: string;
-  onLoad?: () => void;
-  onError?: () => void;
-  onInView?: () => void;
-  renderLoading?: (props: {
-    className?: string;
-    style?: React.CSSProperties;
-  }) => React.ReactNode;
-  renderError?: (props: {
-    className?: string;
-    style?: React.CSSProperties;
-    retry: () => void;
-  }) => React.ReactNode;
-  children?: (
-    status: ImageStatus,
-    imgProps: {
-      src: string;
-      alt: string;
-      className?: string;
-    },
-  ) => React.ReactNode;
+	extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'children'> {
+	src: string
+	alt: string
+	width?: number | string
+	height?: number | string
+	className?: string
+	loadingColor?: string | null
+	blurDataURL?: string
+	intersectionObserverThreshold?: number
+	intersectionObserverRootMargin?: string
+	onLoad?: () => void
+	onError?: () => void
+	onInView?: () => void
+	renderLoading?: (props: {
+		className?: string
+		style?: React.CSSProperties
+	}) => React.ReactNode
+	renderError?: (props: {
+		className?: string
+		style?: React.CSSProperties
+		retry: () => void
+	}) => React.ReactNode
+	children?: (
+		status: ImageStatus,
+		imgProps: {
+			src: string
+			alt: string
+			className?: string
+		},
+	) => React.ReactNode
 }
 
 /**
@@ -112,189 +112,189 @@ interface ImageProps
  */
 
 export const Image: React.FC<ImageProps> = ({
-  src,
-  alt,
-  width,
-  height,
-  className = "",
-  loadingColor, // Default light gray
-  blurDataURL,
-  intersectionObserverThreshold = 0.1,
-  intersectionObserverRootMargin = "200px 0px",
-  onLoad,
-  onError,
-  onInView,
-  renderLoading,
-  renderError,
-  children,
-  ...imageProps
+	src,
+	alt,
+	width,
+	height,
+	className = '',
+	loadingColor, // Default light gray
+	blurDataURL,
+	intersectionObserverThreshold = 0.1,
+	intersectionObserverRootMargin = '200px 0px',
+	onLoad,
+	onError,
+	onInView,
+	renderLoading,
+	renderError,
+	children,
+	...imageProps
 }) => {
-  loadingColor = loadingColor || "#f3f4f6";
-  const [status, setStatus] = useState<ImageStatus>("loading");
-  const [, setIsInView] = useState(false);
-  const [imgSrc, setImgSrc] = useState<string | null>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+	loadingColor = loadingColor || '#f3f4f6'
+	const [status, setStatus] = useState<ImageStatus>('loading')
+	const [, setIsInView] = useState(false)
+	const [imgSrc, setImgSrc] = useState<string | null>(null)
+	const imgRef = useRef<HTMLImageElement>(null)
+	const containerRef = useRef<HTMLDivElement>(null)
 
-  // Handle image loading and errors
-  const handleLoad = useCallback(() => {
-    setStatus("loaded");
-    onLoad?.();
-  }, [onLoad]);
+	// Handle image loading and errors
+	const handleLoad = useCallback(() => {
+		setStatus('loaded')
+		onLoad?.()
+	}, [onLoad])
 
-  const handleError = useCallback(() => {
-    setStatus("error");
-    onError?.();
-  }, [onError]);
+	const handleError = useCallback(() => {
+		setStatus('error')
+		onError?.()
+	}, [onError])
 
-  // Load image when in viewport
-  useEffect(() => {
-    if (!containerRef.current) return;
+	// Load image when in viewport
+	useEffect(() => {
+		if (!containerRef.current) return
 
-    const observer = new IntersectionObserver(
-      async (entries) => {
-        const [entry] = entries;
-        if (!entry) return;
+		const observer = new IntersectionObserver(
+			async (entries) => {
+				const [entry] = entries
+				if (!entry) return
 
-        setIsInView(entry.isIntersecting);
+				setIsInView(entry.isIntersecting)
 
-        if (entry.isIntersecting) {
-          try {
-            await validateImage(src);
-            setImgSrc(src);
-            onInView?.();
-          } catch {
-            handleError();
-            return;
-          }
+				if (entry.isIntersecting) {
+					try {
+						await validateImage(src)
+						setImgSrc(src)
+						onInView?.()
+					} catch {
+						handleError()
+						return
+					}
 
-          // Disconnect once we've seen it
-          observer.disconnect();
-        }
-      },
-      {
-        root: null,
-        rootMargin: intersectionObserverRootMargin,
-        threshold: intersectionObserverThreshold,
-      },
-    );
+					// Disconnect once we've seen it
+					observer.disconnect()
+				}
+			},
+			{
+				root: null,
+				rootMargin: intersectionObserverRootMargin,
+				threshold: intersectionObserverThreshold,
+			},
+		)
 
-    observer.observe(containerRef.current);
+		observer.observe(containerRef.current)
 
-    return () => {
-      observer.disconnect();
-    };
-  }, [
-    src,
-    onInView,
-    intersectionObserverRootMargin,
-    intersectionObserverThreshold,
-    handleError,
-  ]);
+		return () => {
+			observer.disconnect()
+		}
+	}, [
+		src,
+		onInView,
+		intersectionObserverRootMargin,
+		intersectionObserverThreshold,
+		handleError,
+	])
 
-  const retry = () => {
-    setStatus("loading");
-    // Force re-fetch by appending a cache buster
-    const timestamp = new Date().getTime();
-    setImgSrc(`${src}${src.includes("?") ? "&" : "?"}_retry=${timestamp}`);
-  };
+	const retry = () => {
+		setStatus('loading')
+		// Force re-fetch by appending a cache buster
+		const timestamp = new Date().getTime()
+		setImgSrc(`${src}${src.includes('?') ? '&' : '?'}_retry=${timestamp}`)
+	}
 
-  // Default loading state
-  const defaultLoading = (
-    <div
-      className={classNames("animate-pulse", className)}
-      style={{
-        width,
-        height,
-        backgroundColor: loadingColor,
-        backgroundImage: blurDataURL ? `url(${blurDataURL})` : undefined,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-      aria-live="polite"
-      role="status"
-    />
-  );
+	// Default loading state
+	const defaultLoading = (
+		<div
+			className={classNames('animate-pulse', className)}
+			style={{
+				width,
+				height,
+				backgroundColor: loadingColor,
+				backgroundImage: blurDataURL ? `url(${blurDataURL})` : undefined,
+				backgroundSize: 'cover',
+				backgroundPosition: 'center',
+			}}
+			aria-live="polite"
+			role="status"
+		/>
+	)
 
-  // Default error state
-  const defaultError = (
-    <div
-      className={className}
-      style={{
-        width,
-        height,
-        backgroundColor: "#fee2e2",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-      }}
-      onClick={retry}
-      tabIndex={0}
-      role="button"
-      aria-live="assertive"
-    >
-      <span style={{ color: "#b91c1c" }}>
-        Failed to load image. Click to retry.
-      </span>
-    </div>
-  );
+	// Default error state
+	const defaultError = (
+		<div
+			className={className}
+			style={{
+				width,
+				height,
+				backgroundColor: '#fee2e2',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				cursor: 'pointer',
+			}}
+			onClick={retry}
+			tabIndex={0}
+			role="button"
+			aria-live="assertive"
+		>
+			<span style={{ color: '#b91c1c' }}>
+				Failed to load image. Click to retry.
+			</span>
+		</div>
+	)
 
-  // Render children function if provided
-  if (children) {
-    return (
-      <div ref={containerRef} style={{ width, height }}>
-        {children(status, {
-          src: imgSrc || "",
-          alt,
-          className,
-        })}
-      </div>
-    );
-  }
+	// Render children function if provided
+	if (children) {
+		return (
+			<div ref={containerRef} style={{ width, height }}>
+				{children(status, {
+					src: imgSrc || '',
+					alt,
+					className,
+				})}
+			</div>
+		)
+	}
 
-  // Default rendering behavior
-  return (
-    <div ref={containerRef} style={{ width, height }}>
-      {status === "loading" &&
-        (renderLoading
-          ? renderLoading({
-              className,
-              style: {
-                width,
-                height,
-                backgroundColor: loadingColor,
-                backgroundImage: blurDataURL
-                  ? `url(${blurDataURL})`
-                  : undefined,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              },
-            })
-          : defaultLoading)}
+	// Default rendering behavior
+	return (
+		<div ref={containerRef} style={{ width, height }}>
+			{status === 'loading' &&
+				(renderLoading
+					? renderLoading({
+							className,
+							style: {
+								width,
+								height,
+								backgroundColor: loadingColor,
+								backgroundImage: blurDataURL
+									? `url(${blurDataURL})`
+									: undefined,
+								backgroundSize: 'cover',
+								backgroundPosition: 'center',
+							},
+						})
+					: defaultLoading)}
 
-      {status === "error" &&
-        (renderError
-          ? renderError({
-              className,
-              style: { width, height },
-              retry,
-            })
-          : defaultError)}
+			{status === 'error' &&
+				(renderError
+					? renderError({
+							className,
+							style: { width, height },
+							retry,
+						})
+					: defaultError)}
 
-      {imgSrc && (
-        <img
-          ref={imgRef}
-          src={imgSrc}
-          alt={alt}
-          width={width}
-          height={height}
-          className={`${className} ${status === "loaded" ? "block" : "hidden"}`}
-          onLoad={handleLoad}
-          onError={handleError}
-          {...imageProps}
-        />
-      )}
-    </div>
-  );
-};
+			{imgSrc && (
+				<img
+					ref={imgRef}
+					src={imgSrc}
+					alt={alt}
+					width={width}
+					height={height}
+					className={`${className} ${status === 'loaded' ? 'block' : 'hidden'}`}
+					onLoad={handleLoad}
+					onError={handleError}
+					{...imageProps}
+				/>
+			)}
+		</div>
+	)
+}

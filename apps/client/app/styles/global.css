@@ -1,39 +1,39 @@
 .scrollContainer::-webkit-scrollbar {
-  width: 5px;
+	width: 5px;
 }
 
 /* Track */
 .scrollContainer::-webkit-scrollbar-track {
-  background: transparent;
+	background: transparent;
 }
 
 /* Handle */
 .scrollContainer::-webkit-scrollbar-thumb {
-  background: #dadada;
-  border-radius: 500px;
+	background: #dadada;
+	border-radius: 500px;
 }
 
 /* Handle on hover */
 .scrollContainer::-webkit-scrollbar-thumb:hover {
-  background: #bdbbbb;
+	background: #bdbbbb;
 }
 
 .scrollContainerForSidebar::-webkit-scrollbar {
-  width: 5px;
+	width: 5px;
 }
 
 /* Track */
 .scrollContainerForSidebar::-webkit-scrollbar-track {
-  background: transparent;
+	background: transparent;
 }
 
 /* Handle */
 .scrollContainerForSidebar::-webkit-scrollbar-thumb {
-  background: #4f6cc4;
-  border-radius: 500px;
+	background: #4f6cc4;
+	border-radius: 500px;
 }
 
 /* Handle on hover */
 .scrollContainerForSidebar::-webkit-scrollbar-thumb:hover {
-  background: #4f6cc4;
+	background: #4f6cc4;
 }

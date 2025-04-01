@@ -1,19 +1,19 @@
 @font-face {
-  font-family: "Plus Jakarta Sans";
-  src: url("/fonts/PlusJakartaSans.ttf") format("truetype");
-  font-weight: 100 900;
-  font-stretch: 75% 125%;
-  font-style: normal;
-  font-display: swap;
+	font-family: 'Plus Jakarta Sans';
+	src: url('/fonts/PlusJakartaSans.ttf') format('truetype');
+	font-weight: 100 900;
+	font-stretch: 75% 125%;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: "Shantell Sans";
-  src: url("/fonts/ShantellSans.ttf") format("truetype");
-  font-weight: 100 900;
-  font-stretch: 75% 125%;
-  font-style: normal;
-  font-display: swap;
+	font-family: 'Shantell Sans';
+	src: url('/fonts/ShantellSans.ttf') format('truetype');
+	font-weight: 100 900;
+	font-stretch: 75% 125%;
+	font-style: normal;
+	font-display: swap;
 }
 
 @tailwind base;
@@ -21,19 +21,19 @@
 @tailwind utilities;
 
 @layer utilities {
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
+	/* Hide scrollbar for Chrome, Safari and Opera */
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+	/* Hide scrollbar for IE, Edge and Firefox */
+	.no-scrollbar {
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
+	}
 }
 
 @layer base {
-  html {
-    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-  }
+	html {
+		font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+	}
 }

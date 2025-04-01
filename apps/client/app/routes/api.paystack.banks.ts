@@ -4,36 +4,36 @@ import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
 import { transport } from '@/lib/transport/index.ts'
 
 export async function action({ request }: ActionFunctionArgs) {
-  const PAYSTACK_SECRET_KEY = environmentVariables().PAYSTACK_SECRET_KEY;
+	const PAYSTACK_SECRET_KEY = environmentVariables().PAYSTACK_SECRET_KEY
 
-  const formData = await request.formData();
-  const accountNumber = formData.get("accountNumber");
-  const bankCode = formData.get("bankCode");
+	const formData = await request.formData()
+	const accountNumber = formData.get('accountNumber')
+	const bankCode = formData.get('bankCode')
 
-  if (!accountNumber || !bankCode) {
-    return { error: "Invalid request" };
-  }
+	if (!accountNumber || !bankCode) {
+		return { error: 'Invalid request' }
+	}
 
-  const paystackURL = `https://api.paystack.co/bank/resolve?account_number=${accountNumber.toString()}&bank_code=${bankCode.toString()}`;
+	const paystackURL = `https://api.paystack.co/bank/resolve?account_number=${accountNumber.toString()}&bank_code=${bankCode.toString()}`
 
-  try {
-    const response = await transport(paystackURL, {
-      headers: {
-        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
-      },
-    });
+	try {
+		const response = await transport(paystackURL, {
+			headers: {
+				Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+			},
+		})
 
-    const json = (await response.json()) as {
-      status: boolean;
-      data: PaystackBankVerify;
-    };
+		const json = (await response.json()) as {
+			status: boolean
+			data: PaystackBankVerify
+		}
 
-    if (json.status) {
-      return jsonWithCache({ accountDetails: json.data });
-    }
-  } catch {
-    return { error: "No account details fetched" };
-  }
+		if (json.status) {
+			return jsonWithCache({ accountDetails: json.data })
+		}
+	} catch {
+		return { error: 'No account details fetched' }
+	}
 }
 
 export async function loader({ request }: ActionFunctionArgs) {
@@ -55,11 +55,14 @@ export async function loader({ request }: ActionFunctionArgs) {
 	}
 
 	try {
-		const response = await transport(`https://api.paystack.co/bank?${searchParams.toString()}`, {
-			headers: {
-				Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+		const response = await transport(
+			`https://api.paystack.co/bank?${searchParams.toString()}`,
+			{
+				headers: {
+					Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+				},
 			},
-		})
+		)
 
 		const json = (await response.json()) as {
 			status: boolean

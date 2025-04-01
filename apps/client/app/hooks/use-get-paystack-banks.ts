@@ -13,16 +13,19 @@ export function useGetPaystackBanks() {
 
 	useEffect(() => {
 		fetchBanks()
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	const isFetchingBanks = fetcher.state === 'loading' && fetcher.formMethod == null && !fetcher.data?.banks
+	const isFetchingBanks =
+		fetcher.state === 'loading' &&
+		fetcher.formMethod == null &&
+		!fetcher.data?.banks
 
 	return {
 		isLoading: isFetchingBanks,
 		data: fetcher.data?.banks,
 		error: fetcher.data?.error,
-        isError : fetcher.data?.error && fetcher.state === 'idle',
+		isError: fetcher.data?.error && fetcher.state === 'idle',
 		fetch: fetchBanks,
 	}
 }

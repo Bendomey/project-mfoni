@@ -1,43 +1,43 @@
-import { PhotoIcon } from "@heroicons/react/24/outline";
-import { Image } from "../Image.tsx";
-import { useValidateImage } from "@/hooks/use-validate-image.tsx";
-import { classNames } from "@/lib/classNames.ts";
-import { safeString } from "@/lib/strings.ts";
+import { PhotoIcon } from '@heroicons/react/24/outline'
+import { Image } from '../Image.tsx'
+import { useValidateImage } from '@/hooks/use-validate-image.tsx'
+import { classNames } from '@/lib/classNames.ts'
+import { safeString } from '@/lib/strings.ts'
 
 interface ContentItemImageProps {
-  content?: Nullable<Content>;
-  contentAlt: string;
-  contentsLength: number;
-  styles: string;
+	content?: Nullable<Content>
+	contentAlt: string
+	contentsLength: number
+	styles: string
 }
 
 export function ContentItemImage({
-  content,
-  contentAlt,
-  styles,
+	content,
+	contentAlt,
+	styles,
 }: ContentItemImageProps) {
-  const isValidImageUrl = useValidateImage(safeString(content?.media.url));
+	const isValidImageUrl = useValidateImage(safeString(content?.media.url))
 
-  if (!isValidImageUrl || !content?.media.url) {
-    return (
-      <div
-        aria-label={contentAlt}
-        className={classNames(
-          "flex items-center justify-center bg-zinc-100",
-          styles,
-        )}
-      >
-        <PhotoIcon className="size-10 text-zinc-300" />
-      </div>
-    );
-  }
+	if (!isValidImageUrl || !content?.media.url) {
+		return (
+			<div
+				aria-label={contentAlt}
+				className={classNames(
+					'flex items-center justify-center bg-zinc-100',
+					styles,
+				)}
+			>
+				<PhotoIcon className="size-10 text-zinc-300" />
+			</div>
+		)
+	}
 
-  return (
-    <Image
-      alt={contentAlt}
-      loadingColor={content.backgroundColor}
-      className={styles}
-      src={content.media.url}
-    />
-  );
+	return (
+		<Image
+			alt={contentAlt}
+			loadingColor={content.backgroundColor}
+			className={styles}
+			src={content.media.url}
+		/>
+	)
 }

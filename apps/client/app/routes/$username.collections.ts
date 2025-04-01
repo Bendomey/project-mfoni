@@ -1,3 +1,3 @@
-import { CreatorCollectionsModule } from "@/modules/index.ts";
+import { CreatorCollectionsModule } from '@/modules/index.ts'
 
-export default CreatorCollectionsModule;
+export default CreatorCollectionsModule

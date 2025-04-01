@@ -1,81 +1,81 @@
-import { useQuery } from "@tanstack/react-query";
-import { QUERY_KEYS } from "@/constants/index.ts";
-import { getQueryParams } from "@/lib/get-param.ts";
-import { fetchClient } from "@/lib/transport/index.ts";
+import { useQuery } from '@tanstack/react-query'
+import { QUERY_KEYS } from '@/constants/index.ts'
+import { getQueryParams } from '@/lib/get-param.ts'
+import { fetchClient } from '@/lib/transport/index.ts'
 
 export const getWalletTransactions = async (
-  props: FetchMultipleDataInputParams<FetchWalletTransactionFilter>,
-  apiConfig?: ApiConfigForServerConfig,
+	props: FetchMultipleDataInputParams<FetchWalletTransactionFilter>,
+	apiConfig?: ApiConfigForServerConfig,
 ) => {
-  try {
-    const removeAllNullableValues =
-      getQueryParams<FetchWalletTransactionFilter>(props);
-    const params = new URLSearchParams(removeAllNullableValues);
-    const response = await fetchClient<
-      ApiResponse<FetchMultipleDataResponse<WalletTransaction>>
-    >(`/v1/wallet-transactions?${params.toString()}`, {
-      ...(apiConfig ? apiConfig : {}),
-    });
+	try {
+		const removeAllNullableValues =
+			getQueryParams<FetchWalletTransactionFilter>(props)
+		const params = new URLSearchParams(removeAllNullableValues)
+		const response = await fetchClient<
+			ApiResponse<FetchMultipleDataResponse<WalletTransaction>>
+		>(`/v1/wallet-transactions?${params.toString()}`, {
+			...(apiConfig ? apiConfig : {}),
+		})
 
-    return response.parsedBody.data;
-  } catch (error: unknown) {
-    // Error from server.
-    if (error instanceof Response) {
-      const response = await error.json();
-      throw new Error(response.errorMessage);
-    }
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
 
-    if (error instanceof Error) {
-      throw error;
-    }
-  }
-};
+		if (error instanceof Error) {
+			throw error
+		}
+	}
+}
 
 export const useGetWalletTransactions = (
-  query: FetchMultipleDataInputParams<FetchWalletTransactionFilter>,
+	query: FetchMultipleDataInputParams<FetchWalletTransactionFilter>,
 ) =>
-  useQuery({
-    queryKey: [QUERY_KEYS.WALLET_TRANSACTIONS, query],
-    queryFn: () => getWalletTransactions(query),
-  });
+	useQuery({
+		queryKey: [QUERY_KEYS.WALLET_TRANSACTIONS, query],
+		queryFn: () => getWalletTransactions(query),
+	})
 
 interface DepositInput {
-  amount: number;
-  walletTransactionId?: string;
+	amount: number
+	walletTransactionId?: string
 }
 
 export const depositContent = async (
-  depositInput: DepositInput,
-  apiConfig: ApiConfigForServerConfig,
+	depositInput: DepositInput,
+	apiConfig: ApiConfigForServerConfig,
 ) => {
-  try {
-    const params = new URLSearchParams();
-    if (depositInput.walletTransactionId) {
-      params.append("walletTransactionId", depositInput.walletTransactionId);
-    }
+	try {
+		const params = new URLSearchParams()
+		if (depositInput.walletTransactionId) {
+			params.append('walletTransactionId', depositInput.walletTransactionId)
+		}
 
-    const response = await fetchClient<
-      ApiResponse<{ walletTransaction: WalletTransaction; payment: Payment }>
-    >(`/v1/users/wallets/topup?${params.toString()}`, {
-      method: "POST",
-      body: JSON.stringify({ amount: depositInput.amount }),
-      ...apiConfig,
-    });
+		const response = await fetchClient<
+			ApiResponse<{ walletTransaction: WalletTransaction; payment: Payment }>
+		>(`/v1/users/wallets/topup?${params.toString()}`, {
+			method: 'POST',
+			body: JSON.stringify({ amount: depositInput.amount }),
+			...apiConfig,
+		})
 
-    if (!response.parsedBody.status && response.parsedBody.errorMessage) {
-      throw new Error(response.parsedBody.errorMessage);
-    }
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
 
-    return response.parsedBody.data;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      throw error;
-    }
+		return response.parsedBody.data
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
 
-    // Error from server.
-    if (error instanceof Response) {
-      const response = await error.json();
-      throw new Error(response.errorMessage);
-    }
-  }
-};
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}

@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
 type UseDebounceParams<T> = {
-  /** An optional function that runs when setting the debounced value. */
-  callback?: (value: T) => void;
-  /** Number of milliseconds to wait to return the debounced value. */
-  delay: number;
-  /** The value to debounce. */
-  value: T;
-};
+	/** An optional function that runs when setting the debounced value. */
+	callback?: (value: T) => void
+	/** Number of milliseconds to wait to return the debounced value. */
+	delay: number
+	/** The value to debounce. */
+	value: T
+}
 
 /**
  * Takes an input and delays the return.
@@ -37,23 +37,23 @@ type UseDebounceParams<T> = {
  * ```
  */
 export function useDebounce<T>({
-  value,
-  delay,
-  callback,
+	value,
+	delay,
+	callback,
 }: UseDebounceParams<T>): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-      if (callback) {
-        callback(value);
-      }
-    }, delay);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay, callback]);
-  return debouncedValue;
+	const [debouncedValue, setDebouncedValue] = useState<T>(value)
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedValue(value)
+			if (callback) {
+				callback(value)
+			}
+		}, delay)
+		return () => {
+			clearTimeout(handler)
+		}
+	}, [value, delay, callback])
+	return debouncedValue
 }
 
 /**
@@ -82,10 +82,10 @@ export function useDebounce<T>({
  * ```
  */
 export function useDebouncedState<S>(
-  initialValue: S,
-  { delay, callback }: Pick<UseDebounceParams<S>, "delay" | "callback">,
+	initialValue: S,
+	{ delay, callback }: Pick<UseDebounceParams<S>, 'delay' | 'callback'>,
 ): [S, React.Dispatch<React.SetStateAction<S>>, S] {
-  const [state, setState] = useState<S>(initialValue);
-  const debouncedState = useDebounce<S>({ callback, delay, value: state });
-  return [state, setState, debouncedState];
+	const [state, setState] = useState<S>(initialValue)
+	const debouncedState = useDebounce<S>({ callback, delay, value: state })
+	return [state, setState, debouncedState]
 }
