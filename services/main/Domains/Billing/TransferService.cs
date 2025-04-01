@@ -215,7 +215,7 @@ public class TransferService
         // initiate transfer
         var response = await PaystackTransferConfiguration.Initiate(_appConstantsConfiguration.PaystackSecretKey, new CreateTransferInput
         {
-            // Reference = input.Reference,
+            Reference = input.Reference,
             Recipient = recipient.RecipientCode,
             Reason = input.Reason ?? "Transferring from my mfoni wallet",
             Amount = input.Amount,
