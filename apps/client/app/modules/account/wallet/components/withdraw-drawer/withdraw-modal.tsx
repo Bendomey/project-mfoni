@@ -1,7 +1,7 @@
 import { Dialog } from '@headlessui/react'
 import { BanknotesIcon, ExclamationCircleIcon } from '@heroicons/react/24/solid'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as Yup from 'yup'
 import { useInitiateTransfer } from '@/api/transfers/index.ts'
@@ -30,12 +30,16 @@ export function WithdrawModal({ isOpened, onClose, recipient }: Props) {
 
 	const yourFundInCedis = convertPesewasToCedis(currentUser?.bookWallet ?? 0)
 
-	const schema = Yup.object().shape({
-		amount: Yup.number()
-			.typeError('Amount must be a number')
-			.max(yourFundInCedis, `Amount must be less than ${yourFundInCedis}`)
-			.required('Amount is required'),
-	})
+	const schema = useMemo(
+		() =>
+			Yup.object().shape({
+				amount: Yup.number()
+					.typeError('Amount must be a number')
+					.max(yourFundInCedis, `Amount must be less than ${yourFundInCedis}`)
+					.required('Amount is required'),
+			}),
+		[yourFundInCedis],
+	)
 
 	const {
 		register,
