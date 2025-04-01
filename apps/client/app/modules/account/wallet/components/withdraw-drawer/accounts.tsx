@@ -230,7 +230,7 @@ function DeleteRecipient({
 					</h3>
 					<div>
 						<i className="text-sm text-gray-500">
-							Are you sure you want to delete this recipient ?
+							Are you sure you want to delete this recipient?
 						</i>
 					</div>
 				</div>
