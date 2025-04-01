@@ -187,6 +187,19 @@ public class TransferService
         // check if transfer recipient exists
         var recipient = await GetRecipientById(input.TransferRecipientId);
 
+        Models.Transfer? alreadyExistingTransfer = null;
+
+        if (input.Reference != null)
+        {
+            var doesReferenceAlreadyExist = await _transferCollection.Find(x => x.Reference == input.Reference).FirstOrDefaultAsync();
+            if (doesReferenceAlreadyExist is null)
+            {
+                throw new Exception("ReferenceIsInvalid");
+            }
+
+            alreadyExistingTransfer = doesReferenceAlreadyExist;
+        }
+
         // initiate transfer
         var response = await PaystackTransferConfiguration.Initiate(_appConstantsConfiguration.PaystackSecretKey, new CreateTransferInput
         {
@@ -198,7 +211,12 @@ public class TransferService
 
         if (response is null)
         {
-            throw new HttpRequestException("TransferFailed");
+            throw new HttpRequestException("InitializingTransferFailed");
+        }
+
+        if (alreadyExistingTransfer != null)
+        {
+            return alreadyExistingTransfer;
         }
 
         // update user book balance

@@ -47,3 +47,4 @@ jobs:
               --build-arg METRIC_CLIENT_ID=${{ secrets.METRIC_CLIENT_ID }}
               --build-arg METRIC_CLIENT_SECRET=${{ secrets.METRIC_CLIENT_SECRET }}
               --build-arg TAWK_ID=${{ secrets.TAWK_ID }}
+              --build-arg PAYSTACK_SECRET_KEY=${{ secrets.STAGING_PAYSTACK_SECRET_KEY }}

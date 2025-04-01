@@ -21,6 +21,8 @@ export const QUERY_KEYS = {
   CONTENT_LIKES: "content-likes",
   CREATORS: "creators",
   EXPLORE: "explore",
+  TRANSFER_RECIPIENTS: "transfer-recipients",
+  TRANSFERS: "transfers",
 } as const;
 
 export const MFONI_PACKAGES: Array<PackageType> = ["FREE", "BASIC", "ADVANCED"];

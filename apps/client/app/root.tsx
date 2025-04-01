@@ -59,8 +59,8 @@ export const links: LinksFunction = () => {
       href: "/site.webmanifest",
     },
     { rel: "icon", href: "/favicon.ico" },
-    { rel: "stylesheet", href: tailwindStyles },
-    { rel: "stylesheet", href: globalStyles },
+    { rel: "stylesheet", href: tailwindStyles, as: 'style' },
+    { rel: "stylesheet", href: globalStyles, as: 'style' },
   ];
 };
 
@@ -83,8 +83,7 @@ export async function loader(args: LoaderFunctionArgs) {
             url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
           ) {
             return redirect(
-              `${
-                PAGES.AUTHENTICATED_PAGES.ONBOARDING
+              `${PAGES.AUTHENTICATED_PAGES.ONBOARDING
               }?return_to=${getFullUrlPath(url)}`,
             );
           }

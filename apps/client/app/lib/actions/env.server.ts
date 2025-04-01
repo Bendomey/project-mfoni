@@ -19,6 +19,7 @@ const environmentSchema = z.object({
   METRIC_CLIENT_SECRET: z.string().min(1),
   SENTRY_DSN: z.string().min(1).optional(),
   TAWK_ID: z.string().min(1),
+  PAYSTACK_SECRET_KEY: z.string().min(1),
 });
 
 const environmentVariables = () => environmentSchema.parse(process.env);

@@ -125,7 +125,6 @@ public class TransferController : ControllerBase
                 AccountNumber = input.AccountNumber,
                 BankCode = input.BankCode,
                 BankName = input.BankName,
-                RecipientCode = input.RecipientCode,
                 Type = input.Type,
                 CreatedById = currentUser.Id
             });

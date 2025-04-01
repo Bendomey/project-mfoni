@@ -25,7 +25,9 @@ const PackageAndBillingsPage = () => {
             <ChevronLeftIcon className="h-4 w-auto" />
             My Account
           </Button>
-          <h1 className="text-2xl font-semibold">Package and billings</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold font-shantell">
+            Package and billings
+          </h1>
           <p className="mt-1 text-sm text-gray-600">
             Manage your package and billing details.
           </p>
