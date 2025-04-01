@@ -1,28 +1,42 @@
 import { Dialog } from '@headlessui/react'
-import { ExclamationCircleIcon } from '@heroicons/react/24/solid'
+import { BanknotesIcon, ExclamationCircleIcon } from '@heroicons/react/24/solid'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as Yup from 'yup'
+import { useInitiateTransfer } from '@/api/transfers/index.ts'
 import { Button } from '@/components/button/index.tsx'
 import { Loader } from '@/components/loader/index.tsx'
 import { Modal } from '@/components/modal/index.tsx'
 import { classNames } from '@/lib/classNames.ts'
+import { errorToast } from '@/lib/custom-toast-functions.tsx'
+import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
+import { useAuth } from '@/providers/auth/index.tsx'
 
 interface Props {
 	isOpened: boolean
 	onClose: () => void
+	recipient: TransferRecipient
 }
 
 interface FormValues {
 	amount: number
 }
 
-const schema = Yup.object().shape({
-	amount: Yup.number().required('Amount is required'),
-})
+export function WithdrawModal({ isOpened, onClose, recipient }: Props) {
+	const [isPending, setIsPending] = useState(false)
+	const { currentUser } = useAuth()
+	const { mutate } = useInitiateTransfer()
 
-const isPending = false
-export function WithdrawModal({ isOpened, onClose }: Props) {
+	const yourFundInCedis = convertPesewasToCedis(currentUser?.bookWallet ?? 0)
+
+	const schema = Yup.object().shape({
+		amount: Yup.number()
+			.typeError('Amount must be a number')
+			.max(yourFundInCedis, `Amount must be less than ${yourFundInCedis}`)
+			.required('Amount is required'),
+	})
+
 	const {
 		register,
 		handleSubmit,
@@ -31,41 +45,65 @@ export function WithdrawModal({ isOpened, onClose }: Props) {
 		resolver: yupResolver(schema),
 	})
 
-	const onSubmit = () => {}
+	const onSubmit = (data: FormValues) => {
+		setIsPending(true)
+		mutate(
+			{
+				amount: data.amount,
+				transferRecipientId: recipient.id,
+			},
+			{
+				onSuccess() {
+					window.location.reload()
+				},
+				onError() {
+					setIsPending(false)
+					errorToast('Unable to initiate transfer', {
+						id: 'withdraw-funds-error',
+					})
+				},
+			},
+		)
+	}
 
 	return (
-		<Modal className="w-1/3" isOpened={isOpened} onClose={onClose}>
+		<Modal
+			className="w-full sm:w-1/2 lg:w-1/3"
+			isOpened={isOpened}
+			onClose={onClose}
+		>
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<div className="mb-3 flex justify-center">
-					<span className="inline-block h-14 w-14 overflow-hidden rounded-full bg-gray-100">
-						<svg
-							className="h-full w-full text-gray-300"
-							fill="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-						</svg>
-					</span>
-				</div>
 				<Dialog.Title
 					as="h3"
-					className="text-center text-lg font-medium leading-6 text-gray-900"
+					className="font-shantell text-lg font-medium leading-6 text-gray-900"
 				>
 					Withdraw Funds
 				</Dialog.Title>
 				<div className="mt-2">
-					<p className="text-center text-sm text-gray-500">
-						Great news! You&apos;re almost there. Please complete your account
-						setup to continue.
+					<p className="text-sm text-gray-500">
+						You're sending money to your <b>{recipient.bankName}</b> account
+						with number <b>{recipient.accountNumber}</b>.
 					</p>
+
+					<div className="mt-4 flex items-center space-x-3 bg-gray-50 p-3">
+						<div>
+							<BanknotesIcon className="h-10 w-auto text-gray-400" />
+						</div>
+						<div>
+							<p className="text-sm">Available Funds</p>
+							<h1 className="text-2xl font-extrabold">
+								{formatAmount(yourFundInCedis)}
+							</h1>
+						</div>
+					</div>
 
 					<div className="mt-3">
 						<div className="flex justify-between">
 							<label
-								htmlFor="email"
+								htmlFor="amount"
 								className="block text-sm font-medium leading-6 text-gray-900"
 							>
-								Name
+								Amount
 							</label>
 						</div>
 						<div className="relative mt-2">
@@ -77,8 +115,7 @@ export function WithdrawModal({ isOpened, onClose }: Props) {
 									'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6',
 									errors.amount ? 'ring-red-500' : '',
 								)}
-								placeholder="Your Name"
-								aria-describedby="email-optional"
+								placeholder="eg. 0.00"
 							/>
 							{errors.amount ? (
 								<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -89,6 +126,11 @@ export function WithdrawModal({ isOpened, onClose }: Props) {
 								</div>
 							) : null}
 						</div>
+						{errors.amount ? (
+							<p className="mt-1 text-xs text-red-600">
+								{errors.amount.message}
+							</p>
+						) : null}
 					</div>
 				</div>
 
