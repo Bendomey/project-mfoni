@@ -8,7 +8,7 @@ import { useAuth } from '@/providers/auth/index.tsx'
 const WithdrawDrawer = lazy(() => import('./withdraw-drawer/index.tsx'))
 
 export function WalletCard() {
-	const { currentUser } = useAuth()
+	const { currentUser, isACreator } = useAuth()
 	const walletModalState = useDisclosure()
 
 	return (
@@ -38,9 +38,11 @@ export function WalletCard() {
 
 				<div className="mt-3 flex justify-end gap-2 border-t border-gray-200 px-4 py-2">
 					<DepositButton />
-					<Button onClick={walletModalState.onOpen} className="gap-1">
-						Withdraw
-					</Button>
+					{isACreator ? (
+						<Button onClick={walletModalState.onOpen} className="gap-1">
+							Withdraw
+						</Button>
+					) : null}
 				</div>
 			</div>
 			<WithdrawDrawer
