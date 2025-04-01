@@ -16,7 +16,7 @@ interface Props {
   onClose: () => void;
 }
 
-export default function WidthdrawDrawer({ isOpened, onClose }: Props) {
+export default function WithdrawDrawer({ isOpened, onClose }: Props) {
   const [activeTab, setActiveTab] = useState("ACCOUNTS");
 
   return (
