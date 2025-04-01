@@ -2,6 +2,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
 import { CreditCardIcon } from '@heroicons/react/24/solid'
 import { useQueryClient } from '@tanstack/react-query'
+import { WithdrawModal } from './withdraw-modal.tsx'
 import {
 	useDeleteTransferRecipient,
 	useGetTransferRecipients,
@@ -73,6 +74,7 @@ interface RecipientItemProps {
 
 function RecipientItem({ recipient }: RecipientItemProps) {
 	const deleteModalState = useDisclosure()
+	const payModalState = useDisclosure()
 	return (
 		<>
 			<div className="group relative flex items-center px-5 py-6">
@@ -100,14 +102,15 @@ function RecipientItem({ recipient }: RecipientItemProps) {
 							<CreditCardIcon className="size-8 text-gray-300" />
 						)}
 						<div className="ml-4 w-10/12">
-							<p className="text-sm font-medium text-gray-900">
-								{recipient.accountName}
+							<p className="text-sm font-medium capitalize text-gray-900">
+								{recipient.accountName.toLowerCase()}{' '}
+								{recipient.type === 'ghipss' ? `(${recipient.bankName})` : ''}
 							</p>
 							<p className="text-sm text-gray-500">{recipient.accountNumber}</p>
 						</div>
 					</div>
 				</div>
-				<Button size="sm" className="relative">
+				<Button onClick={payModalState.onOpen} size="sm" className="relative">
 					Pay
 				</Button>
 				<Menu
@@ -144,6 +147,11 @@ function RecipientItem({ recipient }: RecipientItemProps) {
 			<DeleteRecipient
 				isOpened={deleteModalState.isOpened}
 				onClose={deleteModalState.onClose}
+				recipient={recipient}
+			/>
+			<WithdrawModal
+				isOpened={payModalState.isOpened}
+				onClose={payModalState.onClose}
 				recipient={recipient}
 			/>
 		</>
