@@ -46,13 +46,19 @@ public class TransferService
 
     public async Task<Models.TransferRecipient> CreateTransferRecipient(CreateTransferRecipientInput input)
     {
+
+        var builder = Builders<Models.TransferRecipient>.Filter;
+        var filter = builder.Eq(x => x.AccountNumber, input.AccountNumber) &
+            builder.Eq(x => x.CreatedById, input.CreatedById) &
+            builder.Eq(x => x.DeletedAt, null);
+
         var oldRecipient = await _transferRecipientCollection
-            .Find(x => x.AccountNumber == input.AccountNumber && x.CreatedById == input.CreatedById)
+            .Find(filter)
             .FirstOrDefaultAsync();
 
         if (oldRecipient != null)
         {
-            throw new Exception("TransferRecipientAlreadyExists");
+            throw new HttpRequestException("TransferRecipientAlreadyExists");
         }
 
         var response = await PaystackTransferRecipientConfiguration.CreateRecipient(_appConstantsConfiguration.PaystackSecretKey, new CreateRecipientInput
@@ -87,13 +93,19 @@ public class TransferService
 
     public async Task DeleteTransferRecipient(DeleteTransferRecipientInput input)
     {
+
+        var builder = Builders<Models.TransferRecipient>.Filter;
+        var filter = builder.Eq(x => x.Id, input.TransferRecipientId) &
+            builder.Eq(x => x.CreatedById, input.CreatedById) &
+            builder.Eq(x => x.DeletedAt, null);
+
         var recipient = await _transferRecipientCollection
-            .Find(x => x.Id == input.TransferRecipientId && x.CreatedById == input.CreatedById && x.DeletedAt == null)
+            .Find(filter)
             .FirstOrDefaultAsync();
 
         if (recipient is null)
         {
-            throw new Exception("TransferRecipientNotFound");
+            throw new HttpRequestException("TransferRecipientNotFound");
         }
 
         await _transferRecipientCollection.UpdateOneAsync(
@@ -163,7 +175,7 @@ public class TransferService
         var recipient = await _transferRecipientCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
         if (recipient is null)
         {
-            throw new Exception("TransferRecipientNotFound");
+            throw new HttpRequestException("TransferRecipientNotFound");
         }
 
         return recipient;
@@ -175,13 +187,13 @@ public class TransferService
         var user = await _userCollection.Find(x => x.Id == input.CreatedById).FirstOrDefaultAsync();
         if (user is null)
         {
-            throw new Exception("UserNotFound");
+            throw new HttpRequestException("UserNotFound");
         }
 
         bool canIPay = user.BookWallet >= input.Amount;
         if (!canIPay)
         {
-            throw new Exception("InsufficientBalance");
+            throw new HttpRequestException("InsufficientBalance");
         }
 
         // check if transfer recipient exists
@@ -194,7 +206,7 @@ public class TransferService
             var doesReferenceAlreadyExist = await _transferCollection.Find(x => x.Reference == input.Reference).FirstOrDefaultAsync();
             if (doesReferenceAlreadyExist is null)
             {
-                throw new Exception("ReferenceIsInvalid");
+                throw new HttpRequestException("ReferenceIsInvalid");
             }
 
             alreadyExistingTransfer = doesReferenceAlreadyExist;
@@ -261,7 +273,7 @@ public class TransferService
 
         if (transfer is null)
         {
-            throw new Exception("TransferNotFound");
+            throw new HttpRequestException("TransferNotFound");
         }
 
         // find wallet transaction by id
@@ -269,7 +281,7 @@ public class TransferService
 
         if (walletTransaction is null)
         {
-            throw new Exception("WalletTransactionNotFound");
+            throw new HttpRequestException("WalletTransactionNotFound");
         }
 
         // update wallet transaction status
@@ -285,7 +297,7 @@ public class TransferService
         var user = await _userCollection.Find(x => x.Id == walletTransaction.UserId).FirstOrDefaultAsync();
         if (user is null)
         {
-            throw new Exception("UserNotFound");
+            throw new HttpRequestException("UserNotFound");
         }
 
         user.Wallet -= transfer.Amount;
@@ -307,7 +319,7 @@ public class TransferService
 
         if (transfer is null)
         {
-            throw new Exception("TransferNotFound");
+            throw new HttpRequestException("TransferNotFound");
         }
 
         // find wallet transaction by id
@@ -315,7 +327,7 @@ public class TransferService
 
         if (walletTransaction is null)
         {
-            throw new Exception("WalletTransactionNotFound");
+            throw new HttpRequestException("WalletTransactionNotFound");
         }
 
         // update wallet transaction status
@@ -331,7 +343,7 @@ public class TransferService
         var user = await _userCollection.Find(x => x.Id == walletTransaction.UserId).FirstOrDefaultAsync();
         if (user is null)
         {
-            throw new Exception("UserNotFound");
+            throw new HttpRequestException("UserNotFound");
         }
 
         user.BookWallet += transfer.Amount;
