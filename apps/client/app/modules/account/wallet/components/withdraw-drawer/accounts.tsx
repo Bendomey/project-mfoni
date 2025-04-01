@@ -1,78 +1,47 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { CreditCardIcon } from "@heroicons/react/24/solid";
+import { useGetTransferRecipients } from "@/api/transfers/index.ts";
 import { Button } from "@/components/button/index.tsx";
 import { EmptyLottie } from "@/components/lotties/empty.tsx";
 import { ErrorLottie } from "@/components/lotties/error.tsx";
-
-const accounts = [
-  {
-    name: "Leslie Alexander",
-    handle: "0201******2",
-    type: "VODA",
-  },
-  {
-    name: "Leslie ATL",
-    handle: "0261******2",
-    type: "ATL",
-  },
-  {
-    name: "Leslie Mtn",
-    handle: "0551******2",
-    type: "MTN",
-  },
-  {
-    name: "Leslie Bank Account",
-    handle: "1551******2",
-    type: "BANK",
-  },
-  {
-    name: "Leslie Bank Account",
-    handle: "1551******2",
-    type: "BANK",
-  },
-  {
-    name: "Leslie Bank Account",
-    handle: "1551******2",
-    type: "BANK",
-  },
-  {
-    name: "Leslie Bank Account",
-    handle: "1551******2",
-    type: "BANK",
-  },
-  {
-    name: "Leslie Bank Account",
-    handle: "1551******2",
-    type: "BANK",
-  },
-  {
-    name: "Leslie Bank Account",
-    handle: "1551******2",
-    type: "BANK",
-  },
-  {
-    name: "Leslie Bank Account",
-    handle: "1551******2",
-    type: "BANK",
-  },
-  {
-    name: "Leslie Bank Account",
-    handle: "1551******2",
-    type: "BANK",
-  },
-];
 
 interface Props {
   addNew: () => void;
 }
 
 export function AccountsListing({ addNew }: Props) {
-  if (accounts.length) {
+  const { data, isPending, isError } = useGetTransferRecipients({
+    pagination:{
+      page: 0,
+      per: 50
+    }
+  })
+
+  if (isPending) {
+    return (
+      <div className="m-4 space-y-3">
+        {[1, 2, 3, 4, 5].map((_, index) => (
+          <div
+            className="flex w-full items-center justify-between bg-gray-50 p-2"
+            key={index}
+          >
+            <div className="flex items-center space-x-2">
+              <div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+              <div className="h-8 w-40 animate-pulse rounded bg-gray-200" />
+            </div>
+            <div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  if (isError) {
     return <ErrorState retry={addNew} />;
   }
 
-  if (accounts.length) {
+  if (!data?.rows.length) {
     return <EmptyState addNew={addNew} />;
   }
 
@@ -81,8 +50,8 @@ export function AccountsListing({ addNew }: Props) {
       role="list"
       className="flex-1 divide-y divide-gray-200 overflow-y-auto scrollContainer mr-.5"
     >
-      {accounts.map((person) => (
-        <li key={person.handle}>
+      {data.rows.map((recipient) => (
+        <li key={recipient.id}>
           <div className="group relative flex items-center px-5 py-6">
             <a className="-m-1 block flex-1 p-1">
               <div
@@ -90,33 +59,33 @@ export function AccountsListing({ addNew }: Props) {
                 className="absolute inset-0 group-hover:bg-gray-50"
               />
               <div className="relative flex min-w-0 flex-1 items-center">
-                {person.type === "VODA" ? (
+                {recipient.bankCode === "VOD" ? (
                   <img
                     alt="telecel logo"
                     src="/images/vodafone.png"
                     className="h-auto w-10"
                   />
-                ) : person.type === "MTN" ? (
+                ) : recipient.bankCode === "MTN" ? (
                   <img
                     alt="mtn logo"
                     src="/images/mtn_logo.png"
                     className="h-auto w-10"
                   />
-                ) : person.type === "ATL" ? (
+                ) : recipient.bankCode === "ATL" ? (
                   <img
                     alt="airtel tigo logo"
                     src="/images/airtel_tigo.png"
                     className="h-auto w-10"
                   />
-                ) : person.type === "BANK" ? (
+                ) : (
                   <CreditCardIcon className="size-8 text-gray-300" />
-                ) : null}
+                )}
                 <div className="ml-4 truncate">
                   <p className="truncate text-sm font-medium text-gray-900">
-                    {person.name}
+                    {recipient.accountName}
                   </p>
                   <p className="truncate text-sm text-gray-500">
-                    {person.handle}
+                    {recipient.accountNumber}
                   </p>
                 </div>
               </div>

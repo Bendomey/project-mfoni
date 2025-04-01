@@ -2,6 +2,7 @@ import { DialogTitle } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { AccountsListing } from "./accounts.tsx";
+import { AddNewAccount } from "./add-account.tsx";
 import { Drawer } from "@/components/drawer/index.tsx";
 import { classNames } from "@/lib/classNames.ts";
 
@@ -15,7 +16,7 @@ interface Props {
   onClose: () => void;
 }
 
-export default function WidthdrawModal({ isOpened, onClose }: Props) {
+export default function WidthdrawDrawer({ isOpened, onClose }: Props) {
   const [activeTab, setActiveTab] = useState("ACCOUNTS");
 
   return (
@@ -72,7 +73,7 @@ export default function WidthdrawModal({ isOpened, onClose }: Props) {
         {activeTab === "ACCOUNTS" ? (
           <AccountsListing addNew={() => setActiveTab("ADD_NEW")} />
         ) : activeTab === "ADD_NEW" ? (
-          <>add new </>
+          <AddNewAccount navigate={setActiveTab} />
         ) : null}
       </div>
     </Drawer>
