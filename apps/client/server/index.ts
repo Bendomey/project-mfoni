@@ -5,7 +5,6 @@ import { createRequestHandler } from '@remix-run/express'
 import { type ServerBuild } from '@remix-run/node'
 import {
 	init as sentryInit,
-	// setContext as sentrySetContext,
 } from '@sentry/remix'
 import address from 'address'
 import chalk from 'chalk'
@@ -17,6 +16,7 @@ import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import { router } from './routes/index.js'
+import { extractAuthCookie, getCurrentUser } from './utils/currentUser.js'
 
 const MODE = process.env.NODE_ENV
 const getHost = (req: { get: (key: string) => string | undefined }) =>
@@ -163,6 +163,48 @@ app.use((req, res, next) => {
 	next()
 })
 
+// Temporary in-memory cache for a request lifecycle
+const userCache = new Map()
+console.log(userCache)
+
+app.use(async (req, res, next) => {
+	// get access to cookies data
+	req.headers['x-request-id'] = "hello-world"
+	const authCookie = await extractAuthCookie(req.headers.cookie)
+	if (authCookie) {
+		const requestId = `${req.ip}-${authCookie.id}` // Unique per request
+
+		const isAFullReload = req.headers.accept?.includes('text/html')
+		if (isAFullReload) {
+			console.log(req.headers.accept)
+			console.log('reloaddddddddd')
+			// userCache.delete(requestId)
+		}
+		if (userCache.has(requestId)) {
+			console.log('callleddddddddd In')
+			res.locals.user = userCache.get(requestId)
+			return next()
+		}
+
+		console.log('callleddddddddd Out')
+
+		try {
+			const currentUserResponse = await getCurrentUser(authCookie.token)
+			if (currentUserResponse?.data) {
+				res.locals.user = currentUserResponse?.data
+			}
+		} catch (error) {
+			console.log(error)
+			res.locals.user = error
+		}
+
+		userCache.set(requestId, res.locals.user)
+		// res.locals.invalidateUser = () => userCache.delete(requestId)
+	}
+
+	next()
+})
+
 app.use(
 	helmet({
 		contentSecurityPolicy: {
@@ -274,6 +316,9 @@ app.all(
 			return {
 				cspNonce: res.locals.cspNonce, // Pass nonce to Remix loaders
 				serverBuild: getBuild(),
+				currentUser: res.locals.user, // all remix loaders can access it!
+				// TODO: figure out how to invalidate the user cache
+				// invalidateUser: res.locals.invalidateUser,
 			}
 		},
 	}),
@@ -316,6 +361,10 @@ const server = app.listen(portToUse, () => {
 
 closeWithGrace(() => {
 	return Promise.all([
+		new Promise((resolve) => {
+			userCache.clear()
+			resolve('ok')
+		}),
 		new Promise((resolve, reject) => {
 			server.close((e) => (e ? reject(e) : resolve('ok')))
 		}),
