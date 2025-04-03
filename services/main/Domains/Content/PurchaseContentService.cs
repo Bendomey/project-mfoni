@@ -198,6 +198,7 @@ public class PurchaseContentService
                     $"{CacheProvider.CacheEntities["contents"]}.find*",
                     $"{CacheProvider.CacheEntities["contents"]}*{input.ContentId}*",
                     $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+                    $"{CacheProvider.CacheEntities["auth"]}*{creatorUser.Id}*",
                 });
 
                 return new PurchaseContentOutput
