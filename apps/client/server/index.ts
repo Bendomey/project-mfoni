@@ -2,21 +2,22 @@ import crypto from 'crypto'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { createRequestHandler } from '@remix-run/express'
-import { type ServerBuild } from '@remix-run/node'
-import {
-	init as sentryInit,
-	// setContext as sentrySetContext,
-} from '@sentry/remix'
+import { type ServerBuild, installGlobals } from '@remix-run/node'
+import { init as sentryInit } from '@sentry/remix'
 import address from 'address'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
 import compression from 'compression'
 import cors from 'cors'
 import express from 'express'
+import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import { router } from './routes/index.js'
+import { extractAuthCookie, getCurrentUser } from './utils/currentUser.js'
+
+installGlobals({ nativeFetch: true })
 
 const MODE = process.env.NODE_ENV
 const getHost = (req: { get: (key: string) => string | undefined }) =>
@@ -70,6 +71,28 @@ const portToUse = await getPort({
 
 const app = express()
 
+const limiter = rateLimit({
+	windowMs: 2 * 60 * 1000, // 2 minutes
+	max: 1000,
+	standardHeaders: true,
+	legacyHeaders: false,
+	skip: () => {
+		return process.env.NODE_ENV === 'development'
+	},
+	message: 'Too many requests, please try again later.',
+	handler: (_, res) => {
+		res.status(429).json({
+			error: {
+				message: 'Too many requests, please try again later.',
+			},
+		})
+	},
+})
+
+// TODO: pass the fly proxy IPs to increase security!!! - https://claude.ai/chat/b090394a-b4db-46ff-a3bd-2c4445dc4ad7
+app.set('trust proxy', true)
+app.use(limiter)
+
 app.use(
 	cors({
 		origin: `http://localhost:${portToUse}`,
@@ -86,8 +109,6 @@ app.use((req, res, next) => {
 		next()
 	}
 })
-
-app.set('trust proxy', true)
 
 app.use((req, res, next) => {
 	const proto = req.get('X-Forwarded-Proto')
@@ -158,8 +179,24 @@ app.use(
 
 app.use('/api', router)
 
-app.use((req, res, next) => {
+app.use((_, res, next) => {
 	res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
+	next()
+})
+
+app.use(async (req, res, next) => {
+	const authCookie = await extractAuthCookie(req.headers.cookie)
+	if (authCookie) {
+		try {
+			const currentUserResponse = await getCurrentUser(authCookie.token)
+			if (currentUserResponse?.data) {
+				res.locals.user = currentUserResponse?.data
+			}
+		} catch (error) {
+			res.locals.user = error
+		}
+	}
+
 	next()
 })
 
@@ -272,8 +309,9 @@ app.all(
 		mode: MODE,
 		getLoadContext(_, res) {
 			return {
-				cspNonce: res.locals.cspNonce, // Pass nonce to Remix loaders
+				cspNonce: res.locals.cspNonce,
 				serverBuild: getBuild(),
+				currentUser: res.locals.user,
 			}
 		},
 	}),

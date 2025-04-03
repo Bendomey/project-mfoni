@@ -120,3 +120,7 @@ interface PaystackBankVerify {
 	account_name: string
 	bank_id: number
 }
+
+interface IMfoniRemixContext {
+	currentUser?: User | Error
+}

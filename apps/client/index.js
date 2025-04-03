@@ -5,7 +5,7 @@ import closeWithGrace from 'close-with-grace'
 
 // make sure globals are installed before we do anything else
 // that way everything's referencing the same globals
-installGlobals()
+installGlobals({ nativeFetch: true })
 
 closeWithGrace(async ({ err }) => {
 	if (err) {

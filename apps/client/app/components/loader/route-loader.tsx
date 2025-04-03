@@ -1,12 +1,55 @@
 import { useNavigation } from '@remix-run/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSpinDelay } from 'spin-delay'
 import { Loader } from './index.tsx'
+import { classNames } from '@/lib/classNames.ts'
+
+export function TopLoader() {
+	let transition = useNavigation()
+	let active = transition.state !== 'idle'
+
+	let ref = useRef<HTMLDivElement>(null)
+	let [animating, setAnimating] = useState(false)
+
+	useEffect(() => {
+		if (!ref.current) return
+
+		Promise.allSettled(
+			ref.current.getAnimations().map(({ finished }) => finished),
+		).then(() => {
+			if (!active) setAnimating(false)
+		})
+
+		if (active) {
+			setAnimating(true)
+		}
+	}, [active])
+
+	return (
+		<div
+			role="progressbar"
+			aria-hidden={!active}
+			aria-valuetext={active ? 'Loading' : undefined}
+			className="fixed inset-x-0 left-0 top-0 z-50 h-1 animate-pulse"
+		>
+			<div
+				ref={ref}
+				className={classNames(
+					'h-full bg-blue-600 transition-all duration-500 ease-in-out',
+					transition.state === 'idle' &&
+						(animating ? 'w-full' : 'w-0 opacity-0 transition-none'),
+					transition.state === 'submitting' && 'w-4/12',
+					transition.state === 'loading' && 'w-10/12',
+				)}
+			/>
+		</div>
+	)
+}
 
 let firstRender = true
 
-export const RouteLoader = () => {
+export const BottomLoader = () => {
 	const transition = useNavigation()
 	const [pendingPath, setPendingPath] = useState<string | null>()
 	const [message, setMessage] = useState<string | null>()
@@ -72,3 +115,5 @@ export const RouteLoader = () => {
 		</AnimatePresence>
 	)
 }
+
+export const RouteLoader = TopLoader

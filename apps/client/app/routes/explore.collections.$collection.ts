@@ -1,15 +1,11 @@
-import {
-	type LoaderFunctionArgs,
-	redirect,
-	type MetaFunction,
-} from '@remix-run/node'
+import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 
 import { dehydrate, QueryClient } from '@tanstack/react-query'
 import {
 	getCollectionBySlug,
 	getCollectionContentsBySlug,
 } from '@/api/collections/index.ts'
-import { PAGES, QUERY_KEYS } from '@/constants/index.ts'
+import { QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
@@ -46,12 +42,18 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		// if content is private and user is not logged in, return 404
 		if (collection?.visibility === 'PRIVATE') {
 			if (!authCookie?.token || authCookie?.id !== collection?.createdById) {
-				return redirect(PAGES.NOT_FOUND)
+				throw new Response(null, {
+					status: 404,
+					statusText: 'Page Not Found',
+				})
 			}
 		}
 	} catch {
 		// if collection is not found, return 404
-		return redirect(PAGES.NOT_FOUND)
+		throw new Response(null, {
+			status: 404,
+			statusText: 'Page Not Found',
+		})
 	}
 
 	const isCollectionMine = collection?.createdBy?.id === authCookie?.id

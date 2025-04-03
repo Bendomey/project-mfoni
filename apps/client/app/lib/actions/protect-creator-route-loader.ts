@@ -1,34 +1,25 @@
 import { redirect, type LoaderFunction } from '@remix-run/node'
-import { QueryClient } from '@tanstack/react-query'
 import { getFullUrlPath } from '../url-helpers.ts'
-import { extractAuthCookie } from './extract-auth-cookie.ts'
-import { getCurrentUser } from '@/api/auth/index.ts'
-import { PAGES, QUERY_KEYS } from '@/constants/index.ts'
+import { PAGES } from '@/constants/index.ts'
 
 export const protectCreatorRouteLoader: LoaderFunction = async ({
+	context,
 	request,
 }) => {
-	const queryClient = new QueryClient()
-	const cookieString = request.headers.get('cookie')
-	const authCookie = await extractAuthCookie(cookieString)
+	const { currentUser } = context as IMfoniRemixContext
 
-	if (authCookie) {
-		// cache the current user for faster session fetches.
-		const res = await queryClient.fetchQuery({
-			queryKey: [QUERY_KEYS.CURRENT_USER],
-			queryFn: () => getCurrentUser(authCookie.token),
-		})
+	if (currentUser) {
+		const currentUserThrewAnError = currentUser instanceof Error
+		if (!currentUserThrewAnError) {
+			if (currentUser?.creator) {
+				return null
+			}
 
-		if (!res?.data.creator) {
-			// TODO: look into designing 404 pages with error boundaries
-			// throw new Response(null, {
-			//   status: 404,
-			//   statusText: 'Not Found',
-			// })
-			return redirect(PAGES.NOT_FOUND)
+			throw new Response(null, {
+				status: 404,
+				statusText: 'Not Found',
+			})
 		}
-
-		return null
 	}
 
 	return redirect(

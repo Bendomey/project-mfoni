@@ -18,19 +18,19 @@ import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat.js'
 import { type PropsWithChildren } from 'react'
 import { Toaster } from 'react-hot-toast'
-import { getCurrentUser } from './api/auth/index.ts'
 import { RouteLoader } from './components/loader/route-loader.tsx'
 import { PAGES } from './constants/index.ts'
 import 'dayjs/locale/en-gb.js'
 import { environmentVariables } from './lib/actions/env.server.ts'
-import { extractAuthCookie } from './lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from './lib/actions/json-with-cache.server.ts'
 import { useNonce } from './lib/nonce-provider.ts'
 import { getFullUrlPath } from './lib/url-helpers.ts'
+import { NotFoundModule } from './modules/index.ts'
 import { EnvContext } from './providers/env/index.tsx'
 import { Providers } from './providers/index.tsx'
-import globalStyles from '@/styles/global.css?url'
-import tailwindStyles from '@/styles/tailwind.css?url'
+
+import '@/styles/tailwind.css'
+import '@/styles/global.css'
 
 dayjs.locale('en-gb')
 dayjs.extend(localizedFormat)
@@ -59,40 +59,31 @@ export const links: LinksFunction = () => {
 			href: '/site.webmanifest',
 		},
 		{ rel: 'icon', href: '/favicon.ico' },
-		{ rel: 'stylesheet', href: tailwindStyles, as: 'style' },
-		{ rel: 'stylesheet', href: globalStyles, as: 'style' },
 	]
 }
 
 export async function loader(args: LoaderFunctionArgs) {
+	const { currentUser } = args.context as IMfoniRemixContext
 	const url = new URL(args.request.url)
 	let user: User | null = null
 
-	const cookieString = args.request.headers.get('cookie')
-	if (cookieString) {
-		const authCookie = await extractAuthCookie(cookieString)
-		if (authCookie) {
-			try {
-				const res = await getCurrentUser(authCookie.token)
+	if (currentUser) {
+		if (currentUser instanceof Error) {
+			if (url.pathname !== PAGES.LOGIN) {
+				return redirect(`${PAGES.LOGIN}?return_to=${getFullUrlPath(url)}`)
+			}
+		} else {
+			user = currentUser
 
-				if (res?.data) {
-					user = res.data
-
-					if (
-						!res.data.role &&
-						url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
-					) {
-						return redirect(
-							`${
-								PAGES.AUTHENTICATED_PAGES.ONBOARDING
-							}?return_to=${getFullUrlPath(url)}`,
-						)
-					}
-				}
-			} catch {
-				if (url.pathname !== PAGES.LOGIN) {
-					return redirect(`${PAGES.LOGIN}?return_to=${getFullUrlPath(url)}`)
-				}
+			if (
+				!currentUser.role &&
+				url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
+			) {
+				return redirect(
+					`${PAGES.AUTHENTICATED_PAGES.ONBOARDING}?return_to=${getFullUrlPath(
+						url,
+					)}`,
+				)
 			}
 		}
 	}
@@ -138,15 +129,22 @@ interface DocumentProps {
 		API_ADDRESS: string
 		TAWK_ID: string
 	}
+	noIndex?: boolean
 }
 
-function Document({ children, ENV }: PropsWithChildren<DocumentProps>) {
+function Document({
+	children,
+	ENV,
+	noIndex,
+}: PropsWithChildren<DocumentProps>) {
 	const cspNonce = useNonce()
 	return (
 		<html lang="en">
 			<head>
 				<meta charSet="utf-8" />
+				<meta name="theme-color" content="#1C4ED8" />
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
+				{noIndex ? <meta name="robots" content="noindex" /> : null}
 				<Meta />
 				<Links />
 			</head>
@@ -224,21 +222,39 @@ export function ErrorBoundary() {
 
 	if (isRouteErrorResponse(error)) {
 		return (
-			<div>
-				<h1>
-					{error.status} {error.statusText}
-				</h1>
-				<p>{error.data}</p>
-			</div>
+			<Document
+				noIndex
+				ENV={{
+					API_ADDRESS: '',
+					MFONI_GOOGLE_AUTH_CLIENT_ID: '',
+					TAWK_ID: '',
+					FACEBOOK_APP_ID: '',
+				}}
+			>
+				<NotFoundModule
+					status={error.status}
+					title={error.statusText}
+					message={error.data}
+				/>
+			</Document>
 		)
 	} else if (error instanceof Error) {
 		return (
-			<div>
-				<h1>Error</h1>
-				<p>{error.message}</p>
-				<p>The stack trace is:</p>
-				<pre>{error.stack}</pre>
-			</div>
+			<Document
+				noIndex
+				ENV={{
+					API_ADDRESS: '',
+					MFONI_GOOGLE_AUTH_CLIENT_ID: '',
+					TAWK_ID: '',
+					FACEBOOK_APP_ID: '',
+				}}
+			>
+				<NotFoundModule
+					status={500}
+					title={error.message}
+					message={error.stack}
+				/>
+			</Document>
 		)
 	} else {
 		return <h1>Unknown Error</h1>

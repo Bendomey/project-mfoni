@@ -5,7 +5,7 @@ import {
 } from '@remix-run/node'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { getCreatorByUsername } from '@/api/creators/index.ts'
-import { PAGES, QUERY_KEYS } from '@/constants/index.ts'
+import { QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
 import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
@@ -39,7 +39,10 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 				origin: getDomainUrl(loaderArgs.request),
 			})
 	} catch {
-		return redirect(PAGES.NOT_FOUND)
+		throw new Response(null, {
+			status: 404,
+			statusText: 'Not Found',
+		})
 	}
 }
 
