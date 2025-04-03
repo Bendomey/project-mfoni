@@ -15,11 +15,13 @@ public class TransferService
     private readonly IMongoCollection<Models.Transfer> _transferCollection;
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.WalletTransaction> _walletTransactionCollection;
+    private readonly CacheProvider _cacheProvider;
 
     public TransferService(
         ILogger<TransferService> logger,
         DatabaseSettings databaseConfig,
-        IOptions<AppConstants> appConstants
+        IOptions<AppConstants> appConstants,
+        CacheProvider cacheProvider
     )
     {
         _logger = logger;
@@ -40,6 +42,8 @@ public class TransferService
         _walletTransactionCollection = databaseConfig.Database.GetCollection<Models.WalletTransaction>(
             appConstants.Value.WalletTransactionCollection
         );
+
+        _cacheProvider = cacheProvider;
 
         logger.LogDebug("Transfer service initialized");
     }
@@ -310,6 +314,10 @@ public class TransferService
                 .Set(x => x.SuccessfulAt, DateTime.UtcNow)
                 .Set(x => x.UpdatedAt, DateTime.UtcNow)
         );
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
+        });
     }
 
     public async Task VerifyFailedTransfer(string Reference)
@@ -357,6 +365,10 @@ public class TransferService
                 .Set(x => x.FailedAt, DateTime.UtcNow)
                 .Set(x => x.UpdatedAt, DateTime.UtcNow)
         );
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
+        });
     }
 
     public async Task VerifyReverseTransfer(string Reference)

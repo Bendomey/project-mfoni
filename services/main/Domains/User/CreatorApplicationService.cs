@@ -19,12 +19,14 @@ public class CreatorApplicationService
     private readonly IMongoCollection<Models.CreatorApplication> _creatorApplicationCollection;
     private readonly AppConstants _appConstantsConfiguration;
     private readonly CreatorService _creatorService;
+    private readonly CacheProvider _cacheProvider;
 
     public CreatorApplicationService(
         ILogger<UserService> logger,
         DatabaseSettings databaseConfig,
         IOptions<AppConstants> appConstants,
-        CreatorService creatorService
+        CreatorService creatorService,
+        CacheProvider cacheProvider
     )
     {
         _logger = logger;
@@ -40,6 +42,7 @@ public class CreatorApplicationService
             );
         _appConstantsConfiguration = appConstants.Value;
         _creatorService = creatorService;
+        _cacheProvider = cacheProvider;
 
         logger.LogDebug("User service initialized");
     }
@@ -221,6 +224,10 @@ public class CreatorApplicationService
         user.Role = UserRole.CREATOR;
         user.UpdatedAt = DateTime.UtcNow;
         await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
+        });
 
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)
         {

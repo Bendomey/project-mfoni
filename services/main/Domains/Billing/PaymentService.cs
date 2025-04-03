@@ -172,6 +172,7 @@ public class PaymentService
                 $"{CacheProvider.CacheEntities["contents"]}.find*",
                 $"{CacheProvider.CacheEntities["contents"]}*{content.Id}*",
                 $"{CacheProvider.CacheEntities["contents"]}*{content.Slug}*",
+                $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
             });
         }
         else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.WalletTopup && !string.IsNullOrEmpty(paymentRecord.MetaData.WalletId))
@@ -208,6 +209,10 @@ public class PaymentService
                     .Replace("{reference}", paymentRecord.Reference)
                     .Replace("{transactionDate}", paymentRecord.UpdatedAt.ToString("dd MMMM, yyyy"))
             );
+
+            _ = _cacheProvider.EntityChanged(new[] {
+                $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
+            });
         }
     }
 
