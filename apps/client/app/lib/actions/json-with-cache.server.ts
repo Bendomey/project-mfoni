@@ -1,6 +1,6 @@
-import { json, type JsonFunction } from '@remix-run/node'
+import { data as json } from '@remix-run/node'
 
-export const jsonWithCache: JsonFunction = <Data>(
+export const jsonWithCache = <Data>(
 	data: Data,
 	init?: number | ResponseInit,
 ) =>

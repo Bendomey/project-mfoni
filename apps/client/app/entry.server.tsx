@@ -87,6 +87,7 @@ function serveTheBots(...args: DocRequestArgs) {
 					context={remixContext}
 					url={request.url}
 					abortDelay={ABORT_DELAY}
+					nonce={nonce}
 				/>
 			</NonceProvider>,
 			{
@@ -141,6 +142,7 @@ function serveBrowsers(...args: DocRequestArgs) {
 					context={remixContext}
 					url={request.url}
 					abortDelay={ABORT_DELAY}
+					nonce={nonce}
 				/>
 			</NonceProvider>,
 			{

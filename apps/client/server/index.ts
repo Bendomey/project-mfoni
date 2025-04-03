@@ -2,7 +2,7 @@ import crypto from 'crypto'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { createRequestHandler } from '@remix-run/express'
-import { type ServerBuild } from '@remix-run/node'
+import { type ServerBuild, installGlobals } from '@remix-run/node'
 import { init as sentryInit } from '@sentry/remix'
 import address from 'address'
 import chalk from 'chalk'
@@ -16,6 +16,8 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import { router } from './routes/index.js'
 import { extractAuthCookie, getCurrentUser } from './utils/currentUser.js'
+
+installGlobals({ nativeFetch: true })
 
 const MODE = process.env.NODE_ENV
 const getHost = (req: { get: (key: string) => string | undefined }) =>
