@@ -63,7 +63,6 @@ export const links: LinksFunction = () => {
 }
 
 export async function loader(args: LoaderFunctionArgs) {
-	const requestId = args.request.headers.get("X-Request-ID") ?? 'not-there'
 	const { currentUser } = args.context as IMfoniRemixContext
 	const url = new URL(args.request.url)
 	let user: User | null = null
@@ -97,10 +96,6 @@ export async function loader(args: LoaderFunctionArgs) {
 			TAWK_ID: environmentVariables().TAWK_ID,
 		},
 		authUser: user,
-	}, {
-		headers: {
-			"X-Request-ID": requestId,
-		}
 	})
 }
 

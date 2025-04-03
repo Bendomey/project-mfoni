@@ -10,7 +10,7 @@ import closeWithGrace from 'close-with-grace'
 import compression from 'compression'
 import cors from 'cors'
 import express from 'express'
-import rateLimit from "express-rate-limit";
+import rateLimit from 'express-rate-limit'
 import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
@@ -69,6 +69,28 @@ const portToUse = await getPort({
 
 const app = express()
 
+const limiter = rateLimit({
+	windowMs: 2 * 60 * 1000, // 2 minutes
+	max: 1000,
+	standardHeaders: true,
+	legacyHeaders: false,
+	skip: () => {
+		return process.env.NODE_ENV === 'development'
+	},
+	message: 'Too many requests, please try again later.',
+	handler: (_, res) => {
+		res.status(429).json({
+			error: {
+				message: 'Too many requests, please try again later.',
+			},
+		})
+	},
+})
+
+// TODO: pass the fly proxy IPs to increase security!!! - https://claude.ai/chat/b090394a-b4db-46ff-a3bd-2c4445dc4ad7
+app.set('trust proxy', true)
+app.use(limiter)
+
 app.use(
 	cors({
 		origin: `http://localhost:${portToUse}`,
@@ -86,15 +108,6 @@ app.use((req, res, next) => {
 	}
 })
 
-const limiter = rateLimit({
-	windowMs: 2 * 60 * 1000, // 2 minutes
-	max: 1000,
-	standardHeaders: true,
-	legacyHeaders: false,
-})
-
-app.set('trust proxy', true)
-app.use(limiter)
 
 app.use((req, res, next) => {
 	const proto = req.get('X-Forwarded-Proto')
@@ -165,47 +178,22 @@ app.use(
 
 app.use('/api', router)
 
-app.use((req, res, next) => {
+app.use((_, res, next) => {
 	res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
 	next()
 })
 
-// Temporary in-memory cache for a request lifecycle
-const userCache = new Map()
-console.log(userCache)
-
 app.use(async (req, res, next) => {
-	// get access to cookies data
 	const authCookie = await extractAuthCookie(req.headers.cookie)
 	if (authCookie) {
-		const requestId = `${req.ip}-${authCookie.id}` // Unique per request
-
-		const isAFullReload = req.headers.accept?.includes('text/html')
-		if (isAFullReload) {
-			console.log(req.headers.accept)
-			console.log('reloaddddddddd')
-			// userCache.delete(requestId)
-		}
-		if (userCache.has(requestId)) {
-			console.log('callleddddddddd In')
-			res.locals.user = userCache.get(requestId)
-			return next()
-		}
-
-		console.log('callleddddddddd Out')
-
 		try {
 			const currentUserResponse = await getCurrentUser(authCookie.token)
 			if (currentUserResponse?.data) {
 				res.locals.user = currentUserResponse?.data
 			}
 		} catch (error) {
-			console.log(error)
 			res.locals.user = error
 		}
-
-		userCache.set(requestId, res.locals.user)
-		// res.locals.invalidateUser = () => userCache.delete(requestId)
 	}
 
 	next()
@@ -320,11 +308,9 @@ app.all(
 		mode: MODE,
 		getLoadContext(_, res) {
 			return {
-				cspNonce: res.locals.cspNonce, // Pass nonce to Remix loaders
+				cspNonce: res.locals.cspNonce,
 				serverBuild: getBuild(),
-				currentUser: res.locals.user, // all remix loaders can access it!
-				// TODO: figure out how to invalidate the user cache
-				// invalidateUser: res.locals.invalidateUser,
+				currentUser: res.locals.user, 
 			}
 		},
 	}),
@@ -367,10 +353,6 @@ const server = app.listen(portToUse, () => {
 
 closeWithGrace(() => {
 	return Promise.all([
-		new Promise((resolve) => {
-			userCache.clear()
-			resolve('ok')
-		}),
 		new Promise((resolve, reject) => {
 			server.close((e) => (e ? reject(e) : resolve('ok')))
 		}),

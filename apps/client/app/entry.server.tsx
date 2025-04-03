@@ -62,11 +62,6 @@ export default async function handleDocumentRequest(...args: DocRequestArgs) {
 		)
 	}
 
-	// create a request header that can be used in the next request?
-	// console.log("request.headers", request.headers)
-	responseHeaders.set("X-Request-ID", 'hello-its-me');
-
-	console.log("startinggggg")
 	return serveBrowsers(
 		request,
 		responseStatusCode,
@@ -84,7 +79,6 @@ function serveTheBots(...args: DocRequestArgs) {
 		remixContext,
 		loadContext,
 	] = args
-	console.log(request.headers)
 	const nonce = loadContext.cspNonce ? String(loadContext.cspNonce) : ''
 	return new Promise((resolve, reject) => {
 		const stream = renderToPipeableStream(
