@@ -3,15 +3,14 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { createRequestHandler } from '@remix-run/express'
 import { type ServerBuild } from '@remix-run/node'
-import {
-	init as sentryInit,
-} from '@sentry/remix'
+import { init as sentryInit } from '@sentry/remix'
 import address from 'address'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
 import compression from 'compression'
 import cors from 'cors'
 import express from 'express'
+import rateLimit from "express-rate-limit";
 import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
@@ -87,7 +86,15 @@ app.use((req, res, next) => {
 	}
 })
 
+const limiter = rateLimit({
+	windowMs: 2 * 60 * 1000, // 2 minutes
+	max: 1000,
+	standardHeaders: true,
+	legacyHeaders: false,
+})
+
 app.set('trust proxy', true)
+app.use(limiter)
 
 app.use((req, res, next) => {
 	const proto = req.get('X-Forwarded-Proto')
@@ -169,7 +176,6 @@ console.log(userCache)
 
 app.use(async (req, res, next) => {
 	// get access to cookies data
-	req.headers['x-request-id'] = "hello-world"
 	const authCookie = await extractAuthCookie(req.headers.cookie)
 	if (authCookie) {
 		const requestId = `${req.ip}-${authCookie.id}` // Unique per request
