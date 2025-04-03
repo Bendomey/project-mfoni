@@ -17,19 +17,22 @@ public class SubscriptionService
     private readonly IMongoCollection<Models.Creator> _creatorCollection;
     private readonly IMongoCollection<Models.CreatorSubscription> _creatorSubscriptionCollection;
     private readonly IMongoCollection<Models.CreatorSubscriptionPurchase> _creatorSubscriptionPurchaseCollection;
+    private readonly CacheProvider _cacheProvider;
 
     public SubscriptionService(
            ILogger<SubscriptionService> logger,
            DatabaseSettings databaseConfig,
            IOptions<AppConstants> appConstants,
             UserService userService,
-            WalletService walletService
+            WalletService walletService,
+            CacheProvider cacheProvider
        )
     {
         _logger = logger;
         _appConstantsConfiguration = appConstants.Value;
         _walletService = walletService;
         _userService = userService;
+        _cacheProvider = cacheProvider;
 
         var database = databaseConfig.Database;
         _creatorSubscriptionPurchaseCollection = database.GetCollection<Models.CreatorSubscriptionPurchase>(
@@ -443,6 +446,10 @@ public class SubscriptionService
                     .Replace("{renewalAmount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(pricing):0.00}")
             );
 
+            _ = _cacheProvider.EntityChanged(new[] {
+                $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
+            });
+
             return creatorSubscription;
         }
 
@@ -458,6 +465,9 @@ public class SubscriptionService
             {
                 await _creatorSubscriptionCollection.DeleteOneAsync(subscription => subscription.Id == cancelledSubscriptionRecord.Id);
 
+                _ = _cacheProvider.EntityChanged(new[] {
+                    $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
+                });
                 return activeSubscription;
             }
 
@@ -547,6 +557,10 @@ public class SubscriptionService
                         .Replace("{renewalDate}", newUpgradeSubEndDate.ToString("dd/MM/yyyy"))
                 );
 
+                _ = _cacheProvider.EntityChanged(new[] {
+                    $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
+                });
+
                 return newUpgradeSub;
             }
             else if (upgradeEffect == "DEFER")
@@ -575,6 +589,10 @@ public class SubscriptionService
                         .Replace("{nextRenewalDate}", upgradeDeferNextRenewalDate.ToString("dd/MM/yyyy"))
                         .Replace("{newMonthlyFee}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(pricingLib.GetPrice()):0.00}")
                 );
+
+                _ = _cacheProvider.EntityChanged(new[] {
+                    $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
+                });
 
                 return newUpgradeSub;
             }
@@ -611,6 +629,10 @@ public class SubscriptionService
                 .Replace("{nextRenewalDate}", downgradeNextRenewalDate.ToString("dd/MM/yyyy"))
                 .Replace("{newMonthlyFee}", $"{MoneyLib.ConvertPesewasToCedis(pricingLib.GetPrice()):0.00}")
         );
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
+        });
 
         return newDowngradeSub;
     }
@@ -654,6 +676,10 @@ public class SubscriptionService
         DateTime expiryDate = (DateTime)lastSubscription.EndedAt;
 
         var pricingLib = new PricingLib(lastSubscription.PackageType);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
+        });
 
         SendNotification(
             user,

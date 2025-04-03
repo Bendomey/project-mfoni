@@ -241,8 +241,8 @@ public class CreatorService
 
         _ = _cacheProvider.EntityChanged(new[] {
             $"{CacheProvider.CacheEntities["creators"]}.*",
+            $"{CacheProvider.CacheEntities["auth"]}*{creator.UserId}*",
         });
-
         return creator;
     }
 
@@ -263,6 +263,7 @@ public class CreatorService
 
         _ = _cacheProvider.EntityChanged(new[] {
             $"{CacheProvider.CacheEntities["creators"]}.*",
+            $"{CacheProvider.CacheEntities["auth"]}*{creator.UserId}*",
         });
 
         return creator;

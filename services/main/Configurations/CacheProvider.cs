@@ -20,6 +20,7 @@ public class CacheProvider
         { "explore", "explore" },
 
         { "creators", "creators" },
+        { "auth", "auth" },
 
         // { "admins", "admins" },
         // { "auth", "users" },

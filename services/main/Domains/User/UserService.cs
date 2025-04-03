@@ -75,6 +75,11 @@ public class UserService
         }
 
         _userCollection.ReplaceOne(user => user.Id == userInput.Id, user);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["auth"]}*{userInput.Id}*",
+        });
+
         return true;
     }
 
@@ -122,6 +127,10 @@ public class UserService
             }
         );
 
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["auth"]}*{userId}*",
+        });
+
         return true;
     }
 
@@ -150,6 +159,10 @@ public class UserService
         await _userCollection.UpdateOneAsync(filter, updates);
 
         await _cacheProvider.ClearCache($"verify-{user.Id}");
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["auth"]}*{userId}*",
+        });
         return true;
     }
 
@@ -196,6 +209,10 @@ public class UserService
             }
         );
 
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["auth"]}*{userId}*",
+        });
+
         return true;
     }
 
@@ -223,6 +240,10 @@ public class UserService
         await _userCollection.UpdateOneAsync(filter, updates);
 
         await _cacheProvider.ClearCache($"verify-{user.Id}");
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["auth"]}*{userId}*",
+        });
         return true;
     }
 
