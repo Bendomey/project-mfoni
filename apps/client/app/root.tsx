@@ -80,8 +80,9 @@ export async function loader(args: LoaderFunctionArgs) {
 				url.pathname !== PAGES.AUTHENTICATED_PAGES.ONBOARDING
 			) {
 				return redirect(
-					`${PAGES.AUTHENTICATED_PAGES.ONBOARDING
-					}?return_to=${getFullUrlPath(url)}`,
+					`${PAGES.AUTHENTICATED_PAGES.ONBOARDING}?return_to=${getFullUrlPath(
+						url,
+					)}`,
 				)
 			}
 		}
@@ -131,7 +132,11 @@ interface DocumentProps {
 	noIndex?: boolean
 }
 
-function Document({ children, ENV, noIndex }: PropsWithChildren<DocumentProps>) {
+function Document({
+	children,
+	ENV,
+	noIndex,
+}: PropsWithChildren<DocumentProps>) {
 	const cspNonce = useNonce()
 	return (
 		<html lang="en">
@@ -223,13 +228,16 @@ export function ErrorBoundary() {
 					API_ADDRESS: '',
 					MFONI_GOOGLE_AUTH_CLIENT_ID: '',
 					TAWK_ID: '',
-					FACEBOOK_APP_ID: ''
+					FACEBOOK_APP_ID: '',
 				}}
 			>
-				<NotFoundModule status={error.status} title={error.statusText} message={error.data} />
+				<NotFoundModule
+					status={error.status}
+					title={error.statusText}
+					message={error.data}
+				/>
 			</Document>
 		)
-
 	} else if (error instanceof Error) {
 		return (
 			<Document
@@ -238,10 +246,14 @@ export function ErrorBoundary() {
 					API_ADDRESS: '',
 					MFONI_GOOGLE_AUTH_CLIENT_ID: '',
 					TAWK_ID: '',
-					FACEBOOK_APP_ID: ''
+					FACEBOOK_APP_ID: '',
 				}}
 			>
-				<NotFoundModule status={500} title={error.message} message={error.stack} />
+				<NotFoundModule
+					status={500}
+					title={error.message}
+					message={error.stack}
+				/>
 			</Document>
 		)
 	} else {

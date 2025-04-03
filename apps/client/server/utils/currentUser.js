@@ -7,12 +7,12 @@ export const getCurrentUser = async (token) => {
 				Authorization: `Bearer ${token}`,
 			},
 		})
-        
-        if (!res.ok) {
-            throw res;
-        }
 
-		const response = (await res.json())
+		if (!res.ok) {
+			throw res
+		}
+
+		const response = await res.json()
 
 		return response
 	} catch (error) {
@@ -28,10 +28,9 @@ export const getCurrentUser = async (token) => {
 	}
 }
 
-
 const USER_CIPHER = 'mfoni-account'
 export const extractAuthCookie = (cookieString) => {
-    if (!cookieString) return null
+	if (!cookieString) return null
 	const cookies = cookieString.split(';')
 	const authCookie = cookies.find((cookie) => cookie.includes(USER_CIPHER))
 	if (!authCookie) return null

@@ -1,9 +1,6 @@
 import { data as json } from '@remix-run/node'
 
-export const jsonWithCache = <Data>(
-	data: Data,
-	init?: number | ResponseInit,
-) =>
+export const jsonWithCache = <Data>(data: Data, init?: number | ResponseInit) =>
 	json(
 		data,
 		typeof init === 'number'

@@ -122,5 +122,5 @@ interface PaystackBankVerify {
 }
 
 interface IMfoniRemixContext {
-	currentUser?: User | Error;
+	currentUser?: User | Error
 }

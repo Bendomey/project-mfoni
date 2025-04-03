@@ -110,7 +110,6 @@ app.use((req, res, next) => {
 	}
 })
 
-
 app.use((req, res, next) => {
 	const proto = req.get('X-Forwarded-Proto')
 	const host = getHost(req)
@@ -312,7 +311,7 @@ app.all(
 			return {
 				cspNonce: res.locals.cspNonce,
 				serverBuild: getBuild(),
-				currentUser: res.locals.user, 
+				currentUser: res.locals.user,
 			}
 		},
 	}),

@@ -1,7 +1,4 @@
-import {
-	type LoaderFunctionArgs,
-	type MetaFunction,
-} from '@remix-run/node'
+import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { getExploreSections } from '@/api/explore/index.ts'
 import { QUERY_KEYS } from '@/constants/index.ts'
