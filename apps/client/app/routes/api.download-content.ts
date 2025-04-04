@@ -41,7 +41,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			return { success: true, signedUrl: downloadSignedUrl.signedUrl, size }
 		}
-	} catch {
+	} catch(e) {
+		console.error('Error downloading content:', e)
 		return { error: 'Downloading image failed. Try again!' }
 	}
 }
