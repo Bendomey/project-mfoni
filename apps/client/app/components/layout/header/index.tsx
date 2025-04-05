@@ -40,14 +40,14 @@ export const Header = ({
 	const scrolled = useScroll(50)
 
 	const headerBlurred = shouldHeaderBlur
-		? 'bg-white/95 backdrop-blur-xl sticky top-0 z-50 shadow-lg'
-		: 'sticky top-0 z-50 bg-white '
+		? 'bg-white/95 backdrop-blur-xl md:sticky top-0 z-50 md:shadow-lg'
+		: 'md:sticky top-0 z-50 bg-white '
 
 	return (
 		<header
 			className={classNames({
 				[headerBlurred]: !isHeroSearchInVisible && scrolled,
-				'z sticky top-0 z-50 bg-white': !isHeroSearchInVisible && !scrolled,
+				'z md:sticky top-0 z-50 bg-white': !isHeroSearchInVisible && !scrolled,
 			})}
 		>
 			<NoticeBanner />
