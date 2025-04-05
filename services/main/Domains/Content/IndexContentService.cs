@@ -93,7 +93,7 @@ public class IndexContent
             throw new HttpRequestException("CollectionNotFound");
         }
 
-        List<Content> contents = [];
+        var contents = new List<Content>();
 
         var canCreatorPriceContent = _permissionService.CanCreatorPriceContent(creatorInfo);
 
