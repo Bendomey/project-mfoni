@@ -33,7 +33,7 @@ public class PermissionService
         _creatorService = creatorService;
         _collectionService = collectionService;
 
-        _logger.LogDebug("IndexContentService initialized");
+        _logger.LogDebug("PermissionService initialized");
     }
 
     public async Task<Int64> GetMonthlyUploadLimit(GetCreatorDetailedResponse creatorInfo)
