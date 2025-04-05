@@ -89,9 +89,9 @@ export const PhotoModule = () => {
 	return (
 		<>
 			<Header isHeroSearchInVisible={false} />
-			<div className="max-w-8xl mx-auto px-4 py-4 lg:px-8">
+			<div className="max-w-8xl mx-auto px-0 py-4 md:px-5">
 				<div>
-					<div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+					<div className="mb-5 px-4 md:px-0 flex flex-col justify-between gap-4 md:flex-row md:items-center">
 						<div className="flex items-center gap-2">
 							<Link
 								to={PAGES.CREATOR.PHOTOS.replace(
@@ -162,45 +162,47 @@ export const PhotoModule = () => {
 						</div>
 					</div>
 
-					{isContentMine ? (
-						content.status === 'REJECTED' ? (
-							<div className="rounded-md bg-red-50 p-4">
-								<div className="flex">
-									<div className="shrink-0">
-										<XCircleIcon
-											aria-hidden="true"
-											className="size-5 text-red-400"
-										/>
-									</div>
-									<div className="ml-3">
-										<h3 className="text-sm font-medium text-red-800">
-											Image failed processing
-										</h3>
-										<p className="mt-1 text-xs text-red-600">
-											{content.imageProcessingResponse?.message ??
-												'Something happened while processing your image.'}
-										</p>
-									</div>
-								</div>
-							</div>
-						) : content.status === 'PROCESSING' ? (
-							<div className="rounded-md bg-yellow-50 p-4">
-								<div className="flex">
-									<div className="shrink-0">
-										<InformationCircleIcon
-											aria-hidden="true"
-											className="size-5 text-yellow-400"
-										/>
-									</div>
-									<div className="ml-3">
-										<h3 className="text-sm font-medium text-yellow-800">
-											Image is processing. Come back later.
-										</h3>
+					<div className='px-4 md:px-0'>
+						{isContentMine ? (
+							content.status === 'REJECTED' ? (
+								<div className="rounded-md bg-red-50 p-4">
+									<div className="flex">
+										<div className="shrink-0">
+											<XCircleIcon
+												aria-hidden="true"
+												className="size-5 text-red-400"
+											/>
+										</div>
+										<div className="ml-3">
+											<h3 className="text-sm font-medium text-red-800">
+												Image failed processing
+											</h3>
+											<p className="mt-1 text-xs text-red-600">
+												{content.imageProcessingResponse?.message ??
+													'Something happened while processing your image.'}
+											</p>
+										</div>
 									</div>
 								</div>
-							</div>
-						) : null
-					) : null}
+							) : content.status === 'PROCESSING' ? (
+								<div className="rounded-md bg-yellow-50 p-4">
+									<div className="flex">
+										<div className="shrink-0">
+											<InformationCircleIcon
+												aria-hidden="true"
+												className="size-5 text-yellow-400"
+											/>
+										</div>
+										<div className="ml-3">
+											<h3 className="text-sm font-medium text-yellow-800">
+												Image is processing. Come back later.
+											</h3>
+										</div>
+									</div>
+								</div>
+							) : null
+						) : null}
+					</div>
 
 					<div
 						className={classNames(
@@ -217,7 +219,7 @@ export const PhotoModule = () => {
 						/>
 					</div>
 
-					<div className="flex flex-row items-start justify-between md:items-center">
+					<div className="flex flex-row px-4 md:px-0 items-start justify-between md:items-center">
 						<div className="grid w-[50vw] grid-cols-1 gap-5 md:w-full md:grid-cols-5">
 							<div className="text-sm">
 								<h1 className="text-gray-500">Views</h1>
@@ -252,7 +254,7 @@ export const PhotoModule = () => {
 						</div>
 					</div>
 
-					<div className="mt-5">
+					<div className="mt-5 px-4 md:px-0">
 						<div className="flex flex-row items-center">
 							<h1 className="font-bold">{content.title}</h1>
 							{isContentMine ? (

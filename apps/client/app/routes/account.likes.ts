@@ -21,7 +21,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 	if (authCookie) {
 		const query = {
 			pagination: { page: 0, per: 50 },
-			populate: ['content'],
+			populate: ['content', 'content.createdBy'],
 			filters: {
 				visibility: 'ALL',
 			},

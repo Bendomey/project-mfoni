@@ -1,7 +1,6 @@
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { useParams } from '@remix-run/react'
 import { useSearchTextualContents } from '@/api/contents/index.ts'
-import { FadeIn, FadeInStagger } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Content } from '@/components/Content/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
@@ -30,24 +29,24 @@ export function SearchPhotosModule() {
 
 	if (isPending) {
 		content = (
-			<div className="mt-8 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4">
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+			<div className="mt-8 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3">
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
 			</div>
 		)
 	}
 
 	if (isError) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center">
+			<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
 				<ErrorState
 					message="An error occurred searching contents."
 					title="Something happened."
@@ -73,7 +72,7 @@ export function SearchPhotosModule() {
 
 	if (data && !data?.total) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center">
+			<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
 				<EmptyState
 					message={`There are no photos found under "${queryParam}". Adjust your search query.`}
 					title="Search results is empty"
@@ -89,17 +88,13 @@ export function SearchPhotosModule() {
 
 	if (data?.total) {
 		content = (
-			<FadeInStagger faster>
-				<div className="mt-8 min-h-[60vh] columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4">
-					{data.rows.map((content) => (
-						<div className="mb-5" key={content.id}>
-							<FadeIn>
-								<Content content={content} />
-							</FadeIn>
-						</div>
-					))}
-				</div>
-			</FadeInStagger>
+			<div className="mt-8 min-h-[60vh] columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3">
+				{data.rows.map((content) => (
+					<div className="mb-7 md:mb-5" key={content.id}>
+						<Content content={content} />
+					</div>
+				))}
+			</div>
 		)
 	}
 

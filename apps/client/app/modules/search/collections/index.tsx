@@ -1,7 +1,7 @@
 import { ArrowPathIcon } from '@heroicons/react/24/outline'
 import { useParams } from '@remix-run/react'
+import { Fragment } from 'react'
 import { useGetCollections } from '@/api/collections/index.ts'
-import { FadeIn, FadeInStagger } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { CollectionCard } from '@/components/CollectionCard/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
@@ -27,12 +27,12 @@ export function SearchCollectionsModule() {
 
 	if (isPending) {
 		content = (
-			<div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+			<div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 				{[...new Array(12)].map((_, index) => (
 					<div key={index} className="animate-pulse space-y-2">
-						<div className="h-60 w-full rounded-md bg-zinc-100" />
-						<div className="h-3 w-2/3 rounded bg-zinc-100" />
-						<div className="h-2 w-1/2 rounded bg-zinc-100" />
+						<div className="h-60 w-full rounded-sm bg-zinc-100" />
+						<div className="h-3 w-2/3 rounded-sm bg-zinc-100" />
+						<div className="h-2 w-1/2 rounded-sm bg-zinc-100" />
 					</div>
 				))}
 			</div>
@@ -41,7 +41,7 @@ export function SearchCollectionsModule() {
 
 	if (isError) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center">
+			<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
 				<ErrorState
 					message="An error occurred searching collections."
 					title="Something happened."
@@ -67,7 +67,7 @@ export function SearchCollectionsModule() {
 
 	if (data && !data?.total) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center">
+			<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
 				<EmptyState
 					message={`There are no collections found under "${queryParam}". Adjust your search query.`}
 					title="Search results is empty"
@@ -83,15 +83,13 @@ export function SearchCollectionsModule() {
 
 	if (data?.total) {
 		content = (
-			<FadeInStagger faster>
-				<div className="mt-8 grid min-h-[60vh] grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-					{data.rows.map((collection) => (
-						<FadeIn key={collection.id}>
-							<CollectionCard collection={collection} />
-						</FadeIn>
-					))}
-				</div>
-			</FadeInStagger>
+			<div className="mt-5 grid min-h-[60vh] grid-cols-1 gap-4 md:grid-cols-3">
+				{data.rows.map((collection) => (
+					<Fragment key={collection.id}>
+						<CollectionCard collection={collection} className='h-[25rem] md:h-[18rem]' />
+					</Fragment>
+				))}
+			</div>
 		)
 	}
 

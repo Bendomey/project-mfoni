@@ -8,7 +8,6 @@ import {
 } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { useGetTagContentsBySlug } from '@/api/tags/index.ts'
-import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Content } from '@/components/Content/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
@@ -40,17 +39,17 @@ export function TagModule() {
 
 	if (isPending) {
 		content = (
-			<div className="mt-10 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4">
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+			<div className="mt-10 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3">
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
 			</div>
 		)
 	}
@@ -94,28 +93,26 @@ export function TagModule() {
 
 	if (data?.total) {
 		content = (
-			<FadeIn>
-				<div className="mt-8 columns-1 gap-2 sm:columns-2 sm:gap-3 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
-					{data.rows.map((tagContent) => (
-						<div className="mb-5" key={tagContent.id}>
-							{tagContent.content ? (
-								<Content
-									key={tagContent.content.id}
-									content={tagContent.content}
-								/>
-							) : null}
-						</div>
-					))}
-				</div>
-			</FadeIn>
+			<div className="mt-8 columns-1 gap-2 sm:columns-2 sm:gap-3 md:columns-3">
+				{data.rows.map((tagContent) => (
+					<div className="mb-7 md:mb-5" key={tagContent.id}>
+						{tagContent.content ? (
+							<Content
+								key={tagContent.content.id}
+								content={tagContent.content}
+							/>
+						) : null}
+					</div>
+				))}
+			</div>
 		)
 	}
 
 	return (
 		<>
 			<Header isHeroSearchInVisible={false} />
-			<div className="max-w-8xl mx-auto px-4 py-4 lg:px-8">
-				<div className="mt-10">
+			<div className="max-w-8xl mx-auto px-0 py-4 lg:px-5">
+				<div className="mt-0 md:mt-10 px-4 md:px-0">
 					<Button
 						onClick={() => navigate(-1)}
 						variant="unstyled"
@@ -124,7 +121,7 @@ export function TagModule() {
 						<ChevronLeftIcon className="h-4 w-auto" />
 						Go Back
 					</Button>
-					<h1 className="text-4xl font-black">{name}</h1>
+					<h1 className="text-4xl font-black capitalize">{name}</h1>
 					<div className="mt-2 flex flex-col">
 						<span className="font-medium text-gray-500">
 							Curated by <span className="text-blue-600">mfoni</span>
@@ -141,11 +138,13 @@ export function TagModule() {
 							</p>
 						</div>
 						<div className="flex flex-row items-center justify-end gap-2">
-							{data?.total ? (
-								<ShareButton
-									text={`Browse through the carefully curated contents around "${name}"`}
-								/>
-							) : null}
+							<div>
+								{data?.total ? (
+									<ShareButton
+										text={`Browse through the carefully curated contents around "${name}"`}
+									/>
+								) : null}
+							</div>
 							<Link
 								to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
 									`${origin}${location.pathname}`,

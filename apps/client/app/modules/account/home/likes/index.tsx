@@ -13,7 +13,7 @@ export function AccountLikesModule() {
 	const { data, isPending, isError } = useGetUserContentLikes(
 		{
 			pagination: { page: 0, per: 50 },
-			populate: ['content'],
+			populate: ['content', 'content.createdBy'],
 			filters: {
 				visibility: 'ALL',
 			},
@@ -23,17 +23,17 @@ export function AccountLikesModule() {
 
 	if (isPending) {
 		return (
-			<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3">
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+			<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3">
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
 			</div>
 		)
 	}
@@ -76,11 +76,11 @@ export function AccountLikesModule() {
 	}
 
 	return (
-		<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8">
+		<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3">
 			{data.rows.map((contentLike, index) => (
-				<div className="mb-5" key={index}>
+				<div className="mb-7 md:mb-5" key={index}>
 					{contentLike.content ? (
-						<Content content={contentLike.content} showCreator={false} />
+						<Content content={contentLike.content} />
 					) : null}
 				</div>
 			))}

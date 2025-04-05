@@ -7,7 +7,6 @@ import { Content } from '@/components/Content/index.tsx'
 
 import { EmptyState } from '@/components/empty-state/index.tsx'
 import { ErrorState } from '@/components/error-state/index.tsx'
-import { Loader } from '@/components/loader/index.tsx'
 import { PAGES } from '@/constants/index.ts'
 import { safeString } from '@/lib/strings.ts'
 
@@ -26,8 +25,17 @@ export function CreatorPhotosModule() {
 
 	if (isPending) {
 		return (
-			<div className="my-16 flex justify-center">
-				<Loader />
+			<div className="mt-8 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3">
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-zinc-200" />
 			</div>
 		)
 	}
@@ -65,7 +73,7 @@ export function CreatorPhotosModule() {
 								content={collectionContent.content}
 								showCreator={false}
 							/>
-							<div className="mt-1 flex items-center gap-2">
+							<div className="mt-1 md:flex items-center gap-2 hidden">
 								{collectionContent.content.tags?.slice(0, 3)?.map((tag) => (
 									<Button
 										key={tag.id}

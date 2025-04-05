@@ -23,9 +23,9 @@ export function AccountCollectionsModule() {
 			<div className="grid grid-cols-2 gap-8 md:grid-cols-3">
 				{[...new Array(12)].map((_, index) => (
 					<div key={index} className="animate-pulse space-y-2">
-						<div className="h-60 w-full rounded-md bg-zinc-100" />
-						<div className="h-3 w-2/3 rounded bg-zinc-100" />
-						<div className="h-2 w-1/2 rounded bg-zinc-100" />
+						<div className="h-60 w-full rounded-md bg-zinc-200" />
+						<div className="h-3 w-2/3 rounded bg-zinc-200" />
+						<div className="h-2 w-1/2 rounded bg-zinc-200" />
 					</div>
 				))}
 			</div>
@@ -75,9 +75,9 @@ export function AccountCollectionsModule() {
 	}
 
 	return (
-		<div className="grid grid-cols-2 gap-8 md:grid-cols-3">
+		<div className="grid grid-cols-1 gap-8 md:grid-cols-3">
 			{data.rows.map((collection) => (
-				<CollectionCard key={collection.id} collection={collection} />
+				<CollectionCard key={collection.id} collection={collection} className='md:h-[15rem]' />
 			))}
 		</div>
 	)

@@ -54,7 +54,7 @@ export function SearchCreatorsModule() {
 
 	if (isError) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center">
+			<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
 				<ErrorState
 					message="An error occurred searching creators."
 					title="Something happened."
@@ -80,17 +80,34 @@ export function SearchCreatorsModule() {
 
 	if (data && !data?.total) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center">
-				<EmptyState
-					message={`There are no creators found under "${queryParam}". Adjust your search query.`}
-					title="Search results is empty"
-					svg={
-						<div className="mb-5">
-							<NoSearchResultLottie />
+			<>
+				{featuredCreators?.total && !data?.total ? (
+					<div className=''>
+						<div className="flex flex-row items-center justify-between gap-x-2 px-4 md:px-5">
+							<h2 className="flex items-center text-xl font-bold">Featured</h2>
 						</div>
-					}
-				/>
-			</div>
+						<div className="no-scrollbar mt-3 flex w-full items-center gap-8 overflow-x-auto px-4 md:px-5">
+							{featuredCreators.rows.map((collectionContent) => (
+								<CreatorSection
+									key={collectionContent.id}
+									data={collectionContent.creator as EnhancedCreator}
+								/>
+							))}
+						</div>
+					</div>
+				) : null}
+				<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
+					<EmptyState
+						message={`There are no creators found under "${queryParam}". Adjust your search query.`}
+						title="Search results is empty"
+						svg={
+							<div className="mb-5">
+								<NoSearchResultLottie />
+							</div>
+						}
+					/>
+				</div>
+			</>
 		)
 	}
 
@@ -110,23 +127,6 @@ export function SearchCreatorsModule() {
 
 	return (
 		<div className="mt-5">
-			{/* Only show featured when search result is empty */}
-			{featuredCreators?.total && !data?.total ? (
-				<>
-					<div className="flex flex-row items-center justify-between gap-x-2">
-						<h2 className="flex items-center text-xl font-bold">Featured</h2>
-					</div>
-					<div className="no-scrollbar mt-3 flex w-full items-center gap-8 overflow-x-auto">
-						{featuredCreators.rows.map((collectionContent) => (
-							<CreatorSection
-								key={collectionContent.id}
-								data={collectionContent.creator as EnhancedCreator}
-							/>
-						))}
-					</div>
-				</>
-			) : null}
-
 			{content}
 		</div>
 	)

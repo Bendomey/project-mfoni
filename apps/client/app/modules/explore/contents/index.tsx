@@ -3,7 +3,6 @@ import { useSearchParams } from '@remix-run/react'
 import { useMemo } from 'react'
 import { FilterBar } from './components/filter-bar.tsx'
 import { useGetContents } from '@/api/contents/index.ts'
-import { FadeIn, FadeInStagger } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Content } from '@/components/Content/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
@@ -49,17 +48,17 @@ export const ContentsModule = () => {
 
 	if (isPending) {
 		content = (
-			<div className="columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4">
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+			<div className="columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3">
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
 			</div>
 		)
 	}
@@ -96,24 +95,20 @@ export const ContentsModule = () => {
 
 	if (data?.total) {
 		content = (
-			<FadeInStagger faster>
-				<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
-					{data.rows.map((content) => (
-						<div className="mb-5" key={content.id}>
-							<FadeIn>
-								<Content content={content} />
-							</FadeIn>
-						</div>
-					))}
-				</div>
-			</FadeInStagger>
+			<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3">
+				{data.rows.map((content) => (
+					<div className="mb-7 md:mb-5" key={content.id}>
+						<Content content={content} />
+					</div>
+				))}
+			</div>
 		)
 	}
 
 	return (
 		<div>
 			<Header isHeroSearchInVisible={false} />
-			<div className="max-w-8xl mx-auto my-10 items-center px-3 sm:px-3 md:px-8">
+			<div className="max-w-8xl mx-auto my-10 items-center px-0 md:px-5">
 				<FilterBar />
 				{content}
 			</div>

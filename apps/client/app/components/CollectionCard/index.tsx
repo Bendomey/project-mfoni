@@ -16,7 +16,7 @@ export function CollectionCard({ collection, className }: Props) {
 		<Link to={PAGES.COLLECTION.replace(':collection', collection.slug)}>
 			<div
 				className={classNames(
-					'relative h-52 overflow-hidden rounded-md',
+					'relative h-[20rem] md:h-[18rem] overflow-hidden rounded-sm',
 					className,
 				)}
 			>
@@ -35,7 +35,7 @@ export function CollectionCard({ collection, className }: Props) {
 					</div>
 				</div>
 			</div>
-			<div className="mt-1">
+			<div className="mt-1 mx-3 md:mx-0">
 				<h1 className="truncate text-lg font-bold">{collection.name}</h1>
 				<p className="truncate text-xs text-gray-500">
 					{collection.contentsCount} contents{' '}

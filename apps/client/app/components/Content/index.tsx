@@ -159,36 +159,40 @@ export const Content = ({ content, showCreator = true, className, imageHeight }:
 			state={{ modal: true }}
 		>
 			<div className={classNames('relative cursor-zoom-in', className)}>
-				<div className='flex items-center justify-between px-3 pb-2 md:hidden'>
-					<div>
-						{
-							content.createdBy ? (
-								<Link
-									to={PAGES.CREATOR.PHOTOS.replace(
-										':username',
-										safeString(content?.createdBy?.username),
-									)}
-									className="flex md:hidden items-center"
+				{
+					showCreator ? (
+						<div className='flex items-center justify-between px-3 pb-2 md:hidden'>
+							<div>
+								{
+									content.createdBy ? (
+										<Link
+											to={PAGES.CREATOR.PHOTOS.replace(
+												':username',
+												safeString(content?.createdBy?.username),
+											)}
+											className="flex md:hidden items-center"
 
-								>
-									<CreatedByCard createdBy={content.createdBy} imageClassName='size-8' />
-									<div className='flex flex-col ml-2'>
-										<span className="truncate text-sm font-semibold ">
-											{content.createdBy.name}
-										</span>
-										{
-											content.amount > 0 ? <span className='text-xs'>For mfoni+</span> : null
-										}
-									</div>
-								</Link>
-							) : null
-						}
-					</div>
-					{content.isFeatured ? (
-						<StarIcon className="h-7 w-7 text-yellow-600" />
-					) : null}
+										>
+											<CreatedByCard createdBy={content.createdBy} imageClassName='size-8' />
+											<div className='flex flex-col ml-2'>
+												<span className="truncate text-sm font-semibold ">
+													{content.createdBy.name}
+												</span>
+												{
+													content.amount > 0 ? <span className='text-xs'>For mfoni+</span> : null
+												}
+											</div>
+										</Link>
+									) : null
+								}
+							</div>
+							{content.isFeatured ? (
+								<StarIcon className="h-7 w-7 text-yellow-600" />
+							) : null}
 
-				</div>
+						</div>
+					) : null
+				}
 				<div className="aspect-w-4 aspect-h-3 w-full">
 					<Image
 						height={size.height}
