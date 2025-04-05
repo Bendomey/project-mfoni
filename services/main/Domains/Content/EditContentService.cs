@@ -14,6 +14,7 @@ public class EditContentService
     private readonly PermissionService _permissionService;
     private readonly IMongoCollection<Content> _contentsCollection;
     private readonly CacheProvider _cacheProvider;
+    private readonly CreatorService _creatorService;
     private readonly QueueHelper _processTextualSearchQueueHelper;
 
     public EditContentService(
@@ -22,7 +23,8 @@ public class EditContentService
         IOptions<AppConstants> appConstants,
         CacheProvider cacheProvider,
         PermissionService permissionService,
-        RabbitMQConnection rabbitMQChannel
+        RabbitMQConnection rabbitMQChannel,
+        CreatorService creatorService
     )
     {
         _logger = logger;
@@ -30,6 +32,7 @@ public class EditContentService
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
         _cacheProvider = cacheProvider;
         _permissionService = permissionService;
+        _creatorService = creatorService;
 
         _processTextualSearchQueueHelper = new QueueHelper(
             rabbitMQChannel.Channel, appConstants.Value.ProcessTextualSearchQueueName
@@ -86,7 +89,12 @@ public class EditContentService
             }
             else
             {
-                await _permissionService.IsAPremiumCreator(input.UserId);
+                var creatorInfo = await _creatorService.GetCreatorDetails(input.UserId);
+                var isAPremiumCreator = _permissionService.IsAPremiumCreator(creatorInfo);
+                if (!isAPremiumCreator)
+                {
+                    throw new HttpRequestException("OnlyPremiumCreatorsCanSetAmount", default, System.Net.HttpStatusCode.Forbidden);
+                }
                 content.Amount = MoneyLib.ConvertCedisToPesewas(input.Amount.Value);
             }
         }
