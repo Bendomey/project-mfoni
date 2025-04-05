@@ -112,7 +112,7 @@ export function TagModule() {
 		<>
 			<Header isHeroSearchInVisible={false} />
 			<div className="max-w-8xl mx-auto px-0 py-4 lg:px-5">
-				<div className="mt-0 md:mt-10 px-4 md:px-0">
+				<div className="mt-0 px-4 md:mt-10 md:px-0">
 					<Button
 						onClick={() => navigate(-1)}
 						variant="unstyled"

@@ -46,7 +46,7 @@ export function SearchPhotosModule() {
 
 	if (isError) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
+			<div className="mx-5 flex h-[60vh] flex-1 items-center justify-center md:mx-0">
 				<ErrorState
 					message="An error occurred searching contents."
 					title="Something happened."
@@ -72,7 +72,7 @@ export function SearchPhotosModule() {
 
 	if (data && !data?.total) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
+			<div className="mx-5 flex h-[60vh] flex-1 items-center justify-center md:mx-0">
 				<EmptyState
 					message={`There are no photos found under "${queryParam}". Adjust your search query.`}
 					title="Search results is empty"

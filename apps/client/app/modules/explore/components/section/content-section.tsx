@@ -12,7 +12,7 @@ export function ContentSection({ data }: Props) {
 		<Content
 			content={data}
 			imageHeight={isSmallDevice ? 200 : 300}
-			className='w-[22rem] md:w-[28rem]'
+			className="w-[22rem] md:w-[28rem]"
 		/>
 	)
 }

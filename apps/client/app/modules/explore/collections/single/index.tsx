@@ -130,9 +130,12 @@ export function CollectionModule() {
 					<div className="mb-5 break-inside-avoid" key={collectionContent.id}>
 						{collectionContent.content ? (
 							<>
-								<Content content={collectionContent.content} showCreator={!isCollectionMine} />
+								<Content
+									content={collectionContent.content}
+									showCreator={!isCollectionMine}
+								/>
 								{isCollectionMine ? (
-									<div className="mt-2 flex justify-end mx-3 md:mx-0">
+									<div className="mx-3 mt-2 flex justify-end md:mx-0">
 										<Button
 											onClick={() => {
 												setSelectedCollectionContent(collectionContent)
@@ -157,11 +160,11 @@ export function CollectionModule() {
 		<>
 			<Header isHeroSearchInVisible={false} />
 			<div className="max-w-8xl mx-auto px-0 py-4 lg:px-5">
-				<div className="mt-0 md:mt-10 px-4 md:px-0">
+				<div className="mt-0 px-4 md:mt-10 md:px-0">
 					<Button
 						onClick={() => navigate(-1)}
 						variant="unstyled"
-						className="mb-4 font-semibold md:mb-1 hover:underline text-sm"
+						className="mb-4 text-sm font-semibold hover:underline md:mb-1"
 					>
 						<ChevronLeftIcon className="h-4 w-auto" />
 						Go Back
@@ -229,7 +232,8 @@ export function CollectionModule() {
 					) : null}
 					<div className="mt-2">
 						<span className="text-xs text-gray-500">
-							{collection?.visibility === 'PUBLIC' ? 'Published' : 'Created'} on {dayjs(collection?.createdAt).format('L')}
+							{collection?.visibility === 'PUBLIC' ? 'Published' : 'Created'} on{' '}
+							{dayjs(collection?.createdAt).format('L')}
 						</span>
 					</div>
 

@@ -47,7 +47,7 @@ export const Header = ({
 		<header
 			className={classNames({
 				[headerBlurred]: !isHeroSearchInVisible && scrolled,
-				'z md:sticky top-0 z-50 bg-white': !isHeroSearchInVisible && !scrolled,
+				'z top-0 z-50 bg-white md:sticky': !isHeroSearchInVisible && !scrolled,
 			})}
 		>
 			<NoticeBanner />

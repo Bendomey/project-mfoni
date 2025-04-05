@@ -73,7 +73,7 @@ export function CreatorPhotosModule() {
 								content={collectionContent.content}
 								showCreator={false}
 							/>
-							<div className="mt-1 md:flex items-center gap-2 hidden">
+							<div className="mt-1 hidden items-center gap-2 md:flex">
 								{collectionContent.content.tags?.slice(0, 3)?.map((tag) => (
 									<Button
 										key={tag.id}

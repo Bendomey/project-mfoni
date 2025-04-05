@@ -49,7 +49,9 @@ s3Router.post(
 		const command = new GetObjectCommand({
 			Bucket: BUCKET_NAME,
 			Key: key,
-			ResponseContentDisposition: `attachment; filename="${encodeURIComponent(key)}"`,
+			ResponseContentDisposition: `attachment; filename="${encodeURIComponent(
+				key,
+			)}"`,
 		})
 		const signedUrl = await getSignedUrl(s3Client, command, {
 			expiresIn: 5 * 60,

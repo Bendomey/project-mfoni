@@ -32,7 +32,12 @@ interface Props {
 	imageHeight?: number
 }
 
-export const Content = ({ content, showCreator = true, className, imageHeight }: Props) => {
+export const Content = ({
+	content,
+	showCreator = true,
+	className,
+	imageHeight,
+}: Props) => {
 	const { currentUser, isLoggedIn } = useAuth()
 	const navigate = useNavigate()
 
@@ -57,7 +62,7 @@ export const Content = ({ content, showCreator = true, className, imageHeight }:
 	const size = useMemo(() => {
 		if (imageHeight) {
 			return {
-				height: imageHeight
+				height: imageHeight,
 			}
 		}
 
@@ -80,48 +85,47 @@ export const Content = ({ content, showCreator = true, className, imageHeight }:
 
 	const downloadButton = (
 		<>
-			{
-				canUserDownload ? (
-					<DownloadButtonApi content={content}>
-						{({ isDisabled, onClick }) => (
-							<Button
-								disabled={isDisabled}
-								size='sm'
-								variant="outlined"
-								onClick={(e) => {
-									e.preventDefault()
-									onClick('MEDIUM')
-								}}
-							>
-								<ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-								Download
-							</Button>
-						)}
-					</DownloadButtonApi>
-				) : (
-					<Button
-						variant={content.amount === 0 ? 'outlined' : 'solid'}
-						size='sm'
-						onClick={(e) => {
-							e.preventDefault()
-							const buyPage = `${PAGES.PHOTO.replace(
-								':slug',
-								content.slug,
-							)}?buy=true`
+			{canUserDownload ? (
+				<DownloadButtonApi content={content}>
+					{({ isDisabled, onClick }) => (
+						<Button
+							disabled={isDisabled}
+							size="sm"
+							variant="outlined"
+							onClick={(e) => {
+								e.preventDefault()
+								onClick('MEDIUM')
+							}}
+						>
+							<ArrowDownTrayIcon className="mr-2 h-4 w-4" />
+							Download
+						</Button>
+					)}
+				</DownloadButtonApi>
+			) : (
+				<Button
+					variant={content.amount === 0 ? 'outlined' : 'solid'}
+					size="sm"
+					onClick={(e) => {
+						e.preventDefault()
+						const buyPage = `${PAGES.PHOTO.replace(
+							':slug',
+							content.slug,
+						)}?buy=true`
 
-							if (isLoggedIn) {
-								navigate(buyPage)
-							} else {
-								navigate(`${PAGES.LOGIN}?return_to=${encodeURIComponent(buyPage)}`)
-							}
-
-						}}
-					>
-						<LockClosedIcon className="mr-2 h-4 w-4" />
-						Buy
-					</Button>
-				)
-			}
+						if (isLoggedIn) {
+							navigate(buyPage)
+						} else {
+							navigate(
+								`${PAGES.LOGIN}?return_to=${encodeURIComponent(buyPage)}`,
+							)
+						}
+					}}
+				>
+					<LockClosedIcon className="mr-2 h-4 w-4" />
+					Buy
+				</Button>
+			)}
 		</>
 	)
 
@@ -159,40 +163,37 @@ export const Content = ({ content, showCreator = true, className, imageHeight }:
 			state={{ modal: true }}
 		>
 			<div className={classNames('relative cursor-zoom-in', className)}>
-				{
-					showCreator ? (
-						<div className='flex items-center justify-between px-3 pb-2 md:hidden'>
-							<div>
-								{
-									content.createdBy ? (
-										<Link
-											to={PAGES.CREATOR.PHOTOS.replace(
-												':username',
-												safeString(content?.createdBy?.username),
-											)}
-											className="flex md:hidden items-center"
-
-										>
-											<CreatedByCard createdBy={content.createdBy} imageClassName='size-8' />
-											<div className='flex flex-col ml-2'>
-												<span className="truncate text-sm font-semibold ">
-													{content.createdBy.name}
-												</span>
-												{
-													content.amount > 0 ? <span className='text-xs'>For mfoni+</span> : null
-												}
-											</div>
-										</Link>
-									) : null
-								}
-							</div>
-							{content.isFeatured ? (
-								<StarIcon className="h-7 w-7 text-yellow-600" />
+				{showCreator ? (
+					<div className="flex items-center justify-between px-3 pb-2 md:hidden">
+						<div>
+							{content.createdBy ? (
+								<Link
+									to={PAGES.CREATOR.PHOTOS.replace(
+										':username',
+										safeString(content?.createdBy?.username),
+									)}
+									className="flex items-center md:hidden"
+								>
+									<CreatedByCard
+										createdBy={content.createdBy}
+										imageClassName="size-8"
+									/>
+									<div className="ml-2 flex flex-col">
+										<span className="truncate text-sm font-semibold">
+											{content.createdBy.name}
+										</span>
+										{content.amount > 0 ? (
+											<span className="text-xs">For mfoni+</span>
+										) : null}
+									</div>
+								</Link>
 							) : null}
-
 						</div>
-					) : null
-				}
+						{content.isFeatured ? (
+							<StarIcon className="h-7 w-7 text-yellow-600" />
+						) : null}
+					</div>
+				) : null}
 				<div className="aspect-w-4 aspect-h-3 w-full">
 					<Image
 						height={size.height}
@@ -203,16 +204,13 @@ export const Content = ({ content, showCreator = true, className, imageHeight }:
 					/>
 				</div>
 
-				<div className='flex items-center justify-between px-3 py-2 md:hidden'>
-					<div>
-						{likeButton}
-					</div>
+				<div className="flex items-center justify-between px-3 py-2 md:hidden">
+					<div>{likeButton}</div>
 
 					{downloadButton}
-
 				</div>
 
-				<div className="group absolute top-0 h-full w-full rounded-sm hover:bg-black/50 hidden md:block">
+				<div className="group absolute top-0 hidden h-full w-full rounded-sm hover:bg-black/50 md:block">
 					<div className="flex h-full w-full flex-col justify-between p-4">
 						<div className="flex flex-row items-center justify-between">
 							<div className="flex items-center gap-1">
@@ -283,9 +281,7 @@ export const Content = ({ content, showCreator = true, className, imageHeight }:
 							</div>
 
 							<div className="flex items-center gap-4">
-								<div className="hidden group-hover:block">
-									{likeButton}
-								</div>
+								<div className="hidden group-hover:block">{likeButton}</div>
 								{content.isFeatured ? (
 									<div>
 										<FlyoutContainer
@@ -337,9 +333,7 @@ export const Content = ({ content, showCreator = true, className, imageHeight }:
 								<div />
 							)}
 
-							<div className="flex justify-end">
-								{downloadButton}
-							</div>
+							<div className="flex justify-end">{downloadButton}</div>
 						</div>
 					</div>
 				</div>
@@ -361,7 +355,10 @@ const CreatedByCard = ({ createdBy, imageClassName }: CreatedByCardProps) => {
 		<div className="flex">
 			{isProfilePhotoValid && createdBy?.photo ? (
 				<Image
-					className={classNames("inline-block h-7 w-7 rounded-full", imageClassName)}
+					className={classNames(
+						'inline-block h-7 w-7 rounded-full',
+						imageClassName,
+					)}
 					src={createdBy.photo}
 					alt={createdBy.name}
 				/>

@@ -21,7 +21,7 @@ export const AccountModule = () => {
 	)
 	const isCompleteCreatorApplicationModalOpened = Boolean(
 		completeCreatorApplicationParam &&
-		completeCreatorApplicationParam !== 'false',
+			completeCreatorApplicationParam !== 'false',
 	)
 
 	return (
@@ -29,18 +29,18 @@ export const AccountModule = () => {
 			<Header isHeroSearchInVisible={false} />
 			<div className="grid grid-cols-8 gap-3 bg-gray-50 px-0 pb-16 pt-4 lg:px-8">
 				<div className="col-span-8 flex flex-col gap-y-8 lg:col-span-6">
-					<div className='mx-4 md:mx-0'>
+					<div className="mx-4 md:mx-0">
 						<AccountCover />
 					</div>
 
 					{currentUser?.role === 'CREATOR' ? (
-						<div className='mx-4 md:mx-0 space-y-5 md:space-y-0'>
+						<div className="mx-4 space-y-5 md:mx-0 md:space-y-0">
 							<CreatorAbout />
 							<CreatorAnalytics />
 						</div>
 					) : null}
 					<div>
-						<div className="mb-5 mx-4 md:mx-0">
+						<div className="mx-4 mb-5 md:mx-0">
 							<h3 className="text-base font-semibold leading-6 text-gray-900">
 								Your Contents
 							</h3>
@@ -51,7 +51,7 @@ export const AccountModule = () => {
 						<Outlet />
 					</div>
 				</div>
-				<div className="col-span-8 flex flex-col gap-y-10 lg:col-span-2 mx-4 md:mx-0">
+				<div className="col-span-8 mx-4 flex flex-col gap-y-10 md:mx-0 lg:col-span-2">
 					<QuickActions />
 					{/* TODO: bring this back when timeline is ready */}
 					{/* <UserTimeline /> */}

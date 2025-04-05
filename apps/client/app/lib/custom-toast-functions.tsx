@@ -54,7 +54,7 @@ export const errorToast = (message: string, options?: ToastOptions) => {
 							animate={{ y: 0, opacity: 1, transition: { delay: 0 } }}
 							exit={{ y: 50, opacity: 0 }}
 							transition={{ ease: 'easeInOut', duration: t.duration }}
-							className="px-[5vw] pointer-events-none fixed bottom-0 right-0"
+							className="pointer-events-none fixed bottom-0 right-0 px-[5vw]"
 						>
 							<div className="max-w-8xl mx-auto flex w-11/12 justify-end">
 								<div className="text-inverse pointer-events-auto relative flex max-w-xl items-center gap-2 rounded bg-red-600 p-6 text-white shadow-md">

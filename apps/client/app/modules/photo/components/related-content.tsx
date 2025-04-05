@@ -15,7 +15,7 @@ export function RelatedContent({ contentId }: Props) {
 				page: 0,
 				per: 50,
 			},
-			populate: ['content.createdBy']
+			populate: ['content.createdBy'],
 		},
 	})
 
@@ -23,7 +23,7 @@ export function RelatedContent({ contentId }: Props) {
 
 	if (isPending) {
 		content = (
-			<div className="columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3 my-10">
+			<div className="my-10 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3">
 				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
 				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
 				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
@@ -64,7 +64,7 @@ export function RelatedContent({ contentId }: Props) {
 
 	return (
 		<div className="mt-10">
-			<div className='px-4 md:px-0'>
+			<div className="px-4 md:px-0">
 				<h1 className="text-2xl font-bold">Related Images</h1>
 			</div>
 

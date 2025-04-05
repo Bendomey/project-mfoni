@@ -60,7 +60,7 @@ export const LandingPageModule = () => {
 	if (data?.total) {
 		content = (
 			<>
-				<div className="columns-1 gap-2 sm:gap-4 sm:columns-2 md:columns-3">
+				<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3">
 					{data.rows.map((content) => (
 						<div className="mb-7 md:mb-5" key={content.id}>
 							<Content content={content} />

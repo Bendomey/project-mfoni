@@ -10,12 +10,12 @@ interface Props {
 export function TagSection({ data }: Props) {
 	return (
 		<Link to={PAGES.TAG.replace(':tag', data.slug)}>
-			<div className="min-w-56 rounded border border-gray-100  px-4 py-2 hover:bg-zinc-50">
+			<div className="min-w-56 rounded border border-gray-100 px-4 py-2 hover:bg-zinc-50">
 				<div className="flex items-center gap-2">
 					<TagIcon className="size-5 text-black" />
 					<div>
 						<h1 className="truncate capitalize">{data.name}</h1>
-						<p className="text-xs text-zinc-400 mt-1">
+						<p className="mt-1 text-xs text-zinc-400">
 							{dayjs(data.createdAt).format('L')}
 						</p>
 					</div>

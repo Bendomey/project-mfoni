@@ -41,7 +41,7 @@ export function SearchCollectionsModule() {
 
 	if (isError) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
+			<div className="mx-5 flex h-[60vh] flex-1 items-center justify-center md:mx-0">
 				<ErrorState
 					message="An error occurred searching collections."
 					title="Something happened."
@@ -67,7 +67,7 @@ export function SearchCollectionsModule() {
 
 	if (data && !data?.total) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
+			<div className="mx-5 flex h-[60vh] flex-1 items-center justify-center md:mx-0">
 				<EmptyState
 					message={`There are no collections found under "${queryParam}". Adjust your search query.`}
 					title="Search results is empty"
@@ -86,7 +86,10 @@ export function SearchCollectionsModule() {
 			<div className="mt-5 grid min-h-[60vh] grid-cols-1 gap-4 md:grid-cols-3">
 				{data.rows.map((collection) => (
 					<Fragment key={collection.id}>
-						<CollectionCard collection={collection} className='h-[25rem] md:h-[18rem]' />
+						<CollectionCard
+							collection={collection}
+							className="h-[25rem] md:h-[18rem]"
+						/>
 					</Fragment>
 				))}
 			</div>

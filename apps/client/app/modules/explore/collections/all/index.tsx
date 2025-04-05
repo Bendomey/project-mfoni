@@ -74,7 +74,10 @@ export function CollectionsModule() {
 			<div className="mt-8 grid grid-cols-1 gap-10 md:grid-cols-3">
 				{data.rows.map((collection) => (
 					<Fragment key={collection.id}>
-						<CollectionCard collection={collection} className='h-[25rem] md:h-[18rem]' />
+						<CollectionCard
+							collection={collection}
+							className="h-[25rem] md:h-[18rem]"
+						/>
 					</Fragment>
 				))}
 			</div>

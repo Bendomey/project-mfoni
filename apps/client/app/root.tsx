@@ -30,7 +30,7 @@ import { EnvContext } from './providers/env/index.tsx'
 import { Providers } from './providers/index.tsx'
 
 import globalStyles from '@/styles/global.css?url'
-import tailwindStyles from  '@/styles/tailwind.css?url'
+import tailwindStyles from '@/styles/tailwind.css?url'
 
 dayjs.locale('en-gb')
 dayjs.extend(localizedFormat)

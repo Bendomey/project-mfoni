@@ -91,7 +91,7 @@ export const PhotoModule = () => {
 			<Header isHeroSearchInVisible={false} />
 			<div className="max-w-8xl mx-auto px-0 py-4 md:px-5">
 				<div>
-					<div className="mb-5 px-4 md:px-0 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+					<div className="mb-5 flex flex-col justify-between gap-4 px-4 md:flex-row md:items-center md:px-0">
 						<div className="flex items-center gap-2">
 							<Link
 								to={PAGES.CREATOR.PHOTOS.replace(
@@ -162,7 +162,7 @@ export const PhotoModule = () => {
 						</div>
 					</div>
 
-					<div className='px-4 md:px-0'>
+					<div className="px-4 md:px-0">
 						{isContentMine ? (
 							content.status === 'REJECTED' ? (
 								<div className="rounded-md bg-red-50 p-4">
@@ -219,7 +219,7 @@ export const PhotoModule = () => {
 						/>
 					</div>
 
-					<div className="flex flex-row px-4 md:px-0 items-start justify-between md:items-center">
+					<div className="flex flex-row items-start justify-between px-4 md:items-center md:px-0">
 						<div className="grid w-[50vw] grid-cols-1 gap-5 md:w-full md:grid-cols-5">
 							<div className="text-sm">
 								<h1 className="text-gray-500">Views</h1>

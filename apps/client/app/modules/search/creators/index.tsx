@@ -54,7 +54,7 @@ export function SearchCreatorsModule() {
 
 	if (isError) {
 		content = (
-			<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
+			<div className="mx-5 flex h-[60vh] flex-1 items-center justify-center md:mx-0">
 				<ErrorState
 					message="An error occurred searching creators."
 					title="Something happened."
@@ -82,7 +82,7 @@ export function SearchCreatorsModule() {
 		content = (
 			<>
 				{featuredCreators?.total && !data?.total ? (
-					<div className=''>
+					<div className="">
 						<div className="flex flex-row items-center justify-between gap-x-2 px-4 md:px-5">
 							<h2 className="flex items-center text-xl font-bold">Featured</h2>
 						</div>
@@ -96,7 +96,7 @@ export function SearchCreatorsModule() {
 						</div>
 					</div>
 				) : null}
-				<div className="flex h-[60vh] flex-1 items-center justify-center mx-5 md:mx-0">
+				<div className="mx-5 flex h-[60vh] flex-1 items-center justify-center md:mx-0">
 					<EmptyState
 						message={`There are no creators found under "${queryParam}". Adjust your search query.`}
 						title="Search results is empty"
@@ -125,9 +125,5 @@ export function SearchCreatorsModule() {
 		)
 	}
 
-	return (
-		<div className="mt-5">
-			{content}
-		</div>
-	)
+	return <div className="mt-5">{content}</div>
 }

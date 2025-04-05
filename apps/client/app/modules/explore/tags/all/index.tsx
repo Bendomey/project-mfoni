@@ -74,12 +74,12 @@ export function TagsModule() {
 			<div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
 				{data.rows.map((tag) => (
 					<Link to={PAGES.TAG.replace(':tag', tag.slug)} key={tag.id}>
-						<div className="rounded border border-gray-100  px-4 py-2 hover:bg-zinc-50">
+						<div className="rounded border border-gray-100 px-4 py-2 hover:bg-zinc-50">
 							<div className="flex items-center gap-2">
 								<TagIcon className="size-5 text-black" />
 								<div>
 									<h1 className="line-clamp-2 capitalize">{tag.name}</h1>
-									<p className="text-xs text-zinc-400 mt-1">
+									<p className="mt-1 text-xs text-zinc-400">
 										{dayjs(tag.createdAt).format('L')}
 									</p>
 								</div>

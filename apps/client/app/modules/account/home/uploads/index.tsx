@@ -86,12 +86,12 @@ export function AccountUploadsModule() {
 			{data.rows.map((collectionContent, index) => (
 				<Fragment key={index}>
 					{collectionContent.content ? (
-						<div className="mb-7 md:mb-5 break-inside-avoid">
+						<div className="mb-7 break-inside-avoid md:mb-5">
 							<Content
 								content={collectionContent.content}
 								showCreator={false}
 							/>
-							<div className="mt-1 md:flex items-center gap-2 hidden">
+							<div className="mt-1 hidden items-center gap-2 md:flex">
 								{collectionContent.content.tags?.map((tag) => (
 									<Button
 										key={tag.id}

@@ -66,7 +66,11 @@ export function CreatorCollectionsModule() {
 	return (
 		<div className="grid grid-cols-1 gap-8 md:grid-cols-3">
 			{data.rows.map((collection) => (
-				<CollectionCard key={collection.id} collection={collection} className='md:h-[15rem]' />
+				<CollectionCard
+					key={collection.id}
+					collection={collection}
+					className="md:h-[15rem]"
+				/>
 			))}
 		</div>
 	)
