@@ -1097,14 +1097,14 @@ public class UserController : ControllerBase
 
             var withdrawalLimit = PermissionsHelper.GetAmountYouCanWithdrawPerMonth(creatorInfo.CreatorSubscription.PackageType);
             var yourWithdrawals = await _permissionService.GetMonthlyWithdrawalLimit(creatorInfo);
-            var uploadLimitForUser = new WithdrawalLimitForUserForCurrentMonth
+            var withdrawalLimitForUser = new WithdrawalLimitForUserForCurrentMonth
             {
                 Withdrawal = yourWithdrawals,
                 Limit = withdrawalLimit
             };
 
             return new ObjectResult(
-                new GetEntityResponse<WithdrawalLimitForUserForCurrentMonth>(uploadLimitForUser, null).Result()
+                new GetEntityResponse<WithdrawalLimitForUserForCurrentMonth>(withdrawalLimitForUser, null).Result()
             )
             {
                 StatusCode = (int)HttpStatusCode.OK
