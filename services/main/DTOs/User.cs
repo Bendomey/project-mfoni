@@ -25,3 +25,23 @@ public class UpdateCreatorBasicDetails
     public string? About { get; set; }
     public string? Address { get; set; }
 }
+
+public class UploadLimitForUserForCurrentMonth
+{
+    public Int64 Uploads { get; set; }
+
+    /// <summary>
+    /// Limit - It's only null when there's no limit.
+    /// </summary>
+    public Int64? Limit { get; set; }
+}
+
+public class WithdrawalLimitForUserForCurrentMonth
+{
+    public Int64 Withdrawal { get; set; }
+
+    /// <summary>
+    /// Limit - It's only null when there's no limit.
+    /// </summary>
+    public Int64? Limit { get; set; }
+}

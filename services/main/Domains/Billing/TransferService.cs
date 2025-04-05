@@ -216,7 +216,7 @@ public class TransferService
         // only check this permission if it's a new request
         if (input.Reference is null)
         {
-            var amountWithdrawnSoFarCurrentMonth = await _permissionService.AmountWithdrawnThisMonth(creatorInfo);
+            var amountWithdrawnSoFarCurrentMonth = await _permissionService.GetMonthlyWithdrawalLimit(creatorInfo);
             amountWithdrawnSoFarCurrentMonth += input.Amount;
 
             var amountCreatorCanWithdraw = PermissionsHelper.GetAmountYouCanWithdrawPerMonth(creatorInfo.CreatorSubscription.PackageType);

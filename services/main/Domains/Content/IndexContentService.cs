@@ -64,7 +64,7 @@ public class IndexContent
             throw new HttpRequestException("NotACreator", null, System.Net.HttpStatusCode.Forbidden);
         }
 
-        var numberOfContentsCreatorHasUploaded = await _permissionService.GetUploadLimitForPackageType(creatorInfo);
+        var numberOfContentsCreatorHasUploaded = await _permissionService.GetMonthlyUploadLimit(creatorInfo);
         numberOfContentsCreatorHasUploaded += mediaInput.Length;
 
         var contentsCreatorCanUpload = PermissionsHelper.GetNumberOfUploadsForPackageType(creatorInfo.CreatorSubscription.PackageType);

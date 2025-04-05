@@ -36,7 +36,7 @@ public class PermissionService
         _logger.LogDebug("IndexContentService initialized");
     }
 
-    public async Task<Int64> GetUploadLimitForPackageType(GetCreatorDetailedResponse creatorInfo)
+    public async Task<Int64> GetMonthlyUploadLimit(GetCreatorDetailedResponse creatorInfo)
     {
         // Get count of contents uploaded this month
         var currentYear = DateTime.UtcNow.Year;
@@ -59,7 +59,7 @@ public class PermissionService
         return contentsCreatorHasUploaded;
     }
 
-    public async Task<Int64> AmountWithdrawnThisMonth(GetCreatorDetailedResponse creatorInfo)
+    public async Task<Int64> GetMonthlyWithdrawalLimit(GetCreatorDetailedResponse creatorInfo)
     {
         // Get count of contents uploaded this month
         var currentYear = DateTime.UtcNow.Year;
