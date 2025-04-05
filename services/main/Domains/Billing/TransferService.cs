@@ -61,7 +61,7 @@ public class TransferService
         var creatorInfo = await _creatorService.GetCreatorDetails(input.CreatedById);
         var canCreateRecipient = _permissionService.IsAPremiumCreator(creatorInfo);
 
-        if (canCreateRecipient)
+        if (!canCreateRecipient)
         {
             throw new HttpRequestException("NotAPremiumCreator", null, System.Net.HttpStatusCode.Forbidden);
         }
@@ -208,7 +208,7 @@ public class TransferService
         var creatorInfo = await _creatorService.GetCreatorDetails(input.CreatedById);
         var canCreateRecipient = _permissionService.IsAPremiumCreator(creatorInfo);
 
-        if (canCreateRecipient)
+        if (!canCreateRecipient)
         {
             throw new HttpRequestException("NotAPremiumCreator", null, System.Net.HttpStatusCode.Forbidden);
         }
