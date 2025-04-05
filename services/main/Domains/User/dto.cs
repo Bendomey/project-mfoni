@@ -52,7 +52,7 @@ public class SubscribeToPackageInput
     public required int Period { get; set; }
 }
 
-public class GetUserInfoResponse
+public class GetCreatorDetailedResponse
 {
     public required Models.User User { get; set; }
     public required Models.Creator Creator { get; set; }

@@ -1,41 +1,14 @@
-namespace main.Lib;
+using main.Models;
 
-public class CanInput
-{
-    public required string Action { get; set; }
-    public required string[] Permissions { get; set; }
-}
+namespace main.Lib;
 
 
 public static class PermissionsHelper
 {
-    public static bool Can(CanInput input)
-    {
-        return input.Permissions.Contains(input.Action);
-    }
+    public static long? Unlimited = null;
 
-    public static string[] GetPermissionsForPackageType(string packageType)
-    {
-        switch (packageType)
-        {
-            case "FREE":
-                return new string[]{
-                    Permissions.UploadContent
-                };
-            case "BASIC":
-                return new string[]{
-                    Permissions.UploadContent
-                };
-            case "ADVANCED":
-                return new string[]{
-                    Permissions.UploadContent
-                };
-            default:
-                return new string[] { };
-        }
-    }
 
-    public static long GetNumberOfUploadsForPackageType(string packageType)
+    public static long? GetNumberOfUploadsForPackageType(string packageType)
     {
         switch (packageType)
         {
@@ -44,9 +17,36 @@ public static class PermissionsHelper
             case "BASIC":
                 return 200;
             case "ADVANCED":
-                return long.MaxValue;
+                return Unlimited;
             default:
                 return 0;
         }
     }
+
+    public static long? GetAmountYouCanWithdrawPerMonth(string packageType)
+    {
+
+        switch (packageType)
+        {
+            case "FREE":
+                return 0;
+            case "BASIC":
+                return 200000; // GHS2,000.00
+            case "ADVANCED":
+                return Unlimited;
+            default:
+                return 0;
+        }
+    }
+
+    public static string[] PremiumPackageTypes = new[]
+    {
+        CreatorSubscriptionPackageType.BASIC,
+        CreatorSubscriptionPackageType.ADVANCED,
+    };
+
+    public static string[] FreePackageTypes = new[]
+    {
+        CreatorSubscriptionPackageType.FREE,
+    };
 }

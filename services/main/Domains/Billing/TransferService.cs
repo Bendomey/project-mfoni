@@ -15,13 +15,17 @@ public class TransferService
     private readonly IMongoCollection<Models.Transfer> _transferCollection;
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.WalletTransaction> _walletTransactionCollection;
+    private readonly PermissionService _permissionService;
+    private readonly CreatorService _creatorService;
     private readonly CacheProvider _cacheProvider;
 
     public TransferService(
         ILogger<TransferService> logger,
         DatabaseSettings databaseConfig,
         IOptions<AppConstants> appConstants,
-        CacheProvider cacheProvider
+        CacheProvider cacheProvider,
+        PermissionService permissionService,
+        CreatorService creatorService
     )
     {
         _logger = logger;
@@ -43,6 +47,9 @@ public class TransferService
             appConstants.Value.WalletTransactionCollection
         );
 
+        _permissionService = permissionService;
+        _creatorService = creatorService;
+
         _cacheProvider = cacheProvider;
 
         logger.LogDebug("Transfer service initialized");
@@ -50,6 +57,15 @@ public class TransferService
 
     public async Task<Models.TransferRecipient> CreateTransferRecipient(CreateTransferRecipientInput input)
     {
+        // =============== START PERMISSIONS CHECK =============================
+        var creatorInfo = await _creatorService.GetCreatorDetails(input.CreatedById);
+        var canCreateRecipient = _permissionService.IsAPremiumCreator(creatorInfo);
+
+        if (!canCreateRecipient)
+        {
+            throw new HttpRequestException("NotAPremiumCreator", null, System.Net.HttpStatusCode.Forbidden);
+        }
+        // =============== END PERMISSIONS CHECK =============================
 
         var builder = Builders<Models.TransferRecipient>.Filter;
         var filter = builder.Eq(x => x.AccountNumber, input.AccountNumber) &
@@ -187,14 +203,31 @@ public class TransferService
 
     public async Task<Models.Transfer> InitiateTransfer(InitiateTransferInput input)
     {
-        // check if you have enough balance
-        var user = await _userCollection.Find(x => x.Id == input.CreatedById).FirstOrDefaultAsync();
-        if (user is null)
+
+        // =============== START PERMISSIONS CHECK =============================
+        var creatorInfo = await _creatorService.GetCreatorDetails(input.CreatedById);
+        var canCreateRecipient = _permissionService.IsAPremiumCreator(creatorInfo);
+
+        if (!canCreateRecipient)
         {
-            throw new HttpRequestException("UserNotFound");
+            throw new HttpRequestException("NotAPremiumCreator", null, System.Net.HttpStatusCode.Forbidden);
         }
 
-        bool canIPay = user.BookWallet >= input.Amount;
+        // only check this permission if it's a new request
+        if (input.Reference is null)
+        {
+            var amountWithdrawnSoFarCurrentMonth = await _permissionService.GetMonthlyWithdrawalLimit(creatorInfo);
+            amountWithdrawnSoFarCurrentMonth += input.Amount;
+
+            var amountCreatorCanWithdraw = PermissionsHelper.GetAmountYouCanWithdrawPerMonth(creatorInfo.CreatorSubscription.PackageType);
+            if (amountCreatorCanWithdraw is not null && amountWithdrawnSoFarCurrentMonth > amountCreatorCanWithdraw)
+            {
+                throw new HttpRequestException("WithdrawLimitReached", null, System.Net.HttpStatusCode.Forbidden);
+            }
+        }
+        // =============== END PERMISSIONS CHECK =============================
+
+        bool canIPay = creatorInfo.User.BookWallet >= input.Amount;
         if (!canIPay)
         {
             throw new HttpRequestException("InsufficientBalance");
@@ -246,8 +279,8 @@ public class TransferService
         };
         await _walletTransactionCollection.InsertOneAsync(walletTransaction);
 
-        user.BookWallet -= input.Amount;
-        await _userCollection.ReplaceOneAsync(user => user.Id == input.CreatedById, user);
+        creatorInfo.User.BookWallet -= input.Amount;
+        await _userCollection.ReplaceOneAsync(user => user.Id == input.CreatedById, creatorInfo.User);
 
         var transfer = new Models.Transfer
         {

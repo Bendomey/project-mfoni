@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using main.DTOs;
 using main.Domains;
@@ -18,6 +18,7 @@ public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> logger;
     private readonly UserService userService;
+    private readonly PermissionService _permissionService;
     private readonly UserTransformer _userTransformer;
     private readonly CreatorApplicationService _creatorApplicationService;
     private readonly CreatorService _creatorService;
@@ -47,7 +48,8 @@ public class UserController : ControllerBase
         ContentPurchaseTransformer contentPurchaseTransformer,
         ContentLikeTransformer contentLikeTransformer,
         PurchaseContentService purchaseContentService,
-        PaymentTransformer paymentTransformer
+        PaymentTransformer paymentTransformer,
+        PermissionService permissionService
     )
     {
         this.logger = logger;
@@ -65,6 +67,7 @@ public class UserController : ControllerBase
         this._paymentTransformer = paymentTransformer;
         this._contentPurchaseTransformer = contentPurchaseTransformer;
         this._purchaseContentService = purchaseContentService;
+        _permissionService = permissionService;
     }
 
     [Authorize]
@@ -1003,6 +1006,135 @@ public class UserController : ControllerBase
         }
     }
 
+
+    /// <summary>
+    /// Get Monthly Upload Limit for User
+    /// </summary>
+    /// <response code="200">Upload Limit returned successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize]
+    [HttpGet("users/limits/upload")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<UploadLimitForUserForCurrentMonth>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> GetMonthlyUploadLimitForUser()
+    {
+        try
+        {
+            logger.LogInformation("Getting user's upload limit");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var creatorInfo = await _creatorService.GetCreatorDetails(currentUser.Id);
+
+            var uploadLimit = PermissionsHelper.GetNumberOfUploadsForPackageType(creatorInfo.CreatorSubscription.PackageType);
+            var yourUploads = await _permissionService.GetMonthlyUploadLimit(creatorInfo);
+            var uploadLimitForUser = new UploadLimitForUserForCurrentMonth
+            {
+                Uploads = yourUploads,
+                Limit = uploadLimit
+            };
+
+            return new ObjectResult(
+                new GetEntityResponse<UploadLimitForUserForCurrentMonth>(uploadLimitForUser, null).Result()
+            )
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError($"Failed to get user's monthly upload limit. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+          {
+              scope.SetTags(new Dictionary<string, string>
+              {
+                    {"action", "Get user's monthly upload limit"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+              });
+              SentrySdk.CaptureException(e);
+          });
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+
+    /// <summary>
+    /// Get Monthly Withdrawal Limit for User
+    /// </summary>
+    /// <response code="200">Withdrawal Limit returned successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize]
+    [HttpGet("users/limits/withdrawal")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<WithdrawalLimitForUserForCurrentMonth>)
+    )]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> GetWithdrawalLimitForUser()
+    {
+        try
+        {
+            logger.LogInformation("Getting user's withdrawal limit");
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+            var creatorInfo = await _creatorService.GetCreatorDetails(currentUser.Id);
+
+            var withdrawalLimit = PermissionsHelper.GetAmountYouCanWithdrawPerMonth(creatorInfo.CreatorSubscription.PackageType);
+            var yourWithdrawals = await _permissionService.GetMonthlyWithdrawalLimit(creatorInfo);
+            var withdrawalLimitForUser = new WithdrawalLimitForUserForCurrentMonth
+            {
+                Withdrawal = yourWithdrawals,
+                Limit = withdrawalLimit
+            };
+
+            return new ObjectResult(
+                new GetEntityResponse<WithdrawalLimitForUserForCurrentMonth>(withdrawalLimitForUser, null).Result()
+            )
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError($"Failed to get user's monthly withdrawal limit. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+          {
+              scope.SetTags(new Dictionary<string, string>
+              {
+                    {"action", "Get user's monthly withdrawal limit"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+              });
+              SentrySdk.CaptureException(e);
+          });
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
 
 
 }
