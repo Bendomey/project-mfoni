@@ -81,7 +81,7 @@ export function AccountContentsModule() {
 		<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8">
 			{data?.rows.map((contentPurchase, index) => (
 				<Fragment key={index}>
-					<div className="mb-5 break-inside-avoid">
+					<div className="mb-7 break-inside-avoid md:mb-5">
 						{contentPurchase.content ? (
 							<Content content={contentPurchase.content} />
 						) : null}

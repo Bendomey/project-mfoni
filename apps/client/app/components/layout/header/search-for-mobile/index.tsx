@@ -6,7 +6,6 @@ import {
 import { useState } from 'react'
 import { SearchPalette } from '../search/search-palette/index.tsx'
 import { VisualSearch } from '../search/visual/index.tsx'
-import { Button } from '@/components/button/index.tsx'
 
 interface Props {
 	onClose: VoidFunction
@@ -95,14 +94,13 @@ export const SearchPhotosForMobile = ({
 	return (
 		<>
 			<div className="flex md:hidden">
-				<Button
-					variant="outlined"
+				<div
 					onClick={() => setIsSearchFocused(true)}
-					className="flex-start flex w-full items-center justify-start rounded-full px-5 py-3 text-base font-medium text-gray-400"
+					className="flex-start flex w-full items-center justify-start rounded-full bg-gray-100 px-5 py-3 text-base font-medium text-gray-400"
 				>
 					<MagnifyingGlassIcon className="mr-3 h-5 w-5 text-zinc-400" />
 					{searchQuery ?? 'Search for photos'}
-				</Button>
+				</div>
 			</div>
 			<SearchModal
 				isOpened={isSearchFocused}

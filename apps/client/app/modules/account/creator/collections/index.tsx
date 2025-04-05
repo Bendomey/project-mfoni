@@ -5,7 +5,6 @@ import { Button } from '@/components/button/index.tsx'
 import { CollectionCard } from '@/components/CollectionCard/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
 import { ErrorState } from '@/components/error-state/index.tsx'
-import { Loader } from '@/components/loader/index.tsx'
 
 export function CreatorCollectionsModule() {
 	const creator = useCreator()
@@ -22,8 +21,14 @@ export function CreatorCollectionsModule() {
 
 	if (isPending) {
 		return (
-			<div className="my-16 flex justify-center">
-				<Loader />
+			<div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+				{[...new Array(12)].map((_, index) => (
+					<div key={index} className="animate-pulse space-y-2">
+						<div className="h-60 w-full rounded-sm bg-zinc-200" />
+						<div className="h-3 w-2/3 rounded-sm bg-zinc-200" />
+						<div className="h-2 w-1/2 rounded-sm bg-zinc-200" />
+					</div>
+				))}
 			</div>
 		)
 	}
@@ -59,9 +64,13 @@ export function CreatorCollectionsModule() {
 	}
 
 	return (
-		<div className="grid grid-cols-2 gap-8 md:grid-cols-3">
+		<div className="grid grid-cols-1 gap-8 md:grid-cols-3">
 			{data.rows.map((collection) => (
-				<CollectionCard key={collection.id} collection={collection} />
+				<CollectionCard
+					key={collection.id}
+					collection={collection}
+					className="md:h-[15rem]"
+				/>
 			))}
 		</div>
 	)

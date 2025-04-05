@@ -2,7 +2,6 @@ import { useInView } from 'react-intersection-observer'
 import { HeroSection } from './components/hero-section/index.tsx'
 import { Pricing } from './components/pricing/index.tsx'
 import { useGetContents } from '@/api/contents/index.ts'
-import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Content } from '@/components/Content/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
@@ -43,17 +42,17 @@ export const LandingPageModule = () => {
 
 	if (isPending) {
 		content = (
-			<div className="columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4">
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+			<div className="columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3">
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
 			</div>
 		)
 	}
@@ -61,12 +60,10 @@ export const LandingPageModule = () => {
 	if (data?.total) {
 		content = (
 			<>
-				<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
+				<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3">
 					{data.rows.map((content) => (
-						<div className="mb-5" key={content.id}>
-							<FadeIn>
-								<Content content={content} />
-							</FadeIn>
+						<div className="mb-7 md:mb-5" key={content.id}>
+							<Content content={content} />
 						</div>
 					))}
 				</div>
@@ -87,12 +84,12 @@ export const LandingPageModule = () => {
 	}
 
 	return (
-		<div className="relative">
+		<div className="">
 			<div ref={heroRef}>
 				<HeroSection />
 			</div>
 			{inView ? null : <Header isHeroSearchInVisible={false} />}
-			<div className="max-w-8xl mx-auto my-10 items-center px-3 sm:px-3 md:px-8">
+			<div className="max-w-8xl mx-auto mb-5 mt-5 items-center px-0 md:px-5">
 				{content}
 				<Pricing />
 			</div>

@@ -195,7 +195,8 @@ export function AccountCover() {
 							</div>
 						</div>
 
-						{currentUser?.role === 'CREATOR' ? (
+						{/* TODO: follower's feature */}
+						{/* {currentUser?.role === 'CREATOR' ? (
 							<div className="flex items-center gap-1">
 								<div className="flex -space-x-1 overflow-hidden">
 									<Image
@@ -218,7 +219,7 @@ export function AccountCover() {
 									125,000 Followers
 								</div>
 							</div>
-						) : null}
+						) : null} */}
 					</div>
 					{currentUser?.role === 'CREATOR' ? (
 						<div className="mt-5 flex flex-row flex-wrap items-center gap-3 md:mt-2 md:gap-1">

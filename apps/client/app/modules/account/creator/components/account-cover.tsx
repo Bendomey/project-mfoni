@@ -1,4 +1,5 @@
-import { UserIcon, MapPinIcon, GlobeAltIcon } from '@heroicons/react/24/outline'
+// import { UserIcon } from '@heroicons/react/24/outline'
+import { MapPinIcon, GlobeAltIcon } from '@heroicons/react/24/outline'
 import { Link } from '@remix-run/react'
 import { Button } from '@/components/button/index.tsx'
 import { Image } from '@/components/Image.tsx'
@@ -6,16 +7,16 @@ import { ShareButton } from '@/components/share-button/index.tsx'
 import { PAGES } from '@/constants/index.ts'
 import { useValidateImage } from '@/hooks/use-validate-image.tsx'
 import { getNameInitials, isALink } from '@/lib/misc.ts'
-import { useAuth } from '@/providers/auth/index.tsx'
+// import { useAuth } from '@/providers/auth/index.tsx'
 
 const COVER =
 	'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
 
 export const AccountCover = ({ data }: { data: EnhancedCreator }) => {
-	const { currentUser } = useAuth()
+	// const { currentUser } = useAuth()
 	const isProfilePhotoValid = useValidateImage(data.photo)
 
-	const isYourOwnAccount = currentUser?.id === data.userId
+	// const isYourOwnAccount = currentUser?.id === data.userId
 
 	return (
 		<div className="rounded-md border border-gray-200 bg-white pb-5">
@@ -45,12 +46,13 @@ export const AccountCover = ({ data }: { data: EnhancedCreator }) => {
 					</div>
 					<div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
 						<div className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-							{isYourOwnAccount ? null : (
+							{/* TODO: bring back after follower's feature is ready */}
+							{/* {isYourOwnAccount ? null : (
 								<Button className="w-full md:w-auto">
 									<UserIcon className="mr-3 h-4 w-4" aria-hidden="true" />
 									Follow
 								</Button>
-							)}
+							)} */}
 
 							<ShareButton
 								buttonProps={{
@@ -70,11 +72,12 @@ export const AccountCover = ({ data }: { data: EnhancedCreator }) => {
 					{data.about ? <p className="mt-1 text-sm">{data.about}</p> : null}
 				</div>
 				<div className="mt-2 flex flex-wrap items-center gap-x-4">
-					<div className="flex items-center gap-1">
+					{/* TODO: bring back after follower's feature is ready */}
+					{/* <div className="flex items-center gap-1">
 						<div className="flex items-center text-sm text-gray-500">
 							{data.followers} Followers
 						</div>
-					</div>
+					</div> */}
 
 					<div className="flex items-center gap-1">
 						<MapPinIcon className="h-5 w-5 text-gray-500" />

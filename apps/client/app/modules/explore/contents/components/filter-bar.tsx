@@ -33,7 +33,7 @@ export function FilterBar() {
 	}, [searchParams])
 
 	return (
-		<div>
+		<div className="px-3 md:px-0">
 			<div className="my-10 flex items-end justify-between">
 				<div>
 					<div className="mb-3">

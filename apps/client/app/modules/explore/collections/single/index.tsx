@@ -19,7 +19,6 @@ import { EditCollectionTitleModal } from './components/edit-collection-modal/ind
 import { RemoveImageContentModal } from './components/remove-image-content-dialog.tsx'
 import { StatusButton } from './components/status-button.tsx'
 import { useGetCollectionContentsBySlug } from '@/api/collections/index.ts'
-import { FadeIn } from '@/components/animation/FadeIn.tsx'
 import { Button } from '@/components/button/index.tsx'
 import { Content } from '@/components/Content/index.tsx'
 import { EmptyState } from '@/components/empty-state/index.tsx'
@@ -53,7 +52,7 @@ export function CollectionModule() {
 		query: {
 			pagination: { page: 0, per: 50 },
 			filters: { visibility: isCollectionMine ? 'ALL' : 'PUBLIC' },
-			populate: ['content'],
+			populate: ['content', 'content.createdBy', 'collection.createdBy'],
 		},
 	})
 
@@ -65,17 +64,17 @@ export function CollectionModule() {
 
 	if (isPending) {
 		content = (
-			<div className="mt-8 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4">
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
-				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-lg bg-gray-100" />
+			<div className="mt-8 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3">
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
 			</div>
 		)
 	}
@@ -126,45 +125,46 @@ export function CollectionModule() {
 
 	if (data?.total) {
 		content = (
-			<FadeIn>
-				<div className="mt-10 columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8">
-					{data.rows.map((collectionContent) => (
-						<div className="mb-5 break-inside-avoid" key={collectionContent.id}>
-							{collectionContent.content ? (
-								<>
-									<Content content={collectionContent.content} />
-									{isCollectionMine ? (
-										<div className="mt-2 flex justify-end">
-											<Button
-												onClick={() => {
-													setSelectedCollectionContent(collectionContent)
-													removeContentsModalState.onToggle()
-												}}
-												size="sm"
-												color="dangerGhost"
-											>
-												Remove
-											</Button>
-										</div>
-									) : null}
-								</>
-							) : null}
-						</div>
-					))}
-				</div>
-			</FadeIn>
+			<div className="mt-10 columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3">
+				{data.rows.map((collectionContent) => (
+					<div className="mb-5 break-inside-avoid" key={collectionContent.id}>
+						{collectionContent.content ? (
+							<>
+								<Content
+									content={collectionContent.content}
+									showCreator={!isCollectionMine}
+								/>
+								{isCollectionMine ? (
+									<div className="mx-3 mt-2 flex justify-end md:mx-0">
+										<Button
+											onClick={() => {
+												setSelectedCollectionContent(collectionContent)
+												removeContentsModalState.onToggle()
+											}}
+											size="sm"
+											color="dangerGhost"
+										>
+											Remove
+										</Button>
+									</div>
+								) : null}
+							</>
+						) : null}
+					</div>
+				))}
+			</div>
 		)
 	}
 
 	return (
 		<>
 			<Header isHeroSearchInVisible={false} />
-			<div className="max-w-8xl mx-auto px-4 py-4 lg:px-8">
-				<div className="mt-10">
+			<div className="max-w-8xl mx-auto px-0 py-4 lg:px-5">
+				<div className="mt-0 px-4 md:mt-10 md:px-0">
 					<Button
 						onClick={() => navigate(-1)}
 						variant="unstyled"
-						className="mb-1 hover:underline"
+						className="mb-4 text-sm font-semibold hover:underline md:mb-1"
 					>
 						<ChevronLeftIcon className="h-4 w-auto" />
 						Go Back
@@ -230,9 +230,10 @@ export function CollectionModule() {
 							</span>
 						</div>
 					) : null}
-					<div className="">
-						<span className="text-xs font-light text-gray-500">
-							Created on {dayjs(collection?.createdAt).format('L')}
+					<div className="mt-2">
+						<span className="text-xs text-gray-500">
+							{collection?.visibility === 'PUBLIC' ? 'Published' : 'Created'} on{' '}
+							{dayjs(collection?.createdAt).format('L')}
 						</span>
 					</div>
 
@@ -255,9 +256,11 @@ export function CollectionModule() {
 									Add Contents
 								</Button>
 							) : null}
-							<ShareButton
-								text={`Check out this collection "${name}" on mfoni`}
-							/>
+							<div>
+								<ShareButton
+									text={`Check out this collection "${name}" on mfoni`}
+								/>
+							</div>
 							<Link
 								to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
 									`${origin}${location.pathname}`,

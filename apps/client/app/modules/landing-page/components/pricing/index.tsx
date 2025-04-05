@@ -62,7 +62,7 @@ export const Pricing = () => {
 	return (
 		<div
 			id="pricing"
-			className="relative isolate mt-32 bg-white px-6 lg:mt-40 lg:px-8 2xl:mt-56"
+			className="relative isolate mt-32 bg-white px-3 md:px-6 lg:mt-40 lg:px-8 2xl:mt-56"
 		>
 			<div
 				className="absolute inset-x-0 -top-3 -z-10 transform-gpu overflow-hidden px-36 blur-3xl"

@@ -17,12 +17,14 @@ export function CreatorPage() {
 	return (
 		<CreatorContext.Provider value={data.creator as unknown as EnhancedCreator}>
 			<Header isHeroSearchInVisible={false} />
-			<div className="grid grid-cols-8 gap-3 bg-gray-50 px-4 pb-16 pt-4 lg:px-8">
+			<div className="grid grid-cols-8 gap-3 bg-gray-50 px-0 pb-16 pt-4 md:px-8">
 				<div className="col-span-8 flex flex-col gap-y-8 lg:col-span-6">
-					<AccountCover data={data.creator as unknown as EnhancedCreator} />
+					<div className="mx-4 md:mx-0">
+						<AccountCover data={data.creator as unknown as EnhancedCreator} />
+					</div>
 
 					<div>
-						<div className="mb-4">
+						<div className="mx-4 mb-4 md:mx-0">
 							<h3 className="text-base font-semibold leading-6 text-gray-900">
 								Contents
 							</h3>
@@ -33,7 +35,7 @@ export function CreatorPage() {
 						<Outlet />
 					</div>
 				</div>
-				<div className="col-span-8 flex flex-col gap-y-10 lg:col-span-2">
+				<div className="col-span-8 mx-4 mt-10 flex flex-col gap-y-10 md:mx-0 md:mt-0 lg:col-span-2">
 					<OtherCreators username={data.creator.username} />
 				</div>
 			</div>

@@ -29,8 +29,8 @@ import { NotFoundModule } from './modules/index.ts'
 import { EnvContext } from './providers/env/index.tsx'
 import { Providers } from './providers/index.tsx'
 
-import '@/styles/tailwind.css'
-import '@/styles/global.css'
+import globalStyles from '@/styles/global.css?url'
+import tailwindStyles from '@/styles/tailwind.css?url'
 
 dayjs.locale('en-gb')
 dayjs.extend(localizedFormat)
@@ -59,6 +59,8 @@ export const links: LinksFunction = () => {
 			href: '/site.webmanifest',
 		},
 		{ rel: 'icon', href: '/favicon.ico' },
+		{ rel: 'stylesheet', href: globalStyles },
+		{ rel: 'stylesheet', href: tailwindStyles },
 	]
 }
 

@@ -40,19 +40,19 @@ export const Header = ({
 	const scrolled = useScroll(50)
 
 	const headerBlurred = shouldHeaderBlur
-		? 'bg-white/95 backdrop-blur-xl sticky top-0 z-50 shadow-lg'
-		: 'sticky top-0 z-50 bg-white '
+		? 'bg-white/95 backdrop-blur-xl md:sticky top-0 z-50 md:shadow-lg'
+		: 'md:sticky top-0 z-50 bg-white '
 
 	return (
 		<header
 			className={classNames({
 				[headerBlurred]: !isHeroSearchInVisible && scrolled,
-				'z sticky top-0 z-50 bg-white': !isHeroSearchInVisible && !scrolled,
+				'z top-0 z-50 bg-white md:sticky': !isHeroSearchInVisible && !scrolled,
 			})}
 		>
 			<NoticeBanner />
 			<nav
-				className="max-w-8xl mx-auto flex items-center justify-between px-4 py-4 lg:px-8"
+				className="max-w-8xl mx-auto flex items-center justify-between px-4 py-4 lg:px-5"
 				aria-label="Global"
 			>
 				<Link to="/" prefetch="intent" className="-m-1.5 p-1.5">

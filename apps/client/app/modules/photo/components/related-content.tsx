@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 import { useGetRelatedContents } from '@/api/contents/index.ts'
 import { FadeIn, FadeInStagger } from '@/components/animation/FadeIn.tsx'
 import { Content } from '@/components/Content/index.tsx'
-import { Loader } from '@/components/loader/index.tsx'
 
 interface Props {
 	contentId: string
@@ -16,6 +15,7 @@ export function RelatedContent({ contentId }: Props) {
 				page: 0,
 				per: 50,
 			},
+			populate: ['content.createdBy'],
 		},
 	})
 
@@ -23,8 +23,17 @@ export function RelatedContent({ contentId }: Props) {
 
 	if (isPending) {
 		content = (
-			<div className="my-16 flex justify-center">
-				<Loader />
+			<div className="my-10 columns-1 gap-8 sm:columns-2 sm:gap-4 md:columns-3">
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-96 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-56 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
+				<div className="mb-5 h-60 w-full animate-pulse break-inside-avoid rounded-sm bg-gray-100" />
 			</div>
 		)
 	}
@@ -36,7 +45,7 @@ export function RelatedContent({ contentId }: Props) {
 	if (data?.total) {
 		content = (
 			<FadeInStagger faster>
-				<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-2 lg:columns-3 [&>img:not(:first-child)]:mt-8">
+				<div className="columns-1 gap-2 sm:columns-2 sm:gap-4 md:columns-3">
 					{data.rows.map((content) => (
 						<Fragment key={content.id}>
 							{
@@ -55,7 +64,9 @@ export function RelatedContent({ contentId }: Props) {
 
 	return (
 		<div className="mt-10">
-			<h1 className="text-2xl font-bold">Related Images</h1>
+			<div className="px-4 md:px-0">
+				<h1 className="text-2xl font-bold">Related Images</h1>
+			</div>
 
 			<div className="mt-5">{content}</div>
 		</div>

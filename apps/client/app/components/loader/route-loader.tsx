@@ -82,7 +82,7 @@ export const BottomLoader = () => {
 					className="px-5vw pointer-events-none fixed bottom-8 left-0 right-0 z-[100]"
 				>
 					<div className="max-w-8xl mx-auto flex w-11/12 justify-end">
-						<div className="text-inverse pointer-events-auto relative max-w-xl rounded-lg bg-blue-600 p-8 pr-14 shadow-md">
+						<div className="text-inverse pointer-events-auto relative max-w-xl rounded-lg bg-blue-600 p-8 shadow-md">
 							<div className="flex w-64 items-center">
 								<Loader color="fill-white" />
 

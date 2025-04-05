@@ -122,7 +122,7 @@ export const Footer = () => {
 					src="/images/payment.png"
 					className="w-full"
 					height={80}
-					width={400}
+					width={300}
 				/>
 			</div>
 		</footer>

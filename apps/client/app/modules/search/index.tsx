@@ -76,8 +76,8 @@ export function SearchModule() {
 	return (
 		<>
 			<Header isHeroSearchInVisible={false} searchQuery={queryParam} />
-			<div className="max-w-8xl mx-auto px-4 lg:px-8">
-				<div>
+			<div className="max-w-8xl mx-auto">
+				<div className="px-4 lg:px-5">
 					<div className="">
 						<div className="flex items-center justify-between border-b border-gray-200">
 							<nav aria-label="Tabs" className="-mb-px flex space-x-8">
@@ -136,7 +136,7 @@ export function SearchModule() {
 					</div>
 				</div>
 				{activeTab === 'Photos' ? (
-					<div className="mt-5 flex justify-end lg:hidden">
+					<div className="mt-5 flex justify-end px-4 lg:hidden lg:px-5">
 						<Button
 							onClick={filterModalState.onOpen}
 							size="sm"
@@ -148,7 +148,9 @@ export function SearchModule() {
 					</div>
 				) : null}
 
-				<Outlet />
+				<div className="px-0 md:px-5">
+					<Outlet />
+				</div>
 			</div>
 			<Footer />
 			<FiltersDialog
