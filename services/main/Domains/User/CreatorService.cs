@@ -214,13 +214,13 @@ public class CreatorService
         return creator;
     }
 
-    public async Task<GetUserInfoResponse> GetUserInfo(string userId)
+    public async Task<GetCreatorDetailedResponse> GetCreatorDetails(string userId)
     {
         var user = await _userService.GetUserById(userId);
         var creator = await GetCreatorByUserId(userId);
         var creatorSubscription = await _subscriptionService.GetActiveCreatorSubscription(creator.Id);
 
-        return new GetUserInfoResponse
+        return new GetCreatorDetailedResponse
         {
             User = user,
             Creator = creator,

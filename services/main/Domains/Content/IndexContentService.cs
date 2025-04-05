@@ -18,13 +18,15 @@ public class IndexContent
     private readonly SaveTagsService _saveTagsService;
     private readonly CollectionService _collectionService;
     private readonly PermissionService _permissionService;
+    private readonly CreatorService _creatorService;
     private readonly CollectionContentService _collectionContentService;
     private readonly CacheProvider _cacheProvider;
     private readonly AppConstants _appConstantsConfiguration;
 
     public IndexContent(ILogger<IndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants, SaveTagsService saveTagsService, CollectionService collectionService, CollectionContentService collectionContentService,
         CacheProvider cacheProvider,
-        PermissionService permissionService
+        PermissionService permissionService,
+        CreatorService creatorService
     )
     {
         _logger = logger;
@@ -46,14 +48,31 @@ public class IndexContent
 
         _collectionContentService = collectionContentService;
         _cacheProvider = cacheProvider;
+        _creatorService = creatorService;
 
         _logger.LogDebug("IndexContentService initialized");
     }
 
     public async Task<List<Content>> Save(SaveMedia[] mediaInput, CurrentUserOutput userInput)
     {
-        // =============== PERMISSIONS CHECK =============================
-        var userInfo = await _permissionService.CanUploadContent(userInput.Id, mediaInput.Length);
+        var creatorInfo = await this._creatorService.GetCreatorDetails(userInput.Id);
+
+        // =============== START PERMISSIONS CHECK =============================
+        var isACreator = _permissionService.IsACreator(creatorInfo);
+        if (!isACreator)
+        {
+            throw new HttpRequestException("NotACreator", null, System.Net.HttpStatusCode.Forbidden);
+        }
+
+        var numberOfContentsCreatorHasUploaded = await _permissionService.NumberOfContentUploadedThisMonth(creatorInfo);
+        numberOfContentsCreatorHasUploaded += mediaInput.Length;
+
+        var contentsCreatorCanUpload = PermissionsHelper.GetNumberOfUploadsForPackageType(creatorInfo.CreatorSubscription.PackageType);
+        if (contentsCreatorCanUpload is not null && numberOfContentsCreatorHasUploaded > contentsCreatorCanUpload)
+        {
+            throw new HttpRequestException("UploadLimitReached", null, System.Net.HttpStatusCode.Forbidden);
+        }
+        // =============== END PERMISSIONS CHECK =============================
 
         var userUploadCollectionName = $"{userInput.Id}::Uploads";
         var userUploadCollectionSlug = userUploadCollectionName.Replace("::", "_").ToLower();
@@ -63,9 +82,9 @@ public class IndexContent
         {
             Name = userUploadCollectionName,
             Slug = userUploadCollectionSlug,
-            Description = $"{userInfo.User.Name}'s collection for all uploads",
+            Description = $"{creatorInfo.User.Name}'s collection for all uploads",
             CreatedByRole = CollectionCreatedByRole.USER,
-            CreatedById = userInfo.User.Id,
+            CreatedById = creatorInfo.User.Id,
             IsCustom = false,
         });
 
@@ -76,6 +95,8 @@ public class IndexContent
 
         List<Content> contents = [];
 
+        var canCreatorPriceContent = _permissionService.CanCreatorPriceContent(creatorInfo);
+
         mediaInput.ToList().ForEach(media =>
         {
             var dbTags = _saveTagsService.ResolveTags(media.Tags ?? [], userInput);
@@ -85,9 +106,9 @@ public class IndexContent
                 Title = media.Title,
                 Slug = StringLib.GenerateSlug(media.Title),
                 IntendedVisibility = media.Visibility,
-                Amount = MoneyLib.ConvertCedisToPesewas(media.Amount),
+                Amount = canCreatorPriceContent ? MoneyLib.ConvertCedisToPesewas(media.Amount) : 0,
                 Media = media.Content,
-                CreatedById = userInfo.User.Id,
+                CreatedById = creatorInfo.User.Id,
             };
 
             _contentsCollection.InsertOne(content);
