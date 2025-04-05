@@ -46,6 +46,7 @@ export const AccountCover = ({ data }: { data: EnhancedCreator }) => {
 					</div>
 					<div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
 						<div className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
+							{/* TODO: bring back after follower's feature is ready */}
 							{/* {isYourOwnAccount ? null : (
 								<Button className="w-full md:w-auto">
 									<UserIcon className="mr-3 h-4 w-4" aria-hidden="true" />
@@ -71,6 +72,7 @@ export const AccountCover = ({ data }: { data: EnhancedCreator }) => {
 					{data.about ? <p className="mt-1 text-sm">{data.about}</p> : null}
 				</div>
 				<div className="mt-2 flex flex-wrap items-center gap-x-4">
+					{/* TODO: bring back after follower's feature is ready */}
 					{/* <div className="flex items-center gap-1">
 						<div className="flex items-center text-sm text-gray-500">
 							{data.followers} Followers
