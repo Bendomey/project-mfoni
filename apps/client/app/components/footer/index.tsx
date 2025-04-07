@@ -11,6 +11,7 @@ import {
 const insideNavigation = [
 	{ name: 'Pricing', href: '/#pricing' },
 	{ name: 'Terms Of Use', href: '/terms' },
+	// { name: 'Blog', href: '/blog' },
 ]
 
 const navigation = [
