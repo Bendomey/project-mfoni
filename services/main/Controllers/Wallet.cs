@@ -172,7 +172,7 @@ public class WalletController : ControllerBase
             var transactions = await walletService.GetWalletTransactions(queryFilter, input);
             long count = await walletService.CountWalletTransactions(input);
 
-            var transformTasks = transactions.Select(content => _walletTransactionTransformer.Transform(content, populate: queryFilter.Populate));
+            var transformTasks = transactions.Select(transaction => _walletTransactionTransformer.Transform(transaction, populate: queryFilter.Populate));
             var transformedTransactions = await Task.WhenAll(transformTasks);
             var outputTransactions = transformedTransactions.ToList();
 
