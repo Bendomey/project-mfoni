@@ -367,16 +367,15 @@ public class CollectionsController : ControllerBase
                 Query = search,
                 CreatedById = created_by
             };
-            var contents = await _collectionService.GetCollections(queryFilter, input);
+            var collections = await _collectionService.GetCollections(queryFilter, input);
             long count = await _collectionService.CountCollections(input);
 
-            var outContent = new List<OutputCollection>();
-            foreach (var content in contents)
-            {
-                outContent.Add(await _collectionTransformer.Transform(content, populate: queryFilter.Populate, contentItemsLimit));
-            }
+            var transformTasks = collections.Select(collection => _collectionTransformer.Transform(collection, populate: queryFilter.Populate, contentItemsLimit: contentItemsLimit));
+            var transformedCollections = await Task.WhenAll(transformTasks);
+            var outCollections = transformedCollections.ToList();
+
             var response = HttpLib.GeneratePagination(
-                outContent,
+                outCollections,
                 count,
                 queryFilter
             );
@@ -697,13 +696,12 @@ public class CollectionsController : ControllerBase
             }
             catch (HttpRequestException) { }
 
-            var outContent = new List<OutputCollectionContent>();
-            foreach (var content in contents)
-            {
-                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
-            }
+            var transformTasks = contents.Select(content => _collectionContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outContents = transformedContents.ToList();
+
             var response = HttpLib.GeneratePagination(
-                outContent,
+                outContents,
                 count,
                 queryFilter
             );
@@ -813,14 +811,12 @@ public class CollectionsController : ControllerBase
             }
             catch (HttpRequestException) { }
 
+            var transformTasks = contents.Select(content => _collectionContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outContents = transformedContents.ToList();
 
-            var outContent = new List<OutputCollectionContent>();
-            foreach (var content in contents)
-            {
-                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
-            }
             var response = HttpLib.GeneratePagination(
-                outContent,
+                outContents,
                 count,
                 queryFilter
             );
@@ -923,13 +919,12 @@ public class CollectionsController : ControllerBase
                 Orientation = orientation
             });
 
-            var outContent = new List<OutputCollectionContent>();
-            foreach (var content in contents)
-            {
-                outContent.Add(await _collectionContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
-            }
+            var transformTasks = contents.Select(content => _collectionContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outContents = transformedContents.ToList();
+
             var response = HttpLib.GeneratePagination(
-                outContent,
+                outContents,
                 count,
                 queryFilter
             );
@@ -1091,7 +1086,7 @@ public class CollectionsController : ControllerBase
     }
 
     /// <summary>
-    /// Feature collection.
+    /// UnFeature collection.
     /// </summary>
     /// <param name="id">id of collection</param>
     /// <response code="200">Collection UnFeatured Successfully</response>

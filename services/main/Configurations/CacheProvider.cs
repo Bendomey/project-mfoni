@@ -7,7 +7,7 @@ public class CacheProvider
 {
     private readonly IDatabase _redis;
     private readonly IServer _redisServer;
-    public static readonly bool CacheEnabled = true; // Controls if caching is enabled or not appwide.
+    public static readonly bool CacheEnabled = false; // Controls if caching is enabled or not appwide.
     public static readonly string CachePrefix = "mfoni-";
     public static readonly TimeSpan? CacheTTL = null;
 
