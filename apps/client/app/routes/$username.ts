@@ -6,6 +6,7 @@ import {
 import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { getCreatorByUsername } from '@/api/creators/index.ts'
 import { QUERY_KEYS } from '@/constants/index.ts'
+import { bypassCfAssetWorkerUrl } from '@/lib/actions/bypass-cf-asset-worker.server.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
 import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
@@ -62,7 +63,7 @@ export const meta: MetaFunction<typeof loader> = ({
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,
 		}),
-		images: data?.creator?.photo ? [data?.creator?.photo] : [],
+		images: data?.creator?.photo ? [bypassCfAssetWorkerUrl(data?.creator?.photo)] : [],
 		origin: data?.origin,
 		keywords:
 			data?.creator?.interests?.map((interest) => interest).join(', ') ?? '',

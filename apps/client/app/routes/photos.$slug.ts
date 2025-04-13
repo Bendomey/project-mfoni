@@ -1,6 +1,7 @@
 import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { getContentBySlug } from '@/api/contents/index.ts'
+import { bypassCfAssetWorkerUrl } from '@/lib/actions/bypass-cf-asset-worker.server.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
@@ -68,7 +69,7 @@ export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
 			? `${data?.content?.title} | mfoni`
 			: '404: Content Not Found',
 		description: `Photo uploaded by ${data?.content?.createdBy?.name}`,
-		images: data?.content?.media?.url ? [data?.content?.media?.url] : [],
+		images: data?.content?.media?.url ? [bypassCfAssetWorkerUrl(data?.content?.media?.url)] : [],
 		url: getDisplayUrl({
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,
