@@ -6,10 +6,10 @@ import {
 	getCollectionContentsBySlug,
 } from '@/api/collections/index.ts'
 import { QUERY_KEYS } from '@/constants/index.ts'
-import { bypassCfAssetWorkerUrl } from '@/lib/actions/bypass-cf-asset-worker.server.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
+import { bypassCfAssetWorkerUrl } from '@/lib/bypass-cf-asset-worker.ts'
 import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
 import { getSocialMetas } from '@/lib/seo.ts'
 import { safeString } from '@/lib/strings.ts'
