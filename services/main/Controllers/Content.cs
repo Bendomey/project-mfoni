@@ -482,11 +482,9 @@ public class ContentController : ControllerBase
                 Orientation = orientation
             });
 
-            var outContents = new List<OutputContent>();
-            foreach (var usercontent in contents)
-            {
-                outContents.Add(await _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
-            }
+            var transformTasks = contents.Select(usercontent => _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outContents = transformedContents.ToList();
 
             var dataResponse = HttpLib.GeneratePagination(
                 outContents,
@@ -629,12 +627,9 @@ public class ContentController : ControllerBase
 
             var count = await _searchContentService.TextualSearchCount(contentIds);
 
-
-            var outContents = new List<OutputContent>();
-            foreach (var usercontent in contents)
-            {
-                outContents.Add(await _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
-            }
+            var transformTasks = contents.Select(usercontent => _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outContents = transformedContents.ToList();
 
             var response = HttpLib.GeneratePagination(
                 outContents,
@@ -742,12 +737,9 @@ public class ContentController : ControllerBase
                 IsFeatured = is_featured
             });
 
-
-            var outContents = new List<OutputContent>();
-            foreach (var usercontent in contents)
-            {
-                outContents.Add(await _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
-            }
+            var transformTasks = contents.Select(usercontent => _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outContents = transformedContents.ToList();
 
             var response = HttpLib.GeneratePagination(
                 outContents,
@@ -844,11 +836,9 @@ public class ContentController : ControllerBase
             var contents = await _searchContentService.GetRelatedContents(queryFilter, contentId, tagsId);
             var count = await _searchContentService.GetRelatedContentsCount(contentId, tagsId);
 
-            var outContents = new List<OutputContent>();
-            foreach (var usercontent in contents)
-            {
-                outContents.Add(await _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
-            }
+            var transformTasks = contents.Select(usercontent => _contentTransformer.Transform(usercontent, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outContents = transformedContents.ToList();
 
             var response = HttpLib.GeneratePagination(
                 outContents,
@@ -1100,13 +1090,12 @@ public class ContentController : ControllerBase
             var contents = await _contentLikeService.GetContentLikes(queryFilter, id);
             long count = await _contentLikeService.CountContentLikes(id);
 
-            var outContent = new List<OutputContentLike>();
-            foreach (var content in contents)
-            {
-                outContent.Add(await _contentLikeTransformer.Transform(content, populate: queryFilter.Populate, userId));
-            }
+            var transformTasks = contents.Select(content => _contentLikeTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outContents = transformedContents.ToList();
+
             var response = HttpLib.GeneratePagination(
-                outContent,
+                outContents,
                 count,
                 queryFilter
             );

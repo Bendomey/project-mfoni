@@ -230,11 +230,10 @@ public class TagsController : ControllerBase
             var tags = await _searchTagsService.GetAll(queryFilter, search);
             var tagsCount = await _searchTagsService.Count(search);
 
-            var outputTags = new List<OutputTag>();
-            foreach (var tag in tags)
-            {
-                outputTags.Add(await _tagTransformer.Transform(tag, populate: queryFilter.Populate));
-            }
+            var transformTasks = tags.Select(tag => _tagTransformer.Transform(tag, populate: queryFilter.Populate));
+            var transformedTags = await Task.WhenAll(transformTasks);
+            var outputTags = transformedTags.ToList();
+
             var response = HttpLib.GeneratePagination(outputTags, tagsCount, queryFilter);
             return new ObjectResult(new GetEntityResponse<EntityWithPagination<OutputTag>>(response, null).Result()) { StatusCode = (int)HttpStatusCode.OK };
         }
@@ -323,13 +322,12 @@ public class TagsController : ControllerBase
             var contents = await _searchTagsService.GetTagContents(queryFilter, input);
             long count = await _searchTagsService.CountTagContents(input);
 
-            var outContent = new List<OutputTagContent>();
-            foreach (var content in contents)
-            {
-                outContent.Add(await _tagContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
-            }
+            var transformTasks = contents.Select(tagContent => _tagContentTransformer.Transform(tagContent, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outputContents = transformedContents.ToList();
+
             var response = HttpLib.GeneratePagination(
-                outContent,
+                outputContents,
                 count,
                 queryFilter
             );
@@ -426,13 +424,12 @@ public class TagsController : ControllerBase
             var contents = await _searchTagsService.GetTagContents(queryFilter, input);
             long count = await _searchTagsService.CountTagContents(input);
 
-            var outContent = new List<OutputTagContent>();
-            foreach (var content in contents)
-            {
-                outContent.Add(await _tagContentTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
-            }
+            var transformTasks = contents.Select(tagContent => _tagContentTransformer.Transform(tagContent, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outputContents = transformedContents.ToList();
+
             var response = HttpLib.GeneratePagination(
-                outContent,
+                outputContents,
                 count,
                 queryFilter
             );
@@ -530,7 +527,7 @@ public class TagsController : ControllerBase
     }
 
     /// <summary>
-    /// Feature tag.
+    /// Unfeature tag.
     /// </summary>
     /// <param name="id">id of tag</param>
     /// <response code="200">Tag UnFeatured Successfully</response>

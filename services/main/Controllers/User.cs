@@ -467,13 +467,12 @@ public class UserController : ControllerBase
             var users = await userService.GetUsers(queryFilter, input);
             long count = await userService.CountUsers(input);
 
-            var outUser = new List<OutputUser>();
-            foreach (var user in users)
-            {
-                outUser.Add(await _userTransformer.Transform(user, populate: queryFilter.Populate));
-            }
+            var transformTasks = users.Select(user => _userTransformer.Transform(user, populate: queryFilter.Populate));
+            var transformedUsers = await Task.WhenAll(transformTasks);
+            var outputUsers = transformedUsers.ToList();
+
             var response = HttpLib.GeneratePagination<OutputUser, User>(
-                outUser,
+                outputUsers,
                 count,
                 queryFilter
             );
@@ -548,11 +547,9 @@ public class UserController : ControllerBase
 
             long count = await _creatorApplicationService.CountCreatorApplications(status);
 
-            var outCreatorApplications = new List<OutputCreatorApplication>();
-            foreach (var creatorApplication in creatorApplications)
-            {
-                outCreatorApplications.Add(await _creatorApplicationTransformer.Transform(creatorApplication, populate: queryFilter.Populate));
-            }
+            var transformTasks = creatorApplications.Select(creatorApplication => _creatorApplicationTransformer.Transform(creatorApplication, populate: queryFilter.Populate));
+            var transformedApplications = await Task.WhenAll(transformTasks);
+            var outCreatorApplications = transformedApplications.ToList();
 
             var response = HttpLib.GeneratePagination<OutputCreatorApplication, CreatorApplication>(
                 outCreatorApplications,
@@ -761,13 +758,12 @@ public class UserController : ControllerBase
                 Orientation = orientation,
             });
 
-            var outContent = new List<OutputContentLike>();
-            foreach (var content in contents)
-            {
-                outContent.Add(await _contentLikeTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
-            }
+            var transformTasks = contents.Select(content => _contentLikeTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outCreatorContents = transformedContents.ToList();
+
             var response = HttpLib.GeneratePagination(
-                outContent,
+                outCreatorContents,
                 count,
                 queryFilter
             );
@@ -870,13 +866,12 @@ public class UserController : ControllerBase
                 Type = type
             });
 
-            var outContent = new List<OutputContentPurchase>();
-            foreach (var content in contents)
-            {
-                outContent.Add(await _contentPurchaseTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
-            }
+            var transformTasks = contents.Select(content => _contentPurchaseTransformer.Transform(content, populate: queryFilter.Populate, userId: userId));
+            var transformedContents = await Task.WhenAll(transformTasks);
+            var outContents = transformedContents.ToList();
+
             var response = HttpLib.GeneratePagination(
-                outContent,
+                outContents,
                 count,
                 queryFilter
             );

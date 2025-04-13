@@ -9,7 +9,7 @@ public class CacheProvider
     private readonly IServer _redisServer;
     public static readonly bool CacheEnabled = true; // Controls if caching is enabled or not appwide.
     public static readonly string CachePrefix = "mfoni-";
-    public static readonly TimeSpan? CacheTTL = null;
+    public static readonly TimeSpan? CacheTTL = TimeSpan.FromMinutes(5);
 
     public static readonly Dictionary<string, string> CacheEntities = new Dictionary<string, string>
     {

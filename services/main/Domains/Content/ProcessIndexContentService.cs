@@ -187,7 +187,7 @@ public class ProcessIndexContent
                 Location = imageResponse.Location,
                 ServerSideEncryption = imageResponse.ServerSideEncryption,
                 Orientation = imageResponse.Orientation,
-                BackgroundColor = imageResponse.BackgroundColor,
+                BackgroundColor = content.Media.BackgroundColor,
                 Size = imageResponse.Size,
             })
             .Set(r => r.UpdatedAt, DateTime.Now);
