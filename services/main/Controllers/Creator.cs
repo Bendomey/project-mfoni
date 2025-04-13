@@ -139,12 +139,9 @@ public class CreatorController : ControllerBase
             var creators = await _creatorService.GetRelatedCreators(username);
             var creatorsCount = await _creatorService.GetRelatedCreatorsCount(username);
 
-            var creatorsTransformed = new List<OutputBasicCreator>();
-            foreach (var creator in creators)
-            {
-                var creatorTransformed = await _creatorTransformer.TransformBasicCreator(creator);
-                creatorsTransformed.Add(creatorTransformed);
-            }
+            var transformTasks = creators.Select(_creatorTransformer.TransformBasicCreator);
+            var transformedCreators = await Task.WhenAll(transformTasks);
+            var creatorsTransformed = transformedCreators.ToList();
 
             var response = HttpLib.GeneratePagination(
                 creatorsTransformed,
@@ -231,12 +228,9 @@ public class CreatorController : ControllerBase
                 Query = search
             });
 
-            var creatorsTransformed = new List<OutputCreatorEnhanced>();
-            foreach (var creator in creators)
-            {
-                var creatorTransformed = await _creatorTransformer.TransformEnhancedCreator(creator);
-                creatorsTransformed.Add(creatorTransformed);
-            }
+            var transformTasks = creators.Select(creator => _creatorTransformer.TransformEnhancedCreator(creator));
+            var transformedCreators = await Task.WhenAll(transformTasks);
+            var creatorsTransformed = transformedCreators.ToList();
 
             var response = HttpLib.GeneratePagination(
                 creatorsTransformed,

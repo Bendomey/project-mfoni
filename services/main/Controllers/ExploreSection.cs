@@ -127,11 +127,8 @@ public class ExploreSectionController : ControllerBase
 
             long count = await _exploreSectionService.CountSections();
 
-            var outSection = new List<OutputExploreSection>();
-            foreach (var content in sections)
-            {
-                outSection.Add(_exploreSectionTransformer.Transform(content, populate: queryFilter.Populate));
-            }
+            var outSectionTransformed = sections.Select(content => _exploreSectionTransformer.Transform(content, populate: queryFilter.Populate));
+            var outSection = outSectionTransformed.ToList();
 
             var response = HttpLib.GeneratePagination(
                 outSection,

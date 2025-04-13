@@ -274,11 +274,13 @@ public class AdminController : ControllerBase
             var outAdmin = admins.ConvertAll<OutputAdmin>(
                 new Converter<Admin, OutputAdmin>(admin => _adminTransformer.Transform(admin, populate: queryFilter.Populate))
             );
+
             var response = HttpLib.GeneratePagination<OutputAdmin, Admin>(
                 outAdmin,
                 count,
                 queryFilter
             );
+
             return new ObjectResult(
                 new GetEntityResponse<EntityWithPagination<OutputAdmin>>(response, null).Result()
             )

@@ -101,11 +101,9 @@ public class SubscriptionController : ControllerBase
             var transactions = await _subscriptionService.GetSubscriptions(queryFilter, input);
             long count = await _subscriptionService.CountSubscriptions(input);
 
-            var outputTransactions = new List<OutputCreatorSubscription>();
-            foreach (var transaction in transactions)
-            {
-                outputTransactions.Add(await _creatorSubscriptionTransformer.Transform(transaction, populate: queryFilter.Populate));
-            }
+            var transformTasks = transactions.Select(transaction => _creatorSubscriptionTransformer.Transform(transaction, populate: queryFilter.Populate));
+            var transformedTransactions = await Task.WhenAll(transformTasks);
+            var outputTransactions = transformedTransactions.ToList();
 
             var response = HttpLib.GeneratePagination<OutputCreatorSubscription, CreatorSubscription>(
                 outputTransactions,
