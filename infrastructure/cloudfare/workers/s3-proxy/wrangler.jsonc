@@ -1,0 +1,8 @@
+{
+	"name": "s3-proxy",
+	"main": "src/index.js",
+	"compatibility_date": "2025-04-10",
+	"observability": {
+		"enabled": true
+	}
+}

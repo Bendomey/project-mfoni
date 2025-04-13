@@ -10,7 +10,7 @@ addEventListener('fetch', event => {
     const path = url.pathname
     
     // Set target S3 bucket
-    const s3BucketUrl = 'https://staging-mfoni.s3.amazonaws.com'
+    const s3BucketUrl = S3_BUCKET_URL;
     
     // Construct the new S3 URL
     const s3Url = s3BucketUrl + path
