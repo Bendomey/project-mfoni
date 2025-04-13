@@ -261,6 +261,8 @@ app.use(
 					'www.gravatar.com',
 					'*.googleusercontent.com',
 					`${process.env.S3_BUCKET}.s3.amazonaws.com`,
+					'staging-images.mfoni.app',
+					'images.mfoni.app',
 					'embed.tawk.to',
 					'cdn.jsdelivr.net',
 
@@ -275,6 +277,8 @@ app.use(
 					'blob:',
 					'*.googleusercontent.com',
 					`${process.env.S3_BUCKET}.s3.amazonaws.com`,
+					'staging-images.mfoni.app',
+					'images.mfoni.app',
 					'images.unsplash.com',
 				],
 				'connect-src': [
