@@ -241,16 +241,23 @@ export const PhotoModule = () => {
 							) : null}
 						</div>
 						<div className="flex flex-row items-center gap-2">
-							<ShareButton
-								text={`Check out this photo by ${content.createdBy?.name} on mfoni`}
-							/>
-							<Link
-								to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
-									`${origin}${location.pathname}`,
-								)}`}
-							>
-								<Button color="dangerGhost">Report</Button>
-							</Link>
+							{
+								content.status === 'REJECTED' ? null : (
+									<>
+										<ShareButton
+											text={`Check out this photo by ${content.createdBy?.name} on mfoni`}
+										/>
+
+										<Link
+											to={`${PAGES.REPORT.CONTENTS}?content_url=${encodeURIComponent(
+												`${origin}${location.pathname}`,
+											)}`}
+										>
+											<Button color="dangerGhost">Report</Button>
+										</Link>
+									</>
+								)
+							}
 						</div>
 					</div>
 
