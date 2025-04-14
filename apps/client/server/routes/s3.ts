@@ -12,6 +12,7 @@ const ACCESS_KEY = process.env.MFONI_AWS_ACCESS_KEY ?? ''
 const SECRET_KEY = process.env.MFONI_AWS_SECRET_KEY ?? ''
 const REGION = process.env.MFONI_AWS_REGION ?? ''
 const BUCKET_NAME = process.env.S3_BUCKET ?? ''
+const IMAGES_URL = process.env.MFONI_IMAGES_URL ?? ''
 
 const s3Client = new S3Client({
 	credentials: {
@@ -33,7 +34,7 @@ s3Router.post(
 			Key: key,
 			ContentType: req.body.contentType,
 		})
-		const fileLink = `https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${key}`
+		const fileLink = `${IMAGES_URL}/${key}`
 		const signedUrl = await getSignedUrl(s3Client, command, {
 			expiresIn: 5 * 60,
 		})

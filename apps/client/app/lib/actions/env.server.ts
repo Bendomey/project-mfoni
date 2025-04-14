@@ -5,6 +5,7 @@ const environmentSchema = z.object({
 		.enum(['development', 'production', 'test', 'staging'])
 		.default('development'),
 	API_ADDRESS: z.string().min(1),
+	MFONI_IMAGES_URL: z.string().min(1),
 	MFONI_AWS_SECRET_KEY: z.string().min(1),
 	MFONI_AWS_ACCESS_KEY: z.string().min(1),
 	MFONI_AWS_REGION: z.string().min(1),

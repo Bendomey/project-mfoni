@@ -41,7 +41,7 @@ export default async function handleDocumentRequest(...args: DocRequestArgs) {
 
 	responseHeaders.append(
 		'Link',
-		`<https://${process.env.S3_BUCKET}.s3.amazonaws.com>; rel="preconnect"`,
+		`<${process.env.MFONI_IMAGES_URL}>; rel="preconnect"`,
 	)
 
 	responseHeaders.append(

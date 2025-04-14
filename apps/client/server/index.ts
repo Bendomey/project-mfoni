@@ -260,9 +260,7 @@ app.use(
 					'res.cloudinary.com',
 					'www.gravatar.com',
 					'*.googleusercontent.com',
-					`${process.env.S3_BUCKET}.s3.amazonaws.com`,
-					'staging-images.mfoni.app',
-					'images.mfoni.app',
+					process.env.MFONI_IMAGES_URL!,
 					'embed.tawk.to',
 					'cdn.jsdelivr.net',
 
@@ -276,9 +274,7 @@ app.use(
 					'data:',
 					'blob:',
 					'*.googleusercontent.com',
-					`${process.env.S3_BUCKET}.s3.amazonaws.com`,
-					'staging-images.mfoni.app',
-					'images.mfoni.app',
+					process.env.MFONI_IMAGES_URL!,
 					'images.unsplash.com',
 				],
 				'connect-src': [

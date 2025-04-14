@@ -34,6 +34,7 @@ jobs:
               --build-arg COMMIT_SHA=${{ github.sha }} 
               --build-arg API_ADDRESS=${{ secrets.API_ADDRESS }} 
               --build-arg SENTRY_DSN=${{ secrets.CLIENT_SENTRY_DSN }}
+              --build-arg MFONI_IMAGES_URL=${{ secrets.STAGING_MFONI_IMAGES_URL }} 
               --build-arg AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} 
               --build-arg AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} 
               --build-arg AWS_REGION=${{ secrets.AWS_REGION }} 
