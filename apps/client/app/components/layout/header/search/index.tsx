@@ -20,18 +20,22 @@ export const SearchPhotos = ({
 	searchQuery,
 }: Props) => {
 	const [isSearchFocused, setIsSearchFocused] = useState(false)
-	const { onClose: onCloseHelpfulInfoAboutVisualSearch, show: showHelpfulInfoAboutVisualSearch } = useSystemAlertHandler({
+	const {
+		onClose: onCloseHelpfulInfoAboutVisualSearch,
+		show: showHelpfulInfoAboutVisualSearch,
+	} = useSystemAlertHandler({
 		localStorageKey: 'mfoni-how-to-use-visual-search',
 		startDate: new Date(2025, 1, 1),
 		identifier: 'How to use visual search helpful system alert.',
-	});
+	})
 
 	return (
 		<div
-			className={`relative block w-full rounded-full border-transparent border-zinc-300 hover:border focus:ring-0 ${isSearchFocused || isSittingOnADarkBackground
-				? 'border bg-white'
-				: 'bg-zinc-100'
-				}`}
+			className={`relative block w-full rounded-full border-transparent border-zinc-300 hover:border focus:ring-0 ${
+				isSearchFocused || isSittingOnADarkBackground
+					? 'border bg-white'
+					: 'bg-zinc-100'
+			}`}
 		>
 			<div className="flex flex-row items-center">
 				<div className="pointer-events-none inset-y-0 left-0 flex items-center pl-5">
@@ -65,7 +69,7 @@ export const SearchPhotos = ({
 						<Popover.Button className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900 outline-none ring-0">
 							<FlyoutContainer
 								intendedPosition="y"
-								arrowColor='bg-blue-600'
+								arrowColor="bg-blue-600"
 								initVisibility={showHelpfulInfoAboutVisualSearch}
 								onOpenInit={onCloseHelpfulInfoAboutVisualSearch}
 								FlyoutContent={

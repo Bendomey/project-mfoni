@@ -41,11 +41,7 @@ export const HeroSection = () => {
 					</div>
 					<div className="mt-5 hidden md:block">
 						<ClientOnly>
-							{
-								() => (
-									<SearchPhotos isSittingOnADarkBackground />
-								)
-							}
+							{() => <SearchPhotos isSittingOnADarkBackground />}
 						</ClientOnly>
 					</div>
 				</div>

@@ -2,7 +2,10 @@ import { Transition } from '@headlessui/react'
 import { type PropsWithChildren } from 'react'
 import { ClientOnly } from 'remix-utils/client-only'
 import { CookiesPolicyBanner } from './components/cookies-policy.tsx'
-import { useSystemAlertHandler, type ISystemAlertHandler } from './use-system-alert-handler.ts'
+import {
+	useSystemAlertHandler,
+	type ISystemAlertHandler,
+} from './use-system-alert-handler.ts'
 
 export interface ISystemAlert extends ISystemAlertHandler {
 	/** The Alert Component */
@@ -10,13 +13,12 @@ export interface ISystemAlert extends ISystemAlertHandler {
 }
 
 function SystemAlert({ data }: { data: ISystemAlert }) {
-	const {onClose, show} = useSystemAlertHandler({
+	const { onClose, show } = useSystemAlertHandler({
 		endDate: data.endDate,
 		localStorageKey: data.localStorageKey,
 		startDate: data.startDate,
 		identifier: data.identifier,
 	})
-
 
 	return (
 		<Transition show={show}>

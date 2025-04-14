@@ -12,7 +12,6 @@ import { Loader } from '@/components/loader/index.tsx'
 import { APP_NAME } from '@/constants/index.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
-
 export const LoginComponent = () => {
 	const { isLoading, errorMessage, setErrorMessage } = useLoginAuth()
 	const { onSignout } = useAuth()
@@ -82,7 +81,9 @@ export const LoginComponent = () => {
 								<span className="font-bold">Go Back</span>
 							</Button>
 						</div>
-						<h1 className=' text-3xl md:text-4xl font-bold leading-9 tracking-tight text-gray-900'>Welcome back 👋🏽</h1>
+						<h1 className="text-3xl font-bold leading-9 tracking-tight text-gray-900 md:text-4xl">
+							Welcome back 👋🏽
+						</h1>
 						<p className="ml-2 leading-6 text-gray-500">
 							Continue with your favorite social media platform.
 						</p>

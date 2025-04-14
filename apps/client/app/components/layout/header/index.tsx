@@ -18,10 +18,10 @@ const navigation = (isLoggedIn: boolean) => [
 	{ name: 'Upload', href: PAGES.AUTHENTICATED_PAGES.UPLOAD, routeType: 'link' },
 	isLoggedIn
 		? {
-			name: 'My Account',
-			href: PAGES.AUTHENTICATED_PAGES.ACCOUNT,
-			routeType: 'link',
-		}
+				name: 'My Account',
+				href: PAGES.AUTHENTICATED_PAGES.ACCOUNT,
+				routeType: 'link',
+			}
 		: undefined,
 ]
 
