@@ -7,6 +7,8 @@ import { Fragment, useState } from 'react'
 import { ClientOnly } from 'remix-utils/client-only'
 import { SearchPalette } from './search-palette/index.tsx'
 import { VisualSearch } from './visual/index.tsx'
+import { FlyoutContainer } from '@/components/flyout/flyout-container.tsx'
+import { useSystemAlertHandler } from '@/components/system-alerts/use-system-alert-handler.ts'
 
 interface Props {
 	isSittingOnADarkBackground?: true
@@ -18,6 +20,14 @@ export const SearchPhotos = ({
 	searchQuery,
 }: Props) => {
 	const [isSearchFocused, setIsSearchFocused] = useState(false)
+	const {
+		onClose: onCloseHelpfulInfoAboutVisualSearch,
+		show: showHelpfulInfoAboutVisualSearch,
+	} = useSystemAlertHandler({
+		localStorageKey: 'mfoni-how-to-use-visual-search',
+		startDate: new Date(2025, 1, 1),
+		identifier: 'How to use visual search helpful system alert.',
+	})
 
 	return (
 		<div
@@ -57,10 +67,24 @@ export const SearchPhotos = ({
 				<div className="inset-y-0 right-0 flex items-center pr-6">
 					<Popover className="relative">
 						<Popover.Button className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900 outline-none ring-0">
-							<ViewfinderCircleIcon
-								className="h-5 w-5 cursor-pointer text-gray-600"
-								aria-hidden="true"
-							/>
+							<FlyoutContainer
+								intendedPosition="y"
+								arrowColor="bg-blue-600"
+								initVisibility={showHelpfulInfoAboutVisualSearch}
+								onOpenInit={onCloseHelpfulInfoAboutVisualSearch}
+								FlyoutContent={
+									<div className="z-50 flex w-60 flex-col items-center justify-center rounded-2xl bg-blue-600 px-3 py-4 shadow-xl">
+										<h3 className="text-center text-sm font-bold text-white">
+											Click here to search by face
+										</h3>
+									</div>
+								}
+							>
+								<ViewfinderCircleIcon
+									className="h-5 w-5 cursor-pointer text-gray-600"
+									aria-hidden="true"
+								/>
+							</FlyoutContainer>
 						</Popover.Button>
 
 						<Transition
