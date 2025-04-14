@@ -20,11 +20,11 @@ public class IUploadToS3Input
     public required string Orientation { get; set; }
     public string? BackgroundColor { get; set; }
     public int ImageQuality { get; set; } = 85;
+    public required string MfoniImagesUrl { get; set; }
 }
 
 public class ProcessImage
 {
-
     // download the image
     public async static Task<Image> DownloadImage(string imageUrl)
     {
@@ -43,6 +43,20 @@ public class ProcessImage
                 return Image.Load(stream);
             }
         }
+    }
+
+    public async static Task<string> GenerateSignedAWSUrl(AmazonS3Client s3Client, Models.S3MetaData contentMedia)
+    {
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = contentMedia.Bucket,
+            Key = contentMedia.Key,
+            Expires = DateTime.UtcNow.AddMinutes(5),
+            Verb = HttpVerb.GET
+        };
+
+        string url = await s3Client.GetPreSignedURLAsync(request);
+        return url;
     }
 
     public static Image AddTextWatermark(Image image)
@@ -103,9 +117,10 @@ public class ProcessImage
             {
                 Bucket = input.BucketName,
                 Key = input.KeyName,
-                Location = $"https://{input.BucketName}.s3.amazonaws.com/{input.KeyName}",
+                Location = $"{input.MfoniImagesUrl}/{input.KeyName}",
                 ServerSideEncryption = ServerSideEncryptionMethod.AES256,
                 ETag = response.ETag,
+                BackgroundColor = input.BackgroundColor,
                 Orientation = input.Orientation,
                 Size = size
             };

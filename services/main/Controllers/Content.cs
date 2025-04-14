@@ -495,7 +495,7 @@ public class ContentController : ControllerBase
             var response = new
             {
                 results = dataResponse,
-                imageUrl = $"https://{_appConstants.BucketName}.s3.amazonaws.com/{media}"
+                imageUrl = $"{_appConstants.MfoniImagesUrl}/{media}"
             };
 
             return new ObjectResult(new GetEntityResponse<object>(response, null).Result())

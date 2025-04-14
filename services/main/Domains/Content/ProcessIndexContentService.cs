@@ -9,6 +9,7 @@ using Amazon.Runtime;
 using main.Lib;
 using Amazon.Rekognition.Model;
 using Newtonsoft.Json;
+using Amazon.S3;
 
 namespace main.Domains;
 
@@ -22,8 +23,8 @@ public class ProcessIndexContent
     private readonly AppConstants _appConstantsConfiguration;
     private readonly IModel _model;
     private readonly CacheProvider _cacheProvider;
-
     private readonly AmazonRekognitionClient _rekognitionClient;
+    private readonly AmazonS3Client _s3Client;
 
     public ProcessIndexContent(ILogger<ProcessIndexContent> logger, DatabaseSettings databaseConfig, RabbitMQConnection rabbitMQChannel, IOptions<AppConstants> appConstants,
         CacheProvider cacheProvider)
@@ -50,6 +51,8 @@ public class ProcessIndexContent
         var credentials = new BasicAWSCredentials(_appConstantsConfiguration.AWSAccessKey, _appConstantsConfiguration.AWSSecretKey);
         var region = Amazon.RegionEndpoint.USEast1;
         _rekognitionClient = new AmazonRekognitionClient(credentials, region);
+        _s3Client = new AmazonS3Client(credentials, region);
+
         _cacheProvider = cacheProvider;
 
         _logger.LogDebug("ProcessIndexContentService initialized");
@@ -98,7 +101,8 @@ public class ProcessIndexContent
             await CheckForNudity(content);
 
             // resolve all image sizes
-            var image = await ProcessImage.DownloadImage(content.Media.Location);
+            var signedContentUrl = await ProcessImage.GenerateSignedAWSUrl(_s3Client, content.Media);
+            var image = await ProcessImage.DownloadImage(signedContentUrl);
 
             if (image is not null)
             {
@@ -214,6 +218,7 @@ public class ProcessIndexContent
             Orientation = content.Media.Orientation,
             BackgroundColor = content.Media.BackgroundColor,
             ImageQuality = 85,
+            MfoniImagesUrl = _appConstantsConfiguration.MfoniImagesUrl,
         });
         await SaveToDb(content, imageResponseForLarge, "large_media");
 
@@ -228,6 +233,7 @@ public class ProcessIndexContent
             Orientation = content.Media.Orientation,
             BackgroundColor = content.Media.BackgroundColor,
             ImageQuality = 75,
+            MfoniImagesUrl = _appConstantsConfiguration.MfoniImagesUrl,
         });
         await SaveToDb(content, imageResponseForMedium, "medium_media");
 
@@ -242,6 +248,7 @@ public class ProcessIndexContent
             Orientation = content.Media.Orientation,
             BackgroundColor = content.Media.BackgroundColor,
             ImageQuality = 65,
+            MfoniImagesUrl = _appConstantsConfiguration.MfoniImagesUrl,
         });
         await SaveToDb(content, imageResponseForSmall, "small_media");
 
@@ -258,6 +265,7 @@ public class ProcessIndexContent
                 Orientation = content.Media.Orientation,
                 BackgroundColor = content.Media.BackgroundColor,
                 ImageQuality = 85,
+                MfoniImagesUrl = _appConstantsConfiguration.MfoniImagesUrl,
             });
 
             await SaveToDb(content, imageResponse, "blurred_media");
