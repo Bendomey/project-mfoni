@@ -2,6 +2,7 @@ import { Dialog } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link } from '@remix-run/react'
 import { Fragment, useState } from 'react'
+import { ClientOnly } from 'remix-utils/client-only'
 import { NoticeBanner } from './notice-banner/index.tsx'
 import { SearchPhotos } from './search/index.tsx'
 import { SearchPhotosForMobile } from './search-for-mobile/index.tsx'
@@ -17,10 +18,10 @@ const navigation = (isLoggedIn: boolean) => [
 	{ name: 'Upload', href: PAGES.AUTHENTICATED_PAGES.UPLOAD, routeType: 'link' },
 	isLoggedIn
 		? {
-				name: 'My Account',
-				href: PAGES.AUTHENTICATED_PAGES.ACCOUNT,
-				routeType: 'link',
-			}
+			name: 'My Account',
+			href: PAGES.AUTHENTICATED_PAGES.ACCOUNT,
+			routeType: 'link',
+		}
 		: undefined,
 ]
 
@@ -63,11 +64,15 @@ export const Header = ({
 						<span className="text-4xl font-extrabold">{APP_NAME.slice(1)}</span>
 					</div>
 				</Link>
-				<div className="mx-8 hidden h-11 flex-grow md:flex">
-					{isHeroSearchInVisible ? null : (
-						<SearchPhotos searchQuery={searchQuery} />
+				<ClientOnly>
+					{() => (
+						<div className="mx-8 hidden h-11 flex-grow md:flex">
+							{isHeroSearchInVisible ? null : (
+								<SearchPhotos searchQuery={searchQuery} />
+							)}
+						</div>
 					)}
-				</div>
+				</ClientOnly>
 				<div className="flex lg:hidden">
 					<button
 						type="button"
