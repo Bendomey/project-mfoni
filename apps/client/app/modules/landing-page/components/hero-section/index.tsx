@@ -25,7 +25,7 @@ export const HeroSection = () => {
 							Announcing visual search feature.{' '}
 							<Link
 								prefetch="intent"
-								to="/blog/visual-search"
+								to="/blog/announcing-visual-search"
 								className="font-semibold text-blue-600"
 							>
 								<span className="absolute inset-0" aria-hidden="true" />
