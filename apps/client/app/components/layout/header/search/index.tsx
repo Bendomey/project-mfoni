@@ -31,10 +31,11 @@ export const SearchPhotos = ({
 
 	return (
 		<div
-			className={`relative block w-full rounded-full border-transparent border-zinc-300 hover:border focus:ring-0 ${isSearchFocused || isSittingOnADarkBackground
+			className={`relative block w-full rounded-full border-transparent border-zinc-300 hover:border focus:ring-0 ${
+				isSearchFocused || isSittingOnADarkBackground
 					? 'border bg-white'
 					: 'bg-zinc-100'
-				}`}
+			}`}
 		>
 			<div className="flex flex-row items-center">
 				<div className="pointer-events-none inset-y-0 left-0 flex items-center pl-5">
@@ -98,10 +99,7 @@ export const SearchPhotos = ({
 									leaveTo="opacity-0 translate-y-1"
 								>
 									<Popover.Panel className="absolute right-1 top-full z-30 mt-5 w-screen max-w-md overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-gray-900/5">
-										<VisualSearch
-											onClose={close}
-											className="px-5 py-3"
-										/>
+										<VisualSearch onClose={close} className="px-5 py-3" />
 									</Popover.Panel>
 								</Transition>
 							</>
