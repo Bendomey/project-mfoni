@@ -9,8 +9,11 @@ import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
 import { getSocialMetas } from '@/lib/seo.ts'
 import { safeString } from '@/lib/strings.ts'
 import { PhotoModule } from '@/modules/index.ts'
+import { requireValidSlug } from '@/lib/requireValidSlug.ts'
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
+	requireValidSlug(loaderArgs.params.slug);
+	
 	const queryClient = new QueryClient()
 
 	const authCookie = await extractAuthCookie(

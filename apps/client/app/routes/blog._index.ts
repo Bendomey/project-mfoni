@@ -3,11 +3,13 @@ import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
 import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
 import { getSocialMetas } from '@/lib/seo.ts'
 import { AllBlogsModule } from '@/modules/index.ts'
+import { posts } from '@/generated/posts.ts'
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
 	return jsonWithCache({
-        origin: getDomainUrl(loaderArgs.request),
-    })
+		posts: posts,
+		origin: getDomainUrl(loaderArgs.request),
+	})
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data, location }) => {
