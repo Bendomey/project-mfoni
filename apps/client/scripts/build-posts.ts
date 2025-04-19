@@ -13,6 +13,9 @@ const posts = files.map((file) => {
 	return { slug, ...data }
 })
 
-const output = `export const posts = ${JSON.stringify(posts, null, 2)};`
+const output = `// This file is auto-generated. Do not edit manually.
+export const posts = ${JSON.stringify(posts, null, 2)};
+`
 
 fs.writeFileSync('app/generated/posts.ts', output)
+console.log('Posts generated successfully!')

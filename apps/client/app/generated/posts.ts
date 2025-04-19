@@ -1,3 +1,4 @@
+// This file is auto-generated. Do not edit manually.
 export const posts = [
   {
     "slug": "announcing-visual-search-feature",
