@@ -25,6 +25,7 @@ export async function getMdxPage({ contentDir, slug }: GetMdxPageProps) {
 
 		return { code, frontmatter }
 	} catch (error) {
+		console.error('Error in getMdxPage:', error instanceof Error ? error.message : error);
 		return null
 	}
 }
