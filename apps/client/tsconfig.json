@@ -1,5 +1,5 @@
 {
-	"include": ["**/*.ts", "**/*.tsx", "server/utils/monitoring.js"],
+	"include": ["**/*.ts", "**/*.tsx", "**/*.mdx", "server/utils/monitoring.js"],
 	"extends": ["@epic-web/config/typescript"],
 	"compilerOptions": {
 		"module": "nodenext",

@@ -97,7 +97,9 @@ export const meta: MetaFunction<typeof loader> = ({
 			? data?.collection?.description
 			: `Browse through the carefully curated contents around "${params.collection}" — you could also submit your best work.`,
 		images: data?.collection
-			? data?.collection?.contentItems?.map((item) => bypassCfAssetWorkerUrl(safeString(item.content?.media?.url)))
+			? data?.collection?.contentItems?.map((item) =>
+					bypassCfAssetWorkerUrl(safeString(item.content?.media?.url)),
+				)
 			: [],
 		url: getDisplayUrl({
 			origin: data?.origin ?? 'https://mfoni.app',

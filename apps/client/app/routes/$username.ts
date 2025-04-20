@@ -63,7 +63,9 @@ export const meta: MetaFunction<typeof loader> = ({
 			origin: data?.origin ?? 'https://mfoni.app',
 			path: location.pathname,
 		}),
-		images: data?.creator?.photo ? [bypassCfAssetWorkerUrl(data?.creator?.photo)] : [],
+		images: data?.creator?.photo
+			? [bypassCfAssetWorkerUrl(data?.creator?.photo)]
+			: [],
 		origin: data?.origin,
 		keywords:
 			data?.creator?.interests?.map((interest) => interest).join(', ') ?? '',

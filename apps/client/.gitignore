@@ -21,3 +21,4 @@ tsconfig.tsbuildinfo
 yarn-error.log
 
 vite.config.ts.timestamp*
+*.cpuprofile

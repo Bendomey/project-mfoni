@@ -98,6 +98,7 @@ WORKDIR /app/
 COPY --from=production-deps /app/node_modules /app/node_modules
 COPY --from=build /app/build /app/build
 COPY --from=build /app/public /app/public
+COPY --from=build /app/app/modules/blog/articles /app/app/modules/blog/articles
 COPY --from=build /app/server-build /app/server-build
 COPY --from=build /app/index.js /app/index.js
 COPY --from=build /app/package.json /app/package.json

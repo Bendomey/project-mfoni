@@ -1,4 +1,5 @@
 import { Link } from '@remix-run/react'
+import { ClientOnly } from 'remix-utils/client-only'
 import { FadeIn } from '@/components/animation/FadeIn.tsx'
 
 import { SearchPhotos } from '@/components/layout/header/search/index.tsx'
@@ -24,7 +25,7 @@ export const HeroSection = () => {
 							Announcing visual search feature.{' '}
 							<Link
 								prefetch="intent"
-								to="/blog/visual-search"
+								to="/blog/announcing-visual-search-feature"
 								className="font-semibold text-blue-600"
 							>
 								<span className="absolute inset-0" aria-hidden="true" />
@@ -39,7 +40,9 @@ export const HeroSection = () => {
 						<SearchPhotosForMobile />
 					</div>
 					<div className="mt-5 hidden md:block">
-						<SearchPhotos isSittingOnADarkBackground />
+						<ClientOnly>
+							{() => <SearchPhotos isSittingOnADarkBackground />}
+						</ClientOnly>
 					</div>
 				</div>
 			</FadeIn>

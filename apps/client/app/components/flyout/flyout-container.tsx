@@ -16,6 +16,8 @@ type Props = {
 	 */
 	intendedPosition: 'x' | 'y'
 	arrowColor?: string
+	initVisibility?: boolean
+	onOpenInit?: () => void
 }
 
 export const FlyoutContainer = ({
@@ -23,8 +25,10 @@ export const FlyoutContainer = ({
 	FlyoutContent,
 	intendedPosition = 'y',
 	arrowColor = 'bg-black',
+	initVisibility = false,
+	onOpenInit,
 }: Props) => {
-	const { value: open, setValue: setOpen } = useBoolean(false)
+	const { value: open, setValue: setOpen } = useBoolean(initVisibility)
 	const [position, setPosition] = React.useState<
 		'top' | 'bottom' | 'left' | 'right'
 	>('bottom')
@@ -62,6 +66,7 @@ export const FlyoutContainer = ({
 				}
 			}
 			setOpen(true)
+			onOpenInit?.()
 		},
 		[],
 	)
