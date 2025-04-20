@@ -316,7 +316,7 @@ public class PurchaseContentService
             PaystackInput = new InitPaymentInput
             {
                 Amount = input.Amount,
-                Email = input.User.Email != null && input.User.EmailVerifiedAt != null ? input.User.Email : _appConstantsConfiguration.MfoniPaymentEmail, // use defualt mfoni email to hold all paystack payments if user have no email.
+                Email = input.User.Email != null && input.User.EmailVerifiedAt != null ? input.User.Email : _appConstantsConfiguration.MfoniSupportEmail, // use defualt mfoni email to hold all paystack payments if user have no email.
                 Metadata = JsonConvert.SerializeObject(paymentMetadata)
             }
         });

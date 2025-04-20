@@ -419,7 +419,7 @@ public class UserService
             PaystackInput = new InitPaymentInput
             {
                 Amount = amount,
-                Email = user.Email != null && user.EmailVerifiedAt != null ? user.Email : _appConstantsConfiguration.MfoniPaymentEmail, // use defualt mfoni email to hold all paystack payments if user have no email.
+                Email = user.Email != null && user.EmailVerifiedAt != null ? user.Email : _appConstantsConfiguration.MfoniSupportEmail, // use defualt mfoni email to hold all paystack payments if user have no email.
                 Metadata = JsonConvert.SerializeObject(paymentMetadata)
             }
         });
