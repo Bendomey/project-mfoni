@@ -21,30 +21,30 @@ export function DownloadButtonApi({ children, content }: Props) {
 
 	const handleSubmit = async (size: ContentSize) => {
 		setInitiatingDownload(true)
-		const formData = new FormData();
-		formData.append("contentId", content.id);
-		formData.append("size", size);
-		formData.append("customerName", currentUser?.name || 'Guest');
-		formData.append('contentTitle', content.title);
+		const formData = new FormData()
+		formData.append('contentId', content.id)
+		formData.append('size', size)
+		formData.append('customerName', currentUser?.name || 'Guest')
+		formData.append('contentTitle', content.title)
 		try {
-			const response = await fetch("/api/download-content", {
-				method: "POST",
+			const response = await fetch('/api/download-content', {
+				method: 'POST',
 				body: formData,
-			});
+			})
 
-			if (!response.ok) throw new Error("Failed to generate package");
+			if (!response.ok) throw new Error('Failed to generate package')
 
-			const blob = await response.blob();
-			const url = URL.createObjectURL(blob);
+			const blob = await response.blob()
+			const url = URL.createObjectURL(blob)
 
-			const a = document.createElement("a");
-			a.href = url;
+			const a = document.createElement('a')
+			a.href = url
 
 			const title = `${content.title.replace(/ /g, '-')}-mfoni`.toLowerCase()
-			a.download = `${title}.zip`;
+			a.download = `${title}.zip`
 
-			a.click();
-			URL.revokeObjectURL(url);
+			a.click()
+			URL.revokeObjectURL(url)
 
 			queryClient.invalidateQueries({
 				queryKey: [QUERY_KEYS.CONTENTS, content.slug],

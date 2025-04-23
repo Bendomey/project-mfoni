@@ -84,12 +84,16 @@ export async function action({ request }: ActionFunctionArgs) {
 
 			const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' })
 
-			const title = `${contentTitle.toString().replace(/ /g, '-')}-mfoni`.toLowerCase()
+			const title = `${contentTitle
+				.toString()
+				.replace(/ /g, '-')}-mfoni`.toLowerCase()
 
 			return new Response(zipBuffer, {
 				headers: {
 					'Content-Type': 'application/zip',
-					'Content-Disposition': `attachment; filename=${encodeURIComponent(`${title}.zip`)}`,
+					'Content-Disposition': `attachment; filename=${encodeURIComponent(
+						`${title}.zip`,
+					)}`,
 				},
 			})
 		}
