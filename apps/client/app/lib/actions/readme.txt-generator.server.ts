@@ -20,6 +20,6 @@ export function readmeTxtGenerator({
 		Unauthorized redistribution or resale of this content is strictly prohibited.
 		
 		Visit us at: https://www.mfoni.com
-		Support: support@mfoni.com
+		Support: support@mfoni.app
 	`
 }
