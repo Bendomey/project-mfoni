@@ -74,7 +74,7 @@ export async function generateLicensePdf({
 	)
 
 	drawText('Authorized by Mfoni', 50, height - 580)
-	drawText('www.mfoni.com | support@mfoni.app', 50, height - 595)
+	drawText('https://www.mfoni.app | support@mfoni.app', 50, height - 595)
 
 	const pdfBytes = await pdfDoc.save()
 	return pdfBytes
