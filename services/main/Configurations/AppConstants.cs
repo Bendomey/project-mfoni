@@ -51,6 +51,6 @@ public class AppConstants
     public string SearchServiceAuthToken { get; set; } = null!;
     public string WebsiteUrl { get; set; } = "https://mfoni.app";
     public string PaystackSecretKey { get; set; } = null!;
-    public string MfoniPaymentEmail { get; set; } = "mfoniapp@gmail.com";
+    public string MfoniPaymentEmail { get; set; } = "support@mfoni.app";
     public string MfoniImagesUrl { get; set; } = null!;
 }
