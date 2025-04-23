@@ -1,4 +1,3 @@
-
 import { ArrowLeftIcon } from '@heroicons/react/24/solid'
 import { useLoaderData, useNavigate } from '@remix-run/react'
 import dayjs from 'dayjs'
