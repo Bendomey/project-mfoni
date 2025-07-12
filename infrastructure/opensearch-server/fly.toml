@@ -5,8 +5,6 @@ primary_region = 'lhr'
   dockerfile = "Dockerfile"
 
 [env]
-  discovery.type = "single-node"
-  bootstrap.memory_lock = "true"
   OPENSEARCH_JAVA_OPTS = "-Xms512m -Xmx512m"
 
 [experimental]
