@@ -1,0 +1,44 @@
+app = 'mfoni-opensearch'
+primary_region = 'lhr'
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  discovery.type = "single-node"
+  bootstrap.memory_lock = "true"
+  OPENSEARCH_JAVA_OPTS = "-Xms512m -Xmx512m"
+
+[experimental]
+  auto_rollback = true
+
+[[services]]
+  internal_port = 9200
+  protocol = "tcp"
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    restart_limit = 3
+
+[[vm]]
+  memory = '2gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[[mounts]]
+  source = "mfoni_opensearch_data"
+  destination = "/usr/share/opensearch/data"
