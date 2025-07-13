@@ -37,6 +37,7 @@ func InitOpenSearch(config *viper.Viper) *opensearch.Client {
 
 	// Create indices if they do not exist.
 	createIndicesIfNotExists(client, config)
+
 	return client
 }
 

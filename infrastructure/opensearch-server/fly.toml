@@ -14,9 +14,9 @@ primary_region = 'lhr'
   internal_port = 9200
   protocol = "tcp"
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = false
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
 
   [[services.ports]]
     handlers = ["http"]
