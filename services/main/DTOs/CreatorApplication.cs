@@ -8,7 +8,7 @@ public class CreateCreatorApplicationInput
     /// <summary>
     /// Package Type
     /// </summary>
-    /// <example>FREE</example>
+    /// <example>MfoniPackage.Free</example>
     [Required]
     public required string CreatorPackageType { get; set; }
 

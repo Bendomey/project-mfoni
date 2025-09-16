@@ -39,7 +39,7 @@ public class GetWalletTransactionsInput
 public class GetSubscriptionsInput
 {
     public required string CreatorId { get; set; }
-    public string? PackageType { get; set; }
+    public string? PackageTypeId { get; set; }
 }
 
 public class CalculateUpgradePricingOutput

@@ -10,11 +10,15 @@ namespace main.HostedServices
         private readonly AdminWalletService _adminWalletService;
         private readonly CollectionService _collectionService;
         private readonly ExploreSectionService _exploreSectionService;
+        private readonly MfoniPackageService _mfoniPackageService;
         private readonly DatabaseSettings _databaseConfig;
         private readonly AppConstants _appConstantsConfiguration;
 
-        public StartUpService(AdminWalletService adminWalletService, CollectionService collectionService,
+        public StartUpService(
+            AdminWalletService adminWalletService,
+            CollectionService collectionService,
             ExploreSectionService exploreSectionService,
+            MfoniPackageService mfoniPackageService,
             IOptions<AppConstants> appConstants,
             DatabaseSettings databaseConfig
         )
@@ -25,6 +29,7 @@ namespace main.HostedServices
             _adminWalletService = adminWalletService;
             _collectionService = collectionService;
             _exploreSectionService = exploreSectionService;
+            _mfoniPackageService = mfoniPackageService;
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
@@ -33,6 +38,7 @@ namespace main.HostedServices
             await _adminWalletService.BootsrapAdminWallet();
             _collectionService.BootstrapCollections();
             await _exploreSectionService.BootstrapExploreSections();
+            await _mfoniPackageService.BootstrapMfoniPackages();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -52,6 +58,7 @@ namespace main.HostedServices
             var contentPurchaseCollection = _databaseConfig.Database.GetCollection<Models.ContentPurchase>(_appConstantsConfiguration.ContentPurchaseCollection);
             var creatorCollection = _databaseConfig.Database.GetCollection<Models.Creator>(_appConstantsConfiguration.CreatorCollection);
             var creatorApplicationCollection = _databaseConfig.Database.GetCollection<Models.CreatorApplication>(_appConstantsConfiguration.CreatorApplicatonCollection);
+            var mfoniPackageCollection = _databaseConfig.Database.GetCollection<Models.MfoniPackage>(_appConstantsConfiguration.MfoniPackageCollection);
             var creatorSubscriptionCollection = _databaseConfig.Database.GetCollection<Models.CreatorSubscription>(_appConstantsConfiguration.CreatorSubscriptionCollection);
             var creatorSubscriptionPurchaseCollection = _databaseConfig.Database.GetCollection<Models.CreatorSubscriptionPurchase>(_appConstantsConfiguration.CreatorSubscriptionPurchaseCollection);
             var exploreSectionCollection = _databaseConfig.Database.GetCollection<Models.ExploreSection>(_appConstantsConfiguration.ExploreSectionCollection);
@@ -76,6 +83,7 @@ namespace main.HostedServices
             await Models.ContentPurchase.EnsureIndexesAsync(contentPurchaseCollection);
             await Models.Creator.EnsureIndexesAsync(creatorCollection);
             await Models.CreatorApplication.EnsureIndexesAsync(creatorApplicationCollection);
+            await Models.MfoniPackage.EnsureIndexesAsync(mfoniPackageCollection);
             await Models.CreatorSubscription.EnsureIndexesAsync(creatorSubscriptionCollection);
             await Models.CreatorSubscriptionPurchase.EnsureIndexesAsync(creatorSubscriptionPurchaseCollection);
             await Models.ExploreSection.EnsureIndexesAsync(exploreSectionCollection);

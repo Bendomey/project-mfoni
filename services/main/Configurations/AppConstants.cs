@@ -24,6 +24,7 @@ public class AppConstants
     public string ContentReportCaseCollection { get; init; } = "content_report_cases";
     public string TagContentCollection { get; init; } = "tag_contents";
     public string WaitlistCollection { get; init; } = "waitlists";
+    public string MfoniPackageCollection { get; init; } = "mfoni_packages";
     public string CreatorSubscriptionCollection { get; init; } = "creator_subscriptions";
     public string CreatorSubscriptionPurchaseCollection { get; init; } = "creator_subscription_purchases";
     public string PaymentCollection { get; init; } = "payments";

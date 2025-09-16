@@ -35,7 +35,7 @@ public class CreatorSubscriptionTransformer
         return new OutputCreatorSubscription
         {
             Id = creatorSubscription.Id,
-            PackageType = creatorSubscription.PackageType,
+            MfoniPackageId = creatorSubscription.PackageTypeId,
             Period = creatorSubscription.Period,
             StartedAt = creatorSubscription.StartedAt,
             EndedAt = creatorSubscription.EndedAt,

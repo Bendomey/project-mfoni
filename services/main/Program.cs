@@ -149,6 +149,7 @@ builder.Services.AddSingleton<CreatorApplicationService>();
 builder.Services.AddSingleton<CreatorService>();
 
 // billing services
+builder.Services.AddSingleton<MfoniPackageService>();
 builder.Services.AddSingleton<WalletService>();
 builder.Services.AddSingleton<SubscriptionService>();
 builder.Services.AddSingleton<PaymentService>();

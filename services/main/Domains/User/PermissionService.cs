@@ -12,6 +12,7 @@ public class PermissionService
     private readonly CreatorService _creatorService;
     private readonly IMongoCollection<Content> _contentsCollection;
     private readonly IMongoCollection<WalletTransaction> _walletTransactionsCollection;
+    private readonly IMongoCollection<MfoniPackage> _mfoniPackageCollection;
 
     public PermissionService(
         ILogger<PermissionService> logger,
@@ -28,6 +29,10 @@ public class PermissionService
         );
         _walletTransactionsCollection = databaseConfig.Database.GetCollection<WalletTransaction>(
             appConstants.Value.WalletTransactionCollection
+        );
+
+        _mfoniPackageCollection = databaseConfig.Database.GetCollection<MfoniPackage>(
+            appConstants.Value.MfoniPackageCollection
         );
 
         _creatorService = creatorService;
@@ -116,7 +121,16 @@ public class PermissionService
             return false;
         }
 
-        return PermissionsHelper.PremiumPackageTypes.Contains(creatorInfo.CreatorSubscription.PackageType);
+        // get mfoni package
+        var mfoniCreatorPackage = _mfoniPackageCollection.Find(package => package.Id == creatorInfo.CreatorSubscription.PackageTypeId)
+            .FirstOrDefault();
+
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidMfoniPackage");
+        }
+
+        return PermissionsHelper.PremiumPackageTypes.Contains(mfoniCreatorPackage.Code);
     }
 
     public bool CanCreatorPriceContent(GetCreatorDetailedResponse creatorInfo)

@@ -12,11 +12,11 @@ public static class PermissionsHelper
     {
         switch (packageType)
         {
-            case "FREE":
+            case "MfoniPackage.Free":
                 return 50;
-            case "BASIC":
+            case "MfoniPackage.Basic":
                 return 200;
-            case "ADVANCED":
+            case "MfoniPackage.Advanced":
                 return Unlimited;
             default:
                 return 0;
@@ -28,11 +28,11 @@ public static class PermissionsHelper
 
         switch (packageType)
         {
-            case "FREE":
+            case "MfoniPackage.Free":
                 return 0;
-            case "BASIC":
+            case "MfoniPackage.Basic":
                 return 200000; // GHS2,000.00
-            case "ADVANCED":
+            case "MfoniPackage.Advanced":
                 return Unlimited;
             default:
                 return 0;
@@ -41,12 +41,12 @@ public static class PermissionsHelper
 
     public static string[] PremiumPackageTypes = new[]
     {
-        CreatorSubscriptionPackageType.BASIC,
-        CreatorSubscriptionPackageType.ADVANCED,
+        MfoniPackageCode.BASIC,
+        MfoniPackageCode.ADVANCED,
     };
 
     public static string[] FreePackageTypes = new[]
     {
-        CreatorSubscriptionPackageType.FREE,
+        MfoniPackageCode.FREE,
     };
 }

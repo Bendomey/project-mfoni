@@ -14,6 +14,7 @@ public class IndexContent
     private readonly IMongoCollection<Content> _contentsCollection;
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.TagContent> _tagContentCollection;
+    private readonly IMongoCollection<Models.MfoniPackage> _mfoniPackageCollection;
     private readonly RabbitMQ.Client.IConnection _rabbitMqChannel;
     private readonly SaveTagsService _saveTagsService;
     private readonly CollectionService _collectionService;
@@ -36,6 +37,10 @@ public class IndexContent
         _contentsCollection = database.GetCollection<Content>(appConstants.Value.ContentCollection);
         _userCollection = databaseConfig.Database.GetCollection<User>(appConstants.Value.UserCollection);
         _tagContentCollection = databaseConfig.Database.GetCollection<TagContent>(appConstants.Value.TagContentCollection);
+
+        _mfoniPackageCollection = databaseConfig.Database.GetCollection<Models.MfoniPackage>(
+            appConstants.Value.MfoniPackageCollection
+        );
 
         _rabbitMqChannel = rabbitMQChannel.Channel;
 
@@ -67,7 +72,13 @@ public class IndexContent
         var numberOfContentsCreatorHasUploaded = await _permissionService.GetMonthlyUploadLimit(creatorInfo);
         numberOfContentsCreatorHasUploaded += mediaInput.Length;
 
-        var contentsCreatorCanUpload = PermissionsHelper.GetNumberOfUploadsForPackageType(creatorInfo.CreatorSubscription.PackageType);
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Id == creatorInfo.CreatorSubscription.PackageTypeId).FirstOrDefaultAsync();
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidMfoniPackage");
+        }
+
+        var contentsCreatorCanUpload = PermissionsHelper.GetNumberOfUploadsForPackageType(mfoniCreatorPackage.Code);
         if (contentsCreatorCanUpload is not null && numberOfContentsCreatorHasUploaded > contentsCreatorCanUpload)
         {
             throw new HttpRequestException("UploadLimitReached", null, System.Net.HttpStatusCode.Forbidden);

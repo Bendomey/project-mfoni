@@ -15,6 +15,7 @@ public class TransferService
     private readonly IMongoCollection<Models.Transfer> _transferCollection;
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.WalletTransaction> _walletTransactionCollection;
+    private readonly IMongoCollection<Models.MfoniPackage> _mfoniPackageCollection;
     private readonly PermissionService _permissionService;
     private readonly CreatorService _creatorService;
     private readonly CacheProvider _cacheProvider;
@@ -45,6 +46,10 @@ public class TransferService
 
         _walletTransactionCollection = databaseConfig.Database.GetCollection<Models.WalletTransaction>(
             appConstants.Value.WalletTransactionCollection
+        );
+
+        _mfoniPackageCollection = databaseConfig.Database.GetCollection<Models.MfoniPackage>(
+            appConstants.Value.MfoniPackageCollection
         );
 
         _permissionService = permissionService;
@@ -219,7 +224,13 @@ public class TransferService
             var amountWithdrawnSoFarCurrentMonth = await _permissionService.GetMonthlyWithdrawalLimit(creatorInfo);
             amountWithdrawnSoFarCurrentMonth += input.Amount;
 
-            var amountCreatorCanWithdraw = PermissionsHelper.GetAmountYouCanWithdrawPerMonth(creatorInfo.CreatorSubscription.PackageType);
+            var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Id == creatorInfo.CreatorSubscription.PackageTypeId).FirstOrDefaultAsync();
+            if (mfoniCreatorPackage is null)
+            {
+                throw new HttpRequestException("InvalidMfoniPackage");
+            }
+
+            var amountCreatorCanWithdraw = PermissionsHelper.GetAmountYouCanWithdrawPerMonth(mfoniCreatorPackage.Code);
             if (amountCreatorCanWithdraw is not null && amountWithdrawnSoFarCurrentMonth > amountCreatorCanWithdraw)
             {
                 throw new HttpRequestException("WithdrawLimitReached", null, System.Net.HttpStatusCode.Forbidden);

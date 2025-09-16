@@ -47,7 +47,7 @@ public class CreatorApplicationTransformer
             IdNumber = creatorApplication.IdNumber,
             IdFrontImage = creatorApplication.IdFrontImage,
             IdBackImage = creatorApplication.IdBackImage,
-            IntendedPricingPackage = creatorApplication.IntendedPricingPackage,
+            IntendedPricingPackageId = creatorApplication.IntendedPricingPackageId,
             CreatedAt = creatorApplication.CreatedAt,
             UpdatedAt = creatorApplication.UpdatedAt,
         };

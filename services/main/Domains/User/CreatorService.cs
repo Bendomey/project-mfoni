@@ -13,6 +13,7 @@ public class CreatorService
     private readonly IMongoCollection<Models.Creator> __creatorCollection;
     private readonly IMongoCollection<Models.CreatorSubscription> __creatorSubscriptionCollection;
     private readonly IMongoCollection<Models.CreatorApplication> _creatorApplicationCollection;
+    private readonly IMongoCollection<Models.MfoniPackage> _mfoniPackageCollection;
     private readonly UserService _userService;
     private readonly SubscriptionService _subscriptionService;
     private readonly AppConstants _appConstantsConfiguration;
@@ -39,6 +40,10 @@ public class CreatorService
              databaseConfig.Database.GetCollection<Models.CreatorApplication>(
                  appConstants.Value.CreatorApplicatonCollection
              );
+
+        _mfoniPackageCollection = databaseConfig.Database.GetCollection<Models.MfoniPackage>(
+            appConstants.Value.MfoniPackageCollection
+        );
 
         _userService = userService;
         _subscriptionService = subscriptionService;
@@ -144,9 +149,18 @@ public class CreatorService
             throw new HttpRequestException("CreatorApplicationNotFound");
         }
 
-        if (creatorApplication.IntendedPricingPackage is null)
+        if (creatorApplication.IntendedPricingPackageId is null)
         {
             throw new HttpRequestException("IntendedPricingPackageNotSet");
+        }
+
+        // get mfoni package
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Code == creatorApplication.IntendedPricingPackageId)
+            .FirstOrDefaultAsync();
+
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidMfoniPackage");
         }
 
         var user = await _userService.GetUserById(creatorApplication.UserId);
@@ -160,15 +174,14 @@ public class CreatorService
 
         await __creatorCollection.InsertOneAsync(creator);
 
-        var pricingLib = new PricingLib(creatorApplication.IntendedPricingPackage);
-        bool isItAPremiumPackage = creatorApplication.IntendedPricingPackage != CreatorSubscriptionPackageType.FREE;
-        bool canIPayWithWallet = user.BookWallet >= pricingLib.GetPrice();
+        bool isItAPremiumPackage = mfoniCreatorPackage.Amount > 0;
+        bool canIPayWithWallet = user.BookWallet >= mfoniCreatorPackage.Amount;
 
         // Create a trail of the package the creator has been activated.
         var creatorSubscription = new CreatorSubscription
         {
             CreatorId = creator.Id,
-            PackageType = creatorApplication.IntendedPricingPackage,
+            PackageTypeId = creatorApplication.IntendedPricingPackageId,
             Period = isItAPremiumPackage ? canIPayWithWallet ? 1 : 0 : null,
             StartedAt = DateTime.UtcNow,
             EndedAt = isItAPremiumPackage ? canIPayWithWallet ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow : null,
@@ -183,7 +196,7 @@ public class CreatorService
                 // subscribe with wallet
                 await _subscriptionService.SubscribeWithWallet(new SubscribeWithWalletInput
                 {
-                    Amount = pricingLib.GetPrice(),
+                    Amount = mfoniCreatorPackage.Amount,
                     SubscriptionId = creatorSubscription.Id,
                     UserId = user.Id,
                 });

@@ -18,6 +18,7 @@ public class UserService
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.CreatorApplication> _creatorApplicationCollection;
     private readonly IMongoCollection<Models.WalletTransaction> _walletTransactionCollection;
+    private readonly IMongoCollection<Models.MfoniPackage> _mfoniPackageCollection;
     private readonly CacheProvider _cacheProvider;
     private readonly AppConstants _appConstantsConfiguration;
     private readonly PaymentService _paymentService;
@@ -41,6 +42,11 @@ public class UserService
         _walletTransactionCollection = databaseConfig.Database.GetCollection<Models.WalletTransaction>(
             appConstants.Value.WalletTransactionCollection
         );
+
+        _mfoniPackageCollection = databaseConfig.Database.GetCollection<Models.MfoniPackage>(
+            appConstants.Value.MfoniPackageCollection
+        );
+
         _cacheProvider = cacheProvider;
         _appConstantsConfiguration = appConstants.Value;
 
@@ -66,10 +72,18 @@ public class UserService
 
         if (accountInput.Role == UserRole.CREATOR)
         {
+            var mfoniCreatorPackage = _mfoniPackageCollection.Find(package => package.Code == accountInput.IntendedPricingPackage)
+            .FirstOrDefault();
+
+            if (mfoniCreatorPackage is null)
+            {
+                throw new HttpRequestException("InvalidMfoniPackage");
+            }
+
             var __newCreatorApplication = new Models.CreatorApplication
             {
                 UserId = user.Id,
-                IntendedPricingPackage = accountInput.IntendedPricingPackage,
+                IntendedPricingPackageId = mfoniCreatorPackage.Id,
             };
             _creatorApplicationCollection.InsertOne(__newCreatorApplication);
         }
