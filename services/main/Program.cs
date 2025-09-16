@@ -180,6 +180,7 @@ builder.Services.AddSingleton<WaitlistService>();
 builder.Services.AddSingleton<ReportContentCaseService>();
 
 // inject transformers
+builder.Services.AddSingleton<MfoniPackageTransformer>();
 builder.Services.AddSingleton<AdminTransformer>();
 builder.Services.AddSingleton<ContentTransformer>();
 builder.Services.AddSingleton<UserTransformer>();

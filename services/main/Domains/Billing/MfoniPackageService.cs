@@ -1,4 +1,5 @@
 using main.Configuratons;
+using main.Lib;
 using main.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -332,5 +333,40 @@ public class MfoniPackageService
         }
 
         return package;
+    }
+
+    public async Task<List<Models.MfoniPackage>> GetAll(FilterQuery<Models.MfoniPackage> queryFilter, string? status = "")
+    {
+        FilterDefinitionBuilder<Models.MfoniPackage> builder = Builders<Models.MfoniPackage>.Filter;
+        var filter = Builders<Models.MfoniPackage>.Filter.Empty;
+
+        if (!string.IsNullOrEmpty(status) && status != "ALL" )
+        {
+            filter = builder.Eq(p => p.Status, status);
+        }
+
+        var packages = await _mfoniPackageCollection
+            .Find(filter)
+            .Skip(queryFilter.Skip)
+            .Limit(queryFilter.Limit)
+            .Sort(queryFilter.Sort)
+            .ToListAsync();
+
+        return packages ?? [];
+    }
+
+    public async Task<long> Count(string? status = "")
+    {
+        FilterDefinitionBuilder<Models.MfoniPackage> builder = Builders<Models.MfoniPackage>.Filter;
+        var filter = builder.Empty;
+        
+        if (!string.IsNullOrEmpty(status) && status != "ALL")
+        {
+            filter = builder.Eq(p => p.Status, status);
+        }
+
+        var packagesCount = await _mfoniPackageCollection.CountDocumentsAsync(filter);
+
+        return packagesCount;
     }
 }

@@ -111,7 +111,7 @@ public class TagsController : ControllerBase
 
             if (tag == null)
             {
-                throw new HttpRequestException("TagNotFound");
+                throw new HttpRequestException("TagNotFound", null, HttpStatusCode.NotFound);
             }
 
             var outputTag = await _tagTransformer.Transform(tag!);

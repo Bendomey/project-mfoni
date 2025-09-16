@@ -18,6 +18,7 @@ public class CacheProvider
         { "contents", "contents" },
         { "tags", "tags" },
         { "explore", "explore" },
+        { "mfoni-packages", "mfoni-packages" },
 
         { "creators", "creators" },
         { "auth", "auth" },

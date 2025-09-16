@@ -19,6 +19,7 @@ public class OutputCreatorApplication
     public string? IdFrontImage { get; set; }
     public string? IdBackImage { get; set; }
     public string? IntendedPricingPackageId { get; set; }
+    public OutputMfoniPackage? IntendedPricingPackage { get; set; }
     public required DateTime CreatedAt { get; set; }
     public required DateTime UpdatedAt { get; set; }
 }
