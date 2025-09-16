@@ -23,6 +23,7 @@ export const QUERY_KEYS = {
 	EXPLORE: 'explore',
 	TRANSFER_RECIPIENTS: 'transfer-recipients',
 	TRANSFERS: 'transfers',
+	MFONI_PACKAGES: 'mfoni-packages',
 } as const
 
 export const MFONI_PACKAGES: Array<PackageType> = ['FREE', 'BASIC', 'ADVANCED']

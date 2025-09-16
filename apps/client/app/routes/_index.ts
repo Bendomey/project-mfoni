@@ -1,6 +1,7 @@
 import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { getContents } from '@/api/contents/index.ts'
+import { getMfoniPackages } from '@/api/mfoni-packages/index.ts'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { environmentVariables } from '@/lib/actions/env.server.ts'
 import { extractAuthCookie } from '@/lib/actions/extract-auth-cookie.ts'
@@ -25,10 +26,32 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		},
 		populate: ['content.createdBy'],
 	}
+
 	queryClient.prefetchQuery({
 		queryKey: [QUERY_KEYS.CONTENTS, query],
 		queryFn: () =>
 			getContents(query, {
+				authToken: authCookie?.token,
+				baseUrl,
+			}),
+	})
+
+	const mfoniPackagesQuery: FetchMultipleDataInputParams<FetchMfoniPackageFilter> =
+		{
+			pagination: { page: 0, per: 5 },
+			filters: {
+				status: 'MfoniPackage.Status.Active',
+			},
+			sorter: {
+				sort: 'asc',
+				sortBy: 'createdAt',
+			},
+		}
+
+	await queryClient.prefetchQuery({
+		queryKey: [QUERY_KEYS.MFONI_PACKAGES, mfoniPackagesQuery],
+		queryFn: () =>
+			getMfoniPackages(mfoniPackagesQuery, {
 				authToken: authCookie?.token,
 				baseUrl,
 			}),

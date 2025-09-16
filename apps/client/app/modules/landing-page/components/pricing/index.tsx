@@ -1,64 +1,65 @@
 import { CheckIcon } from '@heroicons/react/24/outline'
+import { useMemo } from 'react'
+import { useGetMfoniPackages } from '@/api/mfoni-packages/index.ts'
 import { Button } from '@/components/button/index.tsx'
 import { PAGES } from '@/constants/index.ts'
 import { classNames } from '@/lib/classNames.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
-const tiers = [
-	{
-		name: 'Snap & Share',
-		id: 'FREE',
-		priceMonthly: 0,
-		description:
-			"The perfect plan if you're just getting started with our product.",
-		features: [
-			'Upload up to 50 images per month',
-			'All uploaded images are free for users',
-			'Basic one-page portfolio site',
-			'Share profile and content',
-			'Show up to 10 free images on your portfolio',
-		],
-		featured: false,
-	},
-	{
-		name: 'Pro Lens',
-		id: 'BASIC',
-		priceMonthly: 5000,
-		description:
-			'Grow your photography business with premium support and exclusive opportunities.',
-		features: [
-			'Upload up to 200 images per month',
-			'Option to price images',
-			'Enhanced one-page portfolio site with customisation options',
-			'Add contact info and social media links',
-			' Track earnings with basic analytics',
-			'Manual or automatic withdrawal of up to 2,000 GHS per month',
-		],
-		featured: true,
-	},
-	{
-		name: 'Master Shot',
-		id: 'ADVANCED',
-		priceMonthly: 10000,
-		description:
-			'Elevate your brand and streamline workflow with advanced features.',
-		features: [
-			'Unlimited image uploads',
-			'Full pricing control on all images',
-			'Multi-page portfolio site with advanced customisation',
-			'Priority for landing page features',
-			'Advanced earnings analytics and insights',
-			'Unlimited manual or automatic withdrawals',
-			'Priority advertising on mfoni platform',
-			'Early access to new features',
-		],
-		featured: false,
-	},
-]
+const getPackageTypeFromAPIType = (code: MfoniPackageCode) => {
+	switch (code) {
+		case 'MfoniPackage.Free':
+			return 'FREE'
+		case 'MfoniPackage.Basic':
+			return 'BASIC'
+		case 'MfoniPackage.Advanced':
+			return 'ADVANCED'
+	}
+}
 
 export const Pricing = () => {
 	const { currentUser } = useAuth()
+	const { data } = useGetMfoniPackages({
+		query: {
+			pagination: { page: 0, per: 5 },
+			filters: {
+				status: 'MfoniPackage.Status.Active',
+			},
+			sorter: {
+				sort: 'asc',
+				sortBy: 'createdAt',
+			},
+		},
+	})
+
+	const tiers = useMemo(() => {
+		if (data) {
+			return data.rows.map((row) => {
+				const features: Array<string> = []
+				row.features.forEach((feature) => {
+					if (feature.description?.trim().length) {
+						return features.push(feature.description)
+					}
+				})
+				return {
+					name: row.name,
+					id: getPackageTypeFromAPIType(row.code),
+					priceMonthly: row.amount,
+					description: row.description,
+					featured: row.code === 'MfoniPackage.Basic',
+					features,
+				}
+			})
+		}
+
+		return []
+	}, [data])
+
+	if (!tiers.length) {
+		return null
+	}
+
 	return (
 		<div
 			id="pricing"

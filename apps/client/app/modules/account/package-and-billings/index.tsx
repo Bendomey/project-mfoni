@@ -1,6 +1,4 @@
 import { ChevronLeftIcon } from '@heroicons/react/24/outline'
-import { useLoaderData } from '@remix-run/react'
-import { HydrationBoundary, type DehydratedState } from '@tanstack/react-query'
 import { BillingsTable } from './components/billings-table.tsx'
 import { ChangePackageModal } from './components/change-package-modal/index.tsx'
 import { PackageCard } from './components/package-card.tsx'
@@ -52,15 +50,9 @@ const PackageAndBillingsPage = () => {
 }
 
 export const PackageAndBillingsModule = () => {
-	const loaderData = useLoaderData<{
-		dehydratedState: DehydratedState
-	}>()
-
 	return (
-		<HydrationBoundary state={loaderData.dehydratedState}>
-			<PackageAndBillingsProvider>
-				<PackageAndBillingsPage />
-			</PackageAndBillingsProvider>
-		</HydrationBoundary>
+		<PackageAndBillingsProvider>
+			<PackageAndBillingsPage />
+		</PackageAndBillingsProvider>
 	)
 }
