@@ -291,7 +291,7 @@ public class SubscriptionService
         {
             throw new HttpRequestException("InvalidFreeMfoniPackage");
         }
-        
+
         var pipeline = new[]
         {
             // Sort by createdAt in descending order
@@ -451,7 +451,7 @@ public class SubscriptionService
         // all active mfoni packages
         var mfoniCreatorPackages = await _mfoniPackageCollection.Find(package => package.Status == MfoniPackageStatus.ACTIVE)
             .ToListAsync();
-        
+
         if (mfoniCreatorPackages is null || mfoniCreatorPackages.Count == 0)
         {
             throw new HttpRequestException("NoActiveMfoniPackages");

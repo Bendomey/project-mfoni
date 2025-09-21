@@ -233,7 +233,7 @@ public class CreatorApplicationService
             .Set(r => r.ApprovedAt, DateTime.UtcNow)
             .Set(r => r.ApprovedById, adminId)
             .Set(r => r.UpdatedAt, DateTime.UtcNow);
-            
+
         await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
 
         var creator = await _creatorService.Create(input.CreatorApplicationId);

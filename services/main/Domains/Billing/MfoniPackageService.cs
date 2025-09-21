@@ -343,7 +343,7 @@ public class MfoniPackageService
         FilterDefinitionBuilder<Models.MfoniPackage> builder = Builders<Models.MfoniPackage>.Filter;
         var filter = Builders<Models.MfoniPackage>.Filter.Empty;
 
-        if (!string.IsNullOrEmpty(status) && status != "ALL" )
+        if (!string.IsNullOrEmpty(status) && status != "ALL")
         {
             filter = builder.Eq(p => p.Status, status);
         }
@@ -362,7 +362,7 @@ public class MfoniPackageService
     {
         FilterDefinitionBuilder<Models.MfoniPackage> builder = Builders<Models.MfoniPackage>.Filter;
         var filter = builder.Empty;
-        
+
         if (!string.IsNullOrEmpty(status) && status != "ALL")
         {
             filter = builder.Eq(p => p.Status, status);
