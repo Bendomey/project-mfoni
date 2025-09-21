@@ -7,17 +7,6 @@ import { classNames } from '@/lib/classNames.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
-const getPackageTypeFromAPIType = (code: MfoniPackageCode) => {
-	switch (code) {
-		case 'MfoniPackage.Free':
-			return 'FREE'
-		case 'MfoniPackage.Basic':
-			return 'BASIC'
-		case 'MfoniPackage.Advanced':
-			return 'ADVANCED'
-	}
-}
-
 export const Pricing = () => {
 	const { currentUser } = useAuth()
 	const { data } = useGetMfoniPackages({
@@ -44,7 +33,8 @@ export const Pricing = () => {
 				})
 				return {
 					name: row.name,
-					id: getPackageTypeFromAPIType(row.code),
+					id: row.id,
+					code: row.code,
 					priceMonthly: row.amount,
 					description: row.description,
 					featured: row.code === 'MfoniPackage.Basic',
@@ -141,11 +131,11 @@ export const Pricing = () => {
 							isLink
 							href={
 								currentUser && currentUser.role == 'CREATOR'
-									? `${PAGES.AUTHENTICATED_PAGES.PACKAGE_AND_BILLINGS}?change-package=${tier.id}`
-									: `${PAGES.AUTHENTICATED_PAGES.ACCOUNT}?complete-creator-application=${tier.id}`
+									? `${PAGES.AUTHENTICATED_PAGES.PACKAGE_AND_BILLINGS}?change-package=${tier.code}`
+									: `${PAGES.AUTHENTICATED_PAGES.ACCOUNT}?complete-creator-application=${tier.code}`
 							}
 							disabled={
-								currentUser?.creator?.subscription.packageType === tier.id
+								currentUser?.creator?.subscription?.mfoniPackageId === tier.id
 							}
 							aria-describedby={tier.id}
 							className="mt-8 w-full"
@@ -154,7 +144,8 @@ export const Pricing = () => {
 							{currentUser
 								? currentUser.role === 'CLIENT'
 									? 'Apply'
-									: currentUser.creator?.subscription.packageType === tier.id
+									: currentUser.creator?.subscription?.mfoniPackageId ===
+										  tier.id
 										? 'Active'
 										: 'Select'
 								: 'Get started today'}

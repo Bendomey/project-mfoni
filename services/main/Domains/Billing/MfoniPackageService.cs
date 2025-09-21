@@ -45,6 +45,7 @@ public class MfoniPackageService
                     Currency = "GHS",
                     Code = Models.MfoniPackageCode.FREE,
                     Name = "Snap & Share",
+                    Alias = "Free tier",
                     Description = "Starter plan with free uploads",
                     Status = Models.MfoniPackageStatus.ACTIVE,
                     Features = new List<Models.MfoniPackageFeature>{
@@ -130,6 +131,7 @@ public class MfoniPackageService
                     Currency = "GHS",
                     Code = Models.MfoniPackageCode.BASIC,
                     Name = "Pro Lens",
+                    Alias = "Basic Premium tier",
                     Description = "Business growth plan",
                     Status = Models.MfoniPackageStatus.ACTIVE,
                     Features = new List<Models.MfoniPackageFeature>{
@@ -153,7 +155,7 @@ public class MfoniPackageService
                         {
                             Code = MfoniPackageFeatureCode.PORTFOLIO_CUSTOM,
                             Name = "Portfolio customization",
-                            Description = "Enhanced one-page portfolio site with customisation options",
+                            Description = "Enhanced one-page portfolio site",
                             Type = MfoniPackageFeatureType.LEVEL,
                             Value = "basic"
                         },
@@ -216,6 +218,7 @@ public class MfoniPackageService
                     Currency = "GHS",
                     Code = Models.MfoniPackageCode.ADVANCED,
                     Name = "Master Shot",
+                    Alias = "Premium tier",
                     Description = "Advanced professional plan",
                     Status = Models.MfoniPackageStatus.ACTIVE,
                     Features = new List<Models.MfoniPackageFeature>{

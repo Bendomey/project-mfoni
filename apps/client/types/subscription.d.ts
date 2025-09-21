@@ -1,6 +1,7 @@
 interface CreatorSubscription {
 	id: string
-	packageType: PackageType
+	mfoniPackageId: string
+	mfoniPackage: Nullable<MfoniPackage>
 	startedAt: Date
 	endedAt: Nullable<Date>
 	period: Nullable<number>
@@ -22,5 +23,5 @@ interface CreatorSubscriptionPurchase {
 }
 
 interface FetchCreatorSubscriptionFilter {
-	type?: PackageType
+	packageTypeId?: string
 }

@@ -5,6 +5,7 @@ public class OutputMfoniPackage
 {
     public required string Id { get; set; }
     public required string Code { get; set; }
+    public required string Alias { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
     public required Int64 Amount { get; set; }

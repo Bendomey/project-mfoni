@@ -13,7 +13,6 @@ import { Fragment, useState } from 'react'
 import { useGetCreatorSubscriptions } from '@/api/subscriptions/index.ts'
 import { Button } from '@/components/button/index.tsx'
 import { Pagination } from '@/components/pagination/index.tsx'
-import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
 import { classNames } from '@/lib/classNames.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
@@ -29,7 +28,7 @@ export function BillingsTable() {
 			page: Number(page),
 			per: 50,
 		},
-		populate: ['purchase', 'wallet'],
+		populate: ['purchase', 'wallet', 'mfoniPackage'],
 	})
 
 	let content = <></>
@@ -119,7 +118,6 @@ export function BillingsTable() {
 							{data.rows.map((sub) => {
 								const isActive = activeSubcription?.id === sub.id
 								const isUpcoming = dayjs().isBefore(sub.startedAt)
-								const pkg = MFONI_PACKAGES_DETAILED[sub.packageType]
 
 								return (
 									<Fragment key={sub.id}>
@@ -156,8 +154,8 @@ export function BillingsTable() {
 													</Button>
 												) : null}
 												<DocumentTextIcon className="h-6 w-auto" />
-												{pkg.name}
-												{sub.packageType === 'FREE' || isUpcoming ? null : (
+												{sub?.mfoniPackage?.name}
+												{sub?.mfoniPackage?.code === 'MfoniPackage.Free' || isUpcoming ? null : (
 													<span className="ml-1 inline-flex items-center gap-x-1.5 rounded-full px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
 														<CheckIcon className="h-3 w-auto" />
 														Paid
@@ -186,7 +184,7 @@ export function BillingsTable() {
 												{sub.endedAt ? dayjs(sub.endedAt).format('ll') : '-'}
 											</td>
 											<td className="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
-												{formatAmount(convertPesewasToCedis(pkg.amount))}
+												{formatAmount(convertPesewasToCedis(sub?.mfoniPackage?.amount ?? 0))}
 											</td>
 											<td className="flex whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
 												<Button

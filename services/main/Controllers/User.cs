@@ -210,8 +210,9 @@ public class UserController : ControllerBase
             logger.LogInformation($"get user's active creator application");
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creatorApplication = await _creatorApplicationService.GetUserActiveCreatorApplication(currentUser.Id);
+            var populate = new string[] { PopulateKeys.CREATOR_APPLICATION_MFONI_PACKAGE };
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorApplication>(await _creatorApplicationTransformer.Transform(creatorApplication), null).Result()
+            new GetEntityResponse<OutputCreatorApplication>(await _creatorApplicationTransformer.Transform(creatorApplication, populate), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }

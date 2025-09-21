@@ -133,7 +133,7 @@ public class AuthController : ControllerBase
             var res = _authService.Me(currentUser);
 
             return new ObjectResult(
-                new GetEntityResponse<OutputUser>(await _userTransformer.Transform(res!, populate: [PopulateKeys.CREATOR, PopulateKeys.SUBSCRIPTION]), null).Result()
+                new GetEntityResponse<OutputUser>(await _userTransformer.Transform(res!, populate: [PopulateKeys.CREATOR, PopulateKeys.SUBSCRIPTION, PopulateKeys.MFONI_PACKAGE]), null).Result()
             )
             {
                 StatusCode = StatusCodes.Status200OK

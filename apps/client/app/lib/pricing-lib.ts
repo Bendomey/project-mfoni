@@ -1,18 +1,16 @@
-import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
-
 interface IDetermineIfItsAnUpgradeOrDowngradeInput {
-	activePackage: PackageType
-	changePackage: PackageType
+	activePackage: MfoniPackage
+	changePackage: MfoniPackage
 }
 
 export const determineIfItsAnUpgradeOrDowngrade = ({
 	activePackage,
 	changePackage,
 }: IDetermineIfItsAnUpgradeOrDowngradeInput) => {
-	const levels = Object.keys(MFONI_PACKAGES_DETAILED) as Array<PackageType>
+	const levels = ['MfoniPackage.Free', 'MfoniPackage.Basic', 'MfoniPackage.Advanced']
 
-	const oldPackageIndex = levels.indexOf(activePackage)
-	const newPackageIndex = levels.indexOf(changePackage)
+	const oldPackageIndex = levels.indexOf(activePackage.code)
+	const newPackageIndex = levels.indexOf(changePackage.code)
 
 	if (newPackageIndex > oldPackageIndex) {
 		return 'UPGRADE'
@@ -25,23 +23,19 @@ export const determineIfItsAnUpgradeOrDowngrade = ({
 	return 'NO_CHANGE'
 }
 
-export const isPackagePremium = (packageType: PackageType) =>
-	packageType !== 'FREE'
+export const isPackagePremium = (mfoniPackage: MfoniPackage) =>
+	mfoniPackage.code !== 'MfoniPackage.Free'
 
-export const getPriceForPackage = (packageType: PackageType) => {
-	const selectedPackage = MFONI_PACKAGES_DETAILED[packageType]
-
-	return selectedPackage.amount
+export const getPriceForPackage = (mfoniPackage: MfoniPackage) => {
+	return mfoniPackage.amount
 }
 
-export const getPriceForPackagePerDay = (packageType: PackageType) => {
-	const selectedPackage = MFONI_PACKAGES_DETAILED[packageType]
-
-	return selectedPackage.amount / 30
+export const getPriceForPackagePerDay = (mfoniPackage: MfoniPackage) => {
+	return mfoniPackage.amount / 30
 }
 
-export const getPackageUploadLimit = (packageType: PackageType) => {
-	const selectedPackage = MFONI_PACKAGES_DETAILED[packageType]
-
-	return selectedPackage.uploadLimit
+export const getPackageUploadLimit = (mfoniPackage: MfoniPackage) => {
+	// TODO: come back to this
+	return 10;
+	// return mfoniPackage.uploadLimit
 }

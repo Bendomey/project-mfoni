@@ -9,7 +9,6 @@ import {
 import { Button } from '@/components/button/index.tsx'
 import { Image } from '@/components/Image.tsx'
 import { ShareButton } from '@/components/share-button/index.tsx'
-import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
 import { useValidateImage } from '@/hooks/use-validate-image.tsx'
 import { classNames } from '@/lib/classNames.ts'
 import { isBrowser } from '@/lib/is-browser.ts'
@@ -137,7 +136,7 @@ export function AccountCover() {
 							Boolean(activeCreatorApplication.status === 'PENDING') ? (
 								<Button
 									isLink
-									href="/account?complete-creator-application=true"
+									href={`/account?complete-creator-application=${activeCreatorApplication?.intendedPricingPackage?.code ?? 'true'}`}
 									variant="solid"
 									color="secondaryGhost"
 									className="w-full md:w-auto"
@@ -174,17 +173,13 @@ export function AccountCover() {
 						) : null}
 					</div>
 					<div className="mt-2 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:flex-wrap sm:items-center md:gap-5">
-						{currentUser?.creator?.subscription.packageType ? (
+						{currentUser?.creator?.subscription.mfoniPackage ? (
 							<div className="flex items-center text-sm text-gray-500">
 								<ArchiveBoxIcon
 									className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
 									aria-hidden="true"
 								/>
-								{
-									MFONI_PACKAGES_DETAILED[
-										currentUser.creator.subscription.packageType
-									].name
-								}
+								{currentUser?.creator?.subscription?.mfoniPackage?.name} ({currentUser?.creator?.subscription.mfoniPackage?.alias})
 							</div>
 						) : null}
 

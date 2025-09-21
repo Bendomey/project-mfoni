@@ -1,51 +1,18 @@
 import { Field, Label, Switch } from '@headlessui/react'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { usePackageAndBillingsContext } from '../../context/index.tsx'
+import { useGetMfoniPackages } from '@/api/mfoni-packages/index.ts'
 import { useIsSubscriptionCancelled } from '@/api/subscriptions/index.ts'
-import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
 import { classNames } from '@/lib/classNames.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
 interface Props {
-	mfoniPackage: string
-	setMfoniPackage: (value: string) => void
+	mfoniPackage?: MfoniPackage
+	setMfoniPackage: (value?: MfoniPackage) => void
 	annualBillingEnabled: boolean
 	setAnnualBillingEnabled: (value: boolean) => void
 }
-
-const plans = [
-	{
-		name: MFONI_PACKAGES_DETAILED.FREE.name,
-		priceMonthly: 'FREE',
-		priceYearly: 'FREE',
-		limit: 'Up to 5 active job postings',
-		id: MFONI_PACKAGES_DETAILED.FREE.id,
-	},
-	{
-		name: MFONI_PACKAGES_DETAILED.BASIC.name,
-		priceMonthly: formatAmount(
-			convertPesewasToCedis(MFONI_PACKAGES_DETAILED.BASIC.amount * 1),
-		),
-		priceYearly: formatAmount(
-			convertPesewasToCedis(MFONI_PACKAGES_DETAILED.BASIC.amount * 12),
-		),
-		limit: 'Up to 25 active job postings',
-		popular: true,
-		id: MFONI_PACKAGES_DETAILED.BASIC.id,
-	},
-	{
-		name: MFONI_PACKAGES_DETAILED.ADVANCED.name,
-		priceMonthly: formatAmount(
-			convertPesewasToCedis(MFONI_PACKAGES_DETAILED.ADVANCED.amount * 1),
-		),
-		priceYearly: formatAmount(
-			convertPesewasToCedis(MFONI_PACKAGES_DETAILED.ADVANCED.amount * 12),
-		),
-		limit: 'Unlimited active job postings',
-		id: MFONI_PACKAGES_DETAILED.ADVANCED.id,
-	},
-]
 
 export function SelectPackage({
 	mfoniPackage,
@@ -56,10 +23,38 @@ export function SelectPackage({
 	const { activeSubcription } = useAuth()
 	const { activePackage } = usePackageAndBillingsContext()
 	const { data } = useIsSubscriptionCancelled(activeSubcription?.id)
+	const { data: mfoniPackages } = useGetMfoniPackages({
+		query: {
+			pagination: { page: 0, per: 5 },
+			filters: {
+				status: 'MfoniPackage.Status.Active',
+			},
+			sorter: {
+				sort: 'asc',
+				sortBy: 'createdAt',
+			},
+		},
+	})
+
+	const plans = useMemo(() => {
+		if (!mfoniPackages) return []
+
+		return mfoniPackages.rows.map((pkg) => {
+			return {
+				name : pkg.name,
+				priceMonthly: pkg.amount === 0 ? 'FREE' : formatAmount(convertPesewasToCedis(pkg.amount * 1)),
+				priceYearly: pkg.amount === 0 ? 'FREE' : formatAmount(convertPesewasToCedis(pkg.amount * 12)),
+				description: pkg.description,
+				id: pkg.code,
+				popular: pkg.code === 'MfoniPackage.Basic', // hardcoded for now
+				base: pkg
+			}
+		});
+	}, [mfoniPackages])
 
 	const isPlanDisabled = useCallback(
 		(packageId: string) => {
-			let isDisabled = activePackage && activePackage.id === packageId
+			let isDisabled = Boolean(activePackage && activePackage.id === packageId)
 
 			// if the active package was cancelled(but hasn't expired yet), we should allow user it.
 			if (data) {
@@ -112,7 +107,7 @@ export function SelectPackage({
 									key={plan.id}
 									aria-label={plan.id}
 									aria-disabled={isPlanDisabled(plan.id)}
-									aria-description={`${plan.priceMonthly} per month, ${plan.priceYearly} per year, ${plan.limit}`}
+									aria-description={`${plan.priceMonthly} per month, ${plan.priceYearly} per year, ${plan.description}`}
 									className="group relative mb-3 flex cursor-pointer flex-col rounded-md border border-gray-200 p-4 focus:outline-none has-[:checked]:relative has-[:checked]:border-blue-200 has-[:checked]:bg-blue-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:bg-gray-50 aria-disabled:opacity-50 md:grid md:grid-cols-2 md:pl-4 md:pr-6"
 								>
 									{plan.popular ? (
@@ -125,9 +120,9 @@ export function SelectPackage({
 
 									<span className="flex items-center gap-3 text-sm">
 										<input
-											value={mfoniPackage}
-											checked={mfoniPackage === plan.id}
-											onChange={() => setMfoniPackage(plan.id)}
+											value={mfoniPackage?.code}
+											checked={mfoniPackage?.code === plan.id}
+											onChange={() => setMfoniPackage(plan.base)}
 											name="pricing-plan"
 											type="radio"
 											disabled={isPlanDisabled(plan.id)}
@@ -138,7 +133,7 @@ export function SelectPackage({
 												{plan.name}
 											</span>
 											<p className="text-sm text-gray-500 group-has-[:checked]:text-blue-700">
-												{plan.limit}
+												{plan.description}
 											</p>
 										</div>
 									</span>

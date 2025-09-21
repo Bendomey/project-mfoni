@@ -52,7 +52,6 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 		queryKey: [QUERY_KEYS.MFONI_PACKAGES, mfoniPackagesQuery],
 		queryFn: () =>
 			getMfoniPackages(mfoniPackagesQuery, {
-				authToken: authCookie?.token,
 				baseUrl,
 			}),
 	})

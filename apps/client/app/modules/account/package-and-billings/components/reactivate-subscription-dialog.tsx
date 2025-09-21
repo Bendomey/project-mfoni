@@ -17,12 +17,12 @@ export function ReactivateSubscriptionDialog({ onClose, isOpened }: Props) {
 	const { mutate } = useActiveSubscription()
 
 	const handleSubmit = () => {
-		setIsLoading(true)
-		if (activeSubcription) {
+		if (activeSubcription && activeSubcription.mfoniPackage) {
+			setIsLoading(true)
 			mutate(
 				{
 					period: activeSubcription.period ?? 1,
-					pricingPackage: activeSubcription.packageType,
+					pricingPackage: activeSubcription.mfoniPackage?.code,
 				},
 				{
 					onError: () => {
@@ -35,6 +35,8 @@ export function ReactivateSubscriptionDialog({ onClose, isOpened }: Props) {
 					},
 				},
 			)
+		} else {
+			errorToast('Failed to re-activate subscription, try again later.')
 		}
 	}
 	return (

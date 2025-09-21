@@ -1,6 +1,7 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { Link } from '@remix-run/react'
-import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
+import { useGetMfoniPackages } from '@/api/mfoni-packages/index.ts'
+import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
 
 interface Props {
 	mfoniPackage: string
@@ -13,6 +14,18 @@ export function SelectPackage({
 	setMfoniPackage,
 	isWalletLow,
 }: Props) {
+	const { data } = useGetMfoniPackages({
+		query: {
+			pagination: { page: 0, per: 5 },
+			filters: {
+				status: 'MfoniPackage.Status.Active',
+			},
+			sorter: {
+				sort: 'asc',
+				sortBy: 'createdAt',
+			},
+		},
+	})
 	return (
 		<div>
 			<h1 className="text-xl font-bold">1. Choose a package</h1>
@@ -37,9 +50,9 @@ export function SelectPackage({
 						className="mt-2 block w-full rounded-md border-0 py-3 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6"
 					>
 						<option value="">Please Select</option>
-						{Object.entries(MFONI_PACKAGES_DETAILED).map(([key, value]) => (
-							<option key={key} value={key}>
-								{value.name}
+						{data?.rows?.map((mfoniPackage) => (
+							<option key={mfoniPackage.code} value={mfoniPackage.code}>
+								{mfoniPackage.name} ({mfoniPackage.alias}) {mfoniPackage.amount > 0 ? `- ${formatAmount(convertPesewasToCedis(mfoniPackage.amount))}` : ''}
 							</option>
 						))}
 					</select>

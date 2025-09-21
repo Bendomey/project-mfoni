@@ -20,11 +20,11 @@ import {
 	useSubmitCreatorApplication,
 	useUpdateCreatorApplication,
 } from '@/api/creator-applications/index.ts'
+import { useGetMfoniPackages } from '@/api/mfoni-packages/index.ts'
 import { Button } from '@/components/button/index.tsx'
 import { Loader } from '@/components/loader/index.tsx'
 import { Modal } from '@/components/modal/index.tsx'
 import { errorMessagesWrapper } from '@/constants/error-messages.ts'
-import { MFONI_PACKAGES, MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
 import { errorToast, successToast } from '@/lib/custom-toast-functions.tsx'
 import { useAuth } from '@/providers/auth/index.tsx'
 
@@ -57,6 +57,19 @@ export function CreatorApplicationModal({ isOpened }: Props) {
 		isPending: isSubmitingApplication,
 	} = useSubmitCreatorApplication()
 
+	const { data: mfoniPackages } = useGetMfoniPackages({
+		query: {
+			pagination: { page: 0, per: 5 },
+			filters: {
+				status: 'MfoniPackage.Status.Active',
+			},
+			sorter: {
+				sort: 'asc',
+				sortBy: 'createdAt',
+			},
+		},
+	})
+
 	const [step, setStep] = useState<keyof typeof steps>('package')
 	const [searchParams, setSearchParams] = useSearchParams()
 	const [mfoniPackage, setMfoniPackage] = useState<string>('')
@@ -71,35 +84,34 @@ export function CreatorApplicationModal({ isOpened }: Props) {
 			activeCreatorApplication.status !== 'REJECTED'
 		) {
 			if (activeCreatorApplication.intendedPricingPackage) {
-				setMfoniPackage(activeCreatorApplication.intendedPricingPackage)
+				setMfoniPackage(activeCreatorApplication.intendedPricingPackage.code)
 			}
 			setIdType(activeCreatorApplication.idType ?? '')
 			setFrontId(
 				activeCreatorApplication.idFrontImage
 					? {
-							url: activeCreatorApplication.idFrontImage,
-							name: 'front image',
-						}
+						url: activeCreatorApplication.idFrontImage,
+						name: 'front image',
+					}
 					: undefined,
 			)
 			setBackId(
 				activeCreatorApplication.idBackImage
 					? {
-							url: activeCreatorApplication.idBackImage,
-							name: 'back image',
-						}
+						url: activeCreatorApplication.idBackImage,
+						name: 'back image',
+					}
 					: undefined,
 			)
 		}
 
 		const packageFromUrl = searchParams.get('complete-creator-application')
 		if (
-			packageFromUrl &&
-			(MFONI_PACKAGES as Array<string>).includes(packageFromUrl)
+			packageFromUrl && mfoniPackages && mfoniPackages.rows.find((p) => p.code === packageFromUrl)
 		) {
 			setMfoniPackage(packageFromUrl)
 		}
-	}, [activeCreatorApplication, searchParams])
+	}, [activeCreatorApplication, searchParams, mfoniPackages])
 
 	const onClose = useCallback(() => {
 		searchParams.delete('complete-creator-application')
@@ -117,14 +129,18 @@ export function CreatorApplicationModal({ isOpened }: Props) {
 	const isWalletLow = useMemo(() => {
 		if (!currentUser) return false
 
-		// @ts-expect-error - we're making sure that if it's not in the object, it's false
-		if (!MFONI_PACKAGES_DETAILED[mfoniPackage]) return false
+		if(!mfoniPackages) return false
+
+		const mfoniPackageObj = mfoniPackages.rows.find((p) => p.code === mfoniPackage)
+		
+		// we're making sure that if it's not in the object, it's false
+		if (!mfoniPackageObj) return false
 
 		return (
 			currentUser.bookWallet <
-			MFONI_PACKAGES_DETAILED[mfoniPackage as PackageType].amount
+			mfoniPackageObj.amount
 		)
-	}, [currentUser, mfoniPackage])
+	}, [currentUser, mfoniPackage, mfoniPackages])
 
 	const isNextButtonDisabled = useMemo(
 		() => !mfoniPackage || isWalletLow,
@@ -217,9 +233,8 @@ export function CreatorApplicationModal({ isOpened }: Props) {
 					<Button asChild={true} className="mt-5">
 						<Link
 							prefetch="intent"
-							to={`/account/verify?return_to=/account?complete-creator-application=${
-								searchParams.get('complete-creator-application') ?? 'true'
-							}`}
+							to={`/account/verify?return_to=/account?complete-creator-application=${searchParams.get('complete-creator-application') ?? 'true'
+								}`}
 						>
 							Verify Now
 						</Link>
@@ -234,7 +249,7 @@ export function CreatorApplicationModal({ isOpened }: Props) {
 		content = (
 			<div className="flex flex-col items-center justify-center px-10 py-14 pt-10 text-center md:px-0">
 				{activeCreatorApplication &&
-				activeCreatorApplication.status == 'APPROVED' ? (
+					activeCreatorApplication.status == 'APPROVED' ? (
 					<>
 						<img
 							src="/images/creator-svg.png"

@@ -70,7 +70,7 @@ public class UserService
         user.Name = accountInput.Name;
         user.UpdatedAt = DateTime.UtcNow;
 
-        if (accountInput.Role == UserRole.CREATOR)
+        if (accountInput.Role == UserRole.CREATOR && accountInput.IntendedPricingPackage is not null)
         {
             var mfoniCreatorPackage = _mfoniPackageCollection.Find(package => package.Code == accountInput.IntendedPricingPackage)
             .FirstOrDefault();
@@ -135,7 +135,8 @@ public class UserService
                 PhoneNumber = normalizedPhoneNumber,
                 Message = EmailTemplates
                     .VerifyPhoneNumberBody.Replace("{code}", code)
-                    .Replace("{name}", user.Name),
+                    .Replace("{name}", user.Name)
+                    .Replace("{validity}", "1 hour"),
                 AppId = _appConstantsConfiguration.SmsAppId,
                 AppSecret = _appConstantsConfiguration.SmsAppSecret
             }

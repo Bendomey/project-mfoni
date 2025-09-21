@@ -62,11 +62,17 @@ export const SetupAccountModal = ({ onClose, open, selectedType }: Props) => {
 
 	const onSubmit = (data: FormValues) => {
 		setIsPending(true)
+		
+		let intendedPricingPackage: string | undefined = undefined
+		if(data.role === 'CREATOR' && searchParams.get('return_to')) {
+			const url = new URL(`${window.location.origin}${searchParams.get('return_to')}`)
+			intendedPricingPackage = url.searchParams.get('complete-creator-application') ?? undefined
+		}
+
 		mutate(
 			{
 				...data,
-				intendedPricingPackage:
-					searchParams.get('pricing_package') ?? undefined,
+				intendedPricingPackage,
 			},
 			{
 				onSuccess: async () => {

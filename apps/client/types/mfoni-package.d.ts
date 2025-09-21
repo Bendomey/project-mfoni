@@ -10,6 +10,7 @@ interface MfoniPackage {
 	id: string
 	code: MfoniPackageCode
 	name: string
+	alias: string
 	description: Nullable<string>
 	amount: number
 	currency: 'GHS'

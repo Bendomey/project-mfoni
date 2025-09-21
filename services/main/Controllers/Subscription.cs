@@ -58,7 +58,7 @@ public class SubscriptionController : ControllerBase
     /// <summary>
     /// Retrieves all subscriptions of a user
     /// </summary>
-    /// <param name="packageTypeId">Can be `MfoniPackage.Free` or `MfoniPackage.Basic` or `MfoniPackage.Advanced`</param>
+    /// <param name="packageTypeId">Mfoni package id</param>
     /// <param name="populate">Comma separated values to populate fields</param>
     /// <param name="page">The page to be navigated to</param>
     /// <param name="pageSize">The number of items on a page</param>

@@ -1,6 +1,6 @@
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 import { ArrowRightIcon } from '@heroicons/react/24/solid'
-import { useNavigate } from '@remix-run/react'
+import { useNavigate, useSearchParams } from '@remix-run/react'
 import { useCallback, useEffect, useState } from 'react'
 import { SetupAccountModal } from './setup-modal/index.tsx'
 import { TypewriterEffectSmooth } from '@/components/animation/TypeWriteEffect.tsx'
@@ -32,12 +32,25 @@ export const OnboardingModule = () => {
 	const { onToggle, isOpened } = useDisclosure()
 	const { currentUser, getToken, onSignout } = useAuth()
 	const navigate = useNavigate()
+	const [searchParams] = useSearchParams()
 
 	useEffect(() => {
 		if (currentUser?.role) {
 			navigate('/account')
 		}
 	}, [currentUser, getToken, navigate])
+
+	// if the the intended pricing package is in the URL then we know it's a creator sign up.
+	useEffect(() => {
+		if (searchParams.get('return_to')) {
+			const url = new URL(`${window.location.origin}${searchParams.get('return_to')}`)
+			if (url.searchParams.get('complete-creator-application')) {
+				setSelected('CREATOR')
+				handleContinue()
+			}
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchParams])
 
 	const handleContinue = useCallback(() => {
 		onToggle()
@@ -88,11 +101,10 @@ export const OnboardingModule = () => {
 							<button
 								onClick={() => setSelected('CLIENT')}
 								type="button"
-								className={`flex-start flex flex-col border-2 hover:bg-zinc-100 ${
-									selectedType === 'CLIENT'
-										? 'border-zinc-600'
-										: 'border-dashed border-zinc-300'
-								} rounded-lg p-5`}
+								className={`flex-start flex flex-col border-2 hover:bg-zinc-100 ${selectedType === 'CLIENT'
+									? 'border-zinc-600'
+									: 'border-dashed border-zinc-300'
+									} rounded-lg p-5`}
 							>
 								<img
 									className="hidden h-auto max-w-full rounded-lg md:block"
@@ -109,11 +121,10 @@ export const OnboardingModule = () => {
 							<button
 								onClick={() => setSelected('CREATOR')}
 								type="button"
-								className={`flex-start flex flex-col border-2 hover:bg-zinc-100 ${
-									selectedType === 'CREATOR'
-										? 'border-zinc-600'
-										: 'border-dashed border-zinc-300'
-								} cursor-pointer rounded-lg p-5`}
+								className={`flex-start flex flex-col border-2 hover:bg-zinc-100 ${selectedType === 'CREATOR'
+									? 'border-zinc-600'
+									: 'border-dashed border-zinc-300'
+									} cursor-pointer rounded-lg p-5`}
 							>
 								<img
 									className="hidden h-auto max-w-full rounded-lg md:block"

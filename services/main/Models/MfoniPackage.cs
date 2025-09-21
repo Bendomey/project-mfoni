@@ -29,6 +29,9 @@ public class MfoniPackage
     [BsonElement("name")]
     public required string Name { get; set; }
 
+    [BsonElement("alias")]
+    public required string Alias { get; set; } = null!;
+
     [BsonElement("description")]
     public string? Description { get; set; }
 

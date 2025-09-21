@@ -26,35 +26,6 @@ export const QUERY_KEYS = {
 	MFONI_PACKAGES: 'mfoni-packages',
 } as const
 
-export const MFONI_PACKAGES: Array<PackageType> = ['FREE', 'BASIC', 'ADVANCED']
-export interface IMfoniPackageDetail {
-	name: string
-	id: string
-	amount: number
-	uploadLimit: number
-}
-export const MFONI_PACKAGES_DETAILED: Record<PackageType, IMfoniPackageDetail> =
-	{
-		FREE: {
-			name: 'Snap & Share (Free tier)',
-			amount: 0,
-			id: 'FREE',
-			uploadLimit: 50,
-		},
-		BASIC: {
-			name: 'Pro Lens (Basic Premium Tier)',
-			amount: 5000,
-			id: 'BASIC',
-			uploadLimit: 200,
-		},
-		ADVANCED: {
-			name: 'Master Shot (Premium Tier)',
-			amount: 10000,
-			id: 'ADVANCED',
-			uploadLimit: Number.POSITIVE_INFINITY, // inifinity
-		},
-	}
-
 export const PAGES = {
 	NOT_FOUND: '/page/not-found',
 	LOGIN: '/auth',

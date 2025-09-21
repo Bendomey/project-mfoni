@@ -32,11 +32,11 @@ Hello {name},
 
 Your verification code for Mfoni is:
 
-🎯 {code}
+{code}
 
 This code is valid for {validity}. Please enter it to verify your account.
 
-If you didn’t request this code, please ignore this email. For security reasons, do not share this code with anyone.
+If you didn't request this code, please ignore this text message. For security reasons, do not share this code with anyone.
 
 Need help? Contact our support team.
 

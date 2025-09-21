@@ -8,16 +8,12 @@ import {
 	type PropsWithChildren,
 } from 'react'
 import { useIsSubscriptionCancelled } from '@/api/subscriptions/index.ts'
-import {
-	type IMfoniPackageDetail,
-	MFONI_PACKAGES_DETAILED,
-} from '@/constants/index.ts'
 import { safeString } from '@/lib/strings.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
 interface IPackageAndBillingsContext {
 	isActiveSubscriptionCancelled: boolean
-	activePackage?: IMfoniPackageDetail
+	activePackage?: Nullable<MfoniPackage>
 	isChangePackageModalOpened: boolean
 	setIsChangePackageModalOpened: React.Dispatch<React.SetStateAction<boolean>>
 	isActiveSubscriptionCancelledRequestPending: boolean
@@ -27,11 +23,11 @@ export const PackageAndBillingsContext =
 	createContext<IPackageAndBillingsContext>({
 		isActiveSubscriptionCancelled: false,
 		isChangePackageModalOpened: false,
-		setIsChangePackageModalOpened: () => {},
+		setIsChangePackageModalOpened: () => { },
 		isActiveSubscriptionCancelledRequestPending: true,
 	})
 
-interface Props {}
+interface Props { }
 
 export const PackageAndBillingsProvider = ({
 	children,
@@ -44,15 +40,13 @@ export const PackageAndBillingsProvider = ({
 	const { data, isPending } = useIsSubscriptionCancelled(subscriptionId)
 
 	const activePackage = useMemo(() => {
-		if (activeSubcription?.packageType) {
-			return MFONI_PACKAGES_DETAILED[activeSubcription.packageType]
-		}
+		return activeSubcription?.mfoniPackage
 	}, [activeSubcription])
 
 	useEffect(() => {
 		const changePackageParam = searchParams.get('change-package')
 		if (changePackageParam && changePackageParam !== 'false') {
-			if (activePackage?.id === changePackageParam) {
+			if (activePackage?.code === changePackageParam) {
 				searchParams.delete('change-package')
 				setSearchParams(searchParams)
 				setIsChangePackageModalOpened(false)
@@ -60,7 +54,7 @@ export const PackageAndBillingsProvider = ({
 				setIsChangePackageModalOpened(true)
 			}
 		}
-	}, [activePackage?.id, searchParams, setSearchParams])
+	}, [activePackage?.code, searchParams, setSearchParams])
 
 	const isActiveSubscriptionCancelled = useMemo(() => Boolean(data), [data])
 

@@ -15,6 +15,7 @@ public class MfoniPackageTransformer
         return new OutputMfoniPackage
         {
             Id = mfoniPackage.Id,
+            Alias = mfoniPackage.Alias,
             Name = mfoniPackage.Name,
             Description = mfoniPackage.Description,
             Amount = mfoniPackage.Amount,
