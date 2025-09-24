@@ -54,11 +54,11 @@ export function SelectPackage({
 
 	const isPlanDisabled = useCallback(
 		(packageId: string) => {
-			let isDisabled = Boolean(activePackage && activePackage.id === packageId)
+			let isDisabled = Boolean(activePackage && activePackage.code === packageId)
 
 			// if the active package was cancelled(but hasn't expired yet), we should allow user it.
 			if (data) {
-				if (packageId === 'FREE' || packageId === activePackage?.id) {
+				if (packageId === 'MfoniPackage.Free' || packageId === activePackage?.code) {
 					isDisabled = true
 				} else {
 					isDisabled = false
@@ -149,7 +149,7 @@ export function SelectPackage({
 														'group-has-[:checked]:text-blue-900',
 														annualBillingEnabled
 															? 'text-gray-500'
-															: 'font-medium text-gray-900',
+															: 'font-bold text-gray-900',
 													)}
 												>
 													{plan.priceMonthly} / mo
@@ -158,7 +158,7 @@ export function SelectPackage({
 													className={classNames(
 														'group-has-[:checked]:text-blue-700',
 														annualBillingEnabled
-															? 'font-medium text-gray-900'
+															? 'font-bold text-gray-900'
 															: 'text-gray-500',
 													)}
 												>

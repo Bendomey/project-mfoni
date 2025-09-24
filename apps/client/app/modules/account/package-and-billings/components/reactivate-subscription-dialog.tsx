@@ -17,7 +17,7 @@ export function ReactivateSubscriptionDialog({ onClose, isOpened }: Props) {
 	const { mutate } = useActiveSubscription()
 
 	const handleSubmit = () => {
-		if (activeSubcription && activeSubcription.mfoniPackage) {
+		if (activeSubcription && activeSubcription?.mfoniPackage) {
 			setIsLoading(true)
 			mutate(
 				{

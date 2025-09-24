@@ -33,10 +33,10 @@ export function ChangePackageModal({ isOpened }: Props) {
 	const [step, setStep] = useState<'select-package' | 'confirm-amount'>(
 		'select-package',
 	)
-	const [mfoniPackage, setMfoniPackage] = useState<MfoniPackage>()
-	const [upgradeType, setUpgradeType] = useState<'INSTANT' | 'DEFER'>('INSTANT')
 	const { setIsChangePackageModalOpened, activePackage } =
 		usePackageAndBillingsContext()
+	const [mfoniPackage, setMfoniPackage] = useState<MfoniPackage | undefined>()
+	const [upgradeType, setUpgradeType] = useState<'INSTANT' | 'DEFER'>('INSTANT')
 	const [searchParams, setSearchParams] = useSearchParams()
 	const [annualBillingEnabled, setAnnualBillingEnabled] = useState(false)
 	const { currentUser, activeSubcription } = useAuth()
@@ -103,7 +103,7 @@ export function ChangePackageModal({ isOpened }: Props) {
 	}, [currentUser, amountToBePaid])
 
 	const handleSubmit = async () => {
-		if(!activePackage || !mfoniPackage) return
+		if (!activePackage || !mfoniPackage) return
 		setSubmittedForm(true)
 
 		const pricingChange = determineIfItsAnUpgradeOrDowngrade({
@@ -240,7 +240,7 @@ export function ChangePackageModal({ isOpened }: Props) {
 			canBeClosedWithBackdrop={false}
 		>
 			<div className="flex flex-row items-center justify-between bg-gray-100 p-4 text-gray-600">
-				<h1 className="font-bold">Change Plan</h1>
+				<h1 className="font-bold">Change Package</h1>
 			</div>
 			<div className="m-4">
 				{step === 'select-package' ? (
