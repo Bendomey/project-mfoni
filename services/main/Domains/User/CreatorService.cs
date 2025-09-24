@@ -155,7 +155,7 @@ public class CreatorService
         }
 
         // get mfoni package
-        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Code == creatorApplication.IntendedPricingPackageId)
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Id == creatorApplication.IntendedPricingPackageId)
             .FirstOrDefaultAsync();
 
         if (mfoniCreatorPackage is null)

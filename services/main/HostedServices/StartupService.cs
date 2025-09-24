@@ -7,6 +7,7 @@ namespace main.HostedServices
 {
     public class StartUpService : IHostedService
     {
+        private readonly AdminService _adminService;
         private readonly AdminWalletService _adminWalletService;
         private readonly CollectionService _collectionService;
         private readonly ExploreSectionService _exploreSectionService;
@@ -15,6 +16,7 @@ namespace main.HostedServices
         private readonly AppConstants _appConstantsConfiguration;
 
         public StartUpService(
+            AdminService adminService,
             AdminWalletService adminWalletService,
             CollectionService collectionService,
             ExploreSectionService exploreSectionService,
@@ -26,6 +28,7 @@ namespace main.HostedServices
             _appConstantsConfiguration = appConstants.Value;
             _databaseConfig = databaseConfig;
 
+            _adminService = adminService;
             _adminWalletService = adminWalletService;
             _collectionService = collectionService;
             _exploreSectionService = exploreSectionService;
@@ -35,6 +38,7 @@ namespace main.HostedServices
         {
             await ResolveIndexes();
 
+            await _adminService.BootstrapAdmin();
             await _adminWalletService.BootsrapAdminWallet();
             _collectionService.BootstrapCollections();
             await _exploreSectionService.BootstrapExploreSections();

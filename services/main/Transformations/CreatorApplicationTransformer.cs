@@ -55,6 +55,7 @@ public class CreatorApplicationTransformer
             User = outputBasicUser,
             Status = creatorApplication.Status,
             SubmittedAt = creatorApplication.SubmittedAt,
+            RejectedReason = creatorApplication.RejectedReason,
             RejectedAt = creatorApplication.RejectedAt,
             RejectedById = creatorApplication.RejectedById,
             ApprovedAt = creatorApplication.ApprovedAt,

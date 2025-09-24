@@ -45,10 +45,12 @@ function CreatorApplicationBanner({ application }: Props) {
 							<>
 								<p>
 									Your application was rejected unfortunately. Click on the
-									&apos;Become a Creator&apos; button below to re-apply.
+									&apos;Become a Creator&apos; button to re-apply.
 								</p>
 								{application.rejectedReason ? (
-									<b>Reason: {application.rejectedReason}</b>
+									<div className='mt-2'>
+										<b>Reason: {application.rejectedReason}</b>
+									</div>
 								) : null}
 							</>
 						) : null}
@@ -146,8 +148,8 @@ export function AccountCover() {
 								</Button>
 							) : null}
 
-							{currentUser?.role === 'CREATOR' ||
-							activeCreatorApplication ? null : (
+							{currentUser?.role === 'CLIENT' && (!activeCreatorApplication || activeCreatorApplication.status === 'REJECTED') ? 
+							  (
 								<Button
 									isLink
 									href="/account?complete-creator-application=true"
@@ -157,7 +159,7 @@ export function AccountCover() {
 								>
 									Become a Creator
 								</Button>
-							)}
+							) : null}
 						</div>
 					</div>
 				</div>

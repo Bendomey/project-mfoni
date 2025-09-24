@@ -417,18 +417,17 @@ public class SubscriptionService
             Builders<CreatorSubscription>.Filter.Eq("creator_id", ObjectId.Parse(creatorId)),
             Builders<CreatorSubscription>.Filter.Or(
                 Builders<CreatorSubscription>.Filter.And(
-                    Builders<CreatorSubscription>.Filter.Ne("package_type_id", mfoniCreatorPackage.Id),
+                    Builders<CreatorSubscription>.Filter.Ne("package_type_id", ObjectId.Parse(mfoniCreatorPackage.Id)),
                     Builders<CreatorSubscription>.Filter.Lte("started_at", today),
                     Builders<CreatorSubscription>.Filter.Gt("ended_at", today)
                 ),
                 Builders<CreatorSubscription>.Filter.And(
-                    Builders<CreatorSubscription>.Filter.Eq("package_type_id", mfoniCreatorPackage.Id),
+                    Builders<CreatorSubscription>.Filter.Eq("package_type_id", ObjectId.Parse(mfoniCreatorPackage.Id)),
                     Builders<CreatorSubscription>.Filter.Lte("started_at", today),
                     Builders<CreatorSubscription>.Filter.Eq("ended_at", BsonNull.Value)
                 )
             )
         );
-
 
         var activeSubscription = await _creatorSubscriptionCollection.Find(filter).FirstOrDefaultAsync();
 

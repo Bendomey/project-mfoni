@@ -90,7 +90,7 @@ Hey {name},
 
 Congratulations! Your mfoni Creator Application has been approved. 🎉
 
-You can now start uploading your photos and earn money.
+You can now start uploading your contents and earn money.
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)

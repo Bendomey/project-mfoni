@@ -30,6 +30,12 @@ public class SmsConfiguration
 
     public static async Task Send(string jsonBody)
     {
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+        {
+            Console.WriteLine("Email content: " + jsonBody);
+            return;
+        }
+
         try
         {
             using (HttpClient client = new HttpClient())

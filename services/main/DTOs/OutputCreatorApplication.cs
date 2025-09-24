@@ -10,6 +10,7 @@ public class OutputCreatorApplication
     public OutputBasicUserForAdmin? User { get; set; }
     public required string Status { get; set; }
     public DateTime? SubmittedAt { get; set; }
+    public String? RejectedReason { get; set; }
     public DateTime? RejectedAt { get; set; }
     public string? RejectedById { get; set; }
     public DateTime? ApprovedAt { get; set; }

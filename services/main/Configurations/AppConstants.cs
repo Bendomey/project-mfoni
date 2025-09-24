@@ -54,4 +54,6 @@ public class AppConstants
     public string PaystackSecretKey { get; set; } = null!;
     public string MfoniSupportEmail { get; set; } = "mfoniapp@gmail.com";
     public string MfoniImagesUrl { get; set; } = null!;
+    public string SuperAdminEmail { get; set; } = null!;
+    public string SuperAdminPassword { get; set; } = null!;
 }
