@@ -166,7 +166,11 @@ export function PackageCard() {
 					)}
 				</div>
 			</div>
-			<CancelSubscriptionDialog isOpened={isOpened} onClose={onToggle} />
+			{
+				activeSubcription ? (
+					<CancelSubscriptionDialog activeSubcription={activeSubcription} isOpened={isOpened} onClose={onToggle} />
+				) : null
+			}
 			<ReactivateSubscriptionDialog
 				isOpened={isOpenedReactivateModal}
 				onClose={onToggleReactivateModal}
