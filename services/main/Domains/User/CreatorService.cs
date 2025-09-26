@@ -291,7 +291,7 @@ public class CreatorService
 
         var creator = await GetCreatorById(creatorId);
 
-        if( creator.SubscriptionPaymentMethod == paymentMethod)
+        if (creator.SubscriptionPaymentMethod == paymentMethod)
         {
             throw new HttpRequestException("PaymentMethodAlreadySet");
         }
