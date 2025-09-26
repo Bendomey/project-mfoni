@@ -24,17 +24,17 @@ public class SavedCard
     [BsonElement("card_type")]
     public required string CardType { get; init; }
 
-    [BsonElement("last4")]
+    [BsonElement("first_6")]
+    public required string First6 { get; init; } // same as bin from paystack's response
+
+    [BsonElement("last_4")]
     public required string Last4 { get; init; }
 
     [BsonElement("exp_month")]
-    public required string exp_month { get; init; }
+    public required string ExpiryMonth { get; init; }
 
     [BsonElement("exp_year")]
-    public required string exp_year { get; init; }
-
-    [BsonElement("first_6")]
-    public required string First6 { get; init; }
+    public required string ExpiryYear { get; init; }
 
     [BsonElement("bank")]
     public required string Bank { get; init; }
@@ -58,6 +58,9 @@ public class SavedCard
     [BsonElement("email")]
     public required string Email { get; init; }
 
+    [BsonElement("status")]
+    public required string Status { get; set; } = "ACTIVE"; // ACTIVE | INACTIVE
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
@@ -71,6 +74,11 @@ public class SavedCard
             // Index on UserId for fast lookups
             new CreateIndexModel<SavedCard>(
                 Builders<SavedCard>.IndexKeys.Ascending(x => x.UserId)
+            ),
+
+            // Index on Status for fast lookups
+            new CreateIndexModel<SavedCard>(
+                Builders<SavedCard>.IndexKeys.Ascending(x => x.Status)
             ),
 
             // Index on CreatedAt for sorting

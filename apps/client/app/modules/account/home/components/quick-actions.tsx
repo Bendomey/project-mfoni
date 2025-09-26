@@ -18,7 +18,7 @@ export function QuickActions() {
 			})
 
 			actions.push({
-				name: 'Billings and Subscriptions',
+				name: 'Your subscription and billings',
 				href: '/account/package-and-billings',
 				initial: 'B',
 				current: false,

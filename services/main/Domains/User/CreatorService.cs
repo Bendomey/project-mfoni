@@ -282,6 +282,33 @@ public class CreatorService
         return creator;
     }
 
+    public async Task<Creator> ChangeSubscriptionPaymentMethod(string creatorId, string paymentMethod)
+    {
+        if (paymentMethod != "WALLET" && paymentMethod != "SAVED_CARD")
+        {
+            throw new HttpRequestException("InvalidPaymentMethod");
+        }
+
+        var creator = await GetCreatorById(creatorId);
+
+        if( creator.SubscriptionPaymentMethod == paymentMethod)
+        {
+            throw new HttpRequestException("PaymentMethodAlreadySet");
+        }
+
+        creator.SubscriptionPaymentMethod = paymentMethod;
+        creator.UpdatedAt = DateTime.UtcNow;
+
+        await __creatorCollection.ReplaceOneAsync(creator => creator.Id == creator.Id, creator);
+
+        _ = _cacheProvider.EntityChanged(new[] {
+            $"{CacheProvider.CacheEntities["creators"]}.*",
+            $"{CacheProvider.CacheEntities["auth"]}*{creator.UserId}*",
+        });
+
+        return creator;
+    }
+
     private void SendNotification(Models.User user, string subject, string body)
     {
         if (user.PhoneNumber is not null && user.PhoneNumberVerifiedAt is not null)

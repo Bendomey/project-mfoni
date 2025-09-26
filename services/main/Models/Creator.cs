@@ -48,6 +48,9 @@ public class Creator
     [BsonElement("website_disabled_at")]
     public DateTime? WebsiteDisabledAt { get; set; }
 
+    [BsonElement("subscription_payment_method")]
+    public string SubscriptionPaymentMethod { get; set; } = "WALLET"; // WALLET | SAVED_CARD
+
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
