@@ -234,7 +234,7 @@ public class PaymentService
                 }
                 else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.SavedCard && !string.IsNullOrEmpty(paymentRecord.MetaData.UserId))
                 {
-                    
+
                     if (input.Data.Authorization is null)
                     {
                         throw new HttpRequestException("AuthorizationDataMissing");
@@ -333,7 +333,7 @@ public class PaymentService
         return true;
     }
 
-        public async Task<Models.Payment> InitiateSavedCardCreation(InitializeSavedCardInput input)
+    public async Task<Models.Payment> InitiateSavedCardCreation(InitializeSavedCardInput input)
     {
         // We will initiate a payment of GHS 1.00 to get the card details from Paystack.
         // The card details will then be saved in the database.
