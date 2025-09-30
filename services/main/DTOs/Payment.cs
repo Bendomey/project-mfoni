@@ -19,6 +19,10 @@ public class PaystackWebhookDataInput
     [JsonProperty("status")]
     public required string Status { get; set; }
 
+    [JsonProperty("message")]
+    public string? Message { get; set; }
+
+
     [JsonProperty("domain")]
     public required string Domain { get; set; }
 
@@ -27,6 +31,9 @@ public class PaystackWebhookDataInput
 
     // [JsonProperty("metadata")]
     // public required string Metadata { get; set; }
+
+    [JsonProperty("log")]
+    public required object Log { get; set; }
 
     [JsonProperty("authorization")]
     public PaystackAuthorizationDataInput? Authorization { get; set; }
@@ -107,14 +114,8 @@ public class PaystackCustomerDataInput
     public string? InternationalFormatPhone { get; set; }
 }
 
-// "customer": {
-//       "id": 181873746,
-//       "first_name": null,
-//       "last_name": null,
-//       "email": "demo@test.com",
-//       "customer_code": "CUS_1rkzaqsv4rrhqo6",
-//       "phone": null,
-//       "metadata": null,
-//       "risk_action": "default",
-//       "international_format_phone": null
-//     },
+public class OutputManualVerifyPayment
+{
+    public required string TransactionStatus { get; set; }
+    public string? Message { get; set; }
+}

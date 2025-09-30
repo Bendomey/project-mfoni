@@ -152,8 +152,8 @@ public class SavedCardService
                 .Set(x => x.DeletedAt, DateTime.UtcNow)
                 .Set(x => x.UpdatedAt, DateTime.UtcNow)
                 .Set(x => x.Status, "SavedCard.Status.Inactive")
-                .Set(x => x.DefaultedAt, null) // remove primary status if any
-                .Set(x => x.AuthorizationCode, null) // invalidate auth code
+                .Unset(x => x.DefaultedAt) // remove primary status if any
+                .Unset(x => x.AuthorizationCode) // invalidate auth code
         );
 
         var user = await GetUserById(null, savedCard.UserId);

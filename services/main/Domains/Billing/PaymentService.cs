@@ -61,6 +61,19 @@ public class PaymentService
         logger.LogDebug("Payment service initialized");
     }
 
+    public async Task<Payment> GetByReference(string reference)
+    {
+        var paymentRecord = await _paymentCollection.Find(payment => payment.Reference == reference)
+            .FirstOrDefaultAsync();
+
+        if (paymentRecord is null)
+        {
+            throw new HttpRequestException("PaymentNotFound");
+        }
+
+        return paymentRecord;
+    }
+
     public async Task<Payment> InitiatePayment(InitializePaymentInput input)
     {
         var response = await PaymentConfiguration.Initiate(_appConstantsConfiguration.PaystackSecretKey, input.PaystackInput);
@@ -90,7 +103,7 @@ public class PaymentService
         return newPayment;
     }
 
-    public async Task VerifyPayment(DTOs.PaystackWebhookInput input)
+    public async Task VerifySuccessPayment(DTOs.PaystackWebhookInput input)
     {
         using (var session = await _mongoClient.StartSessionAsync())
         {
@@ -269,6 +282,149 @@ public class PaymentService
         }
 
     }
+
+    public async Task VerifyFailedPayment(DTOs.PaystackWebhookInput input)
+    {
+
+        using (var session = await _mongoClient.StartSessionAsync())
+        {
+            session.StartTransaction();
+
+            try
+            {
+                var paymentRecord = await _paymentCollection.Find(session, payment => payment.Reference == input.Data.Reference).FirstOrDefaultAsync();
+
+                if (paymentRecord is null)
+                {
+                    throw new HttpRequestException("PaymentNotFound");
+                }
+
+                var jsonString = JsonConvert.SerializeObject(input.Data.Log);
+
+                var paymentError = new PaymentError
+                {
+                    Message = input.Data.Message ?? "Payment failed",
+                    Obj = jsonString
+                };
+
+                await _paymentCollection.UpdateOneAsync(
+                    session,
+                    Builders<Payment>.Filter.Eq(payment => payment.Id, paymentRecord.Id),
+                    Builders<Payment>.Update
+                        .Set(payment => payment.Status, PaymentStatus.FAILED)
+                        .Set(payment => payment.ErrorObj, paymentError)
+                        .Set(payment => payment.FailedAt, DateTime.UtcNow)
+                        .Set(payment => payment.UpdatedAt, DateTime.UtcNow)
+                        .Unset(payment => payment.AuthorizationUrl)
+                        .Unset(payment => payment.AccessCode)
+                );
+
+                // when it's related to a content purchase.
+                if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.ContentPurchase && !string.IsNullOrEmpty(paymentRecord.MetaData.ContentPurchaseId))
+                {
+                    // content purchases could retry until it's successful, so we don't do anything.
+                }
+                else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.WalletTopup && !string.IsNullOrEmpty(paymentRecord.MetaData.WalletId))
+                {
+                    await _walletTransactionCollection.UpdateOneAsync(
+                       session,
+                       Builders<WalletTransaction>.Filter.Eq(walletTransaction => walletTransaction.Id, paymentRecord.MetaData.WalletId),
+                       Builders<WalletTransaction>.Update
+                           .Set(walletTransaction => walletTransaction.Status, WalletTransactionStatus.FAILED)
+                           .Set(walletTransaction => walletTransaction.PaymentId, paymentRecord.Id)
+                           .Set(walletTransaction => walletTransaction.FailedAt, DateTime.UtcNow)
+                           .Set(walletTransaction => walletTransaction.UpdatedAt, DateTime.UtcNow)
+                   );
+                }
+                else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.SavedCard && !string.IsNullOrEmpty(paymentRecord.MetaData.UserId))
+                {
+                    // card is not created yet so if payment fails, we don't do anything.
+                }
+            }
+            catch (Exception e) when (e is HttpRequestException || e is Exception)
+            {
+                await session.AbortTransactionAsync();
+                throw;
+            }
+        }
+
+    }
+
+    public async Task VerifyCancelledPayment(DTOs.PaystackWebhookInput input)
+    {
+
+        using (var session = await _mongoClient.StartSessionAsync())
+        {
+            session.StartTransaction();
+
+            try
+            {
+                var paymentRecord = await _paymentCollection.Find(session, payment => payment.Reference == input.Data.Reference).FirstOrDefaultAsync();
+
+                if (paymentRecord is null)
+                {
+                    throw new HttpRequestException("PaymentNotFound");
+                }
+
+                var jsonString = JsonConvert.SerializeObject(input.Data.Log);
+
+                var paymentError = new PaymentError
+                {
+                    Message = input.Data.Message ?? "Payment Cancelled",
+                    Obj = jsonString
+                };
+
+                await _paymentCollection.UpdateOneAsync(
+                    session,
+                    Builders<Payment>.Filter.Eq(payment => payment.Id, paymentRecord.Id),
+                    Builders<Payment>.Update
+                        .Set(payment => payment.ErrorObj, paymentError)
+                        .Set(payment => payment.Status, PaymentStatus.CANCELLED)
+                        .Set(payment => payment.CancelledAt, DateTime.UtcNow)
+                        .Set(payment => payment.UpdatedAt, DateTime.UtcNow)
+                        .Unset(payment => payment.AuthorizationUrl)
+                        .Unset(payment => payment.AccessCode)
+                );
+
+                // when it's related to a content purchase.
+                if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.ContentPurchase && !string.IsNullOrEmpty(paymentRecord.MetaData.ContentPurchaseId))
+                {
+                    await _contentPurchaseCollection.UpdateOneAsync(
+                       session,
+                       Builders<ContentPurchase>.Filter.Eq(contentPurchase => contentPurchase.Id, paymentRecord.MetaData.ContentPurchaseId),
+                       Builders<ContentPurchase>.Update
+                           .Set(contentPurchase => contentPurchase.Status, ContentPurchaseStatus.CANCELLED)
+                           .Set(contentPurchase => contentPurchase.PaymentId, paymentRecord.Id)
+                           .Set(contentPurchase => contentPurchase.CancelledAt, DateTime.UtcNow)
+                           .Set(contentPurchase => contentPurchase.UpdatedAt, DateTime.UtcNow)
+                   );
+
+                }
+                else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.WalletTopup && !string.IsNullOrEmpty(paymentRecord.MetaData.WalletId))
+                {
+                    await _walletTransactionCollection.UpdateOneAsync(
+                       session,
+                       Builders<WalletTransaction>.Filter.Eq(walletTransaction => walletTransaction.Id, paymentRecord.MetaData.WalletId),
+                       Builders<WalletTransaction>.Update
+                           .Set(walletTransaction => walletTransaction.Status, WalletTransactionStatus.CANCELLED)
+                           .Set(walletTransaction => walletTransaction.PaymentId, paymentRecord.Id)
+                           .Set(walletTransaction => walletTransaction.CancelledAt, DateTime.UtcNow)
+                           .Set(walletTransaction => walletTransaction.UpdatedAt, DateTime.UtcNow)
+                   );
+                }
+                else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.SavedCard && !string.IsNullOrEmpty(paymentRecord.MetaData.UserId))
+                {
+                    // card is not created yet so if payment is cancelled, we don't do anything.
+                }
+            }
+            catch (Exception e) when (e is HttpRequestException || e is Exception)
+            {
+                await session.AbortTransactionAsync();
+                throw;
+            }
+        }
+    }
+
 
     public async Task<Payment> GetPaymentById(string paymentId)
     {
