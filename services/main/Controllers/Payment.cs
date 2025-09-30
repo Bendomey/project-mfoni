@@ -154,11 +154,11 @@ public class PaymentController : ControllerBase
     /// <summary>
     /// Retry payment verification
     /// </summary>
-    /// <param name="reference">reference of payment</param>
+    /// <param name="id">reference of payment</param>
     /// <response code="200">Payment Verified Successfully</response>
     /// <response code="500">An unexpected error occured</response>
     [Authorize]
-    [HttpPost("references/{reference}/verify")]
+    [HttpPost("{id}/verify")]
     [ProducesResponseType(
         StatusCodes.Status200OK,
         Type = typeof(ApiEntityResponse<OutputManualVerifyPayment>)
@@ -168,15 +168,15 @@ public class PaymentController : ControllerBase
         StatusCodes.Status500InternalServerError,
         Type = typeof(StatusCodeResult)
     )]
-    public async Task<IActionResult> ManualPaymentVerification(string reference)
+    public async Task<IActionResult> ManualPaymentVerification(string id)
     {
         try
         {
             // find payment record by reference
-            await _paymentService.GetByReference(reference);
+            var payment = await _paymentService.GetPaymentById(id);
 
             // call paystack verify
-            var verifyResponse = await PaystackVerifyTransactionConfiguration.Call(_appConstantsConfiguration.PaystackSecretKey, reference);
+            var verifyResponse = await PaystackVerifyTransactionConfiguration.Call(_appConstantsConfiguration.PaystackSecretKey, payment.Reference);
             if (verifyResponse == null || !verifyResponse.Status)
             {
                 throw new HttpRequestException("Payment verification failed", null, HttpStatusCode.BadRequest);
@@ -240,13 +240,13 @@ public class PaymentController : ControllerBase
         }
         catch (Exception e)
         {
-            this._logger.LogError($"Failed to verify payment by reference {reference}. Exception: {e}");
+            this._logger.LogError($"Failed to verify payment by id: {id}. Exception: {e}");
             SentrySdk.ConfigureScope(scope =>
             {
                 scope.SetTags(new Dictionary<string, string>
                 {
-                    {"action", "Get Package by reference"},
-                    {"reference", reference}
+                    {"action", "Get Package by id"},
+                    {"id", id}
                });
                 SentrySdk.CaptureException(e);
             });
