@@ -53,6 +53,7 @@ public class InitializePaymentInput
     public required string Origin { get; set; }
     public string? ContentPurchaseId { get; set; }
     public string? WalletId { get; set; }
+    public string? UserId { get; set; }
     public required InitPaymentInput PaystackInput { get; set; }
 }
 
@@ -90,4 +91,18 @@ public class InitiateTransferInput
     public required string TransferRecipientId { get; set; }
     // when there's a reference then it means the transfer is already initiated. we just retrying.
     public string? Reference { get; set; }
+}
+
+
+public class InitializeSavedCardInput
+{
+    public required string BillingEmail { get; set; }
+    public required string UserId { get; set; }
+}
+
+public class GetSavedCardsInput
+{
+    public required string UserId { get; set; }
+    public string? Status { get; set; }
+    public bool? Reusable { get; set; }
 }

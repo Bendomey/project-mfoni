@@ -495,4 +495,63 @@ The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
     ";
 
+    public static string SuccessfulCardSavedSubject = "Your Card Has Been Added Successfully 💳";
+
+    public static string SuccessfulCardSavedBody = @"
+Hello {name},
+
+Your new payment card has been successfully added to your Mfoni Saved Cards. You can now use it for seamless purchases and subscriptions on the platform.
+
+📌 Card Details:
+
+Card Type: {cardType}
+Card Ending: {last4Digits} [Last 4 Digits]
+Date Added: {dateAdded}
+View Card: {viewCardLink}
+
+For your security, we only display the last four digits of your card.
+
+If you didn't add this card, please contact our support team immediately at support@mfoni.app.
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
+    public static string SuccessfulSavedCardButNotReusuableSubject = "Card Added – Limited Use ⚠️";
+
+    public static string SuccessfulSavedCardButNotReusuableBody = @"
+Hello {name},
+
+Your payment card ending in {last4Digits} has been added to your Mfoni Wallet. However, our payment provider has marked this card as non-reusable, which means it cannot be used for future automatic transactions on Mfoni.
+
+You may still complete one-time purchases directly with this card at checkout (if supported), but we recommend adding a different card to ensure smooth future payments.
+
+📌 Card Details:
+
+Card Type: {cardType}
+Card Ending: {last4Digits} [Last 4 Digits]
+Date Added: {dateAdded}
+View Card: {viewCardLink}
+
+👉 {addAnotherCardLink}
+
+Thank you for your understanding, and we appreciate you being part of Mfoni.
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
+    public static string SuccessfulCardDeletedSubject = "Your Card Has Been Removed Successfully";
+
+    public static string SuccessfulCardDeletedBody = @"
+Hello {name},
+
+Your payment card ending in {last4Digits} has been successfully removed from your Mfoni Saved Cards.
+
+If you didn't request this removal, please contact our support team immediately at support@mfoni.app.
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+    ";
+
 }

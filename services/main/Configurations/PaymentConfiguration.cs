@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace main.Configurations;
@@ -38,6 +37,9 @@ public class InitPaymentMedataInput
 
     [JsonProperty("wallet_id")]
     public string? WalletId { get; set; }
+
+    [JsonProperty("user_id")]
+    public string? UserId { get; set; }
 
     [JsonProperty("custom_field")]
     public InitPaymentMedataCustomFieldsInput[]? CustomFields { get; set; }
@@ -89,9 +91,7 @@ public class PaymentConfiguration
         {
             using (HttpClient client = new HttpClient())
             {
-                string apiKey = ApiKey;
-
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
 
                 var jsonContent = JsonConvert.SerializeObject(input);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");

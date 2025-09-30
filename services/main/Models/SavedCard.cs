@@ -16,10 +16,10 @@ public class SavedCard
     public required string UserId { get; init; }
 
     [BsonElement("defaulted_at")]
-    public DateTime DefaultedAt { get; set; }
+    public DateTime? DefaultedAt { get; set; }
 
     [BsonElement("authorization_code")]
-    public required string AuthorizationCode { get; init; }
+    public string? AuthorizationCode { get; set; }
 
     [BsonElement("card_type")]
     public required string CardType { get; init; }
@@ -59,13 +59,16 @@ public class SavedCard
     public required string Email { get; init; }
 
     [BsonElement("status")]
-    public required string Status { get; set; } = "ACTIVE"; // ACTIVE | INACTIVE
+    public string Status { get; set; } = "SavedCard.Status.Active"; // SavedCard.Status.Active | SavedCard.Status.Inactive
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
     [BsonElement("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    [BsonElement("deleted_at")]
+    public DateTime? DeletedAt { get; set; }
 
     public static async Task EnsureIndexesAsync(IMongoCollection<SavedCard> collection)
     {

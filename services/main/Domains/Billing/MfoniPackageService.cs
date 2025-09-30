@@ -1,3 +1,4 @@
+using System.Net;
 using main.Configuratons;
 using main.Lib;
 using main.Models;
@@ -319,7 +320,11 @@ public class MfoniPackageService
 
         if (package is null)
         {
-            throw new Exception("MfoniPackageNotFound");
+            throw new HttpRequestException(
+              "MfoniPackageNotFound",
+              inner: default,
+              statusCode: HttpStatusCode.NotFound
+            );
         }
 
         return package;
@@ -332,7 +337,11 @@ public class MfoniPackageService
 
         if (package is null)
         {
-            throw new Exception("MfoniPackageNotFound");
+            throw new HttpRequestException(
+              "MfoniPackageNotFound",
+              inner: default,
+              statusCode: HttpStatusCode.NotFound
+            );
         }
 
         return package;

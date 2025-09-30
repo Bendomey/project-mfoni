@@ -16,12 +16,12 @@ namespace main.Controllers;
 [Route("api/v1/creators")]
 public class CreatorController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
+    private readonly ILogger<CreatorController> _logger;
     private readonly CreatorService _creatorService;
     private readonly CreatorTransformer _creatorTransformer;
 
     public CreatorController(
-        ILogger<UserController> logger,
+        ILogger<CreatorController> logger,
         CreatorService creatorService,
         CreatorTransformer creatorTransformer
     )
@@ -447,7 +447,7 @@ public class CreatorController : ControllerBase
     /// <response code="500">An unexpected error occured</response>
     [Authorize]
     [HttpPatch("subscriptions/payment-method")]
-    [ProducesResponseType(typeof(OutputResponse<Models.Creator>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreator>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> ChangeSubscriptionPaymentMethod([FromBody] DTOs.ChangePaymentMethodInput input)

@@ -1,4 +1,5 @@
 
+using System.Net;
 using main.Configuratons;
 using main.Lib;
 using main.Models;
@@ -52,7 +53,11 @@ public class WalletService
             var adminWallet = await _adminWalletService.Get();
             if (adminWallet is null)
             {
-                throw new Exception("AdminWalletNotFound");
+                throw new HttpRequestException(
+                    "AdminWalletNotFound",
+                    inner: default,
+                    statusCode: HttpStatusCode.NotFound
+                );
             }
 
             userId = adminWallet.Id;
@@ -126,7 +131,11 @@ public class WalletService
             var adminWallet = await _adminWalletService.Get();
             if (adminWallet is null)
             {
-                throw new Exception("AdminWalletNotFound");
+                throw new HttpRequestException(
+                    "AdminWalletNotFound",
+                    inner: default,
+                    statusCode: HttpStatusCode.NotFound
+                );
             }
 
             userId = adminWallet.Id;
