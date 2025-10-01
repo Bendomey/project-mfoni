@@ -14,6 +14,7 @@ export const QUERY_KEYS = {
 	TAGS: 'tags',
 	CONTENT_PURCHASES: 'content-purchases',
 	WALLET_TRANSACTIONS: 'wallet-transactions',
+	SAVED_CARDS: 'saved-cards',
 	CREATOR_SUBSCRIPTIONS: 'creator-subscriptions',
 	CREATOR_APPLICATIONS: 'creator-applications',
 	CONTENTS: 'contents',

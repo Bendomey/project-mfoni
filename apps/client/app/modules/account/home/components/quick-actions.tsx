@@ -32,13 +32,12 @@ export function QuickActions() {
 			current: false,
 		})
 
-		// TODO: bring this back after implmenting save cards.
-		// actions.push({
-		// 	name: 'Saved Cards',
-		// 	href: '/account/saved-cards',
-		// 	initial: 'C',
-		// 	current: false,
-		// })
+		actions.push({
+			name: 'Saved Cards',
+			href: '/account/saved-cards',
+			initial: 'C',
+			current: false,
+		})
 		return actions
 	}, [isACreator])
 
