@@ -94,7 +94,8 @@ public class PaymentService
             {
                 Origin = input.Origin,
                 ContentPurchaseId = input.ContentPurchaseId,
-                WalletId = input.WalletId
+                WalletId = input.WalletId,
+                UserId = input.UserId,
             },
         };
 
@@ -107,13 +108,15 @@ public class PaymentService
     {
         using (var session = await _mongoClient.StartSessionAsync())
         {
-            session.StartTransaction();
 
             try
             {
+                session.StartTransaction();
 
                 var paymentRecord = await _paymentCollection.Find(session, payment => payment.Reference == input.Data.Reference).FirstOrDefaultAsync();
 
+                _logger.LogInformation(JsonConvert.SerializeObject(paymentRecord));
+                _logger.LogInformation(JsonConvert.SerializeObject(input));
                 if (paymentRecord is null)
                 {
                     throw new HttpRequestException("PaymentNotFound");
@@ -247,6 +250,7 @@ public class PaymentService
                 }
                 else if (paymentRecord.MetaData.Origin == PaymentMetaDataOrigin.SavedCard && !string.IsNullOrEmpty(paymentRecord.MetaData.UserId))
                 {
+                    _logger.LogInformation("Creating saved card...");
 
                     if (input.Data.Authorization is null)
                     {
@@ -267,14 +271,21 @@ public class PaymentService
                         Signature = input.Data.Authorization?.Signature ?? "",
                         Reusable = input.Data.Authorization?.Reusable ?? false,
                         CountryCode = input.Data.Authorization?.CountryCode ?? "GH",
-                        AccountName = input.Data.Authorization?.AccountName ?? "UNKNOWN",
+                        AccountName = input.Data.Authorization?.AccountName,
                         Email = input.Data.Customer?.Email ?? "UNKNOWN",
                     }, session);
+
+                    await session.CommitTransactionAsync();
 
                 }
 
             }
-            catch (Exception)
+            catch (MongoCommandException ex) when (ex.CodeName == "IllegalOperation")
+            {
+                _logger.LogInformation($"Details: {ex.Message}");
+                await session.AbortTransactionAsync();
+            }
+            catch (Exception e) when (e is HttpRequestException || e is Exception)
             {
                 await session.AbortTransactionAsync();
                 throw;
@@ -288,10 +299,11 @@ public class PaymentService
 
         using (var session = await _mongoClient.StartSessionAsync())
         {
-            session.StartTransaction();
 
             try
             {
+                session.StartTransaction();
+
                 var paymentRecord = await _paymentCollection.Find(session, payment => payment.Reference == input.Data.Reference).FirstOrDefaultAsync();
 
                 if (paymentRecord is null)
@@ -341,6 +353,11 @@ public class PaymentService
                     // card is not created yet so if payment fails, we don't do anything.
                 }
             }
+            catch (MongoCommandException ex) when (ex.CodeName == "IllegalOperation")
+            {
+                _logger.LogInformation($"Details: {ex.Message}");
+                await session.AbortTransactionAsync();
+            }
             catch (Exception e) when (e is HttpRequestException || e is Exception)
             {
                 await session.AbortTransactionAsync();
@@ -355,10 +372,10 @@ public class PaymentService
 
         using (var session = await _mongoClient.StartSessionAsync())
         {
-            session.StartTransaction();
-
             try
             {
+                session.StartTransaction();
+
                 var paymentRecord = await _paymentCollection.Find(session, payment => payment.Reference == input.Data.Reference).FirstOrDefaultAsync();
 
                 if (paymentRecord is null)
@@ -416,6 +433,11 @@ public class PaymentService
                 {
                     // card is not created yet so if payment is cancelled, we don't do anything.
                 }
+            }
+            catch (MongoCommandException ex) when (ex.CodeName == "IllegalOperation")
+            {
+                _logger.LogInformation($"Details: {ex.Message}");
+                await session.AbortTransactionAsync();
             }
             catch (Exception e) when (e is HttpRequestException || e is Exception)
             {

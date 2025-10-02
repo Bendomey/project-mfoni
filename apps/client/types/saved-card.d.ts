@@ -11,7 +11,7 @@ interface SavedCard {
 	channel: string
 	reusable: boolean
 	countryCode: string
-	accountName: string
+	accountName: Nullable<string>
 	email: string
 	status: 'SavedCard.Status.Active' | 'SavedCard.Status.Inactive'
 	createdAt: Date

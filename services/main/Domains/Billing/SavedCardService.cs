@@ -29,7 +29,7 @@ public class SavedCardService
     public async Task<Models.SavedCard> GetById(string id)
     {
         var filter = Builders<Models.SavedCard>.Filter.Eq(p => p.Id, id)
-                        & Builders<Models.SavedCard>.Filter.Ne(p => p.DeletedAt, null);
+                        & Builders<Models.SavedCard>.Filter.Eq(p => p.DeletedAt, null);
 
         var card = await _savedCardCollection.Find(filter).FirstOrDefaultAsync();
 
@@ -178,7 +178,7 @@ public class SavedCardService
     )
     {
         var filter = Builders<Models.SavedCard>.Filter.Eq(p => p.UserId, input.UserId) &
-                     Builders<Models.SavedCard>.Filter.Ne(p => p.DeletedAt, null);
+                     Builders<Models.SavedCard>.Filter.Eq(p => p.DeletedAt, null);
 
         if (!string.IsNullOrEmpty(input.Status))
         {
@@ -205,7 +205,7 @@ public class SavedCardService
     )
     {
         var filter = Builders<Models.SavedCard>.Filter.Eq(p => p.UserId, input.UserId) &
-                     Builders<Models.SavedCard>.Filter.Ne(p => p.DeletedAt, null);
+                     Builders<Models.SavedCard>.Filter.Eq(p => p.DeletedAt, null);
 
         if (!string.IsNullOrEmpty(input.Status))
         {

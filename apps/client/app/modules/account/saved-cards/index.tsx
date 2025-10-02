@@ -188,7 +188,7 @@ export const SavedCardsModule = () => {
                         My Account
                     </Button>
                     <h1 className="font-shantell text-3xl font-semibold md:text-4xl">
-                        Saved Cards
+                        Saved Cards {data?.total ? `(${data.total})` : ''}
                     </h1>
                     <p className="mt-1 text-sm text-gray-600">
                         Manage all your saved cards.

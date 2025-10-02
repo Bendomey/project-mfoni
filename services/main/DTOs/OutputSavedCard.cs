@@ -15,7 +15,7 @@ public class OutputSavedCard
     public required string Channel { get; set; }
     public required bool Reusable { get; set; }
     public required string CountryCode { get; set; }
-    public required string AccountName { get; set; }
+    public string? AccountName { get; set; }
     public required string Email { get; set; }
     public required string Status { get; set; }
     public required DateTime CreatedAt { get; set; }
