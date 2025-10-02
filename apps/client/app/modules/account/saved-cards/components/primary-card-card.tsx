@@ -1,4 +1,5 @@
 import { PlusIcon, CreditCardIcon } from "@heroicons/react/24/outline";
+import { AddCardButton } from "./add-card/index.tsx";
 import { Button } from "@/components/button/index.tsx";
 
 
@@ -9,10 +10,15 @@ interface Props {
 export function PrimaryCardCard({ savedCard }: Props) {
     if (!savedCard) {
         return (
-            <Button variant='unstyled' className='text-blue-600 font-semibold border-2 bg-white border-dashed p-4 rounded-md h-44 w-full flex justify-center items-center'>
-                <PlusIcon className="h-5 w-auto mr-2 inline" />
-                Add card
-            </Button>
+            <AddCardButton>
+                {({ onClick }) => (
+                    <Button onClick={onClick} variant='unstyled' className='text-blue-600 font-semibold border-2 bg-white border-dashed p-4 rounded-md h-44 w-full flex justify-center items-center'>
+                        <PlusIcon className="h-5 w-auto mr-2 inline" />
+                        Add card
+                    </Button>
+                )}
+            </AddCardButton>
+
         );
     }
 

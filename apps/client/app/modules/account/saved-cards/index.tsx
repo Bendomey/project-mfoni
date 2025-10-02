@@ -1,5 +1,6 @@
 import { ChevronLeftIcon, ExclamationCircleIcon, CreditCardIcon } from '@heroicons/react/24/outline'
-import { PrimaryCardCard } from './primary-card-card.tsx';
+import { AddCardButton } from './components/add-card/index.tsx';
+import { PrimaryCardCard } from './components/primary-card-card.tsx';
 import { useGetSavedCards } from '@/api/saved-cards/index.ts';
 import { Button } from "@/components/button/index.tsx";
 import { Footer } from "@/components/footer/index.tsx";
@@ -159,7 +160,11 @@ export const SavedCardsModule = () => {
                                                 <p className="px-10 text-sm text-gray-500">
                                                     Add a secondary card to ensure uninterrupted payments.
                                                 </p>
-                                                <Button>Add Card</Button>
+                                                <AddCardButton>
+                                                    {({ onClick }) => (
+                                                        <Button onClick={onClick}>Add Card</Button>
+                                                    )}
+                                                </AddCardButton>
                                             </div>
                                         )
                                     }
