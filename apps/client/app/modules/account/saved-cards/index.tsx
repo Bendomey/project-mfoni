@@ -1,11 +1,20 @@
-import { ChevronLeftIcon, ExclamationCircleIcon, CreditCardIcon } from '@heroicons/react/24/outline'
+import { Popover } from '@headlessui/react';
+import { ChevronLeftIcon, ExclamationCircleIcon, CreditCardIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { CheckBadgeIcon, TrashIcon } from '@heroicons/react/24/solid';
+import dayjs from 'dayjs';
 import { AddCardButton } from './components/add-card/index.tsx';
 import { PrimaryCardCard } from './components/primary-card-card.tsx';
+import { RemoveCardButton } from './components/remove-card/index.tsx';
 import { useGetSavedCards } from '@/api/saved-cards/index.ts';
+import mastercardLogo from '@/assets/mastercard-icon.png'
+import visaLogo from '@/assets/visa-icon.png'
 import { Button } from "@/components/button/index.tsx";
+import { FlyoutContainer } from '@/components/flyout/flyout-container.tsx';
 import { Footer } from "@/components/footer/index.tsx";
 import { Header } from "@/components/layout/index.ts";
-
+import { Loader } from '@/components/loader/index.tsx';
+import { classNames } from '@/lib/classNames.ts';
+import { toFirstUpperCase } from '@/lib/strings.ts';
 
 export const SavedCardsModule = () => {
     const { data, isError, isLoading } = useGetSavedCards({
@@ -87,7 +96,7 @@ export const SavedCardsModule = () => {
                 <h3 className='font-bold text-gray-500 uppercase mb-2 text-xs'>Primary</h3>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
                     <div className='col-span-2'>
-                        <PrimaryCardCard savedCard={primaryCard} />
+                        <PrimaryCardCard savedCard={primaryCard} showRemoveButton={primaryCard && !secondaryCards.length} />
                     </div>
                 </div>
 
@@ -104,6 +113,15 @@ export const SavedCardsModule = () => {
                                         <p className="mt-1 text-sm text-gray-700">
                                             When the primary card fails, a secondary card pays the balance automatically.
                                         </p>
+                                    </div>
+                                    <div>
+                                        <AddCardButton>
+                                            {({ onClick }) => (
+                                                <Button onClick={onClick} size='sm' className="mt-3 sm:mt-0 sm:ml-3">
+                                                    Add New Card
+                                                </Button>
+                                            )}
+                                        </AddCardButton>
                                     </div>
                                 </div>
                                 <div className="mt-5 flow-root">
@@ -145,7 +163,129 @@ export const SavedCardsModule = () => {
                                                                 </tr>
                                                             </thead>
                                                             <tbody className="divide-y divide-gray-200 bg-white">
+                                                                {secondaryCards.length ? (
+                                                                    <>
+                                                                        {secondaryCards.map((savedCard) => (
+                                                                            <tr key={savedCard.id}>
+                                                                                <td
+                                                                                    className={classNames(
+                                                                                        'flex items-center gap-1 whitespace-nowrap px-7 py-4 text-sm font-medium text-gray-900 sm:px-6',
+                                                                                    )}
+                                                                                >
+                                                                                    <div className='flex flex-row items-center gap-1'>
+                                                                                        {
+                                                                                            savedCard.reusable ? null : (
+                                                                                                <div>
+                                                                                                    <Popover>
+                                                                                                        {({ open }) => (
+                                                                                                            <div
+                                                                                                                className="relative inline-block"
+                                                                                                                onMouseEnter={(e) => {
+                                                                                                                    if (!open) e?.currentTarget?.querySelector("button")?.click();
+                                                                                                                }}
+                                                                                                                onMouseLeave={(e) => {
+                                                                                                                    if (open) e?.currentTarget?.querySelector("button")?.click();
+                                                                                                                }}
+                                                                                                            >
+                                                                                                                <Popover.Button>
+                                                                                                                    <ExclamationTriangleIcon className='text-yellow-600 h-5 w-auto' />
+                                                                                                                </Popover.Button>
 
+                                                                                                                <Popover.Panel className="absolute -top-16 z-10 mt-2 w-72 rounded-lg bg-red-600 text-white shadow-lg ring-1 ring-black/5">
+                                                                                                                    <div className="p-4">
+                                                                                                                        <p className="text-sm">This card can't be used for payments.</p>
+                                                                                                                    </div>
+                                                                                                                </Popover.Panel>
+                                                                                                            </div>
+                                                                                                        )}
+                                                                                                    </Popover>
+                                                                                                </div>
+                                                                                            )
+                                                                                        }
+
+                                                                                        <div className='mx-2 flex flex-row items-center gap-3'>
+                                                                                            {
+                                                                                                savedCard.cardType.toLowerCase().trim() === 'visa' ? (
+                                                                                                    <img src={visaLogo} alt="Visa" className="h-10 w-auto" />
+                                                                                                ) : savedCard.cardType.toLowerCase().trim() === 'mastercard' ? (
+                                                                                                    <img src={mastercardLogo} alt="Mastercard" className="h-10 w-auto" />
+                                                                                                ) : (
+                                                                                                    <CreditCardIcon className="h-10 w-auto text-blue-800" />
+                                                                                                )
+                                                                                            }
+                                                                                            <div className='flex flex-col'>
+                                                                                                <span>{toFirstUpperCase(savedCard.cardType)} *****{savedCard.last4}</span>
+                                                                                                <span className='text-sm text-gray-500'>{toFirstUpperCase(savedCard?.accountName ?? savedCard.bank)}</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+
+                                                                                </td>
+                                                                                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                                                                    {savedCard.expiryMonth}/{savedCard.expiryYear}
+                                                                                </td>
+                                                                                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                                                                    {getStatus(savedCard.status)}
+                                                                                </td>
+                                                                                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                                                                    {dayjs(savedCard.createdAt).format('L')}
+                                                                                </td>
+                                                                                <td className="flex items-start gap-2 text-sm font-medium sm:pr-3">
+                                                                                    <FlyoutContainer
+                                                                                        intendedPosition="y"
+                                                                                        FlyoutContent={
+                                                                                            <div className="z-50 flex w-48 flex-col items-center justify-center rounded-2xl bg-red-600 px-3 py-4 shadow-xl">
+                                                                                                <h3 className="text-center text-sm font-bold text-white">
+                                                                                                    Delete Card
+                                                                                                </h3>
+                                                                                            </div>
+                                                                                        }
+                                                                                    >
+                                                                                        <RemoveCardButton savedCard={savedCard}>
+                                                                                            {({ onClick }) => (
+                                                                                                <Button
+                                                                                                    onClick={onClick}
+                                                                                                    color='dangerGhost'
+                                                                                                    title="Remove Card"
+                                                                                                    className=""
+                                                                                                >
+                                                                                                    <TrashIcon className="h-4 w-auto text-red-600" />
+                                                                                                </Button>
+                                                                                            )}
+                                                                                        </RemoveCardButton>
+                                                                                    </FlyoutContainer>
+                                                                                    {savedCard.reusable && savedCard.status === 'SavedCard.Status.Active' ? (
+                                                                                        <FlyoutContainer
+                                                                                            intendedPosition="y"
+                                                                                            FlyoutContent={
+                                                                                                <div className="z-50 flex w-48 flex-col items-center justify-center rounded-2xl bg-blue-600 px-3 py-4 shadow-xl">
+                                                                                                    <h3 className="text-center text-sm font-bold text-white">
+                                                                                                        Make Primary
+                                                                                                    </h3>
+                                                                                                </div>
+                                                                                            }
+                                                                                        >
+                                                                                            <Button
+                                                                                                // onClick={onClick}
+                                                                                                disabled={isLoading}
+                                                                                                color='successGhost'
+                                                                                                title="Make Card Primary"
+                                                                                                className=""
+                                                                                            >
+                                                                                                {isLoading ? (
+                                                                                                    <Loader size="5" />
+                                                                                                ) : (
+                                                                                                    <CheckBadgeIcon className="h-4 w-auto text-green-600" />
+                                                                                                )}
+                                                                                            </Button>
+                                                                                        </FlyoutContainer>
+                                                                                    ) : null}
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </>
+                                                                ) : null}
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -170,7 +310,7 @@ export const SavedCardsModule = () => {
                                     }
                                 </div>
                             </div>
-                        </div>
+                        </div >
                     ) : null
                 }
 
@@ -199,4 +339,27 @@ export const SavedCardsModule = () => {
             <Footer />
         </>
     );
+}
+
+function getStatus(status: SavedCard['status']) {
+    switch (status) {
+        case 'SavedCard.Status.Active':
+            return (
+                <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-700/10">
+                    Active
+                </span>
+            )
+        case 'SavedCard.Status.Inactive':
+            return (
+                <span className="bg-organge-50 text-organge-700 ring-organge-700/10 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
+                    Inactive
+                </span>
+            )
+        default:
+            return (
+                <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-700/10">
+                    Unknown
+                </span>
+            )
+    }
 }

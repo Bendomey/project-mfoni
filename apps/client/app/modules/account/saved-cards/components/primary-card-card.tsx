@@ -1,5 +1,6 @@
 import { PlusIcon, CreditCardIcon } from "@heroicons/react/24/outline";
 import { AddCardButton } from "./add-card/index.tsx";
+import { RemoveCardButton } from "./remove-card/index.tsx";
 import mastercardLogo from '@/assets/mastercard-icon.png'
 import visaLogo from '@/assets/visa-icon.png'
 import { Button } from "@/components/button/index.tsx";
@@ -7,9 +8,10 @@ import { Button } from "@/components/button/index.tsx";
 
 interface Props {
     savedCard?: SavedCard
+    showRemoveButton?: boolean
 }
 
-export function PrimaryCardCard({ savedCard }: Props) {
+export function PrimaryCardCard({ savedCard, showRemoveButton }: Props) {
     if (!savedCard) {
         return (
             <AddCardButton>
@@ -46,9 +48,18 @@ export function PrimaryCardCard({ savedCard }: Props) {
             </div>
             <div className="p-4 border-t flex flex-row items-center justify-between space-x-2">
                 <div className="text-sm capitalize">{(savedCard.bank ?? "Primary").toLowerCase()}</div>
-                <div>
-                    <Button variant='solid' color='dangerGhost' size='sm' className='w-full'>Remove</Button>
-                </div>
+                {
+                    showRemoveButton ? (
+                        <div>
+                            <RemoveCardButton savedCard={savedCard}>
+                                {({ onClick }) => (
+                                    <Button onClick={onClick} variant='solid' color='dangerGhost' size='sm' className='w-full'>Remove</Button>
+                                )}
+                            </RemoveCardButton>
+                        </div>
+                    ) : null
+                }
+
             </div>
         </div>
     );

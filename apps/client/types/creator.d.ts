@@ -26,6 +26,7 @@ interface Creator {
 	interests: Array<string>
 	socialMedia: Array<CreatorSocialMedia>
 	subscription: CreatorSubscription
+	subscriptionPaymentMethod:  'WALLET' | 'SAVED_CARD'
 	createdAt: Date
 	updatedAt: Date
 }
