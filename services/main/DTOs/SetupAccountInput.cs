@@ -17,7 +17,7 @@ public class SetupAccountInput
     public required string Name { get; set; }
 
     /// <summary>
-    /// Can be `FREE` or `BASIC` or `ADVANCED`
+    /// Can be `MfoniPackage.Free` or `MfoniPackage.Basic` or `MfoniPackage.Advanced`
     /// </summary>
-    public string? IntendedPricingPackage { get; set; } // FREE | BASIC | ADVANCED
+    public string? IntendedPricingPackage { get; set; } // MfoniPackage.Free | MfoniPackage.Basic | MfoniPackage.Advanced
 }

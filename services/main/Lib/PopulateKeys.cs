@@ -3,6 +3,7 @@
 public class PopulateKeys
 {
     public static readonly string ADMIN_CREATED_BY = "admin.createdBy";
+    public static readonly string MFONI_PACKAGE = "mfoniPackage";
     public static readonly string CREATOR = "creator";
     public static readonly string WALLET = "wallet";
     public static readonly string PURCHASE = "purchase";
@@ -26,4 +27,5 @@ public class PopulateKeys
     public static readonly string CONTENT_PURCHASE_CONTENT = "contentPurchase.content";
     public static readonly string CONTENT_PURCHASE_WALLET_FROM = "contentPurchase.wallet.from";
     public static readonly string CONTENT_PURCHASE_WALLET_TO = "contentPurchase.wallet.to";
+    public static readonly string CREATOR_APPLICATION_MFONI_PACKAGE = "creatorApplication.mfoniPackage";
 }

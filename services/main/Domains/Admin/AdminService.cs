@@ -6,6 +6,7 @@ using main.Lib;
 using main.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using NanoidDotNet;
 
@@ -15,9 +16,10 @@ public class AdminService
 {
     private readonly AppConstants _appConstantsConfiguration;
     private readonly IMongoCollection<Models.Admin> _adminsCollection;
-
-    public AdminService(DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
+    private readonly ILogger<AdminService> _logger;
+    public AdminService(ILogger<AdminService> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
     {
+        _logger = logger;
         var database = databaseConfig.Database;
         _adminsCollection = database.GetCollection<Models.Admin>(
             appConstants.Value.AdminCollection
@@ -123,5 +125,43 @@ public class AdminService
 
         return admin;
     }
+
+    public async Task BootstrapAdmin()
+    {
+        _logger.LogInformation("Bootstrapping admin");
+
+        try
+        {
+            var alreadyExists = await _adminsCollection.Find(new BsonDocument()).FirstOrDefaultAsync();
+
+            if (alreadyExists is not null)
+            {
+                _logger.LogInformation("Admins Already Bootstrapped!");
+                return;
+            }
+
+            var defaultAdmin = new Models.Admin
+            {
+                Name = "Mfoni Admin",
+                Email = _appConstantsConfiguration.SuperAdminEmail,
+                Password = _appConstantsConfiguration.SuperAdminPassword
+            };
+
+            var passwordHasher = new PasswordHasher<Models.Admin>();
+            defaultAdmin.Password = passwordHasher.HashPassword(defaultAdmin, defaultAdmin.Password);
+            await _adminsCollection.InsertOneAsync(defaultAdmin);
+            _logger.LogInformation("Admin Bootstrapped now!");
+
+            return;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error bootstrapping admin");
+            throw;
+        }
+
+
+    }
+
 
 }

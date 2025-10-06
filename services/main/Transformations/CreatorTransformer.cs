@@ -52,6 +52,7 @@ public class CreatorTransformer
             About = creator.About,
             Followers = creator.Followers,
             Address = creator.Address,
+            SubscriptionPaymentMethod = creator.SubscriptionPaymentMethod,
             CreatedAt = creator.CreatedAt,
             UpdatedAt = creator.UpdatedAt,
         };

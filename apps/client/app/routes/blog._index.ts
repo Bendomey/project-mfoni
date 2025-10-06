@@ -1,9 +1,9 @@
 import { type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node'
+import { posts } from '@/generated/posts.ts'
 import { jsonWithCache } from '@/lib/actions/json-with-cache.server.ts'
 import { getDisplayUrl, getDomainUrl } from '@/lib/misc.ts'
 import { getSocialMetas } from '@/lib/seo.ts'
 import { AllBlogsModule } from '@/modules/index.ts'
-import { posts } from '@/generated/posts.ts'
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
 	return jsonWithCache({

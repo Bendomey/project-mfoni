@@ -24,6 +24,7 @@ public class AppConstants
     public string ContentReportCaseCollection { get; init; } = "content_report_cases";
     public string TagContentCollection { get; init; } = "tag_contents";
     public string WaitlistCollection { get; init; } = "waitlists";
+    public string MfoniPackageCollection { get; init; } = "mfoni_packages";
     public string CreatorSubscriptionCollection { get; init; } = "creator_subscriptions";
     public string CreatorSubscriptionPurchaseCollection { get; init; } = "creator_subscription_purchases";
     public string PaymentCollection { get; init; } = "payments";
@@ -51,6 +52,8 @@ public class AppConstants
     public string SearchServiceAuthToken { get; set; } = null!;
     public string WebsiteUrl { get; set; } = "https://mfoni.app";
     public string PaystackSecretKey { get; set; } = null!;
-    public string MfoniPaymentEmail { get; set; } = "support@mfoni.app";
+    public string MfoniSupportEmail { get; set; } = "mfoniapp@gmail.com";
     public string MfoniImagesUrl { get; set; } = null!;
+    public string SuperAdminEmail { get; set; } = null!;
+    public string SuperAdminPassword { get; set; } = null!;
 }

@@ -64,8 +64,9 @@ public class CreatorApplication
     [BsonElement("id_back_image")]
     public string? IdBackImage { get; set; }
 
-    [BsonElement("intended_pricing_package")]
-    public string? IntendedPricingPackage { get; set; } // FREE | BASIC | ADVANCED
+    [BsonElement("intended_pricing_package_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? IntendedPricingPackageId { get; set; }
 
     [BsonElement("created_at")]
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
@@ -89,7 +90,7 @@ public class CreatorApplication
 
             // Index on IntendedPricingPackage for fast lookups
             new CreateIndexModel<CreatorApplication>(
-                Builders<CreatorApplication>.IndexKeys.Ascending(x => x.IntendedPricingPackage)
+                Builders<CreatorApplication>.IndexKeys.Ascending(x => x.IntendedPricingPackageId)
             ),
 
             // Index on SubmittedAt for sorting

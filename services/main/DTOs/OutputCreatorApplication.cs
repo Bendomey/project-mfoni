@@ -10,6 +10,7 @@ public class OutputCreatorApplication
     public OutputBasicUserForAdmin? User { get; set; }
     public required string Status { get; set; }
     public DateTime? SubmittedAt { get; set; }
+    public String? RejectedReason { get; set; }
     public DateTime? RejectedAt { get; set; }
     public string? RejectedById { get; set; }
     public DateTime? ApprovedAt { get; set; }
@@ -18,7 +19,8 @@ public class OutputCreatorApplication
     public string? IdNumber { get; set; }
     public string? IdFrontImage { get; set; }
     public string? IdBackImage { get; set; }
-    public string? IntendedPricingPackage { get; set; }
+    public string? IntendedPricingPackageId { get; set; }
+    public OutputMfoniPackage? IntendedPricingPackage { get; set; }
     public required DateTime CreatedAt { get; set; }
     public required DateTime UpdatedAt { get; set; }
 }

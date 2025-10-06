@@ -12,7 +12,7 @@ public class ActivateCreatorSubscriptionInput
     /// <summary>
     /// Package Type
     /// </summary>
-    /// <example>BASIC | ADVANCED</example>
+    /// <example>MfoniPackage.Free | MfoniPackage.Basic | MfoniPackage.Advanced</example>
     [Required]
     public required string PricingPackage { get; set; }
 

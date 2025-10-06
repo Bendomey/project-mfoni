@@ -14,54 +14,18 @@ namespace main.Lib;
 
 public class PricingLib
 {
-    private string _packageType;
 
-    public PricingLib(string packageType)
+    public static long GetPricePerDay(Int64 amount)
     {
-        _packageType = packageType;
+        return amount / 30;
     }
 
-    public Int64 GetPrice()
+    public static string DetermineIfItsAnUpgradeOrDowngrade(string oldPackage, string newPackage)
     {
-        switch (_packageType)
-        {
-            case "FREE":
-                return 0;
-            case "BASIC":
-                return 5000;
-            case "ADVANCED":
-                return 10000;
-            default:
-                throw new HttpRequestException("InvalidPackageType");
-        }
-    }
+        string[] levels = { MfoniPackageCode.FREE, MfoniPackageCode.BASIC, MfoniPackageCode.ADVANCED };
 
-    public long GetPricePerDay()
-    {
-        return GetPrice() / 30;
-    }
-
-    public string GetPackageName()
-    {
-        switch (_packageType)
-        {
-            case "FREE":
-                return "Snap & Share";
-            case "BASIC":
-                return "Pro Lens";
-            case "ADVANCED":
-                return "Master Shot";
-            default:
-                throw new HttpRequestException("InvalidPackageType");
-        }
-    }
-
-    public string DetermineIfItsAnUpgradeOrDowngrade(string newPackage)
-    {
-        string[] levels = { CreatorSubscriptionPackageType.FREE, CreatorSubscriptionPackageType.BASIC, CreatorSubscriptionPackageType.ADVANCED };
-
-        int oldIndex = Array.IndexOf(levels, _packageType.ToUpper());
-        int newIndex = Array.IndexOf(levels, newPackage.ToUpper());
+        int oldIndex = Array.IndexOf(levels, oldPackage);
+        int newIndex = Array.IndexOf(levels, newPackage);
 
         if (oldIndex == -1 || newIndex == -1)
         {

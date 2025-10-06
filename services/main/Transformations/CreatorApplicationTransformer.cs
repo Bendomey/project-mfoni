@@ -7,14 +7,20 @@ namespace main.Transformations;
 public class CreatorApplicationTransformer
 {
     private readonly UserService _userService;
+    private readonly MfoniPackageService _mfoniPackageService;
     private readonly UserTransformer _userTransformer;
+    private readonly MfoniPackageTransformer _mfoniPackageTransformer;
     public CreatorApplicationTransformer(
         UserService userService,
-        UserTransformer userTransformer
+        MfoniPackageService mfoniPackageService,
+        UserTransformer userTransformer,
+        MfoniPackageTransformer mfoniPackageTransformer
     )
     {
         _userService = userService;
+        _mfoniPackageService = mfoniPackageService;
         _userTransformer = userTransformer;
+        _mfoniPackageTransformer = mfoniPackageTransformer;
     }
 
     public async Task<OutputCreatorApplication> Transform(CreatorApplication creatorApplication, string[]? populate = null)
@@ -32,6 +38,16 @@ public class CreatorApplicationTransformer
             }
         }
 
+        OutputMfoniPackage? intendedPricingPackage = null;
+        if (creatorApplication.IntendedPricingPackageId is not null && populate.Any(p => p.Contains(PopulateKeys.CREATOR_APPLICATION_MFONI_PACKAGE)))
+        {
+            var mfoniPackage = await _mfoniPackageService.GetById(creatorApplication.IntendedPricingPackageId);
+            if (mfoniPackage is not null)
+            {
+                intendedPricingPackage = _mfoniPackageTransformer.Transform(mfoniPackage);
+            }
+        }
+
         return new OutputCreatorApplication
         {
             Id = creatorApplication.Id,
@@ -39,6 +55,7 @@ public class CreatorApplicationTransformer
             User = outputBasicUser,
             Status = creatorApplication.Status,
             SubmittedAt = creatorApplication.SubmittedAt,
+            RejectedReason = creatorApplication.RejectedReason,
             RejectedAt = creatorApplication.RejectedAt,
             RejectedById = creatorApplication.RejectedById,
             ApprovedAt = creatorApplication.ApprovedAt,
@@ -47,7 +64,8 @@ public class CreatorApplicationTransformer
             IdNumber = creatorApplication.IdNumber,
             IdFrontImage = creatorApplication.IdFrontImage,
             IdBackImage = creatorApplication.IdBackImage,
-            IntendedPricingPackage = creatorApplication.IntendedPricingPackage,
+            IntendedPricingPackageId = creatorApplication.IntendedPricingPackageId,
+            IntendedPricingPackage = intendedPricingPackage,
             CreatedAt = creatorApplication.CreatedAt,
             UpdatedAt = creatorApplication.UpdatedAt,
         };

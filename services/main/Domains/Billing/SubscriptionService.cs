@@ -17,6 +17,7 @@ public class SubscriptionService
     private readonly IMongoCollection<Models.Creator> _creatorCollection;
     private readonly IMongoCollection<Models.CreatorSubscription> _creatorSubscriptionCollection;
     private readonly IMongoCollection<Models.CreatorSubscriptionPurchase> _creatorSubscriptionPurchaseCollection;
+    private readonly IMongoCollection<Models.MfoniPackage> _mfoniPackageCollection;
     private readonly CacheProvider _cacheProvider;
 
     public SubscriptionService(
@@ -43,6 +44,9 @@ public class SubscriptionService
             appConstants.Value.CreatorSubscriptionCollection
         );
 
+        _mfoniPackageCollection = databaseConfig.Database.GetCollection<Models.MfoniPackage>(
+            appConstants.Value.MfoniPackageCollection
+        );
 
         _creatorCollection = database.GetCollection<Models.Creator>(
            appConstants.Value.CreatorCollection
@@ -70,8 +74,15 @@ public class SubscriptionService
         var user = await _userService.GetUserById(creator.UserId);
 
         // check if they have enough balance to renew
-        var pricingLib = new PricingLib(creatorSubscription.PackageType);
-        bool canIPay = user.BookWallet >= pricingLib.GetPrice();
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Id == creatorSubscription.PackageTypeId)
+            .FirstOrDefaultAsync();
+
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidMfoniPackage");
+        }
+
+        bool canIPay = user.BookWallet >= mfoniCreatorPackage.Amount;
         DateTime renewalDate = (DateTime)creatorSubscription.EndedAt;
         DateTime today = DateTime.Today;
 
@@ -89,7 +100,7 @@ public class SubscriptionService
                 var newSubscription = new Models.CreatorSubscription
                 {
                     CreatorId = creator.Id,
-                    PackageType = creatorSubscription.PackageType,
+                    PackageTypeId = mfoniCreatorPackage.Id,
                     StartedAt = DateTime.UtcNow,
                     EndedAt = nextRenewalDate,
                     Period = 1, // 1 Month
@@ -99,7 +110,7 @@ public class SubscriptionService
 
                 await this.SubscribeWithWallet(new SubscribeWithWalletInput
                 {
-                    Amount = pricingLib.GetPrice(),
+                    Amount = mfoniCreatorPackage.Amount,
                     SubscriptionId = newSubscription.Id,
                     UserId = user.Id
                 });
@@ -110,10 +121,10 @@ public class SubscriptionService
                     EmailTemplates.SuccessfulSubscriptionRenewalSubject,
                     EmailTemplates.SuccessfulSubscriptionRenewalBody
                         .Replace("{name}", user.Name)
-                        .Replace("{package}", pricingLib.GetPackageName())
+                        .Replace("{package}", mfoniCreatorPackage.Name)
                         .Replace("{renewalDate}", today.ToString("dd/MM/yyyy"))
                         .Replace("{nextRenewalDate}", nextRenewalDate.ToString("dd/MM/yyyy"))
-                        .Replace("{renewalAmount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(pricingLib.GetPrice()):0.00}")
+                        .Replace("{renewalAmount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(mfoniCreatorPackage.Amount):0.00}")
                 );
                 return;
             }
@@ -142,7 +153,7 @@ public class SubscriptionService
                     EmailTemplates.RemindingSubscribersToTopupTheirWalletBody
                         .Replace("{name}", user.Name)
                         .Replace("{days}", daysLeft.ToString())
-                        .Replace("{package}", pricingLib.GetPackageName())
+                        .Replace("{package}", mfoniCreatorPackage.Name)
                         .Replace("{renewalDate}", renewalDate.ToString("dd/MM/yyyy"))
                 );
             }
@@ -161,7 +172,7 @@ public class SubscriptionService
                         EmailTemplates.RemindingOverDueSubscribersToTopupTheirWalletSubject,
                         EmailTemplates.RemindingOverdueSubscribersToTopupTheirWalletBody
                             .Replace("{name}", user.Name)
-                            .Replace("{package}", pricingLib.GetPackageName())
+                            .Replace("{package}", mfoniCreatorPackage.Name)
                             .Replace("{renewalDate}", renewalDate.ToString("dd/MM/yyyy"))
                     );
                 }
@@ -177,7 +188,7 @@ public class SubscriptionService
                         EmailTemplates.FailedSubscriptionSubject,
                         EmailTemplates.FailedSubscriptionBody
                             .Replace("{name}", user.Name)
-                            .Replace("{package}", pricingLib.GetPackageName())
+                            .Replace("{package}", mfoniCreatorPackage.Name)
                             .Replace("{renewalDate}", renewalDate.ToString("dd/MM/yyyy"))
                     );
                 }
@@ -246,13 +257,21 @@ public class SubscriptionService
 
     }
 
-
     public async Task<CreatorSubscription> CreateAFreeTierSubscription(string creatorId, DateTime? startDate = null)
     {
+        // get free package
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Code == MfoniPackageCode.FREE)
+            .FirstOrDefaultAsync();
+
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidFreeMfoniPackage");
+        }
+
         var freeTierSubscription = new Models.CreatorSubscription
         {
             CreatorId = creatorId,
-            PackageType = CreatorSubscriptionPackageType.FREE,
+            PackageTypeId = mfoniCreatorPackage.Id,
             StartedAt = startDate is not null ? (DateTime)startDate : DateTime.UtcNow,
         };
 
@@ -264,6 +283,15 @@ public class SubscriptionService
     // get creators who are due for subscription renewal.
     public async Task<List<CreatorSubscription>> GetSubscribersDueForRenewal()
     {
+        // get free package
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Code == MfoniPackageCode.FREE)
+            .FirstOrDefaultAsync();
+
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidFreeMfoniPackage");
+        }
+
         var pipeline = new[]
         {
             // Sort by createdAt in descending order
@@ -279,7 +307,7 @@ public class SubscriptionService
             // Match the latestRecord where packageType is not "FREE" and endDate.AddDays(-5) <= today.
             new BsonDocument("$match", new BsonDocument
             {
-                { "latestRecord.package_type", new BsonDocument("$ne", CreatorSubscriptionPackageType.FREE) },
+                { "latestRecord.package_type_id", new BsonDocument("$ne", mfoniCreatorPackage.Id) },
 
                 { "$expr", new BsonDocument("$and",  new BsonArray
                     {
@@ -316,10 +344,19 @@ public class SubscriptionService
             throw new HttpRequestException("CreatorSubscriptionNotFound");
         }
 
+        // get free package
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Code == MfoniPackageCode.FREE)
+            .FirstOrDefaultAsync();
+
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidFreeMfoniPackage");
+        }
+
         var filter = Builders<CreatorSubscription>.Filter.And(
             Builders<CreatorSubscription>.Filter.Eq("creator_id", ObjectId.Parse(sub.CreatorId)),
              Builders<CreatorSubscription>.Filter.And(
-                Builders<CreatorSubscription>.Filter.Eq("package_type", CreatorSubscriptionPackageType.FREE),
+                Builders<CreatorSubscription>.Filter.Eq("package_type_id", mfoniCreatorPackage.Id),
                 Builders<CreatorSubscription>.Filter.Gte("started_at", sub.EndedAt),
                 Builders<CreatorSubscription>.Filter.Eq("ended_at", BsonNull.Value)
             )
@@ -340,10 +377,19 @@ public class SubscriptionService
             throw new HttpRequestException("CreatorSubscriptionNotFound");
         }
 
+        // get free package
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Code == MfoniPackageCode.FREE)
+            .FirstOrDefaultAsync();
+
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidFreeMfoniPackage");
+        }
+
         var filter = Builders<CreatorSubscription>.Filter.And(
             Builders<CreatorSubscription>.Filter.Eq("creator_id", ObjectId.Parse(sub.CreatorId)),
              Builders<CreatorSubscription>.Filter.And(
-                Builders<CreatorSubscription>.Filter.Ne("package_type", CreatorSubscriptionPackageType.FREE),
+                Builders<CreatorSubscription>.Filter.Ne("package_type_id", mfoniCreatorPackage.Id),
                 Builders<CreatorSubscription>.Filter.Gt("started_at", DateTime.UtcNow)
             )
         );
@@ -357,23 +403,31 @@ public class SubscriptionService
     public async Task<CreatorSubscription> GetActiveCreatorSubscription(string creatorId)
     {
 
+        // get free package
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Code == MfoniPackageCode.FREE)
+            .FirstOrDefaultAsync();
+
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidFreeMfoniPackage");
+        }
+
         var today = DateTime.UtcNow;
         var filter = Builders<CreatorSubscription>.Filter.And(
             Builders<CreatorSubscription>.Filter.Eq("creator_id", ObjectId.Parse(creatorId)),
             Builders<CreatorSubscription>.Filter.Or(
                 Builders<CreatorSubscription>.Filter.And(
-                    Builders<CreatorSubscription>.Filter.Ne("package_type", CreatorSubscriptionPackageType.FREE),
+                    Builders<CreatorSubscription>.Filter.Ne("package_type_id", ObjectId.Parse(mfoniCreatorPackage.Id)),
                     Builders<CreatorSubscription>.Filter.Lte("started_at", today),
                     Builders<CreatorSubscription>.Filter.Gt("ended_at", today)
                 ),
                 Builders<CreatorSubscription>.Filter.And(
-                    Builders<CreatorSubscription>.Filter.Eq("package_type", CreatorSubscriptionPackageType.FREE),
+                    Builders<CreatorSubscription>.Filter.Eq("package_type_id", ObjectId.Parse(mfoniCreatorPackage.Id)),
                     Builders<CreatorSubscription>.Filter.Lte("started_at", today),
                     Builders<CreatorSubscription>.Filter.Eq("ended_at", BsonNull.Value)
                 )
             )
         );
-
 
         var activeSubscription = await _creatorSubscriptionCollection.Find(filter).FirstOrDefaultAsync();
 
@@ -393,12 +447,31 @@ public class SubscriptionService
         // check if the creator has an active subscription.
         var activeSubscription = await GetActiveCreatorSubscription(input.CreatorId);
 
-        var pricingLib = new PricingLib(input.PricingPackage);
+        // all active mfoni packages
+        var mfoniCreatorPackages = await _mfoniPackageCollection.Find(package => package.Status == MfoniPackageStatus.ACTIVE)
+            .ToListAsync();
 
-        if (activeSubscription.PackageType == CreatorSubscriptionPackageType.FREE)
+        if (mfoniCreatorPackages is null || mfoniCreatorPackages.Count == 0)
+        {
+            throw new HttpRequestException("NoActiveMfoniPackages");
+        }
+
+        var freeCreatorPackage = mfoniCreatorPackages.Find(package => package.Code == MfoniPackageCode.FREE);
+        if (freeCreatorPackage is null)
+        {
+            throw new HttpRequestException("NoFreeMfoniPackage");
+        }
+
+        var newPackageToSwitchTo = mfoniCreatorPackages.Find(package => package.Code == input.PricingPackage);
+        if (newPackageToSwitchTo is null)
+        {
+            throw new HttpRequestException("InvalidMfoniPackage");
+        }
+
+        if (activeSubscription.PackageTypeId == freeCreatorPackage.Id)
         {
 
-            var pricing = pricingLib.GetPrice() * input.Period;
+            var pricing = newPackageToSwitchTo.Amount * input.Period;
             bool canIPayWithWallet = user.BookWallet >= pricing;
 
             if (!canIPayWithWallet)
@@ -419,7 +492,7 @@ public class SubscriptionService
             var creatorSubscription = new CreatorSubscription
             {
                 CreatorId = creator.Id,
-                PackageType = input.PricingPackage,
+                PackageTypeId = newPackageToSwitchTo.Id,
                 Period = input.Period,
                 StartedAt = DateTime.UtcNow,
                 EndedAt = nextRenewalDate,
@@ -429,7 +502,7 @@ public class SubscriptionService
 
             await SubscribeWithWallet(new SubscribeWithWalletInput
             {
-                Amount = pricingLib.GetPrice(),
+                Amount = pricing,
                 SubscriptionId = creatorSubscription.Id,
                 UserId = user.Id
             });
@@ -440,7 +513,7 @@ public class SubscriptionService
                 EmailTemplates.SuccessfulSubscriptionSubject,
                 EmailTemplates.SuccessfulSubscriptionBody
                     .Replace("{name}", user.Name)
-                    .Replace("{package}", pricingLib.GetPackageName())
+                    .Replace("{package}", newPackageToSwitchTo.Name)
                     .Replace("{startDate}", today.ToString("dd/MM/yyyy"))
                     .Replace("{renewalDate}", nextRenewalDate.ToString("dd/MM/yyyy"))
                     .Replace("{renewalAmount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(pricing):0.00}")
@@ -453,8 +526,13 @@ public class SubscriptionService
             return creatorSubscription;
         }
 
-        var activeSubPricingLib = new PricingLib(activeSubscription.PackageType);
-        var pricingChange = activeSubPricingLib.DetermineIfItsAnUpgradeOrDowngrade(input.PricingPackage);
+        var activeSubPackage = mfoniCreatorPackages.Find(package => package.Id == activeSubscription.PackageTypeId);
+        if (activeSubPackage is null)
+        {
+            throw new HttpRequestException("ActiveSubscriptionMfoniPackageNotFound");
+        }
+
+        var pricingChange = PricingLib.DetermineIfItsAnUpgradeOrDowngrade(activeSubPackage.Code, input.PricingPackage);
 
         if (pricingChange == "NO_CHANGE")
         {
@@ -493,17 +571,16 @@ public class SubscriptionService
                 var today = DateTime.UtcNow;
 
                 // calculate how much the person has paid for the old billing.
-                var activePricingLib = new PricingLib(activeSubscription.PackageType);
                 int daysSubscribedFor = (activeSubscription.EndedAt?.Date - activeSubscription.StartedAt.Date)?.Days ?? 0;
                 int daysUsed = (today.Date - activeSubscription.StartedAt.Date).Days;
-                var pricingForWhatsBeenUsed = activePricingLib.GetPricePerDay() * daysUsed;
-                var pricingForTotal = activePricingLib.GetPricePerDay() * daysSubscribedFor;
+                var pricingForWhatsBeenUsed = PricingLib.GetPricePerDay(activeSubPackage.Amount) * daysUsed;
+                var pricingForTotal = PricingLib.GetPricePerDay(activeSubPackage.Amount) * daysSubscribedFor;
                 Int64 remainingAmount = (Int64)(pricingForTotal - pricingForWhatsBeenUsed);
 
                 // calculate the balance
                 var newUpgradeSubEndDate = DateTime.UtcNow.AddDays(input.Period * 30);
 
-                Int64 pricingForWhatToPayFor = (Int64)(pricingLib.GetPrice() * input.Period);
+                Int64 pricingForWhatToPayFor = (Int64)(newPackageToSwitchTo.Amount * input.Period);
 
                 Int64 yourMoney = remainingAmount + user.BookWallet;
                 bool canIPayWithWallet = yourMoney >= pricingForWhatToPayFor;
@@ -522,7 +599,7 @@ public class SubscriptionService
                 var newUpgradeSub = new CreatorSubscription
                 {
                     CreatorId = creator.Id,
-                    PackageType = input.PricingPackage,
+                    PackageTypeId = newPackageToSwitchTo.Id,
                     Period = input.Period,
                     StartedAt = DateTime.UtcNow,
                     EndedAt = newUpgradeSubEndDate,
@@ -548,10 +625,10 @@ public class SubscriptionService
                 SendNotification(
                     user,
                     EmailTemplates.SuccessfulSubscriptionImmediateUpgradeSubject
-                        .Replace("{package}", pricingLib.GetPackageName()),
+                        .Replace("{package}", newPackageToSwitchTo.Name),
                     EmailTemplates.SuccessfulSubscriptionImmediateUpgradeBody
                         .Replace("{name}", user.Name)
-                        .Replace("{package}", pricingLib.GetPackageName())
+                        .Replace("{package}", newPackageToSwitchTo.Name)
                         .Replace("{upgradeAmount}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(pricingForWhatToPayFor):0.00}")
                         .Replace("{effectiveDate}", today.ToString("dd/MM/yyyy"))
                         .Replace("{renewalDate}", newUpgradeSubEndDate.ToString("dd/MM/yyyy"))
@@ -572,7 +649,7 @@ public class SubscriptionService
                 var newUpgradeSub = new CreatorSubscription
                 {
                     CreatorId = creator.Id,
-                    PackageType = input.PricingPackage,
+                    PackageTypeId = newPackageToSwitchTo.Id,
                     Period = 0.1,
                     StartedAt = newUpgradeSubStartDate,
                     EndedAt = upgradeDeferNextRenewalDate,
@@ -582,12 +659,12 @@ public class SubscriptionService
                 SendNotification(
                     user,
                     EmailTemplates.SuccessfulSubscriptionScheduledUpgradeSubject
-                        .Replace("{package}", pricingLib.GetPackageName()),
+                        .Replace("{package}", newPackageToSwitchTo.Name),
                     EmailTemplates.SuccessfulSubscriptionScheduledUpgradeBody
                         .Replace("{name}", user.Name)
-                        .Replace("{package}", pricingLib.GetPackageName())
+                        .Replace("{package}", newPackageToSwitchTo.Name)
                         .Replace("{nextRenewalDate}", upgradeDeferNextRenewalDate.ToString("dd/MM/yyyy"))
-                        .Replace("{newMonthlyFee}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(pricingLib.GetPrice()):0.00}")
+                        .Replace("{newMonthlyFee}", $"GH₵ {MoneyLib.ConvertPesewasToCedis(newPackageToSwitchTo.Amount):0.00}")
                 );
 
                 _ = _cacheProvider.EntityChanged(new[] {
@@ -604,13 +681,12 @@ public class SubscriptionService
 
         var newDowngradeSubStartDate = (DateTime)activeSubscription.EndedAt!;
         var downgradeNextRenewalDate = newDowngradeSubStartDate.AddDays(1);
-        var currentPricingLib = new PricingLib(activeSubscription.PackageType);
 
         // this will help cron job to know what new subscription to renew.
         var newDowngradeSub = new CreatorSubscription
         {
             CreatorId = creator.Id,
-            PackageType = input.PricingPackage,
+            PackageTypeId = activeSubPackage.Id,
             Period = 0.1,
             StartedAt = newDowngradeSubStartDate,
             EndedAt = downgradeNextRenewalDate,
@@ -620,14 +696,14 @@ public class SubscriptionService
         SendNotification(
             user,
             EmailTemplates.SuccessfulSubscriptionScheduledDowngradeSubject
-                .Replace("{package}", pricingLib.GetPackageName()),
+                .Replace("{package}", newPackageToSwitchTo.Name),
             EmailTemplates.SuccessfulSubscriptionScheduledDowngradeBody
                 .Replace("{name}", user.Name)
-                .Replace("{package}", pricingLib.GetPackageName())
-                .Replace("{currentPackage}", currentPricingLib.GetPackageName())
+                .Replace("{package}", newPackageToSwitchTo.Name)
+                .Replace("{currentPackage}", activeSubPackage.Name)
                 .Replace("{currentCycleEndDate}", newDowngradeSubStartDate.ToString("dd/MM/yyyy"))
                 .Replace("{nextRenewalDate}", downgradeNextRenewalDate.ToString("dd/MM/yyyy"))
-                .Replace("{newMonthlyFee}", $"{MoneyLib.ConvertPesewasToCedis(pricingLib.GetPrice()):0.00}")
+                .Replace("{newMonthlyFee}", $"{MoneyLib.ConvertPesewasToCedis(newPackageToSwitchTo.Amount):0.00}")
         );
 
         _ = _cacheProvider.EntityChanged(new[] {
@@ -653,7 +729,15 @@ public class SubscriptionService
             .FirstOrDefaultAsync();
 
         // if it's free, then we don't do anything.
-        if (lastSubscription.PackageType == CreatorSubscriptionPackageType.FREE)
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Id == lastSubscription.PackageTypeId)
+            .FirstOrDefaultAsync();
+
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidMfoniPackage");
+        }
+
+        if (mfoniCreatorPackage.Code == MfoniPackageCode.FREE)
         {
             throw new HttpRequestException("AlreadyOnFreeTier");
         }
@@ -672,10 +756,7 @@ public class SubscriptionService
         // if it's premium, then we cancel it by creating a new subscription record with FREE as the package type.
         var newSubscription = await CreateAFreeTierSubscription(creatorId, lastSubscription.EndedAt);
 
-
         DateTime expiryDate = (DateTime)lastSubscription.EndedAt;
-
-        var pricingLib = new PricingLib(lastSubscription.PackageType);
 
         _ = _cacheProvider.EntityChanged(new[] {
             $"{CacheProvider.CacheEntities["auth"]}*{user.Id}*",
@@ -687,7 +768,7 @@ public class SubscriptionService
                 .Replace("{expiryDate}", expiryDate.ToString("dd/MM/yyyy")),
             EmailTemplates.CreatorSubscriptionCancelledBody
                 .Replace("{name}", user.Name)
-                .Replace("{package}", pricingLib.GetPackageName())
+                .Replace("{package}", mfoniCreatorPackage.Name)
                 .Replace("{cancellationDate}", DateTime.UtcNow.ToString("dd/MM/yyyy"))
                 .Replace("{expiryDate}", expiryDate.ToString("dd/MM/yyyy"))
         );
@@ -736,14 +817,14 @@ public class SubscriptionService
     {
         FilterDefinitionBuilder<Models.CreatorSubscription> builder = Builders<Models.CreatorSubscription>.Filter;
         var userIdFilter = builder.Eq(sub => sub.CreatorId, input.CreatorId);
-        var typeFilter = builder.Eq(sub => sub.PackageType, input.PackageType);
+        var packageTypeFilter = builder.Eq(sub => sub.PackageTypeId, input.PackageTypeId);
 
 
         var filters = Builders<CreatorSubscription>.Filter.And(userIdFilter);
 
-        if (input.PackageType is not null)
+        if (input.PackageTypeId is not null)
         {
-            filters = Builders<CreatorSubscription>.Filter.And(userIdFilter, typeFilter);
+            filters = Builders<CreatorSubscription>.Filter.And(userIdFilter, packageTypeFilter);
         }
 
         var subs = await _creatorSubscriptionCollection
@@ -759,15 +840,15 @@ public class SubscriptionService
     public async Task<long> CountSubscriptions(GetSubscriptionsInput input)
     {
         FilterDefinitionBuilder<Models.CreatorSubscription> builder = Builders<Models.CreatorSubscription>.Filter;
-        var userIdFilter = builder.Eq(wallet => wallet.CreatorId, input.CreatorId);
-        var typeFilter = builder.Eq(wallet => wallet.PackageType, input.PackageType);
+        var userIdFilter = builder.Eq(sub => sub.CreatorId, input.CreatorId);
+        var packageTypeFilter = builder.Eq(sub => sub.PackageTypeId, input.PackageTypeId);
 
 
         var filters = Builders<CreatorSubscription>.Filter.And(userIdFilter);
 
-        if (input.PackageType is not null)
+        if (input.PackageTypeId is not null)
         {
-            filters = Builders<CreatorSubscription>.Filter.And(userIdFilter, typeFilter);
+            filters = Builders<CreatorSubscription>.Filter.And(userIdFilter, packageTypeFilter);
         }
 
 

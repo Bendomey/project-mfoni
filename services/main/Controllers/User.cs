@@ -32,6 +32,7 @@ public class UserController : ControllerBase
     private readonly PaymentTransformer _paymentTransformer;
     private readonly PurchaseContentService _purchaseContentService;
     private readonly ContentPurchaseTransformer _contentPurchaseTransformer;
+    private readonly MfoniPackageService _mfoniPackageService;
 
     public UserController(
         ILogger<UserController> logger,
@@ -49,7 +50,8 @@ public class UserController : ControllerBase
         ContentLikeTransformer contentLikeTransformer,
         PurchaseContentService purchaseContentService,
         PaymentTransformer paymentTransformer,
-        PermissionService permissionService
+        PermissionService permissionService,
+        MfoniPackageService mfoniPackageService
     )
     {
         this.logger = logger;
@@ -68,6 +70,7 @@ public class UserController : ControllerBase
         this._contentPurchaseTransformer = contentPurchaseTransformer;
         this._purchaseContentService = purchaseContentService;
         _permissionService = permissionService;
+        this._mfoniPackageService = mfoniPackageService;
     }
 
     [Authorize]
@@ -207,8 +210,9 @@ public class UserController : ControllerBase
             logger.LogInformation($"get user's active creator application");
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creatorApplication = await _creatorApplicationService.GetUserActiveCreatorApplication(currentUser.Id);
+            var populate = new string[] { PopulateKeys.CREATOR_APPLICATION_MFONI_PACKAGE };
             return new ObjectResult(
-            new GetEntityResponse<OutputCreatorApplication>(await _creatorApplicationTransformer.Transform(creatorApplication), null).Result()
+            new GetEntityResponse<OutputCreatorApplication>(await _creatorApplicationTransformer.Transform(creatorApplication, populate), null).Result()
             )
             { StatusCode = StatusCodes.Status200OK };
         }
@@ -1025,7 +1029,9 @@ public class UserController : ControllerBase
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creatorInfo = await _creatorService.GetCreatorDetails(currentUser.Id);
 
-            var uploadLimit = PermissionsHelper.GetNumberOfUploadsForPackageType(creatorInfo.CreatorSubscription.PackageType);
+            var mfoniCreatorPackage = await _mfoniPackageService.GetById(creatorInfo.CreatorSubscription.PackageTypeId);
+
+            var uploadLimit = PermissionsHelper.GetNumberOfUploadsForPackageType(mfoniCreatorPackage.Code);
             var yourUploads = await _permissionService.GetMonthlyUploadLimit(creatorInfo);
             var uploadLimitForUser = new UploadLimitForUserForCurrentMonth
             {
@@ -1090,7 +1096,9 @@ public class UserController : ControllerBase
             var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
             var creatorInfo = await _creatorService.GetCreatorDetails(currentUser.Id);
 
-            var withdrawalLimit = PermissionsHelper.GetAmountYouCanWithdrawPerMonth(creatorInfo.CreatorSubscription.PackageType);
+            var mfoniCreatorPackage = await _mfoniPackageService.GetById(creatorInfo.CreatorSubscription.PackageTypeId);
+
+            var withdrawalLimit = PermissionsHelper.GetAmountYouCanWithdrawPerMonth(mfoniCreatorPackage.Code);
             var yourWithdrawals = await _permissionService.GetMonthlyWithdrawalLimit(creatorInfo);
             var withdrawalLimitForUser = new WithdrawalLimitForUserForCurrentMonth
             {

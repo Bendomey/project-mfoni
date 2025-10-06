@@ -162,7 +162,7 @@ export const useCancelSubscription = () =>
 	})
 
 interface ActivateSubscriptionRequest {
-	pricingPackage: PackageType
+	pricingPackage: MfoniPackageCode
 	period: number
 	upgradeEffect?: 'INSTANT' | 'DEFER'
 }

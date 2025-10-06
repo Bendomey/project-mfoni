@@ -1,6 +1,5 @@
 import { ChevronLeftIcon } from '@heroicons/react/24/outline'
-import { useLoaderData, useSearchParams } from '@remix-run/react'
-import { HydrationBoundary, type DehydratedState } from '@tanstack/react-query'
+import { useSearchParams } from '@remix-run/react'
 import { WalletTransactionsTable } from './components/transactions-table.tsx'
 import { WalletCard } from './components/wallet-card.tsx'
 import { useGetWalletTransactions } from '@/api/wallet-transactions/index.ts'
@@ -8,7 +7,7 @@ import { Button } from '@/components/button/index.tsx'
 import { Footer } from '@/components/footer/index.tsx'
 import { Header } from '@/components/layout/index.ts'
 
-const WalletPage = () => {
+export const WalletModule = () => {
 	const [searchParams] = useSearchParams()
 	const page = searchParams.get('page') ?? '0'
 	const { data, isError, isLoading } = useGetWalletTransactions({
@@ -48,16 +47,5 @@ const WalletPage = () => {
 			</div>
 			<Footer />
 		</>
-	)
-}
-export const WalletModule = () => {
-	const loaderData = useLoaderData<{
-		dehydratedState: DehydratedState
-	}>()
-
-	return (
-		<HydrationBoundary state={loaderData.dehydratedState}>
-			<WalletPage />
-		</HydrationBoundary>
 	)
 }

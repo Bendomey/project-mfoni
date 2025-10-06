@@ -1,9 +1,7 @@
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Link } from '@remix-run/react'
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
 import { usePackageAndBillingsContext } from '../../context/index.tsx'
-import { MFONI_PACKAGES_DETAILED } from '@/constants/index.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
 import {
 	determineIfItsAnUpgradeOrDowngrade,
@@ -12,7 +10,7 @@ import {
 import { useAuth } from '@/providers/auth/index.tsx'
 
 interface Props {
-	mfoniPackage: string
+	mfoniPackage: MfoniPackage
 	isWalletLow: boolean
 	period: number
 	upgradeType: 'INSTANT' | 'DEFER'
@@ -28,13 +26,9 @@ export function ConfirmAmount({
 }: Props) {
 	const { activePackage } = usePackageAndBillingsContext()
 
-	const selectedPackage = useMemo(() => {
-		return MFONI_PACKAGES_DETAILED[mfoniPackage as PackageType]
-	}, [mfoniPackage])
-
 	const pricingChange = determineIfItsAnUpgradeOrDowngrade({
-		activePackage: activePackage?.id as PackageType,
-		changePackage: mfoniPackage as PackageType,
+		activePackage: activePackage!,
+		changePackage: mfoniPackage
 	})
 
 	return (
@@ -49,11 +43,11 @@ export function ConfirmAmount({
 					<div className="flex items-center">
 						<p className="text-sm text-gray-600">Package:</p>
 						<p className="ml-3 text-base font-bold text-gray-900">
-							{selectedPackage.name}
+							{mfoniPackage.name}
 						</p>
 					</div>
 
-					{selectedPackage.amount > 0 ? (
+					{mfoniPackage.amount > 0 ? (
 						<div className="mt-2 flex items-center">
 							<p className="text-sm text-gray-600">Period:</p>
 							<p className="ml-3 text-base font-bold text-gray-900">
@@ -69,14 +63,14 @@ export function ConfirmAmount({
 						<p className="text-sm text-gray-600">Amount:</p>
 						<p className="ml-3 text-base font-bold text-gray-900">
 							{formatAmount(
-								convertPesewasToCedis(selectedPackage.amount * period),
+								convertPesewasToCedis(mfoniPackage.amount * period),
 							)}
 						</p>
 					</div>
 
-					{pricingChange === 'UPGRADE' &&
-					isPackagePremium(activePackage?.id as PackageType) &&
-					isPackagePremium(selectedPackage.id as PackageType) ? (
+					{pricingChange === 'UPGRADE' && activePackage &&
+					isPackagePremium(activePackage) &&
+					isPackagePremium(mfoniPackage) ? (
 						<div className="mt-3 rounded-md border border-gray-300 bg-gray-50 p-3">
 							<span className="text-sm">
 								What type of plan upgrade do you prefer?

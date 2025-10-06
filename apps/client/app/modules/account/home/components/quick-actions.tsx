@@ -16,22 +16,28 @@ export function QuickActions() {
 				initial: 'P',
 				current: false,
 			})
-		} else {
+
 			actions.push({
-				name: 'Manage your Wallet',
-				href: '/account/wallet',
-				initial: 'W',
+				name: 'Your subscription and billings',
+				href: '/account/package-and-billings',
+				initial: 'B',
 				current: false,
 			})
 		}
 
-		// TODO: bring this back after implmenting save cards.
-		// actions.push({
-		// 	name: 'Saved Cards',
-		// 	href: '/account/saved-cards',
-		// 	initial: 'C',
-		// 	current: false,
-		// })
+		actions.push({
+			name: 'Manage your Wallet',
+			href: '/account/wallet',
+			initial: 'W',
+			current: false,
+		})
+
+		actions.push({
+			name: 'Saved Cards',
+			href: '/account/saved-cards',
+			initial: 'C',
+			current: false,
+		})
 		return actions
 	}, [isACreator])
 

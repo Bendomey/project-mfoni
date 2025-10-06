@@ -16,6 +16,7 @@ public class OutputCreator
     public required Int64 Followers { get; set; }
     public required string Address { get; set; }
     public required SocialMedia[] SocialMedia { get; set; }
+    public required string SubscriptionPaymentMethod { get; set; }
     public required DateTime CreatedAt { get; set; }
     public required DateTime UpdatedAt { get; set; }
 }

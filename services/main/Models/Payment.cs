@@ -16,6 +16,7 @@ public static class PaymentMetaDataOrigin
 {
     public static readonly string ContentPurchase = "ContentPurchase";
     public static readonly string WalletTopup = "WalletTopup";
+    public static readonly string SavedCard = "SavedCard";
 }
 // Base Payment model for one time payments.
 public class Payment
@@ -106,7 +107,7 @@ public class Payment
 public class PaymentMetaData
 {
     [BsonElement("origin")]
-    public required string Origin { get; init; } // ContentPurchase | WalletTopup
+    public required string Origin { get; init; } // ContentPurchase | WalletTopup | SavedCard
 
     [BsonElement("content_purchase_id")]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -115,6 +116,10 @@ public class PaymentMetaData
     [BsonElement("wallet_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? WalletId { get; init; }
+
+    [BsonElement("user_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? UserId { get; init; }
 }
 
 public class PaymentError

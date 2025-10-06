@@ -49,7 +49,7 @@ export function PackageCard() {
 								</span>
 							</div>
 							<p className="text-xs text-gray-500">
-								Our most popular plan for starters
+								{activePackage?.description}
 							</p>
 						</div>
 						<div className="hidden items-end gap-1 md:flex">
@@ -120,7 +120,7 @@ export function PackageCard() {
 				<div className="flex justify-end gap-2 border-t border-gray-200 px-4 py-2">
 					{isActiveSubscriptionCancelledRequestPending ? null : (
 						<>
-							{activePackage?.id !== 'FREE' &&
+							{activePackage?.code !== 'MfoniPackage.Free' &&
 							!isActiveSubscriptionCancelled ? (
 								<Button
 									onClick={onToggle}
@@ -132,7 +132,7 @@ export function PackageCard() {
 								</Button>
 							) : null}
 
-							{activePackage?.id !== 'FREE' && isActiveSubscriptionCancelled ? (
+							{activePackage?.code !== 'MfoniPackage.Free' && isActiveSubscriptionCancelled ? (
 								<Button
 									onClick={onToggleReactivateModal}
 									variant="solid"
@@ -151,7 +151,7 @@ export function PackageCard() {
 							className="gap-1"
 							onClick={() => setIsChangePackageModalOpened(true)}
 						>
-							{activePackage?.id === 'ADVANCED' ? (
+							{activePackage?.code === 'MfoniPackage.Advanced' ? (
 								<>
 									Change
 									<ArrowPathIcon className="h-3 w-auto" />
@@ -166,7 +166,11 @@ export function PackageCard() {
 					)}
 				</div>
 			</div>
-			<CancelSubscriptionDialog isOpened={isOpened} onClose={onToggle} />
+			{
+				activeSubcription ? (
+					<CancelSubscriptionDialog activeSubcription={activeSubcription} isOpened={isOpened} onClose={onToggle} />
+				) : null
+			}
 			<ReactivateSubscriptionDialog
 				isOpened={isOpenedReactivateModal}
 				onClose={onToggleReactivateModal}

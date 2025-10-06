@@ -17,6 +17,7 @@ public class CreatorApplicationService
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.Admin> _adminCollection;
     private readonly IMongoCollection<Models.CreatorApplication> _creatorApplicationCollection;
+    private readonly IMongoCollection<Models.MfoniPackage> _mfoniPackageCollection;
     private readonly AppConstants _appConstantsConfiguration;
     private readonly CreatorService _creatorService;
     private readonly CacheProvider _cacheProvider;
@@ -40,6 +41,9 @@ public class CreatorApplicationService
             databaseConfig.Database.GetCollection<Models.CreatorApplication>(
                 appConstants.Value.CreatorApplicatonCollection
             );
+        _mfoniPackageCollection = databaseConfig.Database.GetCollection<Models.MfoniPackage>(
+            appConstants.Value.MfoniPackageCollection
+        );
         _appConstantsConfiguration = appConstants.Value;
         _creatorService = creatorService;
         _cacheProvider = cacheProvider;
@@ -58,13 +62,22 @@ public class CreatorApplicationService
             throw new HttpRequestException("CreatorApplicationAlreadyExists");
         }
 
+        // get mfoni package
+        var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Code == input.CreatorPackageType && package.Status == MfoniPackageStatus.ACTIVE)
+            .FirstOrDefaultAsync();
+
+        if (mfoniCreatorPackage is null)
+        {
+            throw new HttpRequestException("InvalidCreatorPackageType");
+        }
+
         var __newCreatorApplication = new Models.CreatorApplication
         {
             UserId = userId,
             IdType = input.IdType,
             IdBackImage = input.IdBackImage,
             IdFrontImage = input.IdFrontImage,
-            IntendedPricingPackage = input.CreatorPackageType,
+            IntendedPricingPackageId = mfoniCreatorPackage.Id,
         };
         _creatorApplicationCollection.InsertOne(__newCreatorApplication);
 
@@ -94,7 +107,16 @@ public class CreatorApplicationService
 
         if (input.CreatorPackageType is not null)
         {
-            userUpdates = userUpdates.Set(r => r.IntendedPricingPackage, input.CreatorPackageType);
+            // get mfoni package
+            var mfoniCreatorPackage = await _mfoniPackageCollection.Find(package => package.Code == input.CreatorPackageType && package.Status == MfoniPackageStatus.ACTIVE)
+                .FirstOrDefaultAsync();
+
+            if (mfoniCreatorPackage is null)
+            {
+                throw new HttpRequestException("InvalidCreatorPackageType");
+            }
+
+            userUpdates = userUpdates.Set(r => r.IntendedPricingPackageId, mfoniCreatorPackage.Id);
         }
 
         if (input.IdType is not null)
@@ -150,9 +172,9 @@ public class CreatorApplicationService
             throw new HttpRequestException("IdFrontImageNotSet");
         }
 
-        if (creatorApplication.IntendedPricingPackage is null)
+        if (creatorApplication.IntendedPricingPackageId is null)
         {
-            throw new HttpRequestException("PackageTypeNotSet");
+            throw new HttpRequestException("CreatorPackageNotSet");
         }
 
         var idFilter = Builders<CreatorApplication>.Filter.Eq(r => r.Id, creatorApplication.Id);
@@ -211,6 +233,7 @@ public class CreatorApplicationService
             .Set(r => r.ApprovedAt, DateTime.UtcNow)
             .Set(r => r.ApprovedById, adminId)
             .Set(r => r.UpdatedAt, DateTime.UtcNow);
+
         await _creatorApplicationCollection.UpdateOneAsync(idFilter, userUpdates);
 
         var creator = await _creatorService.Create(input.CreatorApplicationId);

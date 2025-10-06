@@ -26,6 +26,15 @@ public class UpdateCreatorBasicDetails
     public string? Address { get; set; }
 }
 
+public class ChangePaymentMethodInput
+{
+    /// <summary>
+    /// Payment Method - Should be either WALLET or SAVED_CARD
+    /// </summary>
+    [Required]
+    public required string PaymentMethod { get; set; }
+}
+
 public class UploadLimitForUserForCurrentMonth
 {
     public Int64 Uploads { get; set; }

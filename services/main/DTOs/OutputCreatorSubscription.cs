@@ -6,7 +6,8 @@ namespace main.DTOs;
 public class OutputCreatorSubscription
 {
     public required string Id { get; set; }
-    public required string PackageType { get; set; }
+    public required string MfoniPackageId { get; set; }
+    public OutputMfoniPackage? MfoniPackage { get; set; }
     public required DateTime StartedAt { get; set; }
     public DateTime? EndedAt { get; set; }
     public double? Period { get; set; }

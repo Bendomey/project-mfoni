@@ -18,6 +18,7 @@ public class UserService
     private readonly IMongoCollection<Models.User> _userCollection;
     private readonly IMongoCollection<Models.CreatorApplication> _creatorApplicationCollection;
     private readonly IMongoCollection<Models.WalletTransaction> _walletTransactionCollection;
+    private readonly IMongoCollection<Models.MfoniPackage> _mfoniPackageCollection;
     private readonly CacheProvider _cacheProvider;
     private readonly AppConstants _appConstantsConfiguration;
     private readonly PaymentService _paymentService;
@@ -41,6 +42,11 @@ public class UserService
         _walletTransactionCollection = databaseConfig.Database.GetCollection<Models.WalletTransaction>(
             appConstants.Value.WalletTransactionCollection
         );
+
+        _mfoniPackageCollection = databaseConfig.Database.GetCollection<Models.MfoniPackage>(
+            appConstants.Value.MfoniPackageCollection
+        );
+
         _cacheProvider = cacheProvider;
         _appConstantsConfiguration = appConstants.Value;
 
@@ -64,12 +70,20 @@ public class UserService
         user.Name = accountInput.Name;
         user.UpdatedAt = DateTime.UtcNow;
 
-        if (accountInput.Role == UserRole.CREATOR)
+        if (accountInput.Role == UserRole.CREATOR && accountInput.IntendedPricingPackage is not null)
         {
+            var mfoniCreatorPackage = _mfoniPackageCollection.Find(package => package.Code == accountInput.IntendedPricingPackage)
+            .FirstOrDefault();
+
+            if (mfoniCreatorPackage is null)
+            {
+                throw new HttpRequestException("InvalidMfoniPackage");
+            }
+
             var __newCreatorApplication = new Models.CreatorApplication
             {
                 UserId = user.Id,
-                IntendedPricingPackage = accountInput.IntendedPricingPackage,
+                IntendedPricingPackageId = mfoniCreatorPackage.Id,
             };
             _creatorApplicationCollection.InsertOne(__newCreatorApplication);
         }
@@ -121,7 +135,8 @@ public class UserService
                 PhoneNumber = normalizedPhoneNumber,
                 Message = EmailTemplates
                     .VerifyPhoneNumberBody.Replace("{code}", code)
-                    .Replace("{name}", user.Name),
+                    .Replace("{name}", user.Name)
+                    .Replace("{validity}", "1 hour"),
                 AppId = _appConstantsConfiguration.SmsAppId,
                 AppSecret = _appConstantsConfiguration.SmsAppSecret
             }
@@ -419,7 +434,7 @@ public class UserService
             PaystackInput = new InitPaymentInput
             {
                 Amount = amount,
-                Email = user.Email != null && user.EmailVerifiedAt != null ? user.Email : _appConstantsConfiguration.MfoniPaymentEmail, // use defualt mfoni email to hold all paystack payments if user have no email.
+                Email = user.Email != null && user.EmailVerifiedAt != null ? user.Email : _appConstantsConfiguration.MfoniSupportEmail, // use defualt mfoni email to hold all paystack payments if user have no email.
                 Metadata = JsonConvert.SerializeObject(paymentMetadata)
             }
         });

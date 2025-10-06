@@ -4,13 +4,6 @@ using MongoDB.Driver;
 
 namespace main.Models;
 
-public static class CreatorSubscriptionPackageType
-{
-    public static readonly string FREE = "FREE";
-    public static readonly string BASIC = "BASIC";
-    public static readonly string ADVANCED = "ADVANCED";
-}
-
 // Holds trail of all packages a creator has ever activated before.
 public class CreatorSubscription
 {
@@ -22,8 +15,9 @@ public class CreatorSubscription
     [BsonRepresentation(BsonType.ObjectId)]
     public required string CreatorId { get; init; }
 
-    [BsonElement("package_type")]
-    public required string PackageType { get; init; }
+    [BsonElement("package_type_id")]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public required string PackageTypeId { get; init; }
 
     [BsonElement("started_at")]
     public required DateTime StartedAt { get; init; }
@@ -51,7 +45,7 @@ public class CreatorSubscription
 
             // Index on PackageType for fast lookups
             new CreateIndexModel<CreatorSubscription>(
-                Builders<CreatorSubscription>.IndexKeys.Ascending(x => x.PackageType)
+                Builders<CreatorSubscription>.IndexKeys.Ascending(x => x.PackageTypeId)
             ),
 
             // Index on StartedAt for sorting

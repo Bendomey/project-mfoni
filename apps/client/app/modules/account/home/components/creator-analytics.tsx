@@ -2,16 +2,17 @@ import { Link } from '@remix-run/react'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { PAGES } from '@/constants/index.ts'
+import { classNames } from '@/lib/classNames.ts'
 import { convertPesewasToCedis, formatAmount } from '@/lib/format-amount.ts'
 import { useAuth } from '@/providers/auth/index.tsx'
 
 export const CreatorAnalytics = () => {
-	const { currentUser } = useAuth()
+	const { currentUser, activeSubcription } = useAuth()
 
 	const subscriptionLink = useMemo(() => {
-		if (currentUser?.role === 'CREATOR' && currentUser.creator) {
-			const startedAt = currentUser.creator.subscription.startedAt
-			const endedAt = currentUser.creator.subscription.endedAt
+		if (activeSubcription) {
+			const startedAt = activeSubcription.startedAt
+			const endedAt = activeSubcription.endedAt
 			const isActive = endedAt
 				? dayjs().isAfter(startedAt) && dayjs().isBefore(endedAt)
 				: dayjs().isAfter(startedAt)
@@ -26,7 +27,15 @@ export const CreatorAnalytics = () => {
 						My Subscription
 					</dt>
 					<dd className="mt-1 flex items-baseline justify-between md:block lg:flex">
-						<div className="flex items-baseline text-2xl font-bold text-blue-600">
+						<div className={
+							classNames(
+								"flex items-baseline text-2xl font-bold",
+								{
+									'text-blue-600': isActive,
+									'text-yellow-600': !isActive,
+								}
+							)
+						}>
 							<span className="truncate">
 								{isActive ? 'Active' : 'Needs Setup'}
 							</span>
@@ -36,7 +45,7 @@ export const CreatorAnalytics = () => {
 			)
 		}
 		return null
-	}, [currentUser])
+	}, [activeSubcription])
 
 	return (
 		<div className="">

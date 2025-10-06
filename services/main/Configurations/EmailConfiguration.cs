@@ -35,6 +35,13 @@ public class EmailConfiguration
                 var jsonContent = JsonConvert.SerializeObject(emailData);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
+                // if it's developement environment, log the email content instead of sending
+                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+                {
+                    Console.WriteLine("Email content: " + jsonContent);
+                    return;
+                }
+
                 var response = await client.PostAsync("https://api.resend.com/emails", content);
                 response.EnsureSuccessStatusCode();
                 Console.WriteLine("Email sent successfully: " + await response.Content.ReadAsStringAsync());

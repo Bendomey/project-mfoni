@@ -1,5 +1,3 @@
-type PackageType = 'FREE' | 'BASIC' | 'ADVANCED'
-
 interface CreatorApplication {
 	id: string
 	userId: string
@@ -8,7 +6,8 @@ interface CreatorApplication {
 	approvedAt: Nullable<Date>
 	rejectedAt: Nullable<Date>
 	rejectedReason: Nullable<string>
-	intendedPricingPackage: Nullable<PackageType>
+	intendedPricingPackageId: Nullable<string>
+	intendedPricingPackage: Nullable<MfoniPackage>
 	idType: Nullable<'DRIVERS_LICENSE' | 'NATIONAL_ID' | 'VOTERS'>
 	idFrontImage: Nullable<string>
 	idBackImage: Nullable<string>
@@ -27,6 +26,7 @@ interface Creator {
 	interests: Array<string>
 	socialMedia: Array<CreatorSocialMedia>
 	subscription: CreatorSubscription
+	subscriptionPaymentMethod:  'WALLET' | 'SAVED_CARD'
 	createdAt: Date
 	updatedAt: Date
 }

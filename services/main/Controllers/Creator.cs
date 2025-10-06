@@ -16,12 +16,12 @@ namespace main.Controllers;
 [Route("api/v1/creators")]
 public class CreatorController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
+    private readonly ILogger<CreatorController> _logger;
     private readonly CreatorService _creatorService;
     private readonly CreatorTransformer _creatorTransformer;
 
     public CreatorController(
-        ILogger<UserController> logger,
+        ILogger<CreatorController> logger,
         CreatorService creatorService,
         CreatorTransformer creatorTransformer
     )
@@ -431,6 +431,52 @@ public class CreatorController : ControllerBase
                 scope.SetTags(new Dictionary<string, string>
                 {
                     {"action", "disable creator website"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
+    /// <summary>
+    /// Change subscription payment method
+    /// </summary>
+    /// <response code="200">Creator Updated Successfully</response>
+    /// <response code="401">Unauthorize</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize]
+    [HttpPatch("subscriptions/payment-method")]
+    [ProducesResponseType(typeof(OutputResponse<OutputCreator>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ChangeSubscriptionPaymentMethod([FromBody] DTOs.ChangePaymentMethodInput input)
+    {
+        try
+        {
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+
+            var creatorUpdates = await _creatorService.ChangeSubscriptionPaymentMethod(currentUser.Id, input.PaymentMethod);
+            return new ObjectResult(new GetEntityResponse<Models.Creator>(creatorUpdates, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<Models.ReportContentCase>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to change subscription payment method. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "change subscription payment method"},
                     {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
                 });
                 SentrySdk.CaptureException(e);

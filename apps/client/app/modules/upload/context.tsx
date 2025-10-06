@@ -170,10 +170,10 @@ export const ContentUploadProvider = () => {
 		if (
 			currentUser?.role === 'CREATOR' &&
 			yourUploadCount !== undefined &&
-			activeSubcription
+			activeSubcription?.mfoniPackage
 		) {
 			return (
-				getPackageUploadLimit(activeSubcription.packageType) > yourUploadCount
+				getPackageUploadLimit(activeSubcription.mfoniPackage) > yourUploadCount
 			)
 		}
 
@@ -183,11 +183,11 @@ export const ContentUploadProvider = () => {
 	const photosToUploadLeft = useMemo(() => {
 		if (
 			currentUser?.role === 'CREATOR' &&
-			activeSubcription &&
+			activeSubcription?.mfoniPackage &&
 			yourUploadCount !== undefined
 		) {
 			const whatsLeft =
-				getPackageUploadLimit(activeSubcription.packageType) - yourUploadCount
+				getPackageUploadLimit(activeSubcription.mfoniPackage) - yourUploadCount
 			if (whatsLeft < 0) {
 				return 0
 			}

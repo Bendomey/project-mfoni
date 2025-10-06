@@ -76,7 +76,7 @@ export function NoticeBanner() {
 				</p>
 				<Button
 					isLink={true}
-					href="/account?complete-creator-application=true"
+					href={`/account?complete-creator-application=${activeCreatorApplication?.intendedPricingPackage?.code ?? 'true'}`}
 					color="black"
 					size="sm"
 					className="rounded-full"

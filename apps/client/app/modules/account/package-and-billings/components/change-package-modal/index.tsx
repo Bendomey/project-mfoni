@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePackageAndBillingsContext } from '../../context/index.tsx'
 import { ConfirmAmount } from './confirm-amount.tsx'
 import { SelectPackage } from './select-package.tsx'
+import { useGetMfoniPackages } from '@/api/mfoni-packages/index.ts'
 import {
 	useActiveSubscription,
 	useCancelSubscription,
@@ -18,7 +19,7 @@ import {
 import { Button } from '@/components/button/index.tsx'
 import { Loader } from '@/components/loader/index.tsx'
 import { Modal } from '@/components/modal/index.tsx'
-import { MFONI_PACKAGES_DETAILED, PAGES } from '@/constants/index.ts'
+import { PAGES } from '@/constants/index.ts'
 import { errorToast } from '@/lib/custom-toast-functions.tsx'
 import { determineIfItsAnUpgradeOrDowngrade } from '@/lib/pricing-lib.ts'
 import { safeString } from '@/lib/strings.ts'
@@ -32,10 +33,10 @@ export function ChangePackageModal({ isOpened }: Props) {
 	const [step, setStep] = useState<'select-package' | 'confirm-amount'>(
 		'select-package',
 	)
-	const [mfoniPackage, setMfoniPackage] = useState<string>('')
-	const [upgradeType, setUpgradeType] = useState<'INSTANT' | 'DEFER'>('INSTANT')
 	const { setIsChangePackageModalOpened, activePackage } =
 		usePackageAndBillingsContext()
+	const [mfoniPackage, setMfoniPackage] = useState<MfoniPackage | undefined>()
+	const [upgradeType, setUpgradeType] = useState<'INSTANT' | 'DEFER'>('INSTANT')
 	const [searchParams, setSearchParams] = useSearchParams()
 	const [annualBillingEnabled, setAnnualBillingEnabled] = useState(false)
 	const { currentUser, activeSubcription } = useAuth()
@@ -51,6 +52,18 @@ export function ChangePackageModal({ isOpened }: Props) {
 	} = useIsSubscriptionPendingDowngrade(subscriptionId)
 	const [isPendingDeletion, setIsPendingDeletion] = useState(false)
 	const { mutate: deleteSubscription } = useDeleteSubscription()
+	const { data: mfoniPackages } = useGetMfoniPackages({
+		query: {
+			pagination: { page: 0, per: 5 },
+			filters: {
+				status: 'MfoniPackage.Status.Active',
+			},
+			sorter: {
+				sort: 'asc',
+				sortBy: 'createdAt',
+			},
+		},
+	})
 
 	const onClose = useCallback(() => {
 		setIsChangePackageModalOpened(false)
@@ -62,12 +75,14 @@ export function ChangePackageModal({ isOpened }: Props) {
 
 	useEffect(() => {
 		const changePackageParam = searchParams.get('change-package')
-		const packages = Object.keys(MFONI_PACKAGES_DETAILED)
+		const mfoniUrlPackage = mfoniPackages?.rows?.find(
+			(pkg) => pkg.code === changePackageParam,
+		)
 
-		if (changePackageParam && packages.includes(changePackageParam)) {
-			setMfoniPackage(changePackageParam)
+		if (changePackageParam && mfoniUrlPackage) {
+			setMfoniPackage(mfoniUrlPackage)
 		}
-	}, [searchParams, setIsChangePackageModalOpened])
+	}, [mfoniPackages?.rows, searchParams, setIsChangePackageModalOpened])
 
 	const amountToBePaid = useMemo(() => {
 		let period = 1
@@ -78,9 +93,7 @@ export function ChangePackageModal({ isOpened }: Props) {
 
 		if (!mfoniPackage) return 0
 
-		const selectedPackage = MFONI_PACKAGES_DETAILED[mfoniPackage as PackageType]
-
-		return selectedPackage.amount * period
+		return mfoniPackage.amount * period
 	}, [annualBillingEnabled, mfoniPackage])
 
 	const isWalletLow = useMemo(() => {
@@ -90,14 +103,15 @@ export function ChangePackageModal({ isOpened }: Props) {
 	}, [currentUser, amountToBePaid])
 
 	const handleSubmit = async () => {
+		if (!activePackage || !mfoniPackage) return
 		setSubmittedForm(true)
 
 		const pricingChange = determineIfItsAnUpgradeOrDowngrade({
-			activePackage: activePackage?.id as PackageType,
-			changePackage: mfoniPackage as PackageType,
+			activePackage: activePackage,
+			changePackage: mfoniPackage,
 		})
 
-		if (pricingChange === 'DOWNGRADE' && mfoniPackage === 'FREE') {
+		if (pricingChange === 'DOWNGRADE' && mfoniPackage.code === 'MfoniPackage.Free') {
 			// call cancel subscription api instead
 			cancelSubscription(undefined, {
 				onSuccess: () => {
@@ -115,7 +129,7 @@ export function ChangePackageModal({ isOpened }: Props) {
 		activateSubscription(
 			{
 				period: annualBillingEnabled ? 12 : 1,
-				pricingPackage: mfoniPackage as PackageType,
+				pricingPackage: mfoniPackage.code,
 				upgradeEffect: upgradeType,
 			},
 			{
@@ -164,10 +178,10 @@ export function ChangePackageModal({ isOpened }: Props) {
 		)
 	}
 
-	if (Boolean(subscriptionPendingDowngrade)) {
+	if (subscriptionPendingDowngrade?.mfoniPackage && activePackage) {
 		const packageChange = determineIfItsAnUpgradeOrDowngrade({
-			activePackage: activePackage?.id as PackageType,
-			changePackage: subscriptionPendingDowngrade?.packageType as PackageType,
+			activePackage,
+			changePackage: subscriptionPendingDowngrade.mfoniPackage,
 		})
 
 		return (
@@ -226,7 +240,7 @@ export function ChangePackageModal({ isOpened }: Props) {
 			canBeClosedWithBackdrop={false}
 		>
 			<div className="flex flex-row items-center justify-between bg-gray-100 p-4 text-gray-600">
-				<h1 className="font-bold">Change Plan</h1>
+				<h1 className="font-bold">Change Package</h1>
 			</div>
 			<div className="m-4">
 				{step === 'select-package' ? (
@@ -249,13 +263,18 @@ export function ChangePackageModal({ isOpened }: Props) {
 								<ChevronLeftIcon className="mr-1 h-4 w-4" /> Back
 							</Button>
 						</div>
-						<ConfirmAmount
-							setUpgradeType={setUpgradeType}
-							upgradeType={upgradeType}
-							isWalletLow={isWalletLow}
-							period={annualBillingEnabled ? 12 : 1}
-							mfoniPackage={mfoniPackage}
-						/>
+						{
+							mfoniPackage ? (
+								<ConfirmAmount
+									setUpgradeType={setUpgradeType}
+									upgradeType={upgradeType}
+									isWalletLow={isWalletLow}
+									period={annualBillingEnabled ? 12 : 1}
+									mfoniPackage={mfoniPackage}
+								/>
+							) : null
+						}
+
 					</div>
 				) : null}
 			</div>

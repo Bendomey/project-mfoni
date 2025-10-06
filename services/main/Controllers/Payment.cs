@@ -1,10 +1,15 @@
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using main.Configurations;
 using main.Configuratons;
 using main.Domains;
 using main.DTOs;
+using main.Transformations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Any;
 using Newtonsoft.Json;
 
 namespace main.Controllers;
@@ -54,11 +59,10 @@ public class PaymentController : ControllerBase
                     case "charge.success":
                         try
                         {
-                            await _paymentService.VerifyPayment(eventData);
+                            await _paymentService.VerifySuccessPayment(eventData);
                         }
-                        catch (System.Exception e)
+                        catch (Exception ex) when (ex is HttpRequestException || ex is Exception)
                         {
-
                             SentrySdk.ConfigureScope(scope =>
                             {
                                 scope.SetTags(new Dictionary<string, string>
@@ -66,7 +70,7 @@ public class PaymentController : ControllerBase
                                         {"action", "Verify Payment"},
                                         {"reference", eventData.Data.Reference},
                                 });
-                                SentrySdk.CaptureException(e);
+                                SentrySdk.CaptureException(ex);
                             });
                         }
                         break;
@@ -75,7 +79,7 @@ public class PaymentController : ControllerBase
                         {
                             await _transferService.VerifySuccessTransfer(eventData.Data.Reference);
                         }
-                        catch (System.Exception e)
+                        catch (Exception ex) when (ex is HttpRequestException || ex is Exception)
                         {
                             SentrySdk.ConfigureScope(scope =>
                             {
@@ -84,7 +88,7 @@ public class PaymentController : ControllerBase
                                         {"action", "Verify Success Transfer"},
                                         {"reference", eventData.Data.Reference},
                                 });
-                                SentrySdk.CaptureException(e);
+                                SentrySdk.CaptureException(ex);
                             });
                         }
                         break;
@@ -93,7 +97,7 @@ public class PaymentController : ControllerBase
                         {
                             await _transferService.VerifyFailedTransfer(eventData.Data.Reference);
                         }
-                        catch (System.Exception e)
+                        catch (Exception ex) when (ex is HttpRequestException || ex is Exception)
                         {
                             SentrySdk.ConfigureScope(scope =>
                             {
@@ -102,7 +106,7 @@ public class PaymentController : ControllerBase
                                         {"action", "Verify Failed Transfer"},
                                         {"reference", eventData.Data.Reference},
                                 });
-                                SentrySdk.CaptureException(e);
+                                SentrySdk.CaptureException(ex);
                             });
                         }
                         break;
@@ -111,7 +115,7 @@ public class PaymentController : ControllerBase
                         {
                             await _transferService.VerifyReverseTransfer(eventData.Data.Reference);
                         }
-                        catch (System.Exception e)
+                        catch (Exception ex) when (ex is HttpRequestException || ex is Exception)
                         {
                             SentrySdk.ConfigureScope(scope =>
                             {
@@ -120,7 +124,7 @@ public class PaymentController : ControllerBase
                                         {"action", "Verify Reversed Transfer"},
                                         {"reference", eventData.Data.Reference},
                                 });
-                                SentrySdk.CaptureException(e);
+                                SentrySdk.CaptureException(ex);
                             });
                         }
                         break;
@@ -146,6 +150,110 @@ public class PaymentController : ControllerBase
 
         return Ok();
     }
+
+    /// <summary>
+    /// Retry payment verification
+    /// </summary>
+    /// <param name="id">reference of payment</param>
+    /// <response code="200">Payment Verified Successfully</response>
+    /// <response code="500">An unexpected error occured</response>
+    [Authorize]
+    [HttpPost("{id}/verify")]
+    [ProducesResponseType(
+        StatusCodes.Status200OK,
+        Type = typeof(ApiEntityResponse<OutputManualVerifyPayment>)
+    )]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError,
+        Type = typeof(StatusCodeResult)
+    )]
+    public async Task<IActionResult> ManualPaymentVerification(string id)
+    {
+        try
+        {
+            // find payment record by reference
+            var payment = await _paymentService.GetPaymentById(id);
+
+            // call paystack verify
+            var verifyResponse = await PaystackVerifyTransactionConfiguration.Call(_appConstantsConfiguration.PaystackSecretKey, payment.Reference);
+            if (verifyResponse == null || !verifyResponse.Status)
+            {
+                throw new HttpRequestException("Payment verification failed", null, HttpStatusCode.BadRequest);
+            }
+
+            // update payment record based on status: https://paystack.com/docs/payments/verify-payments/
+            OutputManualVerifyPayment response = new OutputManualVerifyPayment
+            {
+                TransactionStatus = verifyResponse?.Data.Status ?? "unknown",
+            };
+
+            switch (verifyResponse?.Data.Status)
+            {
+                case "success":
+                    // update payment record as successful
+                    await _paymentService.VerifySuccessPayment(new PaystackWebhookInput
+                    {
+                        Event = "charge.success",
+                        Data = verifyResponse.Data
+                    });
+                    response.Message = verifyResponse?.Data.Message ?? "Payment verified and processed successfully";
+                    break;
+
+                case "failed":
+                    // update payment record as failed
+                    await _paymentService.VerifyFailedPayment(new DTOs.PaystackWebhookInput
+                    {
+                        Event = "charge.failed",
+                        Data = verifyResponse.Data
+                    });
+                    response.Message = verifyResponse?.Data.Message ?? "Payment verification failed";
+                    break;
+
+                case "abandoned":
+                    // update payment record as failed
+                    await _paymentService.VerifyCancelledPayment(new DTOs.PaystackWebhookInput
+                    {
+                        Event = "charge.abandoned",
+                        Data = verifyResponse.Data
+                    });
+                    response.Message = verifyResponse?.Data.Message ?? "Payment Cancelled";
+                    break;
+
+                default:
+                    response.Message = verifyResponse?.Data.Message;
+                    break;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputManualVerifyPayment>(response, null).Result()) { StatusCode = StatusCodes.Status200OK };
+
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<AnyType?>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to verify payment by id: {id}. Exception: {e}");
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Get Package by id"},
+                    {"id", id}
+               });
+                SentrySdk.CaptureException(e);
+            });
+            return new StatusCodeResult(500);
+        }
+    }
+
 
     private bool VerifySignature(string requestBody, string signature)
     {

@@ -9,9 +9,10 @@ import { errorToast } from '@/lib/custom-toast-functions.tsx'
 interface Props {
 	onClose: () => void
 	isOpened: boolean
+	activeSubcription: CreatorSubscription
 }
 
-export function CancelSubscriptionDialog({ onClose, isOpened }: Props) {
+export function CancelSubscriptionDialog({ onClose, isOpened, activeSubcription }: Props) {
 	const [isLoading, setIsLoading] = useState(false)
 	const { mutate } = useCancelSubscription()
 
@@ -27,6 +28,7 @@ export function CancelSubscriptionDialog({ onClose, isOpened }: Props) {
 			},
 		})
 	}
+
 	return (
 		<Modal
 			className="w-full md:w-4/6 lg:w-2/6"
@@ -38,7 +40,7 @@ export function CancelSubscriptionDialog({ onClose, isOpened }: Props) {
 			<div className="mt-3">
 				<p className="text-sm text-gray-600">
 					This action will end your current subscription plan. You&apos;ll still
-					have access to your current subscription until {dayjs().format('L')}
+					have access to your current subscription until <b>{dayjs(activeSubcription?.endedAt).format('L')}</b>
 				</p>
 			</div>
 

@@ -149,6 +149,8 @@ builder.Services.AddSingleton<CreatorApplicationService>();
 builder.Services.AddSingleton<CreatorService>();
 
 // billing services
+builder.Services.AddSingleton<MfoniPackageService>();
+builder.Services.AddSingleton<SavedCardService>();
 builder.Services.AddSingleton<WalletService>();
 builder.Services.AddSingleton<SubscriptionService>();
 builder.Services.AddSingleton<PaymentService>();
@@ -179,12 +181,14 @@ builder.Services.AddSingleton<WaitlistService>();
 builder.Services.AddSingleton<ReportContentCaseService>();
 
 // inject transformers
+builder.Services.AddSingleton<MfoniPackageTransformer>();
 builder.Services.AddSingleton<AdminTransformer>();
 builder.Services.AddSingleton<ContentTransformer>();
 builder.Services.AddSingleton<UserTransformer>();
 builder.Services.AddSingleton<CreatorApplicationTransformer>();
 builder.Services.AddSingleton<CreatorTransformer>();
 builder.Services.AddSingleton<CreatorSubscriptionTransformer>();
+builder.Services.AddSingleton<SavedCardTransformer>();
 builder.Services.AddSingleton<WalletTransactionTransformer>();
 builder.Services.AddSingleton<CreatorSubscriptionPurchaseTransformer>();
 builder.Services.AddSingleton<CollectionTransformer>();
