@@ -115,8 +115,6 @@ public class PaymentService
 
                 var paymentRecord = await _paymentCollection.Find(session, payment => payment.Reference == input.Data.Reference).FirstOrDefaultAsync();
 
-                _logger.LogInformation(JsonConvert.SerializeObject(paymentRecord));
-                _logger.LogInformation(JsonConvert.SerializeObject(input));
                 if (paymentRecord is null)
                 {
                     throw new HttpRequestException("PaymentNotFound");
@@ -275,9 +273,9 @@ public class PaymentService
                         Email = input.Data.Customer?.Email ?? "UNKNOWN",
                     }, session);
 
-                    await session.CommitTransactionAsync();
 
                 }
+                await session.CommitTransactionAsync();
 
             }
             catch (MongoCommandException ex) when (ex.CodeName == "IllegalOperation")

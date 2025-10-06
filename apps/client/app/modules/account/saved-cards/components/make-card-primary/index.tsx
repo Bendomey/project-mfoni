@@ -2,7 +2,7 @@
 import { useFetcher } from '@remix-run/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { RemoveCardModal } from './modal.tsx'
+import { MakeCardPrimaryModal } from './modal.tsx'
 import { QUERY_KEYS } from '@/constants/index.ts'
 import { useDisclosure } from '@/hooks/use-disclosure.tsx'
 import { errorToast } from '@/lib/custom-toast-functions.tsx'
@@ -14,12 +14,12 @@ interface Props {
     }) => React.ReactNode
 }
 
-export function RemoveCardButton({
+export function MakeCardPrimaryButton({
 	savedCard,
     children
 }: Props) {
 	const queryClient = useQueryClient()
-	const removeCardModalState = useDisclosure()
+	const makeCardPrimaryModalState = useDisclosure()
 	const fetcher = useFetcher<{
 		error?: string
 		success?: boolean
@@ -29,7 +29,7 @@ export function RemoveCardButton({
 	useEffect(() => {
 		if (fetcher.state === 'idle' && fetcher?.data?.error) {
 			errorToast(fetcher?.data.error, {
-				id: 'error-removing-card',
+				id: 'error-making-card-primary',
 			})
 		}
 	}, [fetcher?.data, fetcher.state])
@@ -40,7 +40,7 @@ export function RemoveCardButton({
 				savedCardId: savedCard.id,
 			},
 			{
-				action: `/api/remove-saved-card`,
+				action: `/api/make-saved-card-primary`,
 				encType: 'multipart/form-data',
 				method: 'post',
 				preventScrollReset: true,
@@ -61,11 +61,11 @@ export function RemoveCardButton({
 
     return (
         <>
-            {children({ onClick: removeCardModalState.onOpen })}
-            <RemoveCardModal
+            {children({ onClick: makeCardPrimaryModalState.onOpen })}
+            <MakeCardPrimaryModal
                 savedCard={savedCard}
-                isOpened={removeCardModalState.isOpened}
-                onClose={removeCardModalState.onClose}
+                isOpened={makeCardPrimaryModalState.isOpened}
+                onClose={makeCardPrimaryModalState.onClose}
                 onSubmit={handleSubmit}
                 isSubmitting={isLoading}
             />

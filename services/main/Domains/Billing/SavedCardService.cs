@@ -15,12 +15,14 @@ public class SavedCardService
     private readonly AppConstants _appConstantsConfiguration;
     private readonly IMongoCollection<Models.SavedCard> _savedCardCollection;
     private readonly IMongoCollection<Models.User> _userCollection;
+    private readonly MongoClient _mongoClient;
 
     public SavedCardService(ILogger<SavedCardService> logger, DatabaseSettings databaseConfig, IOptions<AppConstants> appConstants)
     {
         _logger = logger;
         _appConstantsConfiguration = appConstants.Value;
 
+        _mongoClient = databaseConfig.Client;
         var database = databaseConfig.Database;
         _savedCardCollection = database.GetCollection<Models.SavedCard>(appConstants.Value.SavedCardCollection);
         _userCollection = database.GetCollection<Models.User>(appConstants.Value.UserCollection);
@@ -47,7 +49,7 @@ public class SavedCardService
 
     public async Task<Models.SavedCard> Create(Models.SavedCard input, IClientSessionHandle? session)
     {
-        var user = await GetUserById(session, input.UserId);
+        var user = await GetUserById(input.UserId);
 
         if (input.Reusable)
         {
@@ -156,7 +158,7 @@ public class SavedCardService
                 .Unset(x => x.AuthorizationCode) // invalidate auth code
         );
 
-        var user = await GetUserById(null, savedCard.UserId);
+        var user = await GetUserById(savedCard.UserId);
 
         var body = EmailTemplates.SuccessfulCardDeletedBody
                     .Replace("{name}", user.Name)
@@ -220,9 +222,89 @@ public class SavedCardService
         return await _savedCardCollection.CountDocumentsAsync(filter);
     }
 
-    private async Task<Models.User> GetUserById(IClientSessionHandle? session, string userId)
+    public async Task<Models.SavedCard> SetAsPrimary(string id, string userId)
     {
-        var user = await _userCollection.Find(session, user => user.Id == userId).FirstOrDefaultAsync();
+        var savedCard = await GetById(id);
+
+        if (savedCard.UserId != userId)
+        {
+            throw new HttpRequestException(
+                "SavedCardNotFound",
+                inner: default,
+                statusCode: HttpStatusCode.NotFound
+            );
+        }
+
+        if (!savedCard.Reusable || savedCard.Status != "SavedCard.Status.Active")
+        {
+            throw new HttpRequestException("Cannot set a non-reusable or inactive card as primary.");
+        }
+
+        using (var session = await _mongoClient.StartSessionAsync())
+        {
+            try
+            {
+                session.StartTransaction();
+
+                // unset any existing primary card for the user.
+                var filter = Builders<Models.SavedCard>.Filter.Eq(p => p.UserId, userId) &
+                             Builders<Models.SavedCard>.Filter.Exists(p => p.DefaultedAt) &
+                             Builders<Models.SavedCard>.Filter.Eq(p => p.DeletedAt, null);
+
+                await _savedCardCollection.UpdateManyAsync(
+                    session,
+                    filter,
+                    Builders<Models.SavedCard>.Update.Unset(x => x.DefaultedAt)
+                );
+
+                // set the selected card as primary.
+                savedCard.DefaultedAt = DateTime.UtcNow;
+                await _savedCardCollection.ReplaceOneAsync(
+                     session,
+                     c => c.Id == savedCard.Id,
+                     savedCard
+                );
+
+                await session.CommitTransactionAsync();
+
+            }
+            catch (MongoCommandException ex) when (ex.CodeName == "IllegalOperation")
+            {
+                _logger.LogInformation($"Details: {ex.Message}");
+                await session.AbortTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                await session.AbortTransactionAsync();
+                _logger.LogError(ex, "Error setting card as primary");
+                throw;
+            }
+        }
+
+        var user = await GetUserById(savedCard.UserId);
+
+        var body = EmailTemplates.SavedCardSetAsPrimaryBody
+                    .Replace("{name}", user.Name)
+                    .Replace("{cardType}", StringLib.CapitalizeFirstLetter(savedCard.CardType.ToLower()))
+                    .Replace("{last4Digits}", savedCard.Last4)
+                    .Replace("{dateUpdated}", DateTime.Now.ToString("dd MMMM, yyyy"))
+                    .Replace("{viewCardLink}", $"{_appConstantsConfiguration.WebsiteUrl}/account/saved-cards");
+
+        var _ = EmailConfiguration.Send(new SendEmailInput
+        {
+            From = _appConstantsConfiguration.EmailFrom,
+            Email = savedCard.Email,
+            Subject = EmailTemplates.SavedCardSetAsPrimarySubject,
+            Message = body,
+            ApiKey = _appConstantsConfiguration.ResendApiKey
+        });
+
+        return savedCard; // return the updated card
+    }
+
+    private async Task<Models.User> GetUserById(string userId)
+    {
+        var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
         if (user is null)
         {
             throw new HttpRequestException("UserNotFound");

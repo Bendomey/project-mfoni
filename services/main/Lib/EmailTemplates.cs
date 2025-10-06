@@ -1,4 +1,6 @@
 
+using Grpc.Core;
+
 namespace main.Lib;
 
 public class EmailTemplates
@@ -23,6 +25,7 @@ Looking forward to having you on board! 🚀
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string VerifyAccountSubject = @"Verify Account";
@@ -42,6 +45,7 @@ Need help? Contact our support team.
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string WaitlistSubject = "You're in! Welcome to the mfoni crew 📸";
@@ -66,6 +70,7 @@ Stay tuned and keep snapping!
 The mfoni Team
 P.S. Let's hang out on socials:
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
 
 #mfoniComingSoon #GhanaPhotography #SnapShareDiscover
     ";
@@ -81,6 +86,7 @@ Password: {password}
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string CreatorApplicationApprovedSubject = "Your mfoni Creator Application has been approved! 🎉";
@@ -94,6 +100,7 @@ You can now start uploading your contents and earn money.
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string CreatorApplicationRejectedSubject = "Your mfoni Creator Application has been rejected";
@@ -107,6 +114,7 @@ Reason: {reason}
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string CreatorApplicationSubmittedSubject = "Your mfoni Creator Application has been submitted";
@@ -118,6 +126,7 @@ Your mfoni Creator Application has been submitted successfully. We'll review it 
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string NewCreatorWithPremiumPackageButLowWalletSubject = "⚠️ Your mfoni package subscription needs your attention!";
@@ -131,6 +140,7 @@ Visit https://mfoni.app/account/wallet to manage this. If you have any questions
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     // TODO: bring this back when we support card.
@@ -148,6 +158,7 @@ Twitter(https://twitter.com/mfoniapp)
 
     // The mfoni Team
     // Twitter(https://twitter.com/mfoniapp)
+    // Email: support@mfoni.app
     //     ";
 
     public static string RemindingSubscribersToTopupTheirWalletSubject = "🚨 Only {days} Day(s) Left to Renew – Top Up Your Wallet Today!";
@@ -169,6 +180,7 @@ Thank you for being a valued subscriber!
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string RemindingOverDueSubscribersToTopupTheirWalletSubject = "⚠️ Your Subscription is Overdue – Top Up Your Wallet Now!";
@@ -193,6 +205,7 @@ We appreciate your prompt action and thank you for being a valued subscriber!
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulSubscriptionRenewalSubject = "🎉 Your Subscription Has Been Successfully Renewed!";
@@ -215,6 +228,7 @@ Thank you for being a valued member of our community!
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string FailedSubscriptionSubject = "⚠️ Subscription Renewal Failed – You've Been Moved to the Free Tier";
@@ -237,6 +251,7 @@ If you have any questions or need further assistance, feel free to reach out to 
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string CreatorSubscriptionCancelledSubject = "⚠️ Your Subscription Has Been Canceled – Access Until {expiryDate}";
@@ -262,6 +277,7 @@ Thank you for giving us the opportunity to serve you.
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulSubscriptionSubject = "Welcome! Your Subscription Is Confirmed";
@@ -287,6 +303,7 @@ We’re here to ensure you get the most out of your subscription. Don’t hesita
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulSubscriptionImmediateUpgradeSubject = "Your Upgrade to {package} is Active!";
@@ -313,6 +330,7 @@ Thank you for choosing mfoni. We’re excited to support your journey!
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulSubscriptionScheduledUpgradeSubject = "Your Upgrade to {package} is Scheduled!";
@@ -340,6 +358,7 @@ Thank you for choosing mfoni. We’re excited for you to experience the benefits
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulSubscriptionScheduledDowngradeSubject = "Your Downgrade to {package} is Scheduled!";
@@ -364,6 +383,7 @@ Thank you for choosing mfoni. We’re here to support you every step of the way!
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulContentPurchaseSubjectForBuyer = "Your Purchase is Confirmed! 🎉";
@@ -385,6 +405,7 @@ If you have any questions or issues, feel free to reach out to our support team.
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulContentPurchaseSubjectForCreator = "You've Made a Sale! 🎉";
@@ -405,6 +426,7 @@ Keep creating amazing content! 🚀
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string ContentReportedSubject = "Your Report Has Been Submitted – Case #{caseNumber}";
@@ -427,6 +449,7 @@ If you have any additional details to share, feel free to reach out to us on our
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string ContentReportAcknowledgedSubject = "Update on Your Report – Case #{caseNumber}";
@@ -449,6 +472,7 @@ Thank you for helping keep Mfoni a safe and respectful platform.
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string ContentReportResolvedSubject = "Case #{caseNumber} – Your Report Has Been Resolved";
@@ -471,6 +495,7 @@ We appreciate your help in making Mfoni a better place. If you have any question
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulWalletTopupSubject = "Wallet Top-Up Successful! 🎉";
@@ -493,6 +518,7 @@ If you have any questions or need assistance, feel free to reach out to our supp
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulCardSavedSubject = "Your Card Has Been Added Successfully 💳";
@@ -515,6 +541,7 @@ If you didn't add this card, please contact our support team immediately at supp
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulSavedCardButNotReusuableSubject = "Card Added – Limited Use ⚠️";
@@ -539,6 +566,7 @@ Thank you for your understanding, and we appreciate you being part of Mfoni.
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
     public static string SuccessfulCardDeletedSubject = "Your Card Has Been Removed Successfully";
@@ -552,6 +580,29 @@ If you didn't request this removal, please contact our support team immediately 
 
 The mfoni Team
 Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
     ";
 
+    public static string SavedCardSetAsPrimarySubject = "Your Primary Card Has Been Updated 💳";
+
+    public static string SavedCardSetAsPrimaryBody = @"
+Hello {name},
+
+You've successfully set a new primary payment card on your Mfoni Wallet.
+
+📌 Card Details:
+
+Card Type: {cardType}
+Card Ending: **** {last4Digits}
+Date Updated: {dateUpdated}
+Card Link: {viewCardLink}
+
+This card will now be used by default for all future purchases and wallet top-ups.
+
+If you didn't make this change, please contact our support team immediately to secure your account.
+
+The mfoni Team
+Twitter(https://twitter.com/mfoniapp)
+Email: support@mfoni.app
+    ";
 }

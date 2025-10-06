@@ -278,4 +278,54 @@ public class SavedCardController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Set saved card as primary
+    /// </summary>
+    /// <response code="200">SavedCard Set as Primary Successfully</response>
+    /// <response code="401">Unauthorize</response>
+    /// <response code="500">An unexpected error occured</response>
+    [HttpPost("{id}/set-as-primary")]
+    [ProducesResponseType(typeof(OutputResponse<OutputSavedCard>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OutputResponse<AnyType>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> SetCardAsPrimary([FromRoute] string id)
+    {
+        try
+        {
+            _logger.LogInformation("setting saved card as primary: " + id);
+            var currentUser = CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity);
+
+            var savedCard = await _savedCardService.SetAsPrimary(id, currentUser.Id);
+
+            var outputCard = _savedCardTransformer.Transform(savedCard);
+            return new ObjectResult(new GetEntityResponse<OutputSavedCard>(outputCard, null).Result()) { StatusCode = StatusCodes.Status200OK };
+        }
+        catch (HttpRequestException e)
+        {
+            var statusCode = HttpStatusCode.BadRequest;
+            if (e.StatusCode != null)
+            {
+                statusCode = (HttpStatusCode)e.StatusCode;
+            }
+
+            return new ObjectResult(new GetEntityResponse<OutputSavedCard>(null, e.Message).Result()) { StatusCode = (int)statusCode };
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError($"Failed to set saved card as primary. Exception: {e}");
+
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.SetTags(new Dictionary<string, string>
+                {
+                    {"action", "Set SavedCard as Primary"},
+                    {"userId", CurrentUser.GetCurrentUser(HttpContext.User.Identity as ClaimsIdentity).Id},
+                    {"id", id},
+                });
+                SentrySdk.CaptureException(e);
+            });
+
+            return new StatusCodeResult(500);
+        }
+    }
 }

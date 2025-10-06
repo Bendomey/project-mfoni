@@ -79,10 +79,40 @@ export const deleteSavedCard = async (
 	apiConfig: ApiConfigForServerConfig,
 ) => {
 	try {
-		const response = await fetchClient<ApiResponse<boolean>>(
+		const response = await fetchClient<ApiResponse<unknown>>(
 			`/v1/saved-cards/${savedCardId}`,
 			{
 				method: 'DELETE',
+				...apiConfig,
+			},
+		)
+
+		if (!response.parsedBody.status && response.parsedBody.errorMessage) {
+			throw new Error(response.parsedBody.errorMessage)
+		}
+        
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			throw error
+		}
+
+		// Error from server.
+		if (error instanceof Response) {
+			const response = await error.json()
+			throw new Error(response.errorMessage)
+		}
+	}
+}
+
+export const makeSavedCardPrimary = async (
+	savedCardId: string,
+	apiConfig: ApiConfigForServerConfig,
+) => {
+	try {
+		const response = await fetchClient<ApiResponse<unknown>>(
+			`/v1/saved-cards/${savedCardId}/set-as-primary`,
+			{
+				method: 'POST',
 				...apiConfig,
 			},
 		)

@@ -3,6 +3,7 @@ import { ChevronLeftIcon, ExclamationCircleIcon, CreditCardIcon, ExclamationTria
 import { CheckBadgeIcon, TrashIcon } from '@heroicons/react/24/solid';
 import dayjs from 'dayjs';
 import { AddCardButton } from './components/add-card/index.tsx';
+import { MakeCardPrimaryButton } from './components/make-card-primary/index.tsx';
 import { PrimaryCardCard } from './components/primary-card-card.tsx';
 import { RemoveCardButton } from './components/remove-card/index.tsx';
 import { useGetSavedCards } from '@/api/saved-cards/index.ts';
@@ -12,7 +13,6 @@ import { Button } from "@/components/button/index.tsx";
 import { FlyoutContainer } from '@/components/flyout/flyout-container.tsx';
 import { Footer } from "@/components/footer/index.tsx";
 import { Header } from "@/components/layout/index.ts";
-import { Loader } from '@/components/loader/index.tsx';
 import { classNames } from '@/lib/classNames.ts';
 import { toFirstUpperCase } from '@/lib/strings.ts';
 
@@ -115,13 +115,18 @@ export const SavedCardsModule = () => {
                                         </p>
                                     </div>
                                     <div>
-                                        <AddCardButton>
-                                            {({ onClick }) => (
-                                                <Button onClick={onClick} size='sm' className="mt-3 sm:mt-0 sm:ml-3">
-                                                    Add New Card
-                                                </Button>
-                                            )}
-                                        </AddCardButton>
+                                        {
+                                            secondaryCards.length ? (
+                                                <AddCardButton>
+                                                    {({ onClick }) => (
+                                                        <Button onClick={onClick} size='sm' className="mt-3 sm:mt-0 sm:ml-3">
+                                                            Add New Card
+                                                        </Button>
+                                                    )}
+                                                </AddCardButton>
+                                            ) : null
+                                        }
+
                                     </div>
                                 </div>
                                 <div className="mt-5 flow-root">
@@ -266,19 +271,19 @@ export const SavedCardsModule = () => {
                                                                                                 </div>
                                                                                             }
                                                                                         >
-                                                                                            <Button
-                                                                                                // onClick={onClick}
-                                                                                                disabled={isLoading}
-                                                                                                color='successGhost'
-                                                                                                title="Make Card Primary"
-                                                                                                className=""
-                                                                                            >
-                                                                                                {isLoading ? (
-                                                                                                    <Loader size="5" />
-                                                                                                ) : (
-                                                                                                    <CheckBadgeIcon className="h-4 w-auto text-green-600" />
+                                                                                            <MakeCardPrimaryButton savedCard={savedCard}>
+                                                                                                {({ onClick }) => (
+                                                                                                    <Button
+                                                                                                        onClick={onClick}
+                                                                                                        disabled={isLoading}
+                                                                                                        color='successGhost'
+                                                                                                        title="Make Card Primary"
+                                                                                                        className=""
+                                                                                                    >
+                                                                                                        <CheckBadgeIcon className="h-4 w-auto text-green-600" />
+                                                                                                    </Button>
                                                                                                 )}
-                                                                                            </Button>
+                                                                                            </MakeCardPrimaryButton>
                                                                                         </FlyoutContainer>
                                                                                     ) : null}
                                                                                 </td>
